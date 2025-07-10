@@ -1,0 +1,72 @@
+import { Colors } from '@/constants/Colors'
+import { ToastMessages } from '@/constants/Messages'
+import { hasInternetAvailable } from '@/helpers/util'
+import { dbCheckSecondsSinceLastRefresh, dbHasManhwas, dbShouldUpdate } from '@/lib/database'
+import { router } from 'expo-router'
+import { useSQLiteContext } from 'expo-sqlite'
+import React from 'react'
+import Toast from 'react-native-toast-message'
+import BooleanRotatingButton from './BooleanRotatingButton'
+
+
+interface UpdateDatabaseProps {
+    iconSize?: number
+    iconColor?: string,
+    type: "server" | "client"
+}
+
+
+const UpdateDatabaseButton = ({
+    iconSize = 28, 
+    iconColor = Colors.white,
+    type
+}: UpdateDatabaseProps) => {
+
+    const db = useSQLiteContext()    
+
+    const update = async () => {        
+        const hasInternet = await hasInternetAvailable()
+        if (!hasInternet) { 
+            Toast.show(ToastMessages.EN.NO_INTERNET)
+            return 
+        }
+
+        const shouldUpdate = await dbShouldUpdate(db, type)
+        let hasMangas = true
+
+        if (!shouldUpdate) {
+            hasMangas = await dbHasManhwas(db)
+        }
+        
+        if (!shouldUpdate && hasMangas) {
+            const secondsUntilRefresh = await dbCheckSecondsSinceLastRefresh(db, type)
+            Toast.show({
+                text1: "Wait ⌛", 
+                text2: `You can try again in ${secondsUntilRefresh} seconds`, 
+                type: 'info',
+                visibilityTime: 3000
+            })
+        } else {
+            Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE)
+            try {
+                // await dbUpdateDatabase(db)
+                Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED)
+                router.replace("/(pages)/HomePage")
+                return
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        
+    }
+
+    return (           
+        <BooleanRotatingButton 
+            onPress={update} 
+            iconSize={iconSize} 
+            iconColor={iconColor}
+        />
+    )
+}
+
+export default UpdateDatabaseButton

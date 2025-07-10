@@ -1,29 +1,76 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
+import { Colors } from '@/constants/Colors';
+import { dbMigrate } from '@/lib/database';
+import { AppStyle } from '@/styles/AppStyle';
 import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { SQLiteProvider } from 'expo-sqlite';
+import React from 'react';
+import { StatusBar, StyleSheet, Text, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Toast from 'react-native-toast-message';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+const TOAST_CONFIG = {
+  success: ({ text1, text2 }: {text1: string, text2: string}) => (
+    <View style={styles.toast}>
+      <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 18}]}>{text1}</Text>
+      {text2 && <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 16}]}>{text2}</Text>}
+      <View style={{position: 'absolute', left: 0, top: 0, borderTopLeftRadius: 4, borderBottomLeftRadius: 4, backgroundColor: Colors.ononokiGreen, height: 66, width: 5}} />
+    </View>
+  ),
+  
+  error: ({ text1, text2 }: {text1: string, text2: string}) => (
+    <View style={styles.toast}>
+      <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 18}]}>{text1}</Text>
+      {text2 && <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 16}]}>{text2}</Text>}
+      <View style={{position: 'absolute', left: 0, top: 0, borderTopLeftRadius: 4, borderBottomLeftRadius: 4, backgroundColor: Colors.neonRed, height: 66, width: 5}} />
+    </View>
+  ),
+  
+  info: ({ text1, text2 }: {text1: string, text2: string}) => (
+    <View style={styles.toast}>
+      <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 18}]}>{text1}</Text>
+      {text2 && <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 16}]}>{text2}</Text>}
+      <View style={{position: 'absolute', left: 0, top: 0, borderTopLeftRadius: 4, borderBottomLeftRadius: 4, backgroundColor: Colors.yellow, height: 66, width: 5}} />
+    </View>
+  )
+};
 
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
-  }
 
+const _layout = () => {
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
-  );
+      <GestureHandlerRootView style={{flex: 1, backgroundColor: Colors.backgroundColor}} >
+        <StatusBar hidden={true} barStyle={'light-content'} animated={true}/>
+        <SQLiteProvider databaseName='ononoki.db' onInit={dbMigrate}>
+          <Stack>
+              <Stack.Screen name='index' options={{headerShown: false}} />
+              <Stack.Screen name='(pages)/HomePage' options={{headerShown: false}} />
+              <Stack.Screen name='(pages)/ManhwaPage' options={{headerShown: false}} />
+              <Stack.Screen name='(pages)/ManhwaSearch' options={{headerShown: false}} />
+          </Stack>
+          <Toast 
+            position='bottom' 
+            config={TOAST_CONFIG as any} 
+            bottomOffset={60} 
+            visibilityTime={2500} 
+            avoidKeyboard={true} 
+            swipeable={true}/>
+        </SQLiteProvider>
+      </GestureHandlerRootView>    
+  )
 }
+
+export default _layout
+
+
+const styles = StyleSheet.create({
+  toast: {
+    height: 66, 
+    width: '90%', 
+    alignItems: "flex-start",
+    justifyContent: "center",
+    paddingHorizontal: 12, 
+    paddingVertical: 6, 
+    borderRadius: 4, 
+    backgroundColor: Colors.gray
+  }
+})
