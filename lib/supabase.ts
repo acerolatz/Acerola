@@ -1,5 +1,6 @@
+import { Manhwa, OugiUser } from "@/helpers/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { createClient } from '@supabase/supabase-js';
+import { createClient, Session } from '@supabase/supabase-js';
 
 
 // RLS
@@ -15,3 +16,45 @@ export const supabase = createClient(supabaseUrl, supabaseKey as any, {
       detectSessionInUrl: false,
     },
 });
+
+
+export async function spGetSession(): Promise<Session | null> {
+    const { data: {session} } = await supabase.auth.getSession()
+    return session
+}
+
+
+export async function spFetchUser(
+    user_id: string
+): Promise<OugiUser | null> {
+
+    const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("user_id", user_id)
+        .single()
+
+    if (error) {
+        console.log("error spFetchUser", error)
+        return null
+    }
+
+    if (!data) {
+        console.log("no user found", user_id)
+        return null
+    }
+
+    return data
+}
+
+
+export async function spGetManhwas(): Promise<Manhwa[]> {
+    const { data, error } = await supabase.from("mv_manhwas").select("*")
+    
+    if (error) {
+        console.log("error spGetManhwas", error)
+        return []
+    }
+    
+    return data
+}

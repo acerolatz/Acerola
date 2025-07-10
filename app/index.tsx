@@ -114,15 +114,15 @@ const App = () => {
 
     return (
         <SafeAreaView style={AppStyle.safeArea} >
-            <View style={{flexDirection: 'row', alignItems: "center", paddingRight: 2, marginTop: 10, marginBottom: 10, justifyContent: "space-between"}} >
+            <Row style={{paddingRight: 2, marginTop: 10, marginBottom: 10, justifyContent: "space-between"}} >
                 <AppLogo/>
-                <Row style={{width: '100%', gap: 16}} >
-                    <Ionicons name='sync' size={28} color={Colors.ononokiBlue} />
-                    <Ionicons name='search' size={28} color={Colors.ononokiBlue} />
-                    <Ionicons name='dice' size={28} color={Colors.ononokiBlue} />
-                    <Ionicons name='options' size={28} color={Colors.ononokiBlue} />
+                <Row style={{gap: 16}} >
+                    <Ionicons name='sync' size={28} color={Colors.white} />
+                    <Ionicons name='search' size={28} color={Colors.white} />
+                    <Ionicons name='dice' size={28} color={Colors.white} />
+                    <Ionicons name='options' size={28} color={Colors.white} />
                 </Row>
-            </View>
+            </Row>
             <View style={{flex: 1, alignItems: "center", justifyContent: "center"}} >
                 <ActivityIndicator size={32} color={Colors.orange} />
             </View>

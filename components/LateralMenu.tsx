@@ -85,10 +85,6 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
         // router.navigate("/(pages)/Account")
     }
 
-    const usersPage = () => {
-        // router.navigate("/(pages)/UsersPage")
-    }
-
     const loginPage = () => {
         // router.navigate("/(auth)/SignIn")
     }
@@ -127,16 +123,12 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
         // router.navigate("/(pages)/Releases")
     }
 
-    const openChat = () => {
-        // router.navigate("/ChatPage")
-    }
-
     return (
         <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} >
             <View style={styles.container} >
                 <Row style={{justifyContent: "space-between", marginBottom: 10}} >
-                    <Text style={[AppStyle.textHeader, {color: Colors.ononokiBlue, fontFamily: "LeagueSpartan_600SemiBold"}]}>Menu</Text>
-                    <CloseBtn onPress={closeMenu} color={Colors.ononokiBlue} />
+                    <Text style={[AppStyle.textHeader, {color: Colors.orange, fontFamily: "LeagueSpartan_600SemiBold"}]}>Menu</Text>
+                    <CloseBtn onPress={closeMenu} color={Colors.orange} />
                 </Row>
             
                 {
@@ -157,22 +149,6 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
                         iconColor={Colors.accountColor}
                     />
                 }
-
-                <Option 
-                    onPress={usersPage} 
-                    title='Users' 
-                    iconName='people-outline'
-                    showLoading={false}
-                    iconColor={Colors.peopleColor}
-                />
-
-                <Option 
-                    onPress={openChat} 
-                    title='Chats' 
-                    iconName='chatbubbles-outline'
-                    showLoading={false}
-                    iconColor={Colors.chatColor}
-                />
 
                 <Option 
                     onPress={libraryPage} 
@@ -200,7 +176,7 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
 
                 <Option 
                     onPress={openMangaRequest} 
-                    title='Request Manga'
+                    title='Request Manhwa'
                     iconName='megaphone-outline'
                     showLoading={false}
                     iconColor={Colors.requestMangaColor}

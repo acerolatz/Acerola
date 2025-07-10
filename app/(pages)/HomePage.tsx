@@ -67,15 +67,15 @@ const HomePage = () => {
         <SafeAreaView style={AppStyle.safeArea} >
             
             {/* Header */}
-            <View style={{flexDirection: 'row', alignItems: "center", paddingRight: 2, marginBottom: 10, justifyContent: "space-between"}} >
+            <Row style={{width: '100%', paddingRight: 2, marginBottom: 10, justifyContent: "space-between"}} >
                 <AppLogo/>
-                <Row style={{width: '100%', gap: 16}} >
-                    <UpdateDatabaseButton iconColor={Colors.ononokiBlue} type='client' />
-                    <Button iconName='search' onPress={searchPress} iconSize={28} iconColor={Colors.ononokiBlue} showLoading={false} />
-                    <OpenRandomManhwaButton color={Colors.ononokiBlue} size={28} backgroundColor='' />
-                    <Button iconName='options' onPress={toggleMenu} iconSize={28} iconColor={Colors.ononokiBlue} showLoading={false} />
+                <Row style={{gap: 16}} >
+                    <UpdateDatabaseButton iconColor={Colors.white} type='client' />
+                    <Button iconName='search' onPress={searchPress} iconSize={28} iconColor={Colors.white} showLoading={false} />
+                    <OpenRandomManhwaButton color={Colors.white} size={28} backgroundColor='' />
+                    <Button iconName='options' onPress={toggleMenu} iconSize={28} iconColor={Colors.white} showLoading={false} />
                 </Row>
-            </View>
+            </Row>
 
             {/* Main content */}
             <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} >
