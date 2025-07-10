@@ -1,0 +1,224 @@
+import { AppConstants } from '@/constants/AppConstants'
+import { Colors } from '@/constants/Colors'
+import { ToastMessages } from '@/constants/Messages'
+import { hp, wp } from '@/helpers/util'
+import { AppStyle } from '@/styles/AppStyle'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import { useRouter } from 'expo-router'
+import React, { useState } from 'react'
+import {
+    ActivityIndicator,
+    Linking,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View
+} from 'react-native'
+import Toast from 'react-native-toast-message'
+import CloseBtn from './buttons/CloseButton'
+import Row from './util/Row'
+
+
+
+const ICON_SIZE = 26
+
+
+interface OptionProps {
+    onPress: () => void
+    iconColor?: string
+    title: string
+    iconName: string
+    showLoading?: boolean
+}
+
+
+const Option = ({onPress, title, iconName, iconColor = Colors.white, showLoading = true}: OptionProps) => {
+
+    const [loading, setLoading] = useState(false)
+
+    const p = async () => {
+        setLoading(true)
+        await onPress()
+        setLoading(false)
+    }
+
+    if (loading && showLoading) {
+        return (
+            <View
+                style={styles.link}
+                hitSlop={AppConstants.HIT_SLOP} >
+                <View style={{padding: 5, backgroundColor: iconColor, borderRadius: 4}} >
+                    <ActivityIndicator size={ICON_SIZE} color={Colors.backgroundColor} />
+                </View>
+                <Text style={[[AppStyle.textRegular, {fontSize: 16}]]}>{title}</Text>
+            </View>
+        )    
+    }
+
+    return (
+        <Pressable 
+            onPress={p} 
+            style={styles.link} 
+            hitSlop={AppConstants.HIT_SLOP} >
+            <View style={{padding: 5, backgroundColor: iconColor, borderRadius: 4}} >
+                <Ionicons name={iconName as any} size={ICON_SIZE} color={Colors.backgroundColor} />
+            </View>
+            <Text style={[[AppStyle.textRegular, {fontSize: 16}]]}>{title}</Text>
+        </Pressable>
+    )
+}
+
+
+interface LateralMenuProps {
+    closeMenu: () => any
+}
+
+const LateralMenu = ({closeMenu}: LateralMenuProps) => {
+        
+    const router = useRouter()    
+
+    const readingHistoryPage = () => {
+        router.navigate("/(pages)/ReadingHistoryPage")
+    }
+
+    const libraryPage = () => {
+        router.navigate("/(pages)/LibraryPage")
+    }
+
+    const scansPage = () => {
+        router.navigate("/(pages)/ScansPage")
+    }
+
+    const openDonate = () => {
+        router.navigate("/(pages)/DonatePage")
+    }
+
+    const openBugReport = () => {
+        router.navigate("/(pages)/BugReportPage")
+    }
+
+    const openDisclaimer = () => {
+        router.navigate("/(pages)/DisclaimerPage")
+    }
+
+    const openManhwaRequest = () => {
+        router.navigate("/(pages)/RequestManhwaPage")
+    }
+
+    const openReddit = async () => {
+        try {
+            await Linking.openURL(AppConstants.PORNHWA_REDDIT_URL)
+        } catch (error) {
+          Toast.show(ToastMessages.EN.UNABLE_TO_OPEN_BROWSER)
+        }
+    }
+
+    const openReleases = () => {
+        router.navigate("/(pages)/ReleasesPage")
+    }
+
+    return (
+        <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} >
+            <View style={styles.container} >
+                <Row style={{justifyContent: "space-between", marginBottom: 10}} >
+                    <Text style={[AppStyle.textHeader, {color: Colors.neonRed, fontFamily: "LeagueSpartan_600SemiBold"}]}>Menu</Text>
+                    <CloseBtn onPress={closeMenu} color={Colors.neonRed} />
+                </Row>                
+
+                <Option 
+                    onPress={libraryPage} 
+                    title='Library' 
+                    iconName='library-outline'
+                    showLoading={false}
+                    iconColor={Colors.libraryColor}
+                />
+                
+                <Option 
+                    onPress={readingHistoryPage} 
+                    title='Reading History' 
+                    iconName='book-outline'
+                    showLoading={false}
+                    iconColor={Colors.readingHistoryColor}
+                />
+
+                <Option 
+                    onPress={openDonate} 
+                    title='Donate' 
+                    iconName='cash-outline'
+                    showLoading={false}
+                    iconColor={Colors.donateColor}
+                />
+
+                <Option 
+                    onPress={openManhwaRequest} 
+                    title='Request Manhwa'
+                    iconName='megaphone-outline'
+                    showLoading={false}
+                    iconColor={Colors.requestMangaColor}
+                />
+
+                <Option 
+                    onPress={openReleases} 
+                    title='Releases' 
+                    iconName='git-branch-outline'
+                    showLoading={false}
+                    iconColor={Colors.releasesColor}
+                />
+
+                <Option 
+                    onPress={openBugReport} 
+                    title='Bug Report' 
+                    iconName='bug-outline'
+                    showLoading={false}
+                    iconColor={Colors.BugReportColor}
+                />
+
+                <Option 
+                    onPress={scansPage} 
+                    title='Scans' 
+                    iconName='earth-outline'
+                    showLoading={false}
+                    iconColor={Colors.scansColor}
+                />
+
+                <Option 
+                    onPress={openReddit} 
+                    title='Reddit' 
+                    iconName='logo-reddit'
+                    showLoading={false}
+                    iconColor={Colors.redditColor}
+                />
+
+                <Option 
+                    onPress={openDisclaimer} 
+                    title='Disclaimer' 
+                    iconName='newspaper-outline'
+                    showLoading={false}
+                    iconColor={Colors.disclaimerColor}
+                />
+
+            </View>            
+        </ScrollView>
+    )
+}
+
+export default LateralMenu
+
+const styles = StyleSheet.create({
+    container: {
+        width: '100%',
+        gap: 16,
+        paddingHorizontal: wp(4),
+        paddingTop: hp(4),       
+        marginTop: 6, 
+        marginBottom: 10 
+    },
+    link: {
+        width: '100%',
+        gap: 16,
+        flexDirection: 'row',
+        alignItems: "center",
+        justifyContent: "flex-start"
+    }
+})

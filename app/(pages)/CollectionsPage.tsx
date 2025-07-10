@@ -1,0 +1,67 @@
+import TopBar from '@/components/TopBar'
+import ReturnButton from '@/components/buttons/ReturnButton'
+import { Colors } from '@/constants/Colors'
+import { Collection } from '@/helpers/types'
+import { useCollectionState } from '@/store/collectionsState'
+import { AppStyle } from '@/styles/AppStyle'
+import { router } from 'expo-router'
+import React from 'react'
+import { FlatList, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native'
+
+
+const CollectionsPage = () => {
+    
+    const { collections } = useCollectionState()
+
+    const onGenrePress = async (collection: Collection) => {
+        router.navigate({
+            pathname: '/(pages)/CollectionPage', 
+            params: {
+                collection_id: collection.collection_id,
+                collection_name: collection.name,
+                collection_descr: collection.descr
+            }
+        })
+    }
+    
+    const renderItem = ({item, index}: {item: Collection, index: number}) => {
+        return (
+            <Pressable
+                onPress={() => onGenrePress(item)}
+                style={[styles.item, {marginRight: index % 2 == 0 ? '4%' : 0}]} >
+                <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor, textAlign: "center", alignSelf: "center"}]} >{item.name}</Text>
+            </Pressable>
+        )
+    }    
+
+    return (
+        <SafeAreaView style={AppStyle.safeArea}>
+            <TopBar title="Collections" titleColor={Colors.neonRed} >
+                <ReturnButton color={Colors.neonRed} />
+            </TopBar>
+            <FlatList
+                data={collections.slice(1, collections.length)}
+                initialNumToRender={30}
+                keyExtractor={(item) => item.collection_id.toString()}
+                showsVerticalScrollIndicator={false}
+                numColumns={2}
+                renderItem={renderItem}
+                ListFooterComponent={<View style={{height: 62}} />}
+            />
+        </SafeAreaView>
+    )
+}
+
+export default CollectionsPage
+
+const styles = StyleSheet.create({
+    item: {
+        width: '48%',
+        height: 52,
+        alignItems: "center", 
+        justifyContent: "center",         
+        backgroundColor: Colors.neonRed, 
+        borderRadius: 4,
+        marginBottom: 10
+    }
+})

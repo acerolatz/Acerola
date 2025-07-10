@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "acerola",
+    "slug": "acerola",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "acerola",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/splash-icon.png",
+        "backgroundColor": "#FA5454"
+      },
+      "icon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#FA5454"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.vitortz.acerola"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#FA5454"
+        }
+      ],
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "c83debc1-3111-42c0-ac72-aff9109d9675"
+      }
+    }
+  }
+}
