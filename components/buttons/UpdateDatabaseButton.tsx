@@ -1,7 +1,7 @@
 import { Colors } from '@/constants/Colors'
 import { ToastMessages } from '@/constants/Messages'
 import { hasInternetAvailable } from '@/helpers/util'
-import { dbCheckSecondsSinceLastRefresh, dbHasManhwas, dbShouldUpdate } from '@/lib/database'
+import { dbCheckSecondsSinceLastRefresh, dbHasManhwas, dbShouldUpdate, dbUpdateDatabase } from '@/lib/database'
 import { router } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
 import React from 'react'
@@ -49,7 +49,7 @@ const UpdateDatabaseButton = ({
         } else {
             Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE)
             try {
-                // await dbUpdateDatabase(db)
+                await dbUpdateDatabase(db)
                 Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED)
                 router.replace("/(pages)/HomePage")
                 return

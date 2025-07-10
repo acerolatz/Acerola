@@ -46,6 +46,10 @@ const _layout = () => {
               <Stack.Screen name='(pages)/HomePage' options={{headerShown: false}} />
               <Stack.Screen name='(pages)/ManhwaPage' options={{headerShown: false}} />
               <Stack.Screen name='(pages)/ManhwaSearch' options={{headerShown: false}} />
+              <Stack.Screen name='(pages)/ChapterPage' options={{headerShown: false}} />
+              <Stack.Screen name='(pages)/GenresPage' options={{headerShown: false}} />
+              <Stack.Screen name='(pages)/ManhwaByGenre' options={{headerShown: false}} />
+              <Stack.Screen name='(pages)/BugReportPage' options={{headerShown: false}} />
           </Stack>
           <Toast 
             position='bottom' 

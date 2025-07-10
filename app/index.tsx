@@ -2,8 +2,9 @@ import AppLogo from '@/components/util/Logo';
 import Row from '@/components/util/Row';
 import { Colors } from '@/constants/Colors';
 import { ToastMessages } from '@/constants/Messages';
-import { dbClearTable, dbSetLastRefresh, dbShouldUpdate } from '@/lib/database';
+import { dbClearTable, dbGetAppVersion, dbSetLastRefresh, dbShouldUpdate, dbUpdateDatabase } from '@/lib/database';
 import { spFetchUser, spGetSession, supabase } from '@/lib/supabase';
+import { useAppVersionState } from '@/store/appVersionState';
 import { useAuthState } from '@/store/authState';
 import { AppStyle } from '@/styles/AppStyle';
 import {
@@ -44,6 +45,7 @@ const App = () => {
     const db = useSQLiteContext()
     const alreadyInited = useRef(false)
     const { login, logout } = useAuthState()
+    const { setLocalVersion } = useAppVersionState()
 
     let [fontsLoaded] = useFonts({
         LeagueSpartan_100Thin,
@@ -70,7 +72,6 @@ const App = () => {
         
         if (user) {
             login(user, session)
-            // await dbPopulateReadingStatusTable(db, session.user.id)
         } else {
             console.log("error fetching user", session.user.id)
             Toast.show(ToastMessages.EN.FAIL_AUTH)
@@ -93,7 +94,7 @@ const App = () => {
                     return
                 }
                 
-                // await dbGetAppVersion(db).then(value => setLocalVersion(value))
+                await dbGetAppVersion(db).then(value => setLocalVersion(value))
 
                 await initSession()                
 
@@ -101,7 +102,7 @@ const App = () => {
                 if (shouldUpdate) {
                     Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE)
                     await dbSetLastRefresh(db, 'client')
-                    // await dbUpdateDatabase(db)
+                    await dbUpdateDatabase(db)
                     Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED)
                 }
 

@@ -1,11 +1,14 @@
 import Button from '@/components/buttons/Button'
 import OpenRandomManhwaButton from '@/components/buttons/OpenRandomManhwaButton'
 import UpdateDatabaseButton from '@/components/buttons/UpdateDatabaseButton'
+import GenreGrid from '@/components/grid/GenreGrid'
+import ManhwaHorizontalGrid from '@/components/grid/ManhwaHorizontalGrid'
 import LateralMenu from '@/components/LateralMenu'
 import AppLogo from '@/components/util/Logo'
 import Row from '@/components/util/Row'
 import { Colors } from '@/constants/Colors'
 import { hp, wp } from '@/helpers/util'
+import { dbReadManhwasOrderedByUpdateAt, dbReadManhwasOrderedByViews } from '@/lib/database'
 import { AppStyle } from '@/styles/AppStyle'
 import { router } from 'expo-router'
 import React, { useRef } from 'react'
@@ -80,10 +83,19 @@ const HomePage = () => {
             {/* Main content */}
             <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} >
                 <View style={{gap: 10}} >
-                    {/* <GenreGrid/>
-                    <LatestUpdatesGrid/>
-                    <MostViewGrid/>
-                    <RandomMangaGrid/> */}
+                    <GenreGrid/>
+                    <ManhwaHorizontalGrid
+                        title='Latest Updates'
+                        iconName='rocket-outline'
+                        onViewAll={() => null}
+                        fetchFunction={dbReadManhwasOrderedByUpdateAt}
+                    />
+                    <ManhwaHorizontalGrid
+                        title='Most View'
+                        iconName='flame-outline'
+                        onViewAll={() => null}
+                        fetchFunction={dbReadManhwasOrderedByViews}
+                    />
                     <View style={{width: '100%', height: 60}} />
                 </View>
             </ScrollView>
