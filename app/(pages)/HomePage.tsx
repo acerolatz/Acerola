@@ -87,13 +87,13 @@ const HomePage = () => {
                     <ManhwaHorizontalGrid
                         title='Latest Updates'
                         iconName='rocket-outline'
-                        onViewAll={() => null}
+                        onViewAll={() => router.navigate("/(pages)/LatestUpdatesPage")}
                         fetchFunction={dbReadManhwasOrderedByUpdateAt}
                     />
                     <ManhwaHorizontalGrid
                         title='Most View'
                         iconName='flame-outline'
-                        onViewAll={() => null}
+                        onViewAll={() => router.navigate("/(pages)/MostViewPage")}
                         fetchFunction={dbReadManhwasOrderedByViews}
                     />
                     <View style={{width: '100%', height: 60}} />

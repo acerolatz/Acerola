@@ -43,13 +43,25 @@ const _layout = () => {
         <SQLiteProvider databaseName='ononoki.db' onInit={dbMigrate}>
           <Stack>
               <Stack.Screen name='index' options={{headerShown: false}} />
+              <Stack.Screen name='(auth)/SignInPage' options={{headerShown: false}} />
+              <Stack.Screen name='(auth)/SignUpPage' options={{headerShown: false}} />
               <Stack.Screen name='(pages)/HomePage' options={{headerShown: false}} />
               <Stack.Screen name='(pages)/ManhwaPage' options={{headerShown: false}} />
               <Stack.Screen name='(pages)/ManhwaSearch' options={{headerShown: false}} />
+              <Stack.Screen name='(pages)/AccountPage' options={{headerShown: false}} />            
               <Stack.Screen name='(pages)/ChapterPage' options={{headerShown: false}} />
               <Stack.Screen name='(pages)/GenresPage' options={{headerShown: false}} />
               <Stack.Screen name='(pages)/ManhwaByGenre' options={{headerShown: false}} />
+              <Stack.Screen name='(pages)/ManhwaByAuthor' options={{headerShown: false}} />
+              <Stack.Screen name='(pages)/ReadingHistoryPage' options={{headerShown: false}} />
+              <Stack.Screen name='(pages)/LatestUpdatesPage' options={{headerShown: false}} />
+              <Stack.Screen name='(pages)/MostViewPage' options={{headerShown: false}} />
               <Stack.Screen name='(pages)/BugReportPage' options={{headerShown: false}} />
+              <Stack.Screen name='(pages)/LibraryPage' options={{headerShown: false}} />
+              <Stack.Screen name='(pages)/DonatePage' options={{headerShown: false}} />              
+              <Stack.Screen name='(pages)/RequestManhwaPage' options={{headerShown: false}} />
+              <Stack.Screen name='(pages)/ReleasesPage' options={{headerShown: false}} />
+              <Stack.Screen name='(pages)/DisclaimerPage' options={{headerShown: false}} />
           </Stack>
           <Toast 
             position='bottom' 

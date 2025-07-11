@@ -82,31 +82,31 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
     const { session, logout } = useAuthState()
     
     const accountPage = () => {
-        // router.navigate("/(pages)/Account")
+        router.navigate("/(pages)/AccountPage")
     }
 
     const loginPage = () => {
-        // router.navigate("/(auth)/SignIn")
+        router.navigate("/(auth)/SignInPage")
     }
 
     const readingHistoryPage = () => {
-        // router.navigate("/(pages)/ReadHistory")
+        router.navigate("/(pages)/ReadingHistoryPage")
     }
 
     const libraryPage = () => {
-        // router.navigate("/(pages)/Library")
+        router.navigate("/(pages)/LibraryPage")
     }
 
     const openDonate = () => {
-        // router.navigate("/(pages)/Donate")
+        router.navigate("/(pages)/DonatePage")
     }
 
     const openBugReport = () => {
-        // router.navigate("/(pages)/BugReport")
+        router.navigate("/(pages)/BugReportPage")
     }
 
     const openDisclaimer = () => {
-        // router.navigate("/(pages)/Disclaimer")
+        router.navigate("/(pages)/DisclaimerPage")
     }
 
     const handleLogout = async () => {
@@ -115,12 +115,12 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
         logout()
     }
 
-    const openMangaRequest = () => {
-        // router.navigate("/(pages)/MangaRequest")
+    const openManhwaRequest = () => {
+        router.navigate("/(pages)/RequestManhwaPage")
     }
 
     const openReleases = () => {
-        // router.navigate("/(pages)/Releases")
+        router.navigate("/(pages)/ReleasesPage")
     }
 
     return (
@@ -175,7 +175,7 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
                 />
 
                 <Option 
-                    onPress={openMangaRequest} 
+                    onPress={openManhwaRequest} 
                     title='Request Manhwa'
                     iconName='megaphone-outline'
                     showLoading={false}

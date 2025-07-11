@@ -2,7 +2,7 @@ import AppLogo from '@/components/util/Logo';
 import Row from '@/components/util/Row';
 import { Colors } from '@/constants/Colors';
 import { ToastMessages } from '@/constants/Messages';
-import { dbClearTable, dbGetAppVersion, dbSetLastRefresh, dbShouldUpdate, dbUpdateDatabase } from '@/lib/database';
+import { dbClearTable, dbGetAppVersion, dbPopulateReadingStatusTable, dbSetLastRefresh, dbShouldUpdate, dbUpdateDatabase } from '@/lib/database';
 import { spFetchUser, spGetSession, supabase } from '@/lib/supabase';
 import { useAppVersionState } from '@/store/appVersionState';
 import { useAuthState } from '@/store/authState';
@@ -71,6 +71,7 @@ const App = () => {
         const user = await spFetchUser(session.user.id)
         
         if (user) {
+            await dbPopulateReadingStatusTable(db, session.user.id)
             login(user, session)
         } else {
             console.log("error fetching user", session.user.id)
@@ -112,6 +113,12 @@ const App = () => {
         },
         [fontsLoaded]
     )  
+
+    if (!fontsLoaded) {
+        return (
+            <SafeAreaView style={AppStyle.safeArea}/>            
+        )
+    }
 
     return (
         <SafeAreaView style={AppStyle.safeArea} >

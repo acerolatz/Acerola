@@ -61,3 +61,29 @@ export type ManhwaGenre = {
     genre_id: number
     genre: string
 }
+
+export type ChapterImage = {
+    image_url: string
+    width: number
+    height: number
+}
+
+export type ChapterReadLog = {
+  chapters: Set<number>,
+  cover_image_url: string,
+  manhwa_id: number,
+  title: string,
+  last_readed_at: Date
+  color: string
+}
+
+export type DonateMethod = {
+    method: string
+    value: string
+    action: string
+}
+
+export type ReadingSummary = {
+    status: string
+    total: number
+}

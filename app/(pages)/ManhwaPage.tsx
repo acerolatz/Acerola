@@ -1,10 +1,10 @@
-import AddToLibray from '@/components/AddToLibrary';
+import AddToLibray from '@/components/AddToLibray';
 import BugReportButton from '@/components/buttons/BugReportButton';
 import HomeButton from '@/components/buttons/HomeButton';
-import OpenRandomMangaButton from '@/components/buttons/RandomMangaButton';
+import RandomManhwaButton from '@/components/buttons/OpenRandomMangaButton';
 import ReturnButton from '@/components/buttons/ReturnButton';
-import MangaChapterGrid from '@/components/grid/MangaChapterGrid';
-import MangaAuthorInfo from '@/components/MangaAuthorInfo';
+import ManhwaChapterGrid from '@/components/grid/ManhwaChapterGrid';
+import ManhwaAuthorInfo from '@/components/ManhwaAuthorInfo';
 import ManhwaGenreInfo from '@/components/ManhwaGenreInfo';
 import { Colors } from '@/constants/Colors';
 import { ToastMessages } from '@/constants/Messages';
@@ -81,7 +81,7 @@ const ManhwaPage = () => {
     return (
       <SafeAreaView style={[AppStyle.safeArea, styles.container]} >        
         <View style={{flex: 1, alignItems: "center", justifyContent: "center"}} >
-          <ActivityIndicator size={'large'} color={Colors.ononokiBlue} />
+          <ActivityIndicator size={'large'} color={Colors.orange} />
         </View>
       </SafeAreaView>
     )
@@ -98,7 +98,7 @@ const ManhwaPage = () => {
             <HomeButton color={manhwa.color} />
             <View style={{flexDirection: 'row', alignItems: "center", justifyContent: "center", gap: 16}} >
                 <BugReportButton color={manhwa.color} title={manhwa.title} />                    
-                <OpenRandomMangaButton color={manhwa.color} />
+                <RandomManhwaButton color={manhwa.color} />
                 <ReturnButton color={manhwa.color} />
             </View>
         </View>
@@ -117,10 +117,10 @@ const ManhwaPage = () => {
               <Text style={AppStyle.textRegular}>{manhwa.descr}</Text>
             </View>
             
-            <MangaAuthorInfo manga={manga} />
+            <ManhwaAuthorInfo manhwa={manhwa} />
             <ManhwaGenreInfo manhwa={manhwa} />
             <AddToLibray 
-              manga={manhwa} 
+              manhwa={manhwa} 
               textColor={Colors.backgroundColor} 
               backgroundColor={manhwa.color} />
 
@@ -129,8 +129,7 @@ const ManhwaPage = () => {
               <Item text={`Views: ${manhwa.views + 1}`} textColor={Colors.backgroundColor} backgroundColor={manhwa.color} />
             </View>
 
-            <MangaChapterGrid manga={manga} />
-            <MangaCommenctSection manga={manga} />
+            <ManhwaChapterGrid manhwa={manhwa} />
         </View>          
       </ScrollView>
     </SafeAreaView>

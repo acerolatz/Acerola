@@ -1,6 +1,7 @@
-import { AppRelease, Chapter, Manhwa, OugiUser } from "@/helpers/types";
+import { AppConstants } from "@/constants/AppConstants";
+import { AppRelease, Chapter, ChapterImage, DonateMethod, Manhwa, OugiUser, ReadingSummary } from "@/helpers/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { createClient, Session } from '@supabase/supabase-js';
+import { AuthError, createClient, PostgrestError, Session } from '@supabase/supabase-js';
 
 
 // RLS
@@ -34,6 +35,7 @@ export async function spFetchUser(
         .eq("user_id", user_id)
         .single()
 
+    console.log(2)
     if (error) {
         console.log("error spFetchUser", error)
         return null
@@ -44,9 +46,57 @@ export async function spFetchUser(
         return null
     }
 
-    return data
+    return data as OugiUser
 }
 
+export async function spCreateUser(
+    email: string,
+    password: string, 
+    username: string
+): Promise<{
+    user: OugiUser | null, 
+    session: Session | null,
+    error: AuthError | null
+}> {
+    const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { username } }
+    })
+    if (error) {
+        console.log("error spCreateUser", error)
+        return {user: null, session: null, error}
+    }    
+
+    const user = await spFetchUser(data.session!.user.id)
+
+    return {user, error, session: data.session}
+}
+
+
+export async function spChangeUserInfos(
+    user_id: string,
+    username: string
+) {
+    const { error } = await supabase
+        .from("users")
+        .update({ username })
+        .eq("user_id", user_id)
+    return error
+}
+
+export async function spSetUserProfileImageUrl(
+    user_id: string, 
+    profile_image_url: string,
+    profile_image_width: number,
+    profile_image_height: number
+): Promise<PostgrestError | null> {
+    const { error } = await supabase
+        .from("users")
+        .update({profile_image_url, profile_image_width, profile_image_height})
+        .eq("user_id", user_id)
+    return error
+}
 
 export async function spGetManhwas(): Promise<Manhwa[]> {
     const { data, error } = await supabase.from("mv_manhwas").select("*")
@@ -117,3 +167,106 @@ export async function spGetReleases(): Promise<AppRelease[]> {
     return data as AppRelease[]
 }
 
+
+export async function spUpdateManhwaReadingStatus(
+    user_id: string,
+    manhwa_id: number, 
+    status: string
+) {
+    const { error } = await supabase
+        .from("reading_status")
+        .upsert({user_id, manhwa_id, status})
+
+    if (error) {
+        console.log("error spUpdateManhwaReadingStatus", error)
+    }
+}
+
+
+export async function spFetchChapterImages(chapter_id: number): Promise<ChapterImage[]> {
+    const { data, error } = await supabase
+        .from("chapter_images")
+        .select("image_url, width, height")
+        .eq("chapter_id", chapter_id)
+        .order('index', {ascending: true})
+
+    if (error) {
+        console.log("error spFetchChapterImages", error)
+        return []
+    }
+
+    return data
+}
+
+
+export async function spRequestManhwa(manhwa: string, message: string | null) {
+    const { error } = await supabase
+        .from("manhwa_requests")
+        .insert([{manhwa, message}])
+
+    if (error) {
+        console.log("error spRequestManhwa")
+    }
+}
+
+export async function spReportBug(
+    title: string, 
+    descr: string | null, 
+    bug_type: string
+): Promise<number | null> {
+    const { data, error } = await supabase
+        .from("bug_reports")
+        .insert([{title, descr, bug_type}])
+        .select("bug_id")
+        .single()
+    
+    if (error) {
+        console.log("error spReportBug", error)
+        return null
+    }
+    
+    return data.bug_id
+}
+
+
+export async function spGetDonationMethods(): Promise<DonateMethod[]> {
+    const { data, error } = await supabase
+        .from("donate_methods")
+        .select("method, value, action")
+
+    if (error) {
+        console.log("error spGetDonationMethods", error)
+        return []
+    }
+
+    return data
+}
+
+
+export async function spFetchUserReadingStatusSummary(
+    p_user_id: string
+): Promise<ReadingSummary[]> {    
+
+    const { data, error } = await supabase
+        .rpc("get_reading_status_summary", {p_user_id})
+
+    if (error) {
+        console.log("error spFetchUserReadingStatusSummary", error)
+        return AppConstants.READING_STATUS_ORDER.map(i => {return {status: i, total: 0}})
+    }
+    return data
+}
+
+export async function spFetchUserReadingStatus(user_id: string): Promise<{manhwa_id: number, status: string}[]> {
+    const { data, error } = await supabase
+        .from('reading_status')
+        .select("manhwa_id, status")
+        .eq("user_id", user_id)
+
+    if (error) {
+        console.log("error spFetchUserReadingStatus", error)
+        return []
+    }
+
+    return data
+}
