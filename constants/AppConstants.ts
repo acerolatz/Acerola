@@ -38,7 +38,7 @@ export const AppConstants = {
     REQ_MANGA_TITLE_MIN_LENGTH: 3,
     REQ_MANGA_TITLE_MAX_LENGTH: 1024,
     REQ_MANGA_DESCR_MAX_LENGTH: 512,
-    DEBUG_MODE: true,
+    DEBUG_MODE: false,
     PORNHWA_REDDIT_URL: "https://www.reddit.com/r/pornhwa/",
     GITHUB_URL: "https://github.com/ougitz/acerola"
 }

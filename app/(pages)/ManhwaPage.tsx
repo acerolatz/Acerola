@@ -11,7 +11,7 @@ import { AppConstants } from '@/constants/AppConstants';
 import { Colors } from '@/constants/Colors';
 import { ToastMessages } from '@/constants/Messages';
 import { Manhwa } from '@/helpers/types';
-import { hp, wp } from '@/helpers/util';
+import { formatTimestamp, hp, wp } from '@/helpers/util';
 import { dbReadManhwaById, dbUpdateManhwaViews } from '@/lib/database';
 import { spUpdateManhwaViews } from '@/lib/supabase';
 import { AppStyle } from '@/styles/AppStyle';
@@ -53,7 +53,7 @@ const ManhwaPage = () => {
   const db = useSQLiteContext()
   const params = useLocalSearchParams()
   const manhwa_id: number = params.manhwa_id as any
-  const [manhwa, setManhwa] = useState<Manhwa | null>(null)  
+  const [manhwa, setManhwa] = useState<Manhwa | null>(null)    
 
   useEffect(
     () => {
@@ -121,7 +121,7 @@ const ManhwaPage = () => {
               <Text style={AppStyle.textMangaTitle}>{manhwa!.title}</Text>
               <Text style={AppStyle.textRegular}>{manhwa.descr}</Text>
             </View>
-            
+            <Text style={[AppStyle.textRegular, {alignSelf: "flex-start"}]}>Last update: {formatTimestamp(manhwa.updated_at)}</Text>
             <ManhwaAuthorInfo manhwa={manhwa} />
             <ManhwaGenreInfo manhwa={manhwa} />
             <AddToLibray 
