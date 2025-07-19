@@ -6,6 +6,7 @@ import ReturnButton from '@/components/buttons/ReturnButton';
 import ManhwaChapterGrid from '@/components/grid/ManhwaChapterGrid';
 import ManhwaAuthorInfo from '@/components/ManhwaAuthorInfo';
 import ManhwaGenreInfo from '@/components/ManhwaGenreInfo';
+import PageActivityIndicator from '@/components/util/PageActivityIndicator';
 import { AppConstants } from '@/constants/AppConstants';
 import { Colors } from '@/constants/Colors';
 import { ToastMessages } from '@/constants/Messages';
@@ -23,7 +24,6 @@ import React, {
   useState
 } from 'react';
 import {
-  ActivityIndicator,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -80,10 +80,8 @@ const ManhwaPage = () => {
 
   if (!manhwa) {
     return (
-      <SafeAreaView style={[AppStyle.safeArea, styles.container]} >        
-        <View style={{flex: 1, alignItems: "center", justifyContent: "center"}} >
-          <ActivityIndicator size={'large'} color={Colors.neonRed} />
-        </View>
+      <SafeAreaView style={[AppStyle.safeArea, styles.container]} >
+        <PageActivityIndicator/>
       </SafeAreaView>
     )
   }
@@ -171,7 +169,7 @@ const styles = StyleSheet.create({
     alignItems: "center", 
     justifyContent: "space-between", 
     marginTop: 10,
-    paddingHorizontal: wp(5),
+    paddingHorizontal: wp(4),
     paddingVertical: hp(4),
     paddingBottom: 20
   },

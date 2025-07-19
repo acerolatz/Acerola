@@ -36,11 +36,11 @@ const CollectionPage = () => {
     if (loading) {
         return (
             <SafeAreaView style={AppStyle.safeArea} >
-                <TopBar title={collection_name} titleColor={Colors.neonRed} >
-                    <ReturnButton color={Colors.neonRed} />
+                <TopBar title={collection_name} titleColor={Colors.yellow} >
+                    <ReturnButton color={Colors.yellow} />
                 </TopBar>
                 <View style={{flex: 1, alignItems: "center", justifyContent: "center"}} >
-                    <ActivityIndicator size={32} color={Colors.neonRed} />
+                    <ActivityIndicator size={32} color={Colors.yellow} />
                 </View>
             </SafeAreaView>
         )
@@ -48,8 +48,8 @@ const CollectionPage = () => {
 
     return (
         <SafeAreaView style={AppStyle.safeArea} >
-            <TopBar title={collection_name} titleColor={Colors.neonRed} >
-                <ReturnButton color={Colors.neonRed} />
+            <TopBar title={collection_name} titleColor={Colors.yellow} >
+                <ReturnButton color={Colors.yellow} />
             </TopBar>
             {
                 collection_descr &&

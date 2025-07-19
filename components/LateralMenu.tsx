@@ -114,6 +114,14 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
         }
     }
 
+    const openGithub = async () => {
+        try {
+            await Linking.openURL(AppConstants.GITHUB_URL)
+        } catch (error) {
+          Toast.show(ToastMessages.EN.UNABLE_TO_OPEN_BROWSER)
+        }
+    }
+
     const openReleases = () => {
         router.navigate("/(pages)/ReleasesPage")
     }
@@ -122,8 +130,8 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
         <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} >
             <View style={styles.container} >
                 <Row style={{justifyContent: "space-between", marginBottom: 10}} >
-                    <Text style={[AppStyle.textHeader, {color: Colors.neonRed, fontFamily: "LeagueSpartan_600SemiBold"}]}>Menu</Text>
-                    <CloseBtn onPress={closeMenu} color={Colors.neonRed} />
+                    <Text style={[AppStyle.textHeader, {color: Colors.yellow, fontFamily: "LeagueSpartan_600SemiBold"}]}>Menu</Text>
+                    <CloseBtn onPress={closeMenu} color={Colors.yellow} />
                 </Row>                
 
                 <Option 
@@ -188,6 +196,14 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
                     iconName='logo-reddit'
                     showLoading={false}
                     iconColor={Colors.redditColor}
+                />
+
+                <Option 
+                    onPress={openGithub} 
+                    title='GitHub' 
+                    iconName='logo-github'
+                    showLoading={false}
+                    iconColor={Colors.white}
                 />
 
                 <Option 

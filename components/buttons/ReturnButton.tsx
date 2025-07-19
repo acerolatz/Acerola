@@ -16,7 +16,7 @@ interface ReturnButtonProps {
 
 const ReturnButton = ({
   size = 28, 
-  color = Colors.white, 
+  color = Colors.yellow, 
   onPress,
   backgroundColor = Colors.almostBlack
 }: ReturnButtonProps) => {

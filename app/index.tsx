@@ -1,4 +1,5 @@
 import AppLogo from '@/components/util/Logo';
+import PageActivityIndicator from '@/components/util/PageActivityIndicator';
 import Row from '@/components/util/Row';
 import { Colors } from '@/constants/Colors';
 import { ToastMessages } from '@/constants/Messages';
@@ -16,7 +17,7 @@ import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import React, { useEffect, useRef } from 'react';
-import { ActivityIndicator, SafeAreaView, View } from 'react-native';
+import { SafeAreaView, StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 
@@ -28,7 +29,7 @@ const App = () => {
     let [fontsLoaded] = useFonts({
         LeagueSpartan_200ExtraLight,
         LeagueSpartan_400Regular,        
-        LeagueSpartan_600SemiBold,    
+        LeagueSpartan_600SemiBold
     });
 
     useEffect(
@@ -69,20 +70,27 @@ const App = () => {
 
     return (
         <SafeAreaView style={AppStyle.safeArea} >
-            <Row style={{paddingRight: 2, marginTop: 10, marginBottom: 10, justifyContent: "space-between"}} >
+            <Row style={styles.container} >
                 <AppLogo/>
                 <Row style={{gap: 16}} >
-                    <Ionicons name='sync' size={28} color={Colors.white} />
-                    <Ionicons name='search-outline' size={28} color={Colors.white} />
-                    <Ionicons name='dice-outline' size={28} color={Colors.white} />
-                    <Ionicons name='options-outline' size={28} color={Colors.white} />
+                    <Ionicons name='sync' size={28} color={Colors.yellow} />
+                    <Ionicons name='search-outline' size={28} color={Colors.yellow} />
+                    <Ionicons name='dice-outline' size={28} color={Colors.yellow} />
+                    <Ionicons name='options-outline' size={28} color={Colors.yellow} />
                 </Row>
             </Row>
-            <View style={{flex: 1, alignItems: "center", justifyContent: "center"}} >
-                <ActivityIndicator size={32} color={Colors.neonRed} />
-            </View>
+            <PageActivityIndicator/>
         </SafeAreaView>
     )
 }
 
 export default App
+
+const styles = StyleSheet.create({
+    container: {
+        paddingRight: 2, 
+        marginTop: 10, 
+        marginBottom: 10, 
+        justifyContent: "space-between"
+    }
+})

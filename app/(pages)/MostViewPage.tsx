@@ -49,8 +49,8 @@ const MostView = () => {
 
   return (
     <SafeAreaView style={AppStyle.safeArea}>
-      <TopBar title='Most Views' titleColor={Colors.neonRed} >
-        <ReturnButton color={Colors.neonRed} />
+      <TopBar title='Most Views' titleColor={Colors.yellow} >
+        <ReturnButton color={Colors.yellow} />
       </TopBar>
       <ManhwaGrid
         manhwas={manhwas}

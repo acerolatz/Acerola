@@ -4,8 +4,9 @@ import { Manhwa } from '@/helpers/types'
 import { getItemGridDimensions, hp, wp } from '@/helpers/util'
 import { FlashList } from '@shopify/flash-list'
 import React from 'react'
-import { ActivityIndicator, FlatList, View } from 'react-native'
+import { FlatList, View } from 'react-native'
 import ManhwaCard from '../ManhwaCard'
+import CustomActivityIndicator from '../util/CustomActivityIndicator'
 
 
 interface MangaGridProps {
@@ -53,7 +54,7 @@ const ManhwaGrid = ({
         if (loading && hasResults) {
             return (
                 <View style={{width: '100%', paddingVertical: 22, alignItems: "center", justifyContent: "center"}} >
-                    <ActivityIndicator size={32} color={activityIndicatorColor} />
+                    <CustomActivityIndicator/>
                 </View> 
             )
         }

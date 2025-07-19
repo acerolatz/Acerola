@@ -68,8 +68,7 @@ const HomePage = () => {
     }
 
     return (
-        <SafeAreaView style={AppStyle.safeArea} >
-            
+        <SafeAreaView style={AppStyle.safeArea} >            
             {/* Header */}
             <Row style={{width: '100%', paddingRight: 2, marginBottom: 10, justifyContent: "space-between"}} >
                 <AppLogo/>
@@ -110,7 +109,6 @@ const HomePage = () => {
             <Animated.View style={[styles.sideMenu, { width: MENU_WIDTH, transform: [{ translateX: menuAnim }] }]}>
                 <LateralMenu closeMenu={closeMenu}/>
             </Animated.View>
-
         </SafeAreaView>
     )
 }
@@ -126,17 +124,13 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: 0,        
         backgroundColor: Colors.backgroundColor,
-        elevation: 5,
-        shadowColor: Colors.almostBlack,
-        shadowOffset: { width: 4, height: 0 },
-        shadowOpacity: 0.8,
-        shadowRadius: 5,    
+        elevation: 5,        
         zIndex: 100
     },
     menuBackground: {
         position: 'absolute',
         width: SCREEN_WIDTH,
-        height: SCREEN_HEIGHT,
+        height: SCREEN_HEIGHT * 1.2,
         top: 0,
         left: 0,        
         backgroundColor: 'rgba(0, 0, 0, 0.8)',

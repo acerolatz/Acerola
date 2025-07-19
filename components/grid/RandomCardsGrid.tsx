@@ -51,8 +51,8 @@ const RandomCardsGrid = () => {
         return (
             <Pressable onPress={() => onPress(item.manhwa_id)} style={{marginRight: 10}} >
                 <Image source={item.image_url} style={{width, height, borderRadius: 12}} contentFit='cover' />
-                <View style={{maxWidth: '90%', position: 'absolute', top: 10, left: 10, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, backgroundColor: Colors.neonRed}} >
-                    <Text numberOfLines={1} style={AppStyle.textRegular}>{item.title}</Text>
+                <View style={{maxWidth: '90%', position: 'absolute', top: 10, left: 10, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, backgroundColor: Colors.yellow, borderWidth: 2, borderColor: Colors.backgroundColor}} >
+                    <Text numberOfLines={1} style={[AppStyle.textRegular, {color: Colors.backgroundColor}]}>{item.title}</Text>
                 </View>
             </Pressable>
         )
@@ -61,8 +61,8 @@ const RandomCardsGrid = () => {
     return (
         <View style={styles.container} >
             <Row style={{width: '100%', justifyContent: "space-between"}} >
-                <Title title='Random' iconName='dice-outline'/>
-                <RotatingButton onPress={reload}/>
+                <Title title='Random'/>
+                <RotatingButton onPress={reload} iconColor={Colors.white} />
             </Row>
             <FlatList
                 ref={flashListRef}

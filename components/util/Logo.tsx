@@ -8,7 +8,7 @@ import { AppConstants } from '../../constants/AppConstants'
 const AppLogo = () => {
   return (
     <View>
-      <Text style={[AppStyle.textHeader, {fontSize: 30, fontFamily: 'LeagueSpartan_600SemiBold', color: Colors.neonRed}]}>
+      <Text style={[AppStyle.textHeader, {fontSize: 30, fontFamily: 'LeagueSpartan_600SemiBold', color: Colors.yellow}]}>
         {AppConstants.APP_NAME}
       </Text>
     </View>

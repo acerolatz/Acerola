@@ -1,6 +1,7 @@
 import ReturnButton from '@/components/buttons/ReturnButton'
 import SearchBar from '@/components/SearchBar'
 import TopBar from '@/components/TopBar'
+import CustomActivityIndicator from '@/components/util/CustomActivityIndicator'
 import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
 import { Manhwa } from '@/helpers/types'
@@ -14,7 +15,7 @@ import { router } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
 import { debounce } from 'lodash'
 import React, { memo, useEffect, useRef, useState } from 'react'
-import { ActivityIndicator, Pressable, SafeAreaView, Text, View } from 'react-native'
+import { Pressable, SafeAreaView, Text, View } from 'react-native'
 
 
 const PAGE_LIMIT = 30
@@ -47,6 +48,12 @@ const Item = memo(({item, onPress}: {item: Manhwa, onPress: (manhwa: Manhwa) => 
         <View style={{position: 'absolute', left: 8, top: 8, borderRadius: 12, backgroundColor: mangaStatusColor, paddingVertical: 6, paddingHorizontal: 8}} >
           <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor, fontSize: 12}]}>{item.status}</Text>
         </View>
+        {
+          AppConstants.DEBUG_MODE &&
+          <View style={{position: 'absolute', right: 6, top: 6, borderRadius: 12, width: 42, height: 42, backgroundColor: Colors.backgroundColor, alignItems: "center", justifyContent: "center"}} >
+              <Text style={AppStyle.textRegular}>{item.manhwa_id}</Text>
+          </View>
+        }
       </Pressable>
     )
 })
@@ -123,7 +130,7 @@ const ManhwaSearch = () => {
     if (loading && hasResults) {
         return (
             <View style={{width: '100%', paddingVertical: 22, alignItems: "center", justifyContent: "center"}} >
-                <ActivityIndicator size={32} color={Colors.neonRed} />
+                <CustomActivityIndicator/>
             </View> 
         )
     }
@@ -132,11 +139,11 @@ const ManhwaSearch = () => {
 
   return (
     <SafeAreaView style={AppStyle.safeArea} >
-      <TopBar title='Search' titleColor={Colors.neonRed} > 
-        <ReturnButton color={Colors.neonRed} />
+      <TopBar title='Search' titleColor={Colors.yellow} > 
+        <ReturnButton color={Colors.yellow} />
       </TopBar>
       <View style={{flex: 1, gap: 10}} >
-        <SearchBar onChangeValue={debounceSearch} color={Colors.neonRed} placeholder='manhwa' />
+        <SearchBar onChangeValue={debounceSearch} color={Colors.yellow} placeholder='manhwa' />
         <FlashList
           keyboardShouldPersistTaps={'always'}
           data={manhwas}

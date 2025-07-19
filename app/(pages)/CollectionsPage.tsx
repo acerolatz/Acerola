@@ -36,8 +36,8 @@ const CollectionsPage = () => {
 
     return (
         <SafeAreaView style={AppStyle.safeArea}>
-            <TopBar title="Collections" titleColor={Colors.neonRed} >
-                <ReturnButton color={Colors.neonRed} />
+            <TopBar title="Collections">
+                <ReturnButton/>
             </TopBar>
             <FlatList
                 data={collections.slice(1, collections.length)}
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
         height: 52,
         alignItems: "center", 
         justifyContent: "center",         
-        backgroundColor: Colors.neonRed, 
+        backgroundColor: Colors.yellow, 
         borderRadius: 4,
         marginBottom: 10
     }

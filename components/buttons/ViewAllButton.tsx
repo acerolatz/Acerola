@@ -1,4 +1,5 @@
 import { AppConstants } from '@/constants/AppConstants'
+import { Colors } from '@/constants/Colors'
 import { AppStyle } from '@/styles/AppStyle'
 import React from 'react'
 import { Pressable, Text } from 'react-native'
@@ -11,7 +12,7 @@ interface ViewAllButtonProps {
 const ViewAllButton = ({onPress}: ViewAllButtonProps) => {
   return (
     <Pressable onPress={onPress} hitSlop={AppConstants.HIT_SLOP_LARGE} >
-        <Text style={[AppStyle.textRegular, {textDecorationLine: 'underline'}]}>view all</Text>
+        <Text style={[AppStyle.textRegular, {textDecorationLine: 'underline', color: Colors.white}]}>view all</Text>
     </Pressable>
   )
 }

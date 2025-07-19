@@ -12,7 +12,7 @@ interface TopBarProps {
 } 
 
 
-const TopBar = ({title, children, titleColor = Colors.white, numberOfLines}: TopBarProps) => {
+const TopBar = ({title, children, titleColor = Colors.yellow, numberOfLines}: TopBarProps) => {
   return (
     <View style={styles.container} >
         <Text

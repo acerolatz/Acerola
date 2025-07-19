@@ -8,11 +8,11 @@ export const Colors = {
   gray: "#2C2C2C",
   gray1: "#3D414A",
 
-  orange: "#FF6740",
   red: "#F24E4E",
+  orange: "#FF6740",
   neonRed: "#ef4069",
   purple: "#8746A7",
-  yellow: "#F8D137",
+  yellow: "#FFF7A6",
   silver: "#C3C3C3",
   paleGrey: "#E5E5E5",
   mediumGray: "#696969",
@@ -43,6 +43,6 @@ export const Colors = {
   releasesColor: "#F24E4E",
   redditColor: "#FF4500",
 
-  manhwaStatusCompleted: "rgba(33, 183, 116, 0.6)",
-  manhwaStatusOnGoing: "rgba(255, 103, 64, 0.6)"
+  manhwaStatusCompleted: "rgba(33, 183, 116, 0.7)",
+  manhwaStatusOnGoing: "rgba(255, 103, 64, 0.7)"
 };

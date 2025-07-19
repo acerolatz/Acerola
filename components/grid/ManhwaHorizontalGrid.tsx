@@ -42,7 +42,7 @@ const ManhwaHorizontalGrid = ({
     return (
         <View style={styles.container} >
             <Row style={{width: '100%', justifyContent: "space-between"}} >
-                <Title title={title} iconName={iconName}/>
+                <Title title={title}/>
                 <ViewAllButton onPress={onViewAll} />
             </Row>
             <View style={styles.flashListContainer}>

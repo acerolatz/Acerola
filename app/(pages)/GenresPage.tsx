@@ -48,8 +48,8 @@ const GenresPage = () => {
 
     return (
         <SafeAreaView style={AppStyle.safeArea}>
-            <TopBar title="Genres" titleColor={Colors.neonRed} >
-                <ReturnButton color={Colors.neonRed} />
+            <TopBar title="Genres">
+                <ReturnButton/>
             </TopBar>
             <FlatList
                 data={genres}
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
         height: 52,
         alignItems: "center", 
         justifyContent: "center",         
-        backgroundColor: Colors.neonRed, 
+        backgroundColor: Colors.yellow,
         borderRadius: 4,
         marginBottom: 10
     }

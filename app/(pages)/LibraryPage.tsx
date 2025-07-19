@@ -51,7 +51,6 @@ const Library = () => {
   useFocusEffect(
     useCallback(() => {
       init()
-      console.log("focus")
     }, [])
   )
 
@@ -59,7 +58,6 @@ const Library = () => {
     if (!value) { return }
     status.current = value
     page.current = 0
-    console.log("change", value)
     await load()
   }
 
