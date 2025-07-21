@@ -1,13 +1,14 @@
 import ReturnButton from '@/components/buttons/ReturnButton'
 import ManhwaGrid from '@/components/grid/ManhwaGrid'
 import TopBar from '@/components/TopBar'
+import PageActivityIndicator from '@/components/util/PageActivityIndicator'
 import { Colors } from '@/constants/Colors'
 import { Manhwa } from '@/helpers/types'
 import { spFetchCollectionItems } from '@/lib/supabase'
 import { AppStyle } from '@/styles/AppStyle'
 import { useLocalSearchParams } from 'expo-router/build/hooks'
 import React, { useEffect, useState } from 'react'
-import { ActivityIndicator, SafeAreaView, StyleSheet, Text, View } from 'react-native'
+import { SafeAreaView, StyleSheet, Text } from 'react-native'
 
 
 const CollectionPage = () => {
@@ -39,9 +40,7 @@ const CollectionPage = () => {
                 <TopBar title={collection_name} titleColor={Colors.yellow} >
                     <ReturnButton color={Colors.yellow} />
                 </TopBar>
-                <View style={{flex: 1, alignItems: "center", justifyContent: "center"}} >
-                    <ActivityIndicator size={32} color={Colors.yellow} />
-                </View>
+                <PageActivityIndicator/>
             </SafeAreaView>
         )
     }

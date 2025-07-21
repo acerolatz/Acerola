@@ -35,7 +35,7 @@ const App = () => {
     useEffect(
         () => {
             async function init() {    
-                if (alreadyInited.current) { return }
+                if (alreadyInited.current || !fontsLoaded) { return }
                 alreadyInited.current = true
                 
                 Image.clearMemoryCache()

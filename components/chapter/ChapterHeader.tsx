@@ -41,8 +41,8 @@ const ChapterHeader = ({
 
   return (
     <View style={styles.container} >
-      <TopBar title={mangaTitle} numberOfLines={1} >
-        <ReturnButton onPress={exitChapter} backgroundColor={'transparent'} />
+      <TopBar title={mangaTitle} titleColor={'white'} numberOfLines={1} >
+        <ReturnButton onPress={exitChapter} color={'white'}  backgroundColor={'transparent'} />
       </TopBar>
       <Row style={styles.row} >
         <BugReportButton size={32} title={reportTitle} backgroundColor={'transparent'} padding={0} />

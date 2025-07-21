@@ -1,6 +1,7 @@
 import ReturnButton from '@/components/buttons/ReturnButton'
 import TopBar from '@/components/TopBar'
 import Column from '@/components/util/Column'
+import PageActivityIndicator from '@/components/util/PageActivityIndicator'
 import { Colors } from '@/constants/Colors'
 import { ToastMessages } from '@/constants/Messages'
 import { DonateMethod } from '@/helpers/types'
@@ -11,14 +12,12 @@ import Ionicons from '@expo/vector-icons/Ionicons'
 import * as Clipboard from 'expo-clipboard'
 import React, { useEffect, useState } from 'react'
 import {
-  ActivityIndicator,
   FlatList,
   Linking,
   Pressable,
   SafeAreaView,
   StyleSheet,
-  Text,
-  View
+  Text
 } from 'react-native'
 import Toast from 'react-native-toast-message'
 
@@ -92,9 +91,7 @@ const Donate = () => {
         <TopBar title='Donate' titleColor={Colors.donateColor} >
             <ReturnButton color={Colors.donateColor} />
         </TopBar>
-        <View style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
-          <ActivityIndicator size={32} color={Colors.donateColor} />
-        </View>
+        <PageActivityIndicator color={Colors.donateColor} />
       </SafeAreaView>  
     )
   }

@@ -3,9 +3,9 @@ import React from 'react'
 import { ActivityIndicator, StyleSheet } from 'react-native'
 
 
-const CustomActivityIndicator = () => {
+const CustomActivityIndicator = ({color = Colors.yellow}: {color?: string}) => {
   return (
-    <ActivityIndicator size={32} color={Colors.yellow} />
+    <ActivityIndicator size={32} color={color} />
   )
 }
 

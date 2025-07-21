@@ -36,6 +36,6 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-lib/supabaseKey.ts
+# lib/supabaseKey.ts
 
 app-example

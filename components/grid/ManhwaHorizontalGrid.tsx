@@ -1,10 +1,8 @@
 import { AppConstants } from '@/constants/AppConstants'
 import { Manhwa } from '@/helpers/types'
-import { wp } from '@/helpers/util'
-import { FlashList } from '@shopify/flash-list'
 import { SQLiteDatabase, useSQLiteContext } from 'expo-sqlite'
 import React, { useEffect, useState } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { FlatList, StyleSheet, View } from 'react-native'
 import ManhwaCard from '../ManhwaCard'
 import Title from '../Title'
 import ViewAllButton from '../buttons/ViewAllButton'
@@ -46,12 +44,11 @@ const ManhwaHorizontalGrid = ({
                 <ViewAllButton onPress={onViewAll} />
             </Row>
             <View style={styles.flashListContainer}>
-                <FlashList
+                <FlatList
                     data={manhwas}
                     horizontal={true}
                     onEndReachedThreshold={2}
-                    estimatedItemSize={wp(80)}
-                    drawDistance={wp(200)}
+                    initialNumToRender={10}
                     keyExtractor={(item: Manhwa) => item.manhwa_id.toString()}
                     renderItem={({item}) => <ManhwaCard manhwa={item} marginRight={4} />}
                 />

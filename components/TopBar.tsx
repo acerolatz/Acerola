@@ -12,12 +12,12 @@ interface TopBarProps {
 } 
 
 
-const TopBar = ({title, children, titleColor = Colors.yellow, numberOfLines}: TopBarProps) => {
+const TopBar = ({title, children, numberOfLines, titleColor = Colors.yellow}: TopBarProps) => {
   return (
     <View style={styles.container} >
         <Text
           numberOfLines={numberOfLines}
-          style={[AppStyle.textHeader, styles.title, {color: titleColor}]}>
+          style={[AppStyle.textHeader, styles.title, {color: titleColor, alignSelf: "center"}]}>
           {title}
         </Text>
         {children}

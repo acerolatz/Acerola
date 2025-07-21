@@ -1,6 +1,7 @@
 import AppVersion from '@/components/AppVersion'
 import ReturnButton from '@/components/buttons/ReturnButton'
 import TopBar from '@/components/TopBar'
+import PageActivityIndicator from '@/components/util/PageActivityIndicator'
 import Row from '@/components/util/Row'
 import { Colors } from '@/constants/Colors'
 import { ToastMessages } from '@/constants/Messages'
@@ -9,7 +10,7 @@ import { useAppVersionState } from '@/store/appVersionState'
 import { AppStyle } from '@/styles/AppStyle'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import React, { useEffect, useState } from 'react'
-import { ActivityIndicator, FlatList, Linking, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native'
+import { FlatList, Linking, Pressable, SafeAreaView, StyleSheet, Text } from 'react-native'
 import Toast from 'react-native-toast-message'
 import { spGetReleases } from '../../lib/supabase'
 
@@ -53,15 +54,15 @@ const Releases = () => {
     }
 
     if (loading) {
-        <SafeAreaView style={AppStyle.safeArea} >
-            <TopBar title='Releases' titleColor={Colors.releasesColor} >
-                <ReturnButton color={Colors.releasesColor} />
-            </TopBar>
-            <AppVersion/>
-            <View style={{flex: 1, alignItems: "center", justifyContent: "center"}} >
-                <ActivityIndicator size={32} color={Colors.releasesColor} />
-            </View>
-        </SafeAreaView>
+        return (
+            <SafeAreaView style={AppStyle.safeArea} >
+                <TopBar title='Releases' titleColor={Colors.releasesColor} >
+                    <ReturnButton color={Colors.releasesColor} />
+                </TopBar>
+                <AppVersion/>
+                <PageActivityIndicator color={Colors.releasesColor}/>
+            </SafeAreaView>
+        )
     }
 
     return (

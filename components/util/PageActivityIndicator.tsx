@@ -1,11 +1,13 @@
+import { Colors } from '@/constants/Colors'
 import React from 'react'
 import { StyleSheet, View } from 'react-native'
 import CustomActivityIndicator from './CustomActivityIndicator'
 
-const PageActivityIndicator = () => {
+
+const PageActivityIndicator = ({color = Colors.yellow}: {color?: string}) => {
   return (
     <View style={styles.container} >
-      <CustomActivityIndicator/>
+      <CustomActivityIndicator color={color} />
     </View>
   )
 }
