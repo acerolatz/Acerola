@@ -1,5 +1,6 @@
 import ReturnButton from '@/components/buttons/ReturnButton'
 import TopBar from '@/components/TopBar'
+import CustomActivityIndicator from '@/components/util/CustomActivityIndicator'
 import Row from '@/components/util/Row'
 import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
@@ -14,6 +15,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native'
 
 
+const PAGE_LIMIT = 10
 const IMAGE_WIDTH = wp(88)
 const TEXT_LENGHT_LIMIT = 128
 
@@ -49,23 +51,49 @@ const News = ({news}: {news: Post}) => {
 const NewsPage = () => {
 
     const [news, setNews] = useState<Post[]>([])
+    const [loading, setLoading] = useState(false)
+
+    const hasResults = useRef(true)
+    const isInitialized = useRef(false)
     const page = useRef(0)
 
     useEffect(
         () => {
             let isCancelled = false
             const init = async () => {
-                const p = await spFetchNews(page.current)
+                const p = await spFetchNews(page.current, PAGE_LIMIT)
                 if (isCancelled) { return }
                 setNews(p)
+                hasResults.current = p.length >= PAGE_LIMIT
+                isInitialized.current = true
             }
             init()
             return () => { isCancelled = true }
-        }
+        },
+        []
     )
+
+    const onEndReached = async () => {
+        if (!hasResults.current || !isInitialized.current) { return }
+        page.current += 1
+        setLoading(true)
+          const n= await spFetchNews(page.current, PAGE_LIMIT)
+          setNews(prev => [...prev, ...n])
+          hasResults.current = n.length >= PAGE_LIMIT
+        setLoading(false)
+    }
 
     const renderItem = ({item} : {item: Post}) => {
         return <News news={item} />
+    }
+
+    const renderFooter = () => {
+        if (loading && hasResults.current) {
+            return (
+                <CustomActivityIndicator color={Colors.newsColor} />
+            )
+        }
+        return <View style={{height: 62}} />
     }
 
     return (
@@ -78,8 +106,9 @@ const NewsPage = () => {
                     data={news}
                     estimatedItemSize={300}
                     keyExtractor={(item) => item.news_id.toString()}
+                    onEndReached={onEndReached}
                     renderItem={renderItem}
-                    ListFooterComponent={<View style={{height: 60}} />}
+                    ListFooterComponent={renderFooter}
                 />
             </View>
         </SafeAreaView>
