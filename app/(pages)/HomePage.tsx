@@ -43,30 +43,42 @@ const HomePage = () => {
     const [latestUpdate, setLatestUpdates] = useState<Manhwa[]>([])
     const [mostView, setMostView] = useState<Manhwa[]>([])
 
+    const randomCardsInitialized = useRef(false)
+
     const reloadCards = async () => {
-        await spFetchRandomManhwaCards(0, 20)
-            .then(v => setCards(v))
+        if (!randomCardsInitialized.current) { return }
+        await spFetchRandomManhwaCards(0, 20).then(v => setCards(v))
     }
 
     useEffect(
         () => {
+            let isCancelled = false
             const init = async () => {
                 const g = await dbReadGenres(db)
                 const l = await dbReadManhwasOrderedByUpdateAt(db, 0, 30)
                 const m = await dbReadManhwasOrderedByViews(db, 0, 30)
+                if (isCancelled) { return }
+
                 setGenres(g)
                 setLatestUpdates(l)
                 setMostView(m)
-                if (collections.length == 0) {
-                    spFetchCollections()
-                        .then(v => setCollections(v))
-                }
+
                 if (cards.length == 0) {
-                    await spFetchRandomManhwaCards(0, 20)
-                        .then(v => setCards(v))
+                    const r = await spFetchRandomManhwaCards(0, 20)
+                    if (isCancelled) { return }
+                    setCards(r)
+                    randomCardsInitialized.current = true
+                }
+
+                if (collections.length == 0) {
+                    const c = await spFetchCollections()
+                    if (isCancelled) { return }
+                    setCollections(c)
                 }
             }
             init()
+            console.log("init home")
+            return () => { isCancelled = true }
         },
         [db]
     )    

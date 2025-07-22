@@ -51,33 +51,38 @@ const ChapterPage = () => {
 
     useEffect(
       () => {
+        let isCancelled = false;
         async function load() {
           if (currentChapterIndex < 0 || currentChapterIndex >= chapters.length) {
             return
           }
           setLoading(true)
-            await dbUpsertReadingHistory(
-              db,
-              currentChapter.manhwa_id,
-              currentChapter.chapter_id
-            )
+            await dbUpsertReadingHistory(db, currentChapter.manhwa_id, currentChapter.chapter_id)
             await Image.clearMemoryCache()
-            const imgs = await spFetchChapterImages(currentChapter.chapter_id)          
+            const imgs = await spFetchChapterImages(currentChapter.chapter_id)
+
+            if (isCancelled) return;
+            
             let newHeight = 0
             imgs.forEach(img => {
               const w = Math.min(img.width, MAX_WIDTH)
               const h = (w * img.height) / img.width
               newHeight += h              
             })
-            listTotalHeight.value = newHeight + AppConstants.CHAPTER_PAGE_FOOTER_HEIGHT
-            setListItemSize(imgs.length > 0 ? newHeight / imgs.length : hp(40))            
-            footerVisible.value = false
-            setImages(imgs)
-          setLoading(false)
 
-      }
-      load()
-    }, [currentChapterIndex])    
+            if (isCancelled) return;
+
+            setImages(imgs)
+            setListItemSize(imgs.length > 0 ? newHeight / imgs.length : hp(40))            
+            listTotalHeight.value = newHeight + AppConstants.CHAPTER_PAGE_FOOTER_HEIGHT
+            footerVisible.value = false
+          setLoading(false)
+        }
+        load()
+        return () => {      
+          isCancelled = true;
+        };
+    }, [currentChapterIndex, chapters, db])
     
     const scrollToTop = () => {
       flashListRef.current?.scrollToOffset({ animated: false, offset: 0 })

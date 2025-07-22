@@ -13,18 +13,16 @@ import {
 } from '@expo-google-fonts/league-spartan';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
-import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { SafeAreaView, StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 
 const App = () => {
 
-    const db = useSQLiteContext()
-    const alreadyInited = useRef(false)
+    const db = useSQLiteContext()    
 
     let [fontsLoaded] = useFonts({
         LeagueSpartan_200ExtraLight,
@@ -34,13 +32,9 @@ const App = () => {
 
     useEffect(
         () => {
-            async function init() {    
-                if (alreadyInited.current || !fontsLoaded) { return }
-                alreadyInited.current = true
-
+            async function init() {                    
                 await dbCheckFirsRun(db)
-                Image.clearMemoryCache()
-
+                
                 const state: NetInfoState = await NetInfo.fetch()
                 if (!state.isConnected) {
                     Toast.show(ToastMessages.EN.NO_INTERNET)
@@ -58,7 +52,7 @@ const App = () => {
             }
             init()
         },
-        [fontsLoaded]
+        [db]
     )  
 
     if (!fontsLoaded) {
@@ -72,10 +66,10 @@ const App = () => {
             <Row style={styles.container} >
                 <AppLogo/>
                 <Row style={{gap: 16}} >
-                    <Ionicons name='sync' size={28} color={Colors.yellow} />
-                    <Ionicons name='search-outline' size={28} color={Colors.yellow} />
-                    <Ionicons name='dice-outline' size={28} color={Colors.yellow} />
-                    <Ionicons name='options-outline' size={28} color={Colors.yellow} />
+                    <Ionicons name='sync' size={28} color={Colors.white} />
+                    <Ionicons name='search-outline' size={28} color={Colors.white} />
+                    <Ionicons name='dice-outline' size={28} color={Colors.white} />
+                    <Ionicons name='options-outline' size={28} color={Colors.white} />
                 </Row>
             </Row>
             <PageActivityIndicator/>

@@ -57,23 +57,33 @@ const ManhwaPage = () => {
 
   useEffect(
     () => {
+      let isCancelled = false
       async function init() {
         if (!manhwa_id) { 
           Toast.show(ToastMessages.EN.INVALID_MANHWA)
           router.replace("/(pages)/HomePage")
           return
         }
-        const m: Manhwa | null = await dbReadManhwaById(db, manhwa_id).catch(e => null)
-        if (m === null) {
+        const m = await dbReadManhwaById(db, manhwa_id)
+        if (!m) {
           Toast.show(ToastMessages.EN.INVALID_MANHWA)
-          router.replace("/(pages)/HomePage")
+          router.back()
           return
         }
+
+        if (isCancelled) { return }
         setManhwa(m)
-        spUpdateManhwaViews(manhwa_id)
-        dbUpdateManhwaViews(db, manhwa_id)
+        
+        await dbUpdateManhwaViews(db, manhwa_id)
+
+        if (isCancelled) { return }
+        await spUpdateManhwaViews(manhwa_id)
       }
+
       init()
+      return () => {
+        isCancelled = true
+      }
     },
     [db, manhwa_id]
   )

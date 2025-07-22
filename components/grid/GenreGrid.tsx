@@ -44,6 +44,8 @@ const GenreGrid = ({genres}: GenreGridProps) => {
         )
     }
 
+    if (genres.length === 0) { return <></> }
+
     return (
         <View style={styles.container} >
             <FlatList

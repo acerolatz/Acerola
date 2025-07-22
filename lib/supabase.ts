@@ -28,7 +28,7 @@ export async function spGetManhwas(): Promise<Manhwa[]> {
 export async function spNewRun() {
     const { error } = await supabase
         .from("app_runs")
-        .insert([{local_time: new Date().toLocaleString()}])
+        .insert([{created_at: new Date().toISOString()}])
     
     if (error) {
         console.log("error spNewRun", error)

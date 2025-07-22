@@ -108,18 +108,26 @@ const ManhwaChapterGrid = ({
 
   useEffect(
     () => {
+      let isCancelled = false
       async function init() {
         if (!manhwa) { return }
+
         setLoading(true)
-        await dbGetManhwaReadChapters(db, manhwa.manhwa_id)
-          .then(s => chaptersReadByUser.current = s)
-        await spFetchChapterList(manhwa.manhwa_id)
-          .then(values => {
-            setLoading(false)
-            setChapters(values)
-        }).catch(error => setLoading(false))
+        const r = await dbGetManhwaReadChapters(db, manhwa.manhwa_id)
+        const c = await spFetchChapterList(manhwa.manhwa_id)
+        
+        if (isCancelled) { return }
+
+        chaptersReadByUser.current = r
+        setChapters(c)
+        setLoading(false)
       }
+
       init()
+
+      return () => {
+        isCancelled = true
+      }
     },
     [db, manhwa]
   )
