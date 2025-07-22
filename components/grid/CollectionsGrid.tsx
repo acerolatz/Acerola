@@ -1,30 +1,18 @@
 import { Colors } from '@/constants/Colors'
 import { Collection } from '@/helpers/types'
-import { spFetchCollections } from '@/lib/supabase'
 import { useCollectionState } from '@/store/collectionsState'
 import { AppStyle } from '@/styles/AppStyle'
 import { router } from 'expo-router'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 
 
 type CollectionType = Collection | 'Header'
 
+
 const CollectionGrid = () => {
 
-    const { collections, setCollections } = useCollectionState()
-    
-    useEffect(
-        () => {
-            async function init() {
-                if (collections.length == 0) {
-                    await spFetchCollections().then(values => setCollections([...['Header' as any], ...values]))
-                }
-            }
-            init()
-        },
-        []
-    )
+    const { collections } = useCollectionState()
 
     const onPress = (collection: Collection) => {
         router.navigate({
@@ -56,10 +44,14 @@ const CollectionGrid = () => {
         )
     }
 
+    if (collections.length === 0) {
+        return <></>
+    }
+
     return (
         <View style={styles.container} >
             <FlatList
-                data={collections}
+                data={[...['Header'] as any, ...collections]}
                 keyExtractor={(item, index) => index.toString()}
                 showsHorizontalScrollIndicator={false}
                 horizontal={true}

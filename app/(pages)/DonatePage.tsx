@@ -25,7 +25,6 @@ import Toast from 'react-native-toast-message'
 
 const Donate = () => {  
 
-
   const { donates, setDonates } = useDonateState()
   const [loading, setLoading] = useState(false)  
 

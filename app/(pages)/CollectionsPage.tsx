@@ -13,7 +13,7 @@ const CollectionsPage = () => {
     
     const { collections } = useCollectionState()
 
-    const onGenrePress = async (collection: Collection) => {
+    const onCollectionPress = async (collection: Collection) => {
         router.navigate({
             pathname: '/(pages)/CollectionPage', 
             params: {
@@ -27,7 +27,7 @@ const CollectionsPage = () => {
     const renderItem = ({item, index}: {item: Collection, index: number}) => {
         return (
             <Pressable
-                onPress={() => onGenrePress(item)}
+                onPress={() => onCollectionPress(item)}
                 style={[styles.item, {marginRight: index % 2 == 0 ? '4%' : 0}]} >
                 <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor, textAlign: "center", alignSelf: "center"}]} >{item.name}</Text>
             </Pressable>

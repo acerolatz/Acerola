@@ -3,7 +3,7 @@ import PageActivityIndicator from '@/components/util/PageActivityIndicator';
 import Row from '@/components/util/Row';
 import { Colors } from '@/constants/Colors';
 import { ToastMessages } from '@/constants/Messages';
-import { dbSetLastRefresh, dbShouldUpdate, dbUpdateDatabase } from '@/lib/database';
+import { dbCheckFirsRun, dbSetLastRefresh, dbShouldUpdate, dbUpdateDatabase } from '@/lib/database';
 import { AppStyle } from '@/styles/AppStyle';
 import {
     LeagueSpartan_200ExtraLight,
@@ -37,7 +37,8 @@ const App = () => {
             async function init() {    
                 if (alreadyInited.current || !fontsLoaded) { return }
                 alreadyInited.current = true
-                
+
+                await dbCheckFirsRun(db)
                 Image.clearMemoryCache()
 
                 const state: NetInfoState = await NetInfo.fetch()
@@ -47,14 +48,12 @@ const App = () => {
                     return
                 }                
 
-                const shouldUpdate = await dbShouldUpdate(db, 'server')
-                if (shouldUpdate) {
+                if (await dbShouldUpdate(db, 'server')) {
                     Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE)
                     await dbSetLastRefresh(db, 'client')
                     await dbUpdateDatabase(db)
                     Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED)
                 }
-
                 router.replace("/(pages)/HomePage")
             }
             init()

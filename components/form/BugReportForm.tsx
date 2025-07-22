@@ -244,9 +244,8 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
     }
 
     return (
-        <KeyboardAvoidingView style={{flex: 1, gap: 20}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
+        <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
             <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='always' >
-                
                 {/* Title */}
                 <Text style={AppStyle.inputHeaderText}>Title</Text>
                 <Controller
@@ -320,8 +319,7 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
                     </View>
                 }
 
-                <View style={{height: 80}} />
-                
+                <View style={{height: 80}} />                
             </ScrollView>
         </KeyboardAvoidingView>
     )

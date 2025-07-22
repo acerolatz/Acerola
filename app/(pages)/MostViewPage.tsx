@@ -57,7 +57,6 @@ const MostView = () => {
         hasResults={true}
         loading={loading}
         numColumns={2}
-        estimatedItemSize={400}
         showChaptersPreview={true}
         shouldShowChapterDate={false}
         onEndReached={onEndReached}

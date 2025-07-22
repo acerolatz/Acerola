@@ -25,6 +25,16 @@ export async function spGetManhwas(): Promise<Manhwa[]> {
     return data
 }
 
+export async function spNewRun() {
+    const { error } = await supabase
+        .from("app_runs")
+        .insert([{local_time: new Date().toLocaleString()}])
+    
+    if (error) {
+        console.log("error spNewRun", error)
+    }
+}
+
 
 export async function spFetchChapterList(manhwa_id: number): Promise<Chapter[]> {
     
@@ -176,9 +186,14 @@ export async function spFetchCollections(): Promise<Collection[]> {
     return data
 }
 
-export async function spFetchCollectionItems(p_collection_id: number): Promise<Manhwa[]> {
+
+export async function spFetchCollectionItems(
+    p_collection_id: number,
+    p_offset: number = 0,
+    p_limit: number = 30
+): Promise<Manhwa[]> {
     const { data, error } = await supabase
-        .rpc('get_manhwas_by_collection', { p_collection_id })
+        .rpc('get_manhwas_by_collection', { p_collection_id, p_offset, p_limit })
 
     if (error) {
         console.log('error spFetchCollectionItems', error)

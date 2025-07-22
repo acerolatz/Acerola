@@ -2,6 +2,7 @@ import ChapterArrowUpButton from '@/components/buttons/ChapterArrowUpButton'
 import ChapterFooter from '@/components/chapter/ChapterFooter'
 import ChapterHeader from '@/components/chapter/ChapterHeader'
 import ChapterImageItem from '@/components/chapter/ChapterImageItem'
+import CustomActivityIndicator from '@/components/util/CustomActivityIndicator'
 import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
 import { Chapter, ChapterImage } from '@/helpers/types'
@@ -13,7 +14,7 @@ import { Image } from 'expo-image'
 import { useLocalSearchParams } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
 import React, { useEffect, useRef, useState } from 'react'
-import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native'
+import { FlatList, StyleSheet, View } from 'react-native'
 import Animated, {
   useAnimatedScrollHandler,
   useAnimatedStyle,
@@ -39,7 +40,7 @@ const ChapterPage = () => {
     const currentChapter: Chapter = chapters[currentChapterIndex]    
     const headerVisible = useSharedValue(true)
     const footerVisible = useSharedValue(false)
-    const flashListTotalHeight = useSharedValue(hp(100))
+    const listTotalHeight = useSharedValue(hp(100))
     const isLastChapter= currentChapterIndex >= chapters.length - 1
     const isFirstChapter= currentChapterIndex === 0
 
@@ -49,26 +50,25 @@ const ChapterPage = () => {
           if (currentChapterIndex < 0 || currentChapterIndex >= chapters.length) {
             return
           }
-        setLoading(true)
-          await Image.clearMemoryCache()
-          const imgs = await spFetchChapterImages(currentChapter.chapter_id)          
-          let newHeight = 0
-          imgs.forEach(img => {
-            const w = Math.min(img.width, MAX_WIDTH)
-            const h = (w * img.height) / img.width
-            newHeight += h
-          })
-          flashListTotalHeight.value = newHeight + AppConstants.CHAPTER_PAGE_FOOTER_HEIGHT
-          footerVisible.value = false
-          setImages(imgs)
-        setLoading(false)
+          setLoading(true)
+            await dbUpsertReadingHistory(
+              db,
+              currentChapter.manhwa_id,
+              currentChapter.chapter_id
+            )
+            await Image.clearMemoryCache()
+            const imgs = await spFetchChapterImages(currentChapter.chapter_id)          
+            let newHeight = 0
+            imgs.forEach(img => {
+              const w = Math.min(img.width, MAX_WIDTH)
+              const h = (w * img.height) / img.width
+              newHeight += h
+            })
+            listTotalHeight.value = newHeight + AppConstants.CHAPTER_PAGE_FOOTER_HEIGHT
+            footerVisible.value = false
+            setImages(imgs)
+          setLoading(false)
 
-        dbUpsertReadingHistory(
-          db,
-          currentChapter.manhwa_id,
-          currentChapter.chapter_id,
-          currentChapter.chapter_num
-        )
       }
       load()
     }, [currentChapterIndex])    
@@ -94,7 +94,7 @@ const ChapterPage = () => {
     const scrollHandler = useAnimatedScrollHandler({
       onScroll: (event) => {
         headerVisible.value = event.contentOffset.y <= 50
-        footerVisible.value = event.contentOffset.y + SCREEN_HEIGHT >= flashListTotalHeight.value - 100
+        footerVisible.value = event.contentOffset.y + SCREEN_HEIGHT >= listTotalHeight.value - 100
       }
     })
 
@@ -164,7 +164,7 @@ const ChapterPage = () => {
             initialNumToRender={5}
             maxToRenderPerBatch={5}
             windowSize={12}
-            ListEmptyComponent={<ActivityIndicator size={32} color={Colors.neonRed} />}
+            ListEmptyComponent={<CustomActivityIndicator/>}
           />          
           <Animated.View style={animatedFooterStyle} >
             <ChapterFooter

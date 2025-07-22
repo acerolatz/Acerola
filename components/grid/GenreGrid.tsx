@@ -1,29 +1,19 @@
 import { Colors } from '@/constants/Colors'
 import { Genre } from '@/helpers/types'
-import { dbReadGenres } from '@/lib/database'
 import { AppStyle } from '@/styles/AppStyle'
 import { router } from 'expo-router'
-import { useSQLiteContext } from 'expo-sqlite'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 
 
 type GenreType = Genre | 'Header'
 
-const GenreGrid = () => {
 
-    const db = useSQLiteContext()
-    const [genres, setGenres] = useState<GenreType[]>([])
-    
-    useEffect(
-        () => {
-            async function init() {
-                await dbReadGenres(db).then(values => setGenres([...['Header' as any], ...values]))
-            }
-            init()
-        },
-        [db]
-    )
+interface GenreGridProps {
+    genres: Genre[]
+}
+
+const GenreGrid = ({genres}: GenreGridProps) => {
 
     const onPress = (genre: Genre) => {
         router.navigate({
@@ -57,7 +47,7 @@ const GenreGrid = () => {
     return (
         <View style={styles.container} >
             <FlatList
-                data={genres}
+                data={[...['Header'], ...genres] as GenreType[]}
                 keyExtractor={(item, index) => index.toString()}
                 showsHorizontalScrollIndicator={false}
                 horizontal={true}

@@ -26,17 +26,18 @@ const LatestUpdatesPage = () => {
   useEffect(
     () => {
       async function init() {
-        if (manhwas.length === 0) {
           setLoading(true)
-          await dbReadManhwasOrderedByUpdateAt(db, 0, PAGE_LIMIT)
-            .then(values => setManhwas(values))
+            await dbReadManhwasOrderedByUpdateAt(db, 0, PAGE_LIMIT)
+              .then(values => {
+                hasResults.current =  values.length > 0
+                setManhwas(values)
+              })
+            isInitialized.current = true
           setLoading(false)
-      }
-        isInitialized.current = true
       }
       init()
     },
-    [db, manhwas]
+    [db]
   )
 
   const onEndReached = async () => {
@@ -60,7 +61,6 @@ const LatestUpdatesPage = () => {
         manhwas={manhwas}
         loading={loading}
         numColumns={2}
-        estimatedItemSize={400}
         hasResults={true}
         showChaptersPreview={true}
         shouldShowChapterDate={false}

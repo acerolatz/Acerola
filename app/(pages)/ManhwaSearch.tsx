@@ -18,7 +18,8 @@ import React, { memo, useEffect, useRef, useState } from 'react'
 import { Pressable, SafeAreaView, Text, View } from 'react-native'
 
 
-const PAGE_LIMIT = 30
+const PAGE_LIMIT = 20
+
 
 const {width, height} = getItemGridDimensions(
     wp(5),

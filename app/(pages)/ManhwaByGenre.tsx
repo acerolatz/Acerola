@@ -64,7 +64,6 @@ const MangaByGenre = () => {
                 manhwas={manhwas}
                 numColumns={2}
                 loading={loading}
-                estimatedItemSize={400}
                 hasResults={true}
                 listMode='FlashList'
                 showChaptersPreview={false}

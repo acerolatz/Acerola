@@ -18,15 +18,14 @@ const GenresPage = () => {
     useEffect(
         () => {
             const init = async () => {
-                const g: Genre[] = await dbReadGenres(db)
-                setGenres([...g])
+                await dbReadGenres(db).then(v => setGenres(v))
             }
             init()
         },
         [db]
     )
 
-    const onGenrePress = async (genre: Genre) => {
+    const onPress = async (genre: Genre) => {
         router.navigate({
             pathname: '/(pages)/ManhwaByGenre', 
             params: {
@@ -39,7 +38,7 @@ const GenresPage = () => {
     const renderItem = ({item, index}: {item: Genre, index: number}) => {
         return (
             <Pressable
-                onPress={() => onGenrePress(item)}
+                onPress={() => onPress(item)}
                 style={[styles.item, {marginRight: index % 2 == 0 ? '4%' : 0}]} >
                 <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor, textAlign: "center", alignSelf: "center"}]} >{item.genre}</Text>
             </Pressable>

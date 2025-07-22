@@ -70,9 +70,9 @@ const ReadingHistory = () => {
         hasResults={hasResults.current}
         listMode='FlashList'
         showManhwaStatus={false}
+        color={Colors.readingHistoryColor}
         showChaptersPreview={false}
         loading={loading}
-        activityIndicatorColor={Colors.readingHistoryColor}
       />
     </SafeAreaView>
   )

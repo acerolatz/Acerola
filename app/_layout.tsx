@@ -40,7 +40,7 @@ const _layout = () => {
   return (
       <GestureHandlerRootView style={{flex: 1, backgroundColor: Colors.backgroundColor}} >
         <StatusBar hidden={true} barStyle={'light-content'} animated={true}/>
-        <SQLiteProvider databaseName='ononoki.db' onInit={dbMigrate}>
+        <SQLiteProvider databaseName='acerola.db' onInit={dbMigrate}>
           <Stack>
               <Stack.Screen name='index' options={{headerShown: false}} />              
               <Stack.Screen name='(pages)/HomePage' options={{headerShown: false}} />

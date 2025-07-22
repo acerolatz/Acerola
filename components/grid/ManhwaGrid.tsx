@@ -15,13 +15,11 @@ interface MangaGridProps {
     loading?: boolean
     hasResults?: boolean
     paddingHorizontal?: number
-    gap?: number
     numColumns?: number
     shouldShowChapterDate?: boolean
     showChaptersPreview?: boolean
     listMode?: 'FlashList' | 'FlatList'
-    estimatedItemSize?: number
-    activityIndicatorColor?: string
+    color?: string
     showManhwaStatus?: boolean
 }
 
@@ -31,30 +29,44 @@ const ManhwaGrid = ({
     onEndReached, 
     loading = false, 
     hasResults = true,
-    paddingHorizontal = wp(5), 
-    gap = 10, 
+    paddingHorizontal = wp(4),
     numColumns = 1,
     shouldShowChapterDate = true,
     showChaptersPreview = true,
     listMode = 'FlashList',
-    estimatedItemSize = AppConstants.MANHWA_COVER_DIMENSION.height + 180,
-    activityIndicatorColor = Colors.neonRed,
+    color = Colors.yellow,
     showManhwaStatus = true
 }: MangaGridProps) => {        
 
     const {width, height} = getItemGridDimensions(
         paddingHorizontal,
-        gap,
+        10,
         numColumns,
         AppConstants.MANHWA_COVER_DIMENSION.width,
         AppConstants.MANHWA_COVER_DIMENSION.height
     )
 
+    const estimatedItemSize = height + (showChaptersPreview ? 180 : 0)
+
+    const renderItem = ({item}: {item: Manhwa}) => {
+        return (
+            <ManhwaCard 
+                showChaptersPreview={showChaptersPreview} 
+                shouldShowChapterDate={shouldShowChapterDate}
+                showManhwaStatus={showManhwaStatus}
+                width={width} 
+                height={height} 
+                marginBottom={6} 
+                manhwa={item}
+            />
+        )
+    }
+
     const renderFooter = () => {
         if (loading && hasResults) {
             return (
                 <View style={{width: '100%', paddingVertical: 22, alignItems: "center", justifyContent: "center"}} >
-                    <CustomActivityIndicator/>
+                    <CustomActivityIndicator color={color}/>
                 </View> 
             )
         }
@@ -74,50 +86,28 @@ const ManhwaGrid = ({
                     onEndReached={onEndReached}
                     scrollEventThrottle={4}
                     onEndReachedThreshold={2}
-                    renderItem={({item}) => 
-                        <ManhwaCard 
-                            showChaptersPreview={showChaptersPreview} 
-                            shouldShowChapterDate={shouldShowChapterDate}
-                            showManhwaStatus={showManhwaStatus}
-                            width={width} 
-                            height={height} 
-                            marginBottom={6} 
-                            manhwa={item} />
-                    }
+                    renderItem={renderItem}
                     ListFooterComponent={renderFooter}
                     />
             </View>
         )
     }
-
-    if (listMode == "FlatList") {
-        return (
-            <View style={{flex: 1}} >
-                <FlatList
-                    keyboardShouldPersistTaps={'always'}
-                    data={manhwas}
-                    numColumns={numColumns}
-                    keyExtractor={(item) => item.manhwa_id.toString()}
-                    initialNumToRender={12}
-                    onEndReached={onEndReached}
-                    scrollEventThrottle={4}
-                    onEndReachedThreshold={3}
-                    renderItem={({item}) => 
-                        <ManhwaCard 
-                            showChaptersPreview={showChaptersPreview} 
-                            shouldShowChapterDate={shouldShowChapterDate} 
-                            showManhwaStatus={showManhwaStatus}
-                            width={width} 
-                            height={height} 
-                            marginBottom={6} 
-                            manhwa={item} />
-                    }
-                    ListFooterComponent={renderFooter}/>
-            </View>
-        )
-    }
-
-    return <></>
+    
+    return (
+        <View style={{flex: 1}} >
+            <FlatList
+                keyboardShouldPersistTaps={'always'}
+                data={manhwas}
+                numColumns={numColumns}
+                keyExtractor={(item) => item.manhwa_id.toString()}
+                initialNumToRender={12}
+                onEndReached={onEndReached}
+                scrollEventThrottle={4}
+                onEndReachedThreshold={3}
+                renderItem={renderItem}
+                ListFooterComponent={renderFooter}/>
+        </View>
+    )    
 }
 
 export default ManhwaGrid

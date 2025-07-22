@@ -68,9 +68,8 @@ const RequestManhwaForm = () => {
     };
 
   return (
-    <KeyboardAvoidingView style={{flex: 1, gap: 20}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
+    <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
         <ScrollView style={{flex: 1}} keyboardShouldPersistTaps='always' >
-            
             {/* Manga Name */}
             <Text style={AppStyle.inputHeaderText}>Name</Text>
             <Controller
@@ -117,7 +116,6 @@ const RequestManhwaForm = () => {
             </Pressable>
             
             <View style={{width: '100%', height: 60}} />
-
         </ScrollView>
     </KeyboardAvoidingView>
   )

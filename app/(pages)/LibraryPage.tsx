@@ -78,13 +78,12 @@ const Library = () => {
             manhwas={manhwas}
             loading={loading}          
             numColumns={2}
-            estimatedItemSize={400}
             hasResults={true}
             shouldShowChapterDate={false}
             showManhwaStatus={false}
             onEndReached={onEndReached}
             listMode='FlashList'
-            activityIndicatorColor={Colors.libraryColor}
+            color={Colors.libraryColor}
           />
         </View>
     </SafeAreaView>

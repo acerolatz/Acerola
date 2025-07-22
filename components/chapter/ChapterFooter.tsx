@@ -38,7 +38,7 @@ const ChapterFooter = ({
   }
 
   return (
-    <View style={{width: '100%', paddingHorizontal: wp(5)}} >
+    <View style={{width: '100%', paddingHorizontal: wp(4)}} >
         
         {/* Chapter Controller Button */}
         <View style={{flexDirection: 'row', alignItems: "center", gap: 10, justifyContent: "center", marginBottom: 20}} >

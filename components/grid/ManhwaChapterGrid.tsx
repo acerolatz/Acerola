@@ -105,7 +105,7 @@ const ManhwaChapterGrid = ({
   
   const chaptersReadByUser = useRef<Set<number>>(new Set())
   const maxChapterPageNum = Math.floor(chapters.length / PAGE_LIMIT)
-  
+
   useEffect(
     () => {
       async function init() {
@@ -123,7 +123,6 @@ const ManhwaChapterGrid = ({
     },
     [db, manhwa]
   )
-  
   
   const readFirst = () => {
     if (chapters.length > 0) {
