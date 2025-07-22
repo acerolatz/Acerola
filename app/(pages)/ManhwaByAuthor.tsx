@@ -25,16 +25,18 @@ const ManhwaByAuthor = () => {
     
     useEffect(
         () => {
+            let isCancelled = false
             async function init() {
                 if (manhwas.length === 0) {
                     setLoading(true)
-                    await dbReadManhwasByAuthorId(db, author_id)
-                        .then(values => setManhwas([...values]))
-                        .catch(e => setManhwas([]))
+                        const m = await dbReadManhwasByAuthorId(db, author_id)
+                        if (isCancelled) { return }
+                        setManhwas(m)
                     setLoading(false)
                 }
             }
             init()
+            return () => { isCancelled = true }
         },
         [db, manhwas, author_id]
     )    

@@ -81,9 +81,7 @@ const ManhwaPage = () => {
       }
 
       init()
-      return () => {
-        isCancelled = true
-      }
+      return () => { isCancelled = true }
     },
     [db, manhwa_id]
   )

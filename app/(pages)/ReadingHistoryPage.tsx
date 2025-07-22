@@ -25,21 +25,18 @@ const ReadingHistory = () => {
 
   useEffect(
     () => {
+      let isCancelled = false
       const init = async () => {
         if (isInitialized.current) { return }
         isInitialized.current = true
-        await dbGetReadingHistory(db, 0, PAGE_LIMIT)
-          .then(values => {
-            hasResults.current = values.length > 0
-            setManhwas([...values])
-          })
-          .catch(e => {
-            console.log(e); 
-            hasResults.current = false; 
-            setManhwas([])
-          })
+        const m = await dbGetReadingHistory(db, 0, PAGE_LIMIT)
+        if (isCancelled) { return }
+        setManhwas(m)
+        hasResults.current = m.length > 0
       }
+
       init()
+      return () => { isCancelled = true }
     },
     [db]
   )
@@ -48,12 +45,9 @@ const ReadingHistory = () => {
     if (!hasResults.current || !isInitialized.current) { return }
     setLoading(true)
       page.current += 1    
-      await dbGetReadingHistory(db, page.current * PAGE_LIMIT, PAGE_LIMIT)
-        .then(values => {
-          hasResults.current = values.length > 0
-          setManhwas(prev => [...prev, ...values])
-        })
-        .catch(e => {console.log(e); hasResults.current = false;})
+      const m = await dbGetReadingHistory(db, page.current * PAGE_LIMIT, PAGE_LIMIT)
+      setManhwas(prev => [...prev, ...m])
+      hasResults.current = m.length > 0
     setLoading(false)
   }
 

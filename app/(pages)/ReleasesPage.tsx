@@ -22,13 +22,17 @@ const Releases = () => {
 
     useEffect(
         () => {
+            let isCancelled = false
             async function init() {
                 if (allReleases.length > 0) { return }
                 setLoading(true)
-                    await spGetReleases().then(v => setAllReleases([...v]))
+                    const r = await spGetReleases()
+                    if (isCancelled) { return }
+                    setAllReleases(r)
                 setLoading(false)
             }
             init()
+            return () => { isCancelled = true }
         },
         []
     )

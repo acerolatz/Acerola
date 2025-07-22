@@ -26,25 +26,22 @@ const Library = () => {
 
   const init = async () => {
     setLoading(true)
-    await dbGetManhwasByReadingStatus(db, status.current      
-    ).then(values => {
-        hasResults.current = values.length > 0
-        setManhwas([...values])
-      })
+      const m = await dbGetManhwasByReadingStatus(db, status.current, 0, PAGE_LIMIT)
+      hasResults.current = m.length > 0
+      setManhwas(m)
     setLoading(false)
   }
 
   const load = async (append: boolean = false) => {
     setLoading(true)
-      await dbGetManhwasByReadingStatus(
+      const m = await dbGetManhwasByReadingStatus(
         db,
         status.current,
         page.current * PAGE_LIMIT,
         PAGE_LIMIT
-      ).then(values => {
-          hasResults.current = values.length > 0
-          setManhwas(prev => append ? [...prev, ...values] : [...values])
-        })
+      )    
+      hasResults.current = m.length > 0
+      setManhwas(prev => append ? [...prev, ...m] : m)
     setLoading(false)
   }
 

@@ -73,10 +73,12 @@ const ManhwaSearch = () => {
   
   useEffect(
     () => {
+      let isCancelled = false
       const init = async () => {
         if (manhwas.length == 0) {
           setLoading(true)
             const m = await spSearchManhwas(searchTerm.current, 0, PAGE_LIMIT)
+            if (isCancelled) { return }
             hasResults.current = m.length > 0
             setManhwas(m)
           setLoading(false)
@@ -84,6 +86,9 @@ const ManhwaSearch = () => {
         isInitialized.current = true
       }
       init()
+      return () => {
+        isCancelled = true
+      }
     },
     []
   )
@@ -94,11 +99,11 @@ const ManhwaSearch = () => {
     setLoading(true)
         const m = await spSearchManhwas(searchTerm.current, page.current * PAGE_LIMIT, PAGE_LIMIT)        
         hasResults.current = m.length > 0
-        setManhwas([...m])
+        setManhwas(m)
     setLoading(false)
   }
 
-  const debounceSearch = debounce(handleSearch, 400)
+  const debounceSearch = debounce(handleSearch, 500)
 
   const onEndReached = async () => {
     if (!hasResults.current || !isInitialized.current) { return }

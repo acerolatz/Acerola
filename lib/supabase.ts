@@ -1,6 +1,7 @@
-import { AppRelease, Chapter, ChapterImage, Collection, DonateMethod, Manhwa, ManhwaCard, Scan } from "@/helpers/types";
+import { AppRelease, Chapter, ChapterImage, Collection, DonateMethod, Manhwa, ManhwaCard, Post, Scan } from "@/helpers/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createClient } from '@supabase/supabase-js';
+import * as RNLocalize from 'react-native-localize';
 import { supabaseKey, supabaseUrl } from "./supabaseKey";
 
 
@@ -25,14 +26,33 @@ export async function spGetManhwas(): Promise<Manhwa[]> {
     return data
 }
 
+
 export async function spNewRun() {
+    const timezone = RNLocalize.getTimeZone()
+    const locales = RNLocalize.getLocales()
+    const language = locales.length > 0 ? locales.slice(0, 5).map(i => i.languageTag).join(', ') : null
+
     const { error } = await supabase
         .from("app_runs")
-        .insert([{created_at: new Date().toISOString()}])
+        .insert([{ language, timezone}])
     
     if (error) {
         console.log("error spNewRun", error)
     }
+}
+
+export async function spFetchNews(page: number = 0, limit: number = 10): Promise<Post[]> {
+    const { data, error } = await supabase
+        .from("news")
+        .select('*')
+        .order("created_at", {ascending: false})
+        .range(page * limit, (page + 1) * limit)
+
+    if (error) {
+        console.log("error spFetchNews", error)
+    }
+
+    return data ? data as Post[] : []
 }
 
 

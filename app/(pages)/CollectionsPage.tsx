@@ -40,7 +40,7 @@ const CollectionsPage = () => {
                 <ReturnButton/>
             </TopBar>
             <FlatList
-                data={collections.slice(1, collections.length)}
+                data={collections}
                 initialNumToRender={30}
                 keyExtractor={(item) => item.collection_id.toString()}
                 showsVerticalScrollIndicator={false}

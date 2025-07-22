@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
         color: Colors.white
     },
     dropDownContainer: {
-        height: 52, 
+        height: 52,
         borderRadius: AppConstants.BORDER_RADIUS,
         borderWidth: 0
     }

@@ -21,12 +21,14 @@ interface MangaGridProps {
     listMode?: 'FlashList' | 'FlatList'
     color?: string
     showManhwaStatus?: boolean
+    listHeader?: React.ComponentType<any> | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | null | undefined
 }
 
 
 const ManhwaGrid = ({
     manhwas, 
     onEndReached, 
+    listHeader,
     loading = false, 
     hasResults = true,
     paddingHorizontal = wp(4),
@@ -36,7 +38,7 @@ const ManhwaGrid = ({
     listMode = 'FlashList',
     color = Colors.yellow,
     showManhwaStatus = true
-}: MangaGridProps) => {        
+}: MangaGridProps) => {
 
     const {width, height} = getItemGridDimensions(
         paddingHorizontal,
@@ -87,6 +89,7 @@ const ManhwaGrid = ({
                     scrollEventThrottle={4}
                     onEndReachedThreshold={2}
                     renderItem={renderItem}
+                    ListHeaderComponent={listHeader}
                     ListFooterComponent={renderFooter}
                     />
             </View>
@@ -105,6 +108,7 @@ const ManhwaGrid = ({
                 scrollEventThrottle={4}
                 onEndReachedThreshold={3}
                 renderItem={renderItem}
+                ListHeaderComponent={listHeader}
                 ListFooterComponent={renderFooter}/>
         </View>
     )    

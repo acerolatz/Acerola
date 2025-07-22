@@ -47,7 +47,7 @@ const HomePage = () => {
 
     const reloadCards = async () => {
         if (!randomCardsInitialized.current) { return }
-        await spFetchRandomManhwaCards(0, 20).then(v => setCards(v))
+        await spFetchRandomManhwaCards(0, 32).then(v => setCards(v))
     }
 
     useEffect(
@@ -64,7 +64,7 @@ const HomePage = () => {
                 setMostView(m)
 
                 if (cards.length == 0) {
-                    const r = await spFetchRandomManhwaCards(0, 20)
+                    const r = await spFetchRandomManhwaCards(0, 32)
                     if (isCancelled) { return }
                     setCards(r)
                     randomCardsInitialized.current = true
@@ -76,8 +76,8 @@ const HomePage = () => {
                     setCollections(c)
                 }
             }
+            
             init()
-            console.log("init home")
             return () => { isCancelled = true }
         },
         [db]

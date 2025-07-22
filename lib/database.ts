@@ -94,8 +94,7 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       CREATE INDEX IF NOT EXISTS idx_authors_name ON authors(name);
       CREATE INDEX IF NOT EXISTS idx_chapters_manhwa_num ON chapters(manhwa_id, chapter_num DESC);
       CREATE INDEX IF NOT EXISTS idx_reading_status_manhwa_id_status ON reading_status (manhwa_id, status);
-      CREATE INDEX IF NOT EXISTS idx_reading_history_readed_at ON reading_history(manhwa_id, readed_at DESC);
-      DROP INDEX IF EXISTS idx_reading_history_updated;
+      CREATE INDEX IF NOT EXISTS idx_reading_history_readed_at ON reading_history(manhwa_id, readed_at DESC);      
 
       INSERT OR REPLACE INTO 
         app_info (name, value)
@@ -823,7 +822,7 @@ export async function dbReadManhwasByGenreId(
       WHERE 
         g.genre_id = ?
       ORDER BY 
-        m.views DESC
+        m.views DESC, m.manhwa_id ASC
       LIMIT ?
       OFFSET ?;
     `,

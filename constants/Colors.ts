@@ -41,8 +41,10 @@ export const Colors = {
   scansColor: "#4682A9",
   chatColor: "#E14434",
   releasesColor: "#F24E4E",
+  newsColor: "#F3E9DC",
   redditColor: "#FF4500",
 
-  manhwaStatusCompleted: "rgba(33, 183, 116, 0.7)",
-  manhwaStatusOnGoing: "rgba(255, 103, 64, 0.7)"
+  manhwaStatusTextColor: "#111419",
+  manhwaStatusCompleted: "rgba(33, 183, 116, 0.9)",
+  manhwaStatusOnGoing: "rgba(255, 103, 64, 0.9)"
 };

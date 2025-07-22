@@ -61,6 +61,7 @@ const _layout = () => {
               <Stack.Screen name='(pages)/DonatePage' options={{headerShown: false}} />              
               <Stack.Screen name='(pages)/RequestManhwaPage' options={{headerShown: false}} />
               <Stack.Screen name='(pages)/ReleasesPage' options={{headerShown: false}} />
+              <Stack.Screen name='(pages)/NewsPage' options={{headerShown: false}} />
               <Stack.Screen name='(pages)/DisclaimerPage' options={{headerShown: false}} />
           </Stack>
           <Toast 

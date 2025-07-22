@@ -42,7 +42,7 @@ const CollectionGrid = () => {
                 <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor}]}>{item.name}</Text>
             </Pressable>
         )
-    }
+    }    
 
     if (collections.length === 0) {
         return <></>

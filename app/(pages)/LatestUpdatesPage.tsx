@@ -25,17 +25,18 @@ const LatestUpdatesPage = () => {
 
   useEffect(
     () => {
+      let isCancelled = false
       async function init() {
           setLoading(true)
-            await dbReadManhwasOrderedByUpdateAt(db, 0, PAGE_LIMIT)
-              .then(values => {
-                hasResults.current =  values.length > 0
-                setManhwas(values)
-              })
+            const m = await dbReadManhwasOrderedByUpdateAt(db, 0, PAGE_LIMIT)
+            if (isCancelled) { return }
+            setManhwas(m)
+            hasResults.current = m.length > 0
             isInitialized.current = true
           setLoading(false)
       }
       init()
+      return () => { isCancelled = true }
     },
     [db]
   )
@@ -44,11 +45,9 @@ const LatestUpdatesPage = () => {
     if (!hasResults.current || !isInitialized.current) { return }
     page.current += 1
     setLoading(true)
-      await dbReadManhwasOrderedByUpdateAt(db, page.current * PAGE_LIMIT, PAGE_LIMIT)
-        .then(values => {
-          hasResults.current = values.length > 0
-          setManhwas(prev => [...prev, ...values])
-        })
+      const m = await dbReadManhwasOrderedByUpdateAt(db, page.current * PAGE_LIMIT, PAGE_LIMIT)
+      hasResults.current = m.length > 0
+      setManhwas(prev => [...prev, ...m])
     setLoading(false)
   }  
 

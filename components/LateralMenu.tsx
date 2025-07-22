@@ -114,6 +114,10 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
         }
     }
 
+    const openNews = () => {
+        router.navigate("/(pages)/NewsPage")
+    }
+
     const openGithub = async () => {
         try {
             await Linking.openURL(AppConstants.GITHUB_URL)
@@ -156,6 +160,14 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
                     iconName='cash-outline'
                     showLoading={false}
                     iconColor={Colors.donateColor}
+                />
+
+                <Option 
+                    onPress={openNews} 
+                    title='News' 
+                    iconName='newspaper-outline'
+                    showLoading={false}
+                    iconColor={Colors.newsColor}
                 />
 
                 <Option 
@@ -209,11 +221,12 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
                 <Option 
                     onPress={openDisclaimer} 
                     title='Disclaimer' 
-                    iconName='newspaper-outline'
+                    iconName='receipt-outline'
                     showLoading={false}
                     iconColor={Colors.disclaimerColor}
                 />
-
+                
+                <View style={{height: 82}} />
             </View>            
         </ScrollView>
     )

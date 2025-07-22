@@ -17,10 +17,16 @@ const GenresPage = () => {
 
     useEffect(
         () => {
+            let isCancelled = false
             const init = async () => {
-                await dbReadGenres(db).then(v => setGenres(v))
+                const g = await dbReadGenres(db)
+                if (isCancelled) { return }
+                setGenres(g)
             }
+            
             init()
+
+            return () => { isCancelled = true }
         },
         [db]
     )

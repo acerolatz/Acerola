@@ -25,12 +25,18 @@ const MostView = () => {
 
   useEffect(
     () => {
+      let isCancelled = false
       async function init() {
-        const m: Manhwa[] = await dbReadManhwasOrderedByViews(db, 0, PAGE_LIMIT)
-        setManhwas(m)
-        isInitialized.current = true
+        setLoading(true)
+          const m: Manhwa[] = await dbReadManhwasOrderedByViews(db, 0, PAGE_LIMIT)
+          if (isCancelled) { return }
+          setManhwas(m)
+          isInitialized.current = true
+        setLoading(false)
       }
+
       init()
+      return () => { isCancelled = true }
     },
     [db]
   )

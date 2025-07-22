@@ -84,3 +84,13 @@ export type Collection = {
     name: string
     descr: string | null
 }
+
+export type Post = {
+    news_id: number
+    title: string
+    descr: string
+    image_url: string | null
+    image_width: number | null
+    image_height: number | null
+    created_at: string
+}

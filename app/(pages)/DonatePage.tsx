@@ -30,14 +30,21 @@ const Donate = () => {
 
   useEffect(
     () => {
+      let isCancelled = false
+      
       const init = async () => {
-        if (donates.length == 0) {
-          setLoading(true)
-          await spGetDonationMethods().then(values => setDonates(values))
-          setLoading(false)
-        }
+        if (donates.length != 0) { return }
+
+        setLoading(true)
+          const d = await spGetDonationMethods()
+          if (isCancelled) { return }
+          setDonates(d)
+        setLoading(false)
       }
+      
       init()
+
+      return () => { isCancelled = true }
     },
     []
   )
@@ -55,7 +62,6 @@ const Donate = () => {
     await Clipboard.setStringAsync(value);
     Toast.show(ToastMessages.EN.COPIED_TO_CLIPBOARD)
   }
-
 
   const onPress = async (donate: DonateMethod) => {
     switch (donate.action) {

@@ -7,10 +7,10 @@ import { spFetchCollectionItems } from '@/lib/supabase'
 import { AppStyle } from '@/styles/AppStyle'
 import { useLocalSearchParams } from 'expo-router/build/hooks'
 import React, { useEffect, useRef, useState } from 'react'
-import { SafeAreaView, Text } from 'react-native'
+import { SafeAreaView, Text, View } from 'react-native'
 
 
-const PAGE_LIMIT = 20
+const PAGE_LIMIT = 24
 
 
 const CollectionPage = () => {
@@ -30,14 +30,19 @@ const CollectionPage = () => {
 
     useEffect(
         () => {
+            let isCancelled = false
             const init = async () => {
                 setLoading(true)
-                await spFetchCollectionItems(collection_id, 0, PAGE_LIMIT)
-                    .then(v => setManhwas([...v]))
+                    const m = await spFetchCollectionItems(collection_id, 0, PAGE_LIMIT)
+                    if (isCancelled) { return }
+                    setManhwas(m)
+                    isInitialized.current = true
                 setLoading(false)
-                isInitialized.current = true
             }
             init()
+            return () => {
+                isCancelled = true
+            }
         },
         []
     )
@@ -52,24 +57,29 @@ const CollectionPage = () => {
         setLoading(false)
     }
 
+    const renderHeader = () => {
+        if (!collection_descr) { return <></> }
+        return (
+            <View>
+                <Text style={[AppStyle.textRegular, {marginBottom: 10}]}>{collection_descr}</Text>
+            </View>
+        )
+    }
+
     return (
         <SafeAreaView style={AppStyle.safeArea} >
             <TopBar title={collection_name} titleColor={Colors.yellow} >
                 <ReturnButton color={Colors.yellow} />
             </TopBar>
-            {
-                collection_descr &&
-                <Text style={AppStyle.textRegular}>{collection_descr}</Text>
-            }
             <ManhwaGrid
                 manhwas={manhwas}
                 numColumns={2}
                 showChaptersPreview={false}
                 hasResults={true}
                 loading={loading}
+                listHeader={renderHeader}
                 onEndReached={onEndReached}
                 listMode='FlashList'/>
-
         </SafeAreaView>
     )
 }

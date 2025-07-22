@@ -32,7 +32,7 @@ const ManhwaStatusComponent = ({
             backgroundColor,
             alignSelf: 'flex-start'
         }, style]} >
-            <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor}, {fontSize}]}>{status}</Text>
+            <Text style={[AppStyle.textRegular, {color: Colors.manhwaStatusTextColor}, {fontSize}]}>{status}</Text>
         </View>
     )
 }

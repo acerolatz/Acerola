@@ -29,13 +29,18 @@ const MangaByGenre = () => {
 
     useEffect(
         () => {
+            let isCancelled = false
             async function init() {
-                await dbReadManhwasByGenreId(db, genre_id, 0, PAGE_LIMIT)
-                    .then(values => setManhwas([...values]))
-                    .catch(e => setManhwas([]))
-                isInitialized.current = true
+                setLoading(true)
+                    const m = await dbReadManhwasByGenreId(db, genre_id, 0, PAGE_LIMIT)
+                    if (isCancelled) { return }
+                    setManhwas(m)
+                    hasResults.current = m.length > 0
+                    isInitialized.current = true
+                setLoading(false)
             }
             init()
+            return () => { isCancelled = true }
         },
         [db, genre_id]
     )
@@ -46,11 +51,9 @@ const MangaByGenre = () => {
         }
         page.current += 1
         setLoading(true)
-            await dbReadManhwasByGenreId(db, genre_id, page.current * PAGE_LIMIT, PAGE_LIMIT)
-                .then(values => {
-                    hasResults.current = values.length > 0
-                    setManhwas(prev => [...prev, ...values])
-                })
+            const m = await dbReadManhwasByGenreId(db, genre_id, page.current * PAGE_LIMIT, PAGE_LIMIT)
+            hasResults.current = m.length > 0
+            setManhwas(prev => [...prev, ...m])
         setLoading(false)
     }  
 

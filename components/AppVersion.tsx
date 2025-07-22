@@ -18,7 +18,7 @@ const AppVersion = () => {
             }
             init()
         },
-        []
+        [db]
     )
 
     if (!localVersion) {
