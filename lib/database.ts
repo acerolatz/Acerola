@@ -106,7 +106,7 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
         app_info (name, value)
       VALUES
         ('read_mode', 'List'),
-        ('first_run', '0'),
+        ('first_run', '1'),
         ('has_new_manhwas', '0')
       ON CONFLICT (name)
       DO NOTHING;
@@ -170,8 +170,8 @@ export async function dbClearDatabase(db: SQLite.SQLiteDatabase) {
 
 export async function dbCheckFirsRun(db: SQLite.SQLiteDatabase) {
   const r = await dbCheckInfo(db, 'first_run')
-  if (r === '0') {
-    await dbSetInfo(db, 'first_run', '1')
+  if (r == '1') {
+    await dbSetInfo(db, 'first_run', '0')
     await spNewRun()
   }
 }

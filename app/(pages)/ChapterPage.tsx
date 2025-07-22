@@ -10,11 +10,12 @@ import { hp, wp } from '@/helpers/util'
 import { dbUpsertReadingHistory } from '@/lib/database'
 import { spFetchChapterImages } from '@/lib/supabase'
 import { useChapterState } from '@/store/chapterState'
+import { FlashList } from '@shopify/flash-list'
 import { Image } from 'expo-image'
 import { useLocalSearchParams } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
 import React, { useEffect, useRef, useState } from 'react'
-import { FlatList, StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import Animated, {
   useAnimatedScrollHandler,
   useAnimatedStyle,
@@ -26,6 +27,8 @@ import Animated, {
 const MAX_WIDTH = wp(100)
 const SCREEN_HEIGHT = hp(100)
 
+const AnimatedFlashList = Animated.createAnimatedComponent(FlashList<ChapterImage>)
+
 
 const ChapterPage = () => {
 
@@ -35,14 +38,16 @@ const ChapterPage = () => {
     const { chapters, currentChapterIndex, setCurrentChapterIndex } = useChapterState()
     const [images, setImages] = useState<ChapterImage[]>([])
     const [loading, setLoading] = useState(false)
-    const flatListRef = useRef<FlatList<ChapterImage>>(null)
+    const flashListRef = useRef<FlashList<ChapterImage>>(null)
+    
+    const [listItemSize, setListItemSize] = useState(hp(40))
 
     const currentChapter: Chapter = chapters[currentChapterIndex]    
     const headerVisible = useSharedValue(true)
     const footerVisible = useSharedValue(false)
     const listTotalHeight = useSharedValue(hp(100))
     const isLastChapter= currentChapterIndex >= chapters.length - 1
-    const isFirstChapter= currentChapterIndex === 0
+    const isFirstChapter= currentChapterIndex === 0    
 
     useEffect(
       () => {
@@ -62,9 +67,10 @@ const ChapterPage = () => {
             imgs.forEach(img => {
               const w = Math.min(img.width, MAX_WIDTH)
               const h = (w * img.height) / img.width
-              newHeight += h
+              newHeight += h              
             })
             listTotalHeight.value = newHeight + AppConstants.CHAPTER_PAGE_FOOTER_HEIGHT
+            setListItemSize(imgs.length > 0 ? newHeight / imgs.length : hp(40))            
             footerVisible.value = false
             setImages(imgs)
           setLoading(false)
@@ -74,7 +80,7 @@ const ChapterPage = () => {
     }, [currentChapterIndex])    
     
     const scrollToTop = () => {
-      flatListRef.current?.scrollToOffset({ animated: false, offset: 0 })
+      flashListRef.current?.scrollToOffset({ animated: false, offset: 0 })
     }
     
     const goToNextChapter = () => {
@@ -153,17 +159,16 @@ const ChapterPage = () => {
               goToPreviousChapter={goToPreviousChapter}
             />
           </Animated.View>
-          <Animated.FlatList
+          <AnimatedFlashList
             data={[...['BoxHeader'], ...images, ...['BoxFooter']] as any}
-            ref={flatListRef}
+            ref={flashListRef}
             keyExtractor={keyExtractor}
+            estimatedItemSize={listItemSize}
             renderItem={renderItem}
+            drawDistance={hp(300)}
             scrollEventThrottle={4}
             onScroll={scrollHandler}
             onEndReachedThreshold={3}
-            initialNumToRender={5}
-            maxToRenderPerBatch={5}
-            windowSize={12}
             ListEmptyComponent={<CustomActivityIndicator/>}
           />          
           <Animated.View style={animatedFooterStyle} >

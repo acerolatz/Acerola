@@ -44,25 +44,25 @@ const HomePage = () => {
     const [mostView, setMostView] = useState<Manhwa[]>([])
 
     const reloadCards = async () => {
-        await spFetchRandomManhwaCards(30, 0)
+        await spFetchRandomManhwaCards(0, 20)
             .then(v => setCards(v))
     }
 
     useEffect(
         () => {
             const init = async () => {
-                await dbReadGenres(db)
-                    .then(v => setGenres(v))
-                await dbReadManhwasOrderedByUpdateAt(db, 0, 32)
-                    .then(v => setLatestUpdates(v))
-                await dbReadManhwasOrderedByViews(db, 0, 32)
-                    .then(v => setMostView(v))
+                const g = await dbReadGenres(db)
+                const l = await dbReadManhwasOrderedByUpdateAt(db, 0, 30)
+                const m = await dbReadManhwasOrderedByViews(db, 0, 30)
+                setGenres(g)
+                setLatestUpdates(l)
+                setMostView(m)
                 if (collections.length == 0) {
                     spFetchCollections()
                         .then(v => setCollections(v))
                 }
                 if (cards.length == 0) {
-                    await spFetchRandomManhwaCards(30, 0)
+                    await spFetchRandomManhwaCards(0, 20)
                         .then(v => setCards(v))
                 }
             }

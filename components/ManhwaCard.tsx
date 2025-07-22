@@ -54,12 +54,14 @@ const ManhwaCard = ({
     }, [manhwa.manhwa_id]);
 
     return (
-        <Pressable style={[{width, marginRight, marginBottom}, styleProp]} onPress={onPress} >
-            <Image 
-                source={manhwa.cover_image_url} 
-                contentFit='cover'
-                cachePolicy={'disk'}
-                style={[{borderRadius: 12, width, height}]}/>
+        <View style={[{width, marginRight, marginBottom}, styleProp]} >
+            <Pressable onPress={onPress}>
+                <Image
+                    source={manhwa.cover_image_url} 
+                    contentFit='cover'
+                    cachePolicy={'disk'}
+                    style={[{borderRadius: 12, width, height}]}/>
+            </Pressable>
             <View style={styles.container} >
                 <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 20}]}>{manhwa.title}</Text>
                 {
@@ -97,7 +99,7 @@ const ManhwaCard = ({
                     <Text style={AppStyle.textRegular}>{manhwa.manhwa_id}</Text>
                 </View>
             }
-        </Pressable>
+        </View>
     )
 }
 

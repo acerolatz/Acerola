@@ -136,7 +136,7 @@ export async function spGetDonationMethods(): Promise<DonateMethod[]> {
     return data
 }
 
-export async function spFetchRandomManhwaCards(p_limit: number = 30, p_offset: number = 0): Promise<ManhwaCard[]> {
+export async function spFetchRandomManhwaCards(p_offset: number = 0, p_limit: number = 30): Promise<ManhwaCard[]> {
     const { data, error } = await supabase
         .rpc("get_random_cards", {p_offset, p_limit})
 
