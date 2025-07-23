@@ -34,6 +34,7 @@ export type Manhwa = {
     status: "OnGoing" | "Completed"
     color: string
     views: number
+    rate: number
     genres: Genre[]
     authors: ManhwaAuthor[]
     chapters: Chapter[]

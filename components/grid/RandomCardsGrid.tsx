@@ -6,14 +6,15 @@ import { AppStyle } from '@/styles/AppStyle'
 import { FlashList } from '@shopify/flash-list'
 import { Image } from 'expo-image'
 import { router } from 'expo-router'
+import { debounce } from 'lodash'
 import React, { useRef } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import Title from '../Title'
 import RotatingButton from '../buttons/RotatingButton'
 import Row from '../util/Row'
 
-const MAX_WIDTH = wp(80)
-const MAX_HEIGHT = hp(100)
+const MAX_WIDTH = wp(87)
+const MAX_HEIGHT = hp(80)
 
 
 interface RandomCardsGridProps {
@@ -34,11 +35,13 @@ const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
         flatListRef.current?.scrollToIndex({index: 0, animated: true})
     }
 
+    const debounceReload = debounce(reload, 800)
+
     const renderItem = ({item, index}: {item: ManhwaCard, index: number}) => {
 
         const height = item.height > MAX_HEIGHT ? MAX_HEIGHT : item.height
         let width = (height * item.width) / item.height
-        width = index === 0 ? width > MAX_WIDTH ? MAX_WIDTH : width : width
+        width = width > MAX_WIDTH ? MAX_WIDTH : width
 
         return (
             <Pressable onPress={() => onPress(item.manhwa_id)} style={{marginRight: 4}} >
@@ -51,20 +54,28 @@ const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
     }
 
     if (cards.length === 0) {
-        return <></>
+        return (
+            <View style={styles.container} >
+                <Row style={{width: '100%', justifyContent: "space-between"}} >
+                    <Title title='Random'/>
+                    <RotatingButton onPress={debounceReload} iconColor={Colors.white} />
+                </Row>
+            </View>
+        )
     }
     
     return (
         <View style={styles.container} >
             <Row style={{width: '100%', justifyContent: "space-between"}} >
                 <Title title='Random'/>
-                <RotatingButton onPress={reload} iconColor={Colors.white} />
+                <RotatingButton onPress={debounceReload} iconColor={Colors.white} />
             </Row>
             <View style={{width: '100%', height: MAX_HEIGHT}} >
                 <FlashList
                     ref={flatListRef}
                     data={cards}
                     estimatedItemSize={wp(90)}
+                    drawDistance={(wp(100))}
                     horizontal={true}
                     keyExtractor={(item: ManhwaCard) => item.manhwa_id.toString()}
                     renderItem={renderItem}

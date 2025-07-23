@@ -94,6 +94,8 @@ const ManhwaPage = () => {
     )
   }
 
+  console.log(manhwa.rate / 10.0)
+
   return (
     <SafeAreaView style={[AppStyle.safeArea, styles.container]} >
       <ScrollView style={{flex: 1}} keyboardShouldPersistTaps={'always'} showsVerticalScrollIndicator={false} >

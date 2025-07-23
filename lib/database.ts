@@ -32,7 +32,7 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
           name TEXT NOT NULL,
           role TEXT NOT NULL
       );
-      
+
       CREATE TABLE IF NOT EXISTS manhwas (
           manhwa_id INTEGER PRIMARY KEY,
           title TEXT NOT NULL UNIQUE,
@@ -40,7 +40,7 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
           cover_image_url TEXT NOT NULL,
           status TEXT NOT NULL,
           color TEXT NOT NULL,
-          rating REAL DEFAULT NULL,
+          rate REAL NOT NULL DEFAULT 0,
           views INTEGER NOT NULL DEFAULT 0,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
@@ -87,10 +87,11 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
           FOREIGN KEY  (manhwa_id) REFERENCES manhwas (manhwa_id) ON UPDATE CASCADE ON DELETE CASCADE          
       );   
 
+      DROP INDEX IF EXISTS idx_manhwas_rating;
       CREATE INDEX IF NOT EXISTS idx_chapters_manhwa_id ON chapters(manhwa_id);
       CREATE INDEX IF NOT EXISTS idx_ma_manhwa_id ON manhwa_authors(manhwa_id);
       CREATE INDEX IF NOT EXISTS idx_manhwas_status ON manhwas(status);
-      CREATE INDEX IF NOT EXISTS idx_manhwas_rating ON manhwas(rating);
+      CREATE INDEX IF NOT EXISTS idx_manhwas_rate ON manhwas(rate);
       CREATE INDEX IF NOT EXISTS idx_authors_name ON authors(name);
       CREATE INDEX IF NOT EXISTS idx_chapters_manhwa_num ON chapters(manhwa_id, chapter_num DESC);
       CREATE INDEX IF NOT EXISTS idx_reading_status_manhwa_id_status ON reading_status (manhwa_id, status);
@@ -274,10 +275,11 @@ export async function dbUpsertManhwa(db: SQLite.SQLiteDatabase, manhwa: Manhwa) 
         status,
         color,
         views,
+        rate,
         updated_at
     )
-    VALUES (?,?,?,?,?,?,?,?);`, 
-    [manhwa.manhwa_id, manhwa.title, manhwa.descr, manhwa.cover_image_url, manhwa.status, manhwa.color, manhwa.views, manhwa.updated_at]
+    VALUES (?,?,?,?,?,?,?,?,?);`, 
+    [manhwa.manhwa_id, manhwa.title, manhwa.descr, manhwa.cover_image_url, manhwa.status, manhwa.color, manhwa.views, manhwa.rate, manhwa.updated_at]
   ).catch(error => console.log("error dbUpsertManhwa", error));
 
   // Genres
@@ -294,7 +296,7 @@ export async function dbUpsertManhwa(db: SQLite.SQLiteDatabase, manhwa: Manhwa) 
 
 
 async function dbUpsertManhwas(db: SQLite.SQLiteDatabase, manhwas: Manhwa[]) {
-  const placeholders = manhwas.map(() => '(?,?,?,?,?,?,?,?)').join(',');  
+  const placeholders = manhwas.map(() => '(?,?,?,?,?,?,?,?,?)').join(',');  
   const params = manhwas.flatMap(i => [
     i.manhwa_id, 
     i.title, 
@@ -303,6 +305,7 @@ async function dbUpsertManhwas(db: SQLite.SQLiteDatabase, manhwas: Manhwa[]) {
     i.status,
     i.color,
     i.views,
+    i.rate,
     i.updated_at,
   ]);  
   await db.runAsync(`    
@@ -314,6 +317,7 @@ async function dbUpsertManhwas(db: SQLite.SQLiteDatabase, manhwas: Manhwa[]) {
         status,
         color,
         views,
+        rate,
         updated_at
     )
     VALUES ${placeholders};`, 
