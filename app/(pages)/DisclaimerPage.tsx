@@ -27,43 +27,46 @@ Article 2: License Grant
 
 The Licensor grants you the following rights, provided that you comply with all terms and conditions of this EULA:
 
-2.1. Right to Use: The Licensor grants you a personal, limited, non-exclusive, revocable, and non-transferable license to install and use one copy of the Software on a single device owned or controlled by you.
+2.1. Right to Use: The Licensor grants you a personal, limited, non-exclusive, revocable, and non-transferable license to install and use one copy of the Software on a single device owned or controlled by you for personal, non-commercial purposes.
 
 2.2. Right to View Source Code: The Licensor grants you the right to view the Software's Source Code for the exclusive purposes of reference, security auditing, and personal learning.
+
+2.3. Right to Compile: The Licensor grants you the non-exclusive, non-transferable right to compile the Source Code into an executable format, exclusively for your personal, non-commercial use.
+
 Article 3: License Restrictions
 
 The Licensee agrees NOT to perform, nor to permit third parties to perform, any of the following actions:
 
-a) Modify or Create Derivative Works: You may not modify, translate, adapt, or otherwise create derivative works or improvements, whether or not patentable, of the Software or its Source Code. It is expressly forbidden to use any part of the Source Code to create another application or software.
+a) Modify or Create Derivative Works: You may not modify, adapt, or otherwise create derivative works or improvements, whether or not patentable, of the Software or its Source Code. It is expressly forbidden to use any part of the Source Code to create another application or software.
 
 b) Reverse Engineering: You may not reverse engineer, decompile, decode, disassemble, or otherwise attempt to derive or gain access to the Source Code of the Software, other than the right to view granted in Article 2.2.
 
-c) Distribution or Transfer: You may not sell, rent, lease, lend, sublicense, redistribute, or otherwise transfer or make the Software or its Source Code available, in whole or in part, to any third party.
+c) Removal of Notices: You may not remove, delete, alter, or obscure any trademarks or any copyright, patent, or other intellectual property or proprietary rights notices from the Software.
 
-d) Removal of Notices: You may not remove, delete, alter, or obscure any trademarks or any copyright, patent, or other intellectual property or proprietary rights notices from the Software.
-
-e) Competitive Use: You may not use the Software or its Source Code to develop, or assist in the development of, any product or service that is competitive with the Licensor's Software.
-
-Article 4: Intellectual Property
-
-The Software and its Source Code are licensed, not sold. You acknowledge that the Licensor owns all right, title, and interest in and to the Software and its Source Code, including all associated intellectual property rights. All rights not expressly granted in this EULA are reserved by the Licensor.
-
-Article 5: Disclaimer of Warranty
+Article 4: Disclaimer of Warranty
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. THE LICENSOR DISCLAIMS ALL WARRANTIES, WHETHER EXPRESS OR IMPLIED, INCLUDING, WITHOUT LIMITATION, THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
 
-Article 6: Limitation of Liability
+Article 5: Limitation of Liability
 
 IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT, OR CONSEQUENTIAL DAMAGES WHATSOEVER (INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS, BUSINESS INTERRUPTION, OR LOSS OF INFORMATION) ARISING OUT OF THE USE OF OR INABILITY TO USE THE SOFTWARE.
+
+Article 6: Severability
+
+If any provision of this EULA is held to be invalid, illegal, or unenforceable, such provision shall be struck out, and the remaining provisions shall continue in full force and effect.
 
 Article 7: Termination
 
 This EULA will terminate automatically, without notice from the Licensor, if you fail to comply with any term of this agreement. Upon termination, you must cease all use of the Software and destroy all copies thereof
 
-Article 9: Entire Agreement
+Article 8: Entire Agreement
 
 This EULA constitutes the entire agreement between the Licensee and the Licensor regarding the Software and supersedes all prior communications, proposals, or agreements, whether oral or written.
-`
+
+Article 9: Waiver
+
+The Licensor's failure to enforce any right or provision of this EULA shall not constitute a waiver of such right or provision and shall not affect the Licensor's right to enforce such right or provision at a later time.`
+
 
 const DISCLAIMER = `
 Intellectual Property
@@ -95,17 +98,6 @@ Amendments to This Disclaimer
 
 We reserve the right to modify this Disclaimer at any time, without prior notice. We recommend that you review this section periodically to stay informed of any changes.`
 
-
-const DisclaimerText = ({title, message}: {title: string, message: string}) => {
-    return (
-        <View style={{width: '100%', gap: 10, marginBottom: 20}}>
-            <Text style={AppStyle.textHeader}>{title}</Text>
-            <Text style={AppStyle.textRegular}>{message}</Text>
-        </View>
-    )
-}
-
-
 const DisclaimerPage = () => {
 
     return (
@@ -115,10 +107,10 @@ const DisclaimerPage = () => {
             </TopBar>
             <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} >
                 <Text style={AppStyle.textRegular}>{EULA}</Text>
-                <View style={{width: '100%', height: 4, borderRadius: 4, marginVertical: 10, backgroundColor: Colors.disclaimerColor}} />
-                <Text style={[AppStyle.textHeader, {marginBottom: 10, color: Colors.disclaimerColor}]}>Disclaimer</Text>
+                <View style={{width: '100%', height: 4, borderRadius: 4, marginVertical: 30, backgroundColor: Colors.disclaimerColor}} />
+                <Text style={[AppStyle.textHeader, {color: Colors.disclaimerColor}]}>Disclaimer</Text>
                 <Text style={AppStyle.textRegular}>{DISCLAIMER}</Text>
-                <View style={{marginBottom: 50}} />
+                <View style={{marginBottom: 60}} />
             </ScrollView>
         </SafeAreaView>
     )

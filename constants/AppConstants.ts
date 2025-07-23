@@ -40,6 +40,6 @@ export const AppConstants = {
     REQ_MANGA_DESCR_MAX_LENGTH: 512,
     DEBUG_MODE: true,
     PORNHWA_REDDIT_URL: "https://www.reddit.com/r/pornhwa/",
-    GITHUB_URL: "https://github.com/ougitz/acerola",
-    email: "ougireader@proton.me"
+    GITHUB_URL: "https://github.com/acerolatz/Acerola",
+    email: "acerola.app@proton.me"
 }
