@@ -21,7 +21,6 @@ import { useSQLiteContext } from 'expo-sqlite'
 import React, { useEffect, useRef, useState } from 'react'
 import { Animated, Pressable, SafeAreaView, ScrollView, StyleSheet, View } from 'react-native'
 
-
 const MENU_WIDTH = 250
 const ANIMATION_TIME = 300
 const SCREEN_WIDTH = wp(100)
@@ -76,7 +75,7 @@ const HomePage = () => {
                     setCollections(c)
                 }
             }
-            
+
             init()
             return () => { isCancelled = true }
         },

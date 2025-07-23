@@ -61,11 +61,13 @@ const NewsPage = () => {
         () => {
             let isCancelled = false
             const init = async () => {
-                const p = await spFetchNews(page.current, PAGE_LIMIT)
-                if (isCancelled) { return }
-                setNews(p)
-                hasResults.current = p.length >= PAGE_LIMIT
-                isInitialized.current = true
+                setLoading(true)
+                    const p = await spFetchNews(page.current, PAGE_LIMIT)
+                    if (isCancelled) { return }
+                    setNews(p)
+                    hasResults.current = p.length >= PAGE_LIMIT
+                    isInitialized.current = true
+                setLoading(true)
             }
             init()
             return () => { isCancelled = true }
