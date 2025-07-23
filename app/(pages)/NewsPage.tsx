@@ -19,6 +19,7 @@ const PAGE_LIMIT = 10
 const IMAGE_WIDTH = wp(88)
 const TEXT_LENGHT_LIMIT = 128
 
+
 const News = ({news}: {news: Post}) => {
     
     const [expandText, setExpandText] = useState(false)
