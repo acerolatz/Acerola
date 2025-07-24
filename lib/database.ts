@@ -1,6 +1,8 @@
 import { Author, Chapter, Genre, Manhwa, ManhwaAuthor, ManhwaGenre } from '@/helpers/types';
 import { secondsSince } from '@/helpers/util';
 import * as SQLite from 'expo-sqlite';
+import DeviceInfo from 'react-native-device-info';
+import uuid from 'react-native-uuid';
 import { spGetManhwas, spNewRun } from './supabase';
 
 
@@ -84,10 +86,9 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
           chapter_id   INTEGER NOT NULL,
           readed_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           PRIMARY KEY  (manhwa_id, chapter_id),              
-          FOREIGN KEY  (manhwa_id) REFERENCES manhwas (manhwa_id) ON UPDATE CASCADE ON DELETE CASCADE          
+          FOREIGN KEY  (manhwa_id) REFERENCES manhwas (manhwa_id) ON UPDATE CASCADE ON DELETE CASCADE
       );   
-
-      DROP INDEX IF EXISTS idx_manhwas_rating;
+      
       CREATE INDEX IF NOT EXISTS idx_chapters_manhwa_id ON chapters(manhwa_id);
       CREATE INDEX IF NOT EXISTS idx_ma_manhwa_id ON manhwa_authors(manhwa_id);
       CREATE INDEX IF NOT EXISTS idx_manhwas_status ON manhwas(status);
@@ -105,6 +106,7 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       INSERT INTO
         app_info (name, value)
       VALUES
+        ('device', 'null'),
         ('read_mode', 'List'),
         ('first_run', '1'),
         ('has_new_manhwas', '0')
@@ -143,7 +145,15 @@ export async function dbLog(db: SQLite.SQLiteDatabase) {
 }
 
 
-export async function dbCheckInfo(db: SQLite.SQLiteDatabase, name: string): Promise<string | null> {
+export async function dbClearDatabase(db: SQLite.SQLiteDatabase) {
+    await db.runAsync('DELETE FROM manhwas;').catch(error => console.log("error dbClearDatabase manhwas", error))
+    await db.runAsync('DELETE FROM genres;').catch(error => console.log("error dbClearDatabase genres", error))
+    await db.runAsync('DELETE FROM authors;').catch(error => console.log("error dbClearDatabase authors", error))
+    console.log("[DATABASE CLEARED]")
+}
+
+
+export async function dbReadInfo(db: SQLite.SQLiteDatabase, name: string): Promise<string | null> {
   const r = await db.getFirstAsync<{value: string}>(
     "SELECT value FROM app_info WHERE name = ?;",
     [name]
@@ -160,19 +170,38 @@ export async function dbSetInfo(db: SQLite.SQLiteDatabase, name: string, value: 
 }
 
 
-export async function dbClearDatabase(db: SQLite.SQLiteDatabase) {
-    await db.runAsync('DELETE FROM manhwas;').catch(error => console.log("error dbClearDatabase manhwas", error))
-    await db.runAsync('DELETE FROM genres;').catch(error => console.log("error dbClearDatabase genres", error))
-    await db.runAsync('DELETE FROM authors;').catch(error => console.log("error dbClearDatabase authors", error))
-    console.log("[DATABASE CLEARED]")
+async function dbSetUserUUID(db: SQLite.SQLiteDatabase): Promise<string> {
+  const user_id = uuid.v4()
+  await db.runAsync(
+    "INSERT OR REPLACE INTO app_info (name, value) VALUES (?, ?);",
+    ['user_id', user_id]
+  ).catch(error => console.log("error dbSetInfo", error))
+  return user_id
+}
+
+export async function dbGetUserUUID(db: SQLite.SQLiteDatabase): Promise<string> {  
+  let user_id: string | null = await dbReadInfo(db, 'user_id')    
+  if (!user_id) {
+    user_id = await dbSetUserUUID(db)
+  }
+  
+  console.log("user_id", user_id)
+  return user_id!
 }
 
 
-export async function dbCheckFirsRun(db: SQLite.SQLiteDatabase) {
-  const r = await dbCheckInfo(db, 'first_run')
-  if (r == '1') {
+export async function dbFirstRun(db: SQLite.SQLiteDatabase) {
+  const r = await dbReadInfo(db, 'first_run')  
+  if (r === '1') {
+    const model = DeviceInfo.getModel()
+    const systemName = DeviceInfo.getSystemName()
+    const systemVersion = DeviceInfo.getSystemVersion()
+    const device = `${model}, ${systemName}[${systemVersion}]`
     await dbSetInfo(db, 'first_run', '0')
-    await spNewRun()
+    await dbSetInfo(db, 'device', device)
+    const user_id = await dbSetUserUUID(db)
+    await spNewRun(user_id, device)
+    console.log("New User", device, user_id)
   }
 }
 
@@ -262,6 +291,16 @@ export async function dbShouldUpdate(db: SQLite.SQLiteDatabase, name: string): P
     }
 
     return false
+}
+
+
+export async function dbReadManhwaRating(db: SQLite.SQLiteDatabase, manhwa_id: number): Promise<number | null> {
+  const r = await db.getFirstAsync<{rate: number}>(
+    'SELECT rate FROM manhwas WHERE manhwa_id = ?;', 
+    [manhwa_id]
+  ).catch(error => console.log("error dbReadManhwaRating", error))
+  
+  return r ? r.rate : null
 }
 
 
@@ -529,7 +568,7 @@ export async function dbReadLast3Chapters(
 
 
 export async function dbGetAppVersion(db: SQLite.SQLiteDatabase): Promise<string> {
-  const r = await dbCheckInfo(db, 'version')
+  const r = await dbReadInfo(db, 'version')
   return r!
 }
 
@@ -571,7 +610,8 @@ export async function dbReadManhwasOrderedByUpdateAt(
         manhwa_id,
         title,
         status,
-        cover_image_url
+        cover_image_url,
+        rate
       FROM 
         manhwas
       ORDER BY 
@@ -609,7 +649,8 @@ export async function dbReadManhwasOrderedByViews(
         manhwa_id,
         title,
         status,
-        cover_image_url
+        cover_image_url,
+        rate
       FROM
         manhwas
       ORDER BY 

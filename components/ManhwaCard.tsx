@@ -17,7 +17,6 @@ import ChapterLink from './chapter/ChapterLink';
 import ManhwaStatusComponent from './ManhwaStatusComponent';
 
 
-
 interface ManhwaCardProps {
     manhwa: Manhwa
     width?: number
@@ -28,23 +27,26 @@ interface ManhwaCardProps {
     showChaptersPreview?: boolean
     shouldShowChapterDate?: boolean
     showManhwaStatus?: boolean
+    showRating?: boolean
 }
 
 
 const ManhwaCard = ({
-    manhwa, 
+    manhwa,
+    styleProp,
     width = AppConstants.MANHWA_COVER_DIMENSION.width, 
     height = AppConstants.MANHWA_COVER_DIMENSION.height, 
-    styleProp,
     marginRight = 10,
     marginBottom = 0,
     showChaptersPreview = true,
     shouldShowChapterDate = true,
-    showManhwaStatus = true
+    showManhwaStatus = true,
+    showRating = false
 }: ManhwaCardProps) => {
+    
     const mangaStatusColor = manhwa.status === "Completed" ?
         Colors.manhwaStatusCompleted : 
-        Colors.manhwaStatusOnGoing
+        Colors.manhwaStatusOnGoing    
     
     const onPress = useCallback(() => {
         router.push({
@@ -60,25 +62,27 @@ const ManhwaCard = ({
                     source={manhwa.cover_image_url} 
                     contentFit='cover'
                     cachePolicy={'disk'}
-                    style={[{borderRadius: 12, width, height}]}/>
+                    style={[{borderRadius: 8, width, height}]}/>
             </Pressable>
             <View style={styles.container} >
                 <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 20}]}>{manhwa.title}</Text>
                 {
                     showChaptersPreview && 
                     manhwa.chapters &&
-                    manhwa.chapters.map(
-                        (item, index) => 
-                            <ChapterLink 
-                                shouldShowChapterDate={shouldShowChapterDate} 
-                                key={item.chapter_id}
-                                manhwaTitle={manhwa.title}
-                                manhwa_id={manhwa.manhwa_id}
-                                index={index}
-                                chapter_name={item.chapter_name}
-                                chapter_created_at={item.created_at}
-                                chapter_id={item.chapter_id} />
-                    )
+                    <View style={{gap: 12, marginTop: 6}} >
+                        {manhwa.chapters.map(
+                            (item, index) => 
+                                <ChapterLink 
+                                    shouldShowChapterDate={shouldShowChapterDate} 
+                                    key={item.chapter_id}
+                                    manhwaTitle={manhwa.title}
+                                    manhwa_id={manhwa.manhwa_id}
+                                    index={index}
+                                    chapter_name={item.chapter_name}
+                                    chapter_created_at={item.created_at}
+                                    chapter_id={item.chapter_id} />
+                        )}
+                    </View>
                 }
             </View>
             {

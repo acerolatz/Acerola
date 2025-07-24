@@ -27,19 +27,20 @@ export async function spGetManhwas(): Promise<Manhwa[]> {
 }
 
 
-export async function spNewRun() {
+export async function spNewRun(user_id: string, device: string) {
     const timezone = RNLocalize.getTimeZone()
     const locales = RNLocalize.getLocales()
     const language = locales.length > 0 ? locales.slice(0, 5).map(i => i.languageTag).join(', ') : null
 
     const { error } = await supabase
-        .from("app_runs")
-        .insert([{ language, timezone}])
+        .from("users")
+        .insert([{ language, timezone, user_id, device}])
     
     if (error) {
         console.log("error spNewRun", error)
     }
 }
+
 
 export async function spFetchNews(page: number = 0, limit: number = 10): Promise<Post[]> {
     const { data, error } = await supabase
@@ -126,12 +127,13 @@ export async function spRequestManhwa(manhwa: string, message: string | null) {
 
 export async function spReportBug(
     title: string, 
-    descr: string | null, 
-    bug_type: string
+    bug_type: string,
+    device: string | null,
+    descr: string | null
 ): Promise<number | null> {
     const { data, error } = await supabase
         .from("bug_reports")
-        .insert([{title, descr, bug_type}])
+        .insert([{title, descr, bug_type, device}])
         .select("bug_id")
         .single()
     
@@ -166,6 +168,19 @@ export async function spFetchRandomManhwaCards(p_limit: number = 30): Promise<Ma
     
     return data as ManhwaCard[]
 }
+
+
+export async function spAddNewManhwaRating(manhwa_id: number, user_id: string, rate: number) {
+    const { error } = await supabase
+        .from("manhwa_rates")
+        .upsert({manhwa_id, user_id, rate})
+
+    console.log(manhwa_id, user_id, rate)
+    if (error) {
+        console.log("error spAddNewManhwaRating", error)
+    }
+}
+
 
 export async function spFetchScans(): Promise<Scan[]> {
     const { data, error } = await supabase

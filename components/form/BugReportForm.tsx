@@ -2,12 +2,14 @@ import { AppConstants } from '@/constants/AppConstants';
 import { Colors } from '@/constants/Colors';
 import { ToastMessages } from '@/constants/Messages';
 import { hp } from '@/helpers/util';
+import { dbReadInfo } from '@/lib/database';
 import { spReportBug, supabase } from '@/lib/supabase';
 import { AppStyle } from '@/styles/AppStyle';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
+import { useSQLiteContext } from 'expo-sqlite';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
@@ -36,10 +38,10 @@ type BugType = "ImagesOutOfOrder" | "MissingImages" | "Broken" | "Other" | "Suge
 
 const BUT_TYPE_LIST: BugType[] = [
     "Other",
+    "Sugestion",
     "Broken",
     "ImagesOutOfOrder",
-    "MissingImages",
-    "Sugestion"
+    "MissingImages"
 ]
 
 
@@ -54,7 +56,7 @@ const schema = yup.object().shape({
         .max(AppConstants.BUG_REPORT_DESCR_MAX_LENGTH, `Max ${AppConstants.BUG_REPORT_DESCR_MAX_LENGTH} characters`),
     bugType: yup
         .string()
-        .max(AppConstants.BUG_REPORT_BUG_TYPE_MAX_LENGTH, `Max ${AppConstants.BUG_REPORT_BUG_TYPE_MAX_LENGTH} characters`)
+        .max(AppConstants.BUG_REPORT_BUG_TYPE_MAX_LENGTH, `Max ${AppConstants.BUG_REPORT_BUG_TYPE_MAX_LENGTH} characters`)    
 });
 
 
@@ -103,6 +105,7 @@ const BugTypeSelector = ({value, onChange}: {value: BugType, onChange: (b: BugTy
 
 const BugReportForm = ({title}: {title: string | undefined | null}) => {
         
+    const db = useSQLiteContext()
     const [isLoading, setLoading] = useState(false)
     const [photos, setPhotos] = useState<string[]>([])
 
@@ -192,20 +195,20 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
         resolver: yupResolver(schema as any),
         defaultValues: {            
             title: title ? title: '',
-            descr: '',
-            bugType: 'Other'
+            bugType: 'Other',
+            descr: ''
         },
     });
     
     const onSubmit = async (form_data: FormData) => {
         setLoading(true)
             Keyboard.dismiss()
-            
-            // Create bug
+            const device = await dbReadInfo(db, 'device')
             const bug_id: number | null = await spReportBug(
-                form_data.title, 
-                form_data.descr.trim() === '' ? null : form_data.descr.trim(), 
-                form_data.bugType
+                form_data.title,
+                form_data.bugType,
+                device,
+                form_data.descr.trim() === '' ? null : form_data.descr.trim()
             )            
 
             if (bug_id === null) {
@@ -214,7 +217,7 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
                 return
             }
             
-            // Upload bug images
+            // Upload
             if (photos.length > 0) {
                 const bug_id_str = bug_id.toString()
                 Toast.show({text1: "Uploading images...", type: "info"})
@@ -235,9 +238,9 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
 
         return (
             <View style={{marginRight: 10}} >
-                <Image source={{uri: item}} style={{width: 128, height: 256, borderRadius: 4}} contentFit='cover' />
-                <Pressable onPress={onPress} style={{position: "absolute", right: 6, top: 6, padding: 6, backgroundColor: Colors.gray, borderRadius: 4}} hitSlop={AppConstants.HIT_SLOP_LARGE} >
-                    <Ionicons name='trash-bin' size={20} color={Colors.BugReportColor} />
+                <Image source={{uri: item}} style={{width: 200, height: 312, borderRadius: 4}} contentFit='cover' />
+                <Pressable onPress={onPress} style={{position: "absolute", right: 6, top: 6, padding: 6, backgroundColor: Colors.BugReportColor, borderRadius: 4}} hitSlop={AppConstants.HIT_SLOP_LARGE} >
+                    <Ionicons name='trash-bin' size={20} color={Colors.backgroundColor} />
                 </Pressable>
             </View>
         )        
@@ -282,7 +285,7 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
                     control={control}
                     render={({ field: { onChange, onBlur, value } }) => (
                     <TextInput
-                        style={[AppStyle.input, {height: hp(25), paddingVertical: 10, textAlignVertical: 'top'}]}                    
+                        style={[AppStyle.input, {height: hp(20), paddingVertical: 10, textAlignVertical: 'top'}]}                    
                         multiline={true}
                         autoCapitalize="sentences"
                         onBlur={onBlur}

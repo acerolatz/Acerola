@@ -96,7 +96,7 @@ const RequestManhwaForm = () => {
                 control={control}
                 render={({ field: { onChange, onBlur, value } }) => (
                 <TextInput
-                    style={[AppStyle.input, {height: hp(25), paddingVertical: 10, textAlignVertical: 'top'}]}                    
+                    style={[AppStyle.input, {height: hp(10), paddingVertical: 10, textAlignVertical: 'top'}]}                    
                     multiline={true}
                     autoCapitalize="sentences"
                     onBlur={onBlur}

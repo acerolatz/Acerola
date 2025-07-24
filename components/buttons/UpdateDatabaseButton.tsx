@@ -1,4 +1,3 @@
-import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
 import { ToastMessages } from '@/constants/Messages'
 import { hasInternetAvailable } from '@/helpers/util'
@@ -32,7 +31,7 @@ const UpdateDatabaseButton = ({
             return 
         }
 
-        const shouldUpdate = await dbShouldUpdate(db, type) || AppConstants.DEBUG_MODE
+        const shouldUpdate = await dbShouldUpdate(db, type)
         let hasMangas = true
 
         if (!shouldUpdate) {

@@ -3,7 +3,7 @@ import PageActivityIndicator from '@/components/util/PageActivityIndicator';
 import Row from '@/components/util/Row';
 import { Colors } from '@/constants/Colors';
 import { ToastMessages } from '@/constants/Messages';
-import { dbCheckFirsRun, dbSetLastRefresh, dbShouldUpdate, dbUpdateDatabase } from '@/lib/database';
+import { dbFirstRun, dbSetLastRefresh, dbShouldUpdate, dbUpdateDatabase } from '@/lib/database';
 import { AppStyle } from '@/styles/AppStyle';
 import {
     LeagueSpartan_200ExtraLight,
@@ -33,7 +33,7 @@ const App = () => {
     useEffect(
         () => {
             async function init() {                    
-                await dbCheckFirsRun(db)
+                await dbFirstRun(db)
                 
                 const state: NetInfoState = await NetInfo.fetch()
                 if (!state.isConnected) {

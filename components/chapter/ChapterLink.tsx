@@ -70,7 +70,7 @@ const ChapterLink = ({
             <Text style={AppStyle.textRegular}>{prefix}{chapter_name}</Text>
             {
                 shouldShowChapterDate &&
-                <Text style={[AppStyle.textRegular, {paddingRight: 20}]}>
+                <Text style={AppStyle.textRegular}>
                     {formatTimestamp(chapter_created_at)}
                 </Text>
             }
@@ -81,13 +81,10 @@ const ChapterLink = ({
 export default ChapterLink
 
 const styles = StyleSheet.create({
-    chapterLink: {
-        paddingVertical: 8,        
-        borderRadius: 4,
-        backgroundColor: Colors.backgroundColor,
+    chapterLink: {        
         flexDirection: 'row',
-        alignItems: "center",
+        alignItems: "center",        
         justifyContent: "space-between",
-        gap: 20
+        paddingRight: 4
     }
 })

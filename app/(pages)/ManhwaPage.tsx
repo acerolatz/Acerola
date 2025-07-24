@@ -53,7 +53,8 @@ const ManhwaPage = () => {
   const db = useSQLiteContext()
   const params = useLocalSearchParams()
   const manhwa_id: number = params.manhwa_id as any
-  const [manhwa, setManhwa] = useState<Manhwa | null>(null)    
+  const [manhwa, setManhwa] = useState<Manhwa | null>(null)
+ 
 
   useEffect(
     () => {
@@ -64,6 +65,7 @@ const ManhwaPage = () => {
           router.replace("/(pages)/HomePage")
           return
         }
+
         const m = await dbReadManhwaById(db, manhwa_id)
         if (!m) {
           Toast.show(ToastMessages.EN.INVALID_MANHWA)
@@ -72,8 +74,9 @@ const ManhwaPage = () => {
         }
 
         if (isCancelled) { return }
+
         setManhwa(m)
-        
+
         await dbUpdateManhwaViews(db, manhwa_id)
 
         if (isCancelled) { return }
@@ -93,8 +96,6 @@ const ManhwaPage = () => {
       </SafeAreaView>
     )
   }
-
-  console.log(manhwa.rate / 10.0)
 
   return (
     <SafeAreaView style={[AppStyle.safeArea, styles.container]} >
@@ -127,7 +128,7 @@ const ManhwaPage = () => {
                 </View>
               }
             </View>
-            <View style={{alignSelf: "flex-start"}} >
+            <View style={{alignSelf: "flex-start", gap: 8}} >
               <Text style={AppStyle.textMangaTitle}>{manhwa!.title}</Text>
               <Text style={AppStyle.textRegular}>{manhwa.descr}</Text>
             </View>
