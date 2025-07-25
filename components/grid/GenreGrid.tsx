@@ -68,8 +68,8 @@ const styles = StyleSheet.create({
         alignItems: "flex-start"
     },
     button: {
-        paddingHorizontal: 10,
-        paddingVertical: 12,
+        paddingHorizontal: 8,
+        paddingVertical: 10,
         alignItems: "center",
         justifyContent: "center",
         borderRadius: 4,

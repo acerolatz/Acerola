@@ -39,6 +39,7 @@ export type Manhwa = {
     authors: ManhwaAuthor[]
     chapters: Chapter[]
     updated_at: string
+    alt_titles: string[]
 }
 
 export type AppRelease = {

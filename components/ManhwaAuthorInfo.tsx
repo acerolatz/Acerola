@@ -53,7 +53,7 @@ const ManhwaAuthorInfo = ({manhwa}: ManhwaAuthorInfoProps) => {
   }
 
   return (
-    <Row style={{width: '100%', flexWrap: 'wrap', gap: 10}} >
+    <Row style={{width: '100%'}} >
       <FlatList
         ref={flatListRef}
         data={authors}
@@ -70,13 +70,13 @@ const ManhwaAuthorInfo = ({manhwa}: ManhwaAuthorInfoProps) => {
 export default ManhwaAuthorInfo;
 
 const styles = StyleSheet.create({
-    item: {
-        paddingHorizontal: 10,
-        paddingVertical: 12,
-        backgroundColor: Colors.gray,
-        marginRight: 8,
-        borderRadius: 4,
-        alignItems: "center",
-        justifyContent: "center"
-      }
+  item: {
+      paddingHorizontal: 10,
+      paddingVertical: 12,
+      backgroundColor: Colors.gray,
+      marginRight: 8,
+      borderRadius: 4,
+      alignItems: "center",
+      justifyContent: "center"
+    }
 })

@@ -1,4 +1,5 @@
 import AddToLibray from '@/components/AddToLibray';
+import ManhwaAlternativeNames from '@/components/AltNames';
 import BugReportButton from '@/components/buttons/BugReportButton';
 import HomeButton from '@/components/buttons/HomeButton';
 import OpenRandomManhwaButton from '@/components/buttons/OpenRandomManhwaButton';
@@ -12,7 +13,7 @@ import { Colors } from '@/constants/Colors';
 import { ToastMessages } from '@/constants/Messages';
 import { Manhwa } from '@/helpers/types';
 import { formatTimestamp, hp, wp } from '@/helpers/util';
-import { dbReadManhwaById, dbUpdateManhwaViews } from '@/lib/database';
+import { dbGetManhwaAltNames, dbReadManhwaById, dbUpdateManhwaViews } from '@/lib/database';
 import { spUpdateManhwaViews } from '@/lib/supabase';
 import { AppStyle } from '@/styles/AppStyle';
 import { Image } from 'expo-image';
@@ -54,6 +55,7 @@ const ManhwaPage = () => {
   const params = useLocalSearchParams()
   const manhwa_id: number = params.manhwa_id as any
   const [manhwa, setManhwa] = useState<Manhwa | null>(null)
+  const [altNames, setAltNames] = useState<string[]>([])
  
 
   useEffect(
@@ -74,10 +76,13 @@ const ManhwaPage = () => {
         }
 
         if (isCancelled) { return }
-
         setManhwa(m)
 
         await dbUpdateManhwaViews(db, manhwa_id)
+        const names = await dbGetManhwaAltNames(db, manhwa_id, m.title)
+
+        if (isCancelled) { return }
+        setAltNames(names)
 
         if (isCancelled) { return }
         await spUpdateManhwaViews(manhwa_id)
@@ -130,6 +135,7 @@ const ManhwaPage = () => {
             </View>
             <View style={{alignSelf: "flex-start", gap: 8}} >
               <Text style={AppStyle.textMangaTitle}>{manhwa!.title}</Text>
+              <ManhwaAlternativeNames names={altNames} />
               <Text style={AppStyle.textRegular}>{manhwa.descr}</Text>
             </View>
             <Text style={[AppStyle.textRegular, {alignSelf: "flex-start"}]}>Last update: {formatTimestamp(manhwa.updated_at)}</Text>

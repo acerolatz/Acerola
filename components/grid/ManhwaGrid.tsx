@@ -48,7 +48,7 @@ const ManhwaGrid = ({
         AppConstants.MANHWA_COVER_DIMENSION.height
     )
 
-    const estimatedItemSize = height + (showChaptersPreview ? 180 : 0)
+    const estimatedItemSize = height + (showChaptersPreview ? 180 : 20)
 
     const renderItem = ({item}: {item: Manhwa}) => {
         return (
@@ -84,7 +84,7 @@ const ManhwaGrid = ({
                     numColumns={numColumns}
                     keyExtractor={(item) => item.manhwa_id.toString()}
                     estimatedItemSize={estimatedItemSize}
-                    drawDistance={hp(100)}
+                    drawDistance={hp(150)}
                     onEndReached={onEndReached}
                     scrollEventThrottle={4}
                     onEndReachedThreshold={2}

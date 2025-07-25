@@ -21,6 +21,7 @@ import { useSQLiteContext } from 'expo-sqlite'
 import React, { useEffect, useRef, useState } from 'react'
 import { Animated, Pressable, SafeAreaView, ScrollView, StyleSheet, View } from 'react-native'
 
+
 const MENU_WIDTH = 250
 const ANIMATION_TIME = 300
 const SCREEN_WIDTH = wp(100)
@@ -40,12 +41,9 @@ const HomePage = () => {
 
     const [genres, setGenres] = useState<Genre[]>([])
     const [latestUpdate, setLatestUpdates] = useState<Manhwa[]>([])
-    const [mostView, setMostView] = useState<Manhwa[]>([])
-
-    const randomCardsInitialized = useRef(false)
+    const [mostView, setMostView] = useState<Manhwa[]>([])    
 
     const reloadCards = async () => {
-        if (!randomCardsInitialized.current) { return }
         const r = await spFetchRandomManhwaCards(32)
         setCards(r)
     }
@@ -67,7 +65,6 @@ const HomePage = () => {
                     const r = await spFetchRandomManhwaCards(32)
                     if (isCancelled) { return }
                     setCards(r)
-                    randomCardsInitialized.current = true
                 }
 
                 if (collections.length == 0) {

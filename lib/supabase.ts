@@ -158,6 +158,22 @@ export async function spGetDonationMethods(): Promise<DonateMethod[]> {
     return data
 }
 
+
+export async function spFetchManhwaAltName(manhwa_id: number): Promise<string[]> {
+    console.log("fetching alt names for", manhwa_id)
+    const { data, error } = await supabase
+        .from("alt_titles")
+        .select("title")
+        .eq("manhwa_id", manhwa_id)
+
+    if (error) {
+        console.log("error spFetchManhwaAltName", error)
+        return []
+    }
+
+    return data.map(i => i.title)
+}
+
 export async function spFetchRandomManhwaCards(p_limit: number = 30): Promise<ManhwaCard[]> {
     const { data, error } = await supabase
         .rpc("get_random_cards", { p_limit })

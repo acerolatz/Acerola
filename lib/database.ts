@@ -47,6 +47,13 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
+      CREATE TABLE IF NOT EXISTS alt_titles (
+        manhwa_id INTEGER NOT NULL,
+        title TEXT NOT NULL,
+        PRIMARY KEY (manhwa_id, title),
+        FOREIGN KEY (manhwa_id) REFERENCES manhwas(manhwa_id) ON DELETE CASCADE ON UPDATE CASCADE
+      );
+
       CREATE TABLE IF NOT EXISTS manhwa_authors (
           manhwa_author_id INTEGER AUTO_INCREMENT,
           author_id INTEGER NOT NULL,
@@ -82,11 +89,11 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       );
       
       CREATE TABLE IF NOT EXISTS reading_history (
-          manhwa_id    INTEGER NOT NULL,      
-          chapter_id   INTEGER NOT NULL,
-          readed_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          PRIMARY KEY  (manhwa_id, chapter_id),              
-          FOREIGN KEY  (manhwa_id) REFERENCES manhwas (manhwa_id) ON UPDATE CASCADE ON DELETE CASCADE
+          manhwa_id INTEGER NOT NULL,      
+          chapter_id INTEGER NOT NULL,
+          readed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          PRIMARY KEY (manhwa_id, chapter_id),              
+          FOREIGN KEY (manhwa_id) REFERENCES manhwas (manhwa_id) ON UPDATE CASCADE ON DELETE CASCADE
       );   
       
       CREATE INDEX IF NOT EXISTS idx_chapters_manhwa_id ON chapters(manhwa_id);
@@ -96,7 +103,8 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       CREATE INDEX IF NOT EXISTS idx_authors_name ON authors(name);
       CREATE INDEX IF NOT EXISTS idx_chapters_manhwa_num ON chapters(manhwa_id, chapter_num DESC);
       CREATE INDEX IF NOT EXISTS idx_reading_status_manhwa_id_status ON reading_status (manhwa_id, status);
-      CREATE INDEX IF NOT EXISTS idx_reading_history_readed_at ON reading_history(manhwa_id, readed_at DESC);      
+      CREATE INDEX IF NOT EXISTS idx_reading_history_readed_at ON reading_history(manhwa_id, readed_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_alt_titles ON alt_titles(title);
 
       INSERT OR REPLACE INTO 
         app_info (name, value)
@@ -136,12 +144,20 @@ export async function dbLog(db: SQLite.SQLiteDatabase) {
   const r4 = await db.getFirstAsync<{total: number}>('SELECT count(*) as total_manhwa_genres FROM manhwa_genres;')
   const r5 = await db.getFirstAsync<{total: number}>('SELECT count(*) as total_authors FROM authors;')
   const r6 = await db.getFirstAsync<{total: number}>('SELECT count(*) as total_manhwa_authors FROM manhwa_authors;')
+  const r7 = await db.getFirstAsync<{total: number}>('SELECT count(*) as total_alt_titles FROM alt_titles;')
   console.log(r1)
   console.log(r2)
   console.log(r3)
   console.log(r4)
   console.log(r5)
   console.log(r6)
+  console.log(r7)
+}
+
+
+export async function dbListTable(db: SQLite.SQLiteDatabase, table: string) {
+  const r = await db.getAllAsync(`SELECT * FROM ${table};`).catch(error => console.log("error dbListTable", error))
+  r ? r.forEach(i => console.log(i)) : null
 }
 
 
@@ -203,6 +219,20 @@ export async function dbFirstRun(db: SQLite.SQLiteDatabase) {
     await spNewRun(user_id, device)
     console.log("New User", device, user_id)
   }
+}
+
+
+export async function dbGetManhwaAltNames(
+  db: SQLite.SQLiteDatabase, 
+  manhwa_id: number, 
+  manhwa_title: string
+): Promise<string[]> {
+  const r = await db.getAllAsync<{title: string}>(
+    'SELECT title FROM alt_titles WHERE manhwa_id = ?;',
+    [manhwa_id]
+  ).catch(error => console.log("erro  dbGetManhwaAltNames", error))
+
+  return r ? r.map(i => i.title).filter(i => i != manhwa_title) : []
 }
 
 
@@ -331,6 +361,28 @@ export async function dbUpsertManhwa(db: SQLite.SQLiteDatabase, manhwa: Manhwa) 
   
   // Chapters
   await dbUpsertChapter(db, manhwa.chapters)
+}
+
+
+async function dbUpsertAltTitles(db: SQLite.SQLiteDatabase, titles: (number | string)[]) {  
+  let placeholders = ''
+  const p = '(?, ?), '
+  for (let i = 0; i < titles.length / 2; i++) {
+    placeholders += p
+  }
+  
+  placeholders = placeholders.slice(0, placeholders.length - 2)
+
+  await db.runAsync(
+    `
+      INSERT INTO alt_titles (
+        manhwa_id,
+        title
+      )
+      VALUES ${placeholders};
+    `,
+    titles
+  ).catch(error =>  console.log("error dbUpsertAltTitles", error))
 }
 
 
@@ -469,12 +521,13 @@ async function dbUpsertManhwaAuthors(db: SQLite.SQLiteDatabase, manhwaAuthor: Ma
 
 export async function dbUpdateDatabase(db: SQLite.SQLiteDatabase) {
     console.log('[UPDATING DATABASE]')
-    const start = Date.now()
 
+    const response_time_start = Date.now()
     const manhwas: Manhwa[] = await spGetManhwas()
+    const response_time_end = Date.now()
 
-    if (manhwas.length == 0) { return }
-      
+    if (manhwas.length == 0) { return }    
+
     await dbClearDatabase(db)
     await dbUpsertManhwas(db, manhwas)
 
@@ -483,26 +536,34 @@ export async function dbUpdateDatabase(db: SQLite.SQLiteDatabase) {
     const manhwaAuthors: ManhwaAuthor[] = []
     const genres: Genre[] = []
     const manhwaGenres: ManhwaGenre[] = []
+    const titles: (number | string)[] = []
 
     manhwas.forEach(i => {
       i.chapters.forEach(c => chapters.push(c)); 
       i.genres.forEach(g => {genres.push(g); manhwaGenres.push({...g, manhwa_id: i.manhwa_id})});
-      i.authors.forEach(a => {authors.push(a); manhwaAuthors.push({...a, manhwa_id: i.manhwa_id})});    
+      i.authors.forEach(a => {authors.push(a); manhwaAuthors.push({...a, manhwa_id: i.manhwa_id})});
+      titles.push(i.manhwa_id); titles.push(i.title)
+      i.alt_titles.forEach(alt_title => {
+        titles.push(i.manhwa_id); titles.push(alt_title)
+      })
     })
-      
-    // Genres
+
+    await dbUpsertAltTitles(db, titles)
+          
     await dbUpsertGenres(db, genres)
     await dbUpsertManhwaGenres(db, manhwaGenres)
-    
-    // Authors
+        
     await dbUpsertAuthors(db, authors)
     await dbUpsertManhwaAuthors(db, manhwaAuthors)
-
-    // Chapters
+    
     await dbUpsertChapter(db, chapters)    
 
     const end = Date.now()
-    console.log("[DATABASE UPDATED]", (end - start) / 1000)
+    console.log(
+      "[DATABASE UPDATED]", 
+      "[SUPABASE] ->", (response_time_end - response_time_start) / 1000,
+      "| [SQLITE] ->", (end - response_time_end) / 1000
+    )
 }
 
 
@@ -680,11 +741,20 @@ export async function dbSearchMangas(
   const rows = await db.getAllAsync(
     `
       SELECT 
-        *
+        m.title,
+        m.manhwa_id,
+        m.cover_image_url,
+        m.status
       FROM 
-        manhwas
+        alt_titles at
+      JOIN
+        manhwas m ON m.manhwa_id = at.manhwa_id
       WHERE 
-        title LIKE ? COLLATE NOCASE
+        at.title LIKE ? COLLATE NOCASE
+      GROUP BY
+        m.manhwa_id
+      ORDER BY 
+        m.views DESC, m.manhwa_id      
       LIMIT ?
       OFFSET ?;
     `,
