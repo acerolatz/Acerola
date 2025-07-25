@@ -2,35 +2,35 @@ import Button from '@/components/buttons/Button'
 import OpenRandomManhwaButton from '@/components/buttons/OpenRandomManhwaButton'
 import UpdateDatabaseButton from '@/components/buttons/UpdateDatabaseButton'
 import CollectionGrid from '@/components/grid/CollectionsGrid'
+import ContinueReadingGrid from '@/components/grid/ContinueReadingGrid'
 import GenreGrid from '@/components/grid/GenreGrid'
 import ManhwaHorizontalGrid from '@/components/grid/ManhwaHorizontalGrid'
 import RandomCardsGrid from '@/components/grid/RandomCardsGrid'
 import LateralMenu from '@/components/LateralMenu'
 import AppLogo from '@/components/util/Logo'
 import Row from '@/components/util/Row'
+import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
 import { Genre, Manhwa } from '@/helpers/types'
 import { hp, wp } from '@/helpers/util'
-import { dbReadGenres, dbReadManhwasOrderedByUpdateAt, dbReadManhwasOrderedByViews } from '@/lib/database'
+import { dbGetReadingHistory, dbReadCollections, dbReadGenres, dbReadManhwasOrderedByUpdateAt, dbReadManhwasOrderedByViews, dbUpsertCollections } from '@/lib/database'
 import { spFetchCollections, spFetchRandomManhwaCards } from '@/lib/supabase'
 import { useCollectionState } from '@/store/collectionsState'
 import { useManhwaCardsState } from '@/store/randomManhwaState'
 import { AppStyle } from '@/styles/AppStyle'
-import { router } from 'expo-router'
+import { router, useFocusEffect } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Animated, Pressable, SafeAreaView, ScrollView, StyleSheet, View } from 'react-native'
 
 
-const MENU_WIDTH = 250
-const ANIMATION_TIME = 300
 const SCREEN_WIDTH = wp(100)
 const SCREEN_HEIGHT = hp(100)
 
 
 const HomePage = () => {
 
-    const menuAnim = useRef(new Animated.Value(-MENU_WIDTH)).current 
+    const menuAnim = useRef(new Animated.Value(-AppConstants.MENU_WIDTH)).current 
     const backgroundAnim = useRef(new Animated.Value(-SCREEN_WIDTH)).current
     const menuVisible = useRef(false)
     
@@ -42,6 +42,7 @@ const HomePage = () => {
     const [genres, setGenres] = useState<Genre[]>([])
     const [latestUpdate, setLatestUpdates] = useState<Manhwa[]>([])
     const [mostView, setMostView] = useState<Manhwa[]>([])    
+    const [readingHistoryManhwas, setReadingHistoryManhwas] = useState<Manhwa[]>([])
 
     const reloadCards = async () => {
         const r = await spFetchRandomManhwaCards(32)
@@ -61,16 +62,20 @@ const HomePage = () => {
                 setLatestUpdates(l)
                 setMostView(m)
 
+                if (collections.length == 0) {
+                    let c = await dbReadCollections(db)
+                    if (c.length === 0) {
+                        c = await spFetchCollections()
+                        await dbUpsertCollections(db, c)
+                    }
+                    if (isCancelled) { return }
+                    setCollections(c)
+                }
+
                 if (cards.length == 0) {
                     const r = await spFetchRandomManhwaCards(32)
                     if (isCancelled) { return }
                     setCards(r)
-                }
-
-                if (collections.length == 0) {
-                    const c = await spFetchCollections()
-                    if (isCancelled) { return }
-                    setCollections(c)
                 }
             }
 
@@ -78,34 +83,47 @@ const HomePage = () => {
             return () => { isCancelled = true }
         },
         [db]
-    )    
+    )
+
+    useFocusEffect(
+        useCallback(
+            () => {
+                const reload = async () => {
+                    const h = await dbGetReadingHistory(db, 0, 32)
+                    setReadingHistoryManhwas(h)
+                }
+                reload()
+            },
+            []
+        )
+    )
 
     const openMenu = () => {
         Animated.timing(menuAnim, {
             toValue: 0,
-            duration: ANIMATION_TIME,      
+            duration: AppConstants.MENU_ANIMATION_TIME,      
             useNativeDriver: false
         }).start(() => {
             menuVisible.current = true
         })
         Animated.timing(backgroundAnim, {
             toValue: 0,
-            duration: ANIMATION_TIME * 1.2,
+            duration: AppConstants.MENU_ANIMATION_TIME * 1.2,
             useNativeDriver: false
         }).start(() => {})
     }
 
     const closeMenu = () => {
         Animated.timing(menuAnim, {
-            toValue: -MENU_WIDTH,
-            duration: ANIMATION_TIME,
+            toValue: -AppConstants.MENU_WIDTH,
+            duration: AppConstants.MENU_ANIMATION_TIME,
             useNativeDriver: false
         }).start(() => {
             menuVisible.current = false
         })
         Animated.timing(backgroundAnim, {
             toValue: -SCREEN_WIDTH,
-            duration: ANIMATION_TIME,
+            duration: AppConstants.MENU_ANIMATION_TIME,
             useNativeDriver: false
         }).start(() => {})
     }  
@@ -136,13 +154,14 @@ const HomePage = () => {
                 <View style={{gap: 10}} >
                     <GenreGrid genres={genres} />
                     <CollectionGrid/>
+                    <ContinueReadingGrid manhwas={readingHistoryManhwas} />
                     <ManhwaHorizontalGrid
                         title='Latest Updates'
                         onViewAll={() => router.navigate("/(pages)/LatestUpdatesPage")}
                         manhwas={latestUpdate}
                     />
                     <ManhwaHorizontalGrid
-                        title='Most View'
+                        title='Most Popular'
                         onViewAll={() => router.navigate("/(pages)/MostViewPage")}
                         manhwas={mostView}
                     />
@@ -155,7 +174,7 @@ const HomePage = () => {
             <Animated.View style={[styles.menuBackground, { width: SCREEN_WIDTH, transform: [{ translateX: backgroundAnim }] }]}>
                 <Pressable onPress={closeMenu} style={{width: '100%', height: '100%'}} />
             </Animated.View>
-            <Animated.View style={[styles.sideMenu, { width: MENU_WIDTH, transform: [{ translateX: menuAnim }] }]}>
+            <Animated.View style={[styles.sideMenu, { width: AppConstants.MENU_WIDTH, transform: [{ translateX: menuAnim }] }]}>
                 <LateralMenu closeMenu={closeMenu}/>
             </Animated.View>
         </SafeAreaView>

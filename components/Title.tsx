@@ -12,7 +12,7 @@ interface TitleProps {
 const Title = ({title, textColor = Colors.white}: TitleProps) => {
   return (
     <View>
-        <Text style={[AppStyle.textHeader, {fontSize: 24, fontFamily: 'LeagueSpartan_600SemiBold', color: textColor}]}>{title}</Text>
+        <Text style={[AppStyle.textHeader, {fontSize: 22, fontFamily: 'LeagueSpartan_600SemiBold', color: textColor}]}>{title}</Text>
     </View>
   )
 }

@@ -29,7 +29,7 @@ const UpdateDatabaseButton = ({
         if (!hasInternet) { 
             Toast.show(ToastMessages.EN.NO_INTERNET)
             return 
-        }
+        }        
 
         const shouldUpdate = await dbShouldUpdate(db, type)
         let hasMangas = true

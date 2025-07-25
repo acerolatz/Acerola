@@ -1,3 +1,4 @@
+import { AppConstants } from '@/constants/AppConstants'
 import { Manhwa } from '@/helpers/types'
 import { wp } from '@/helpers/util'
 import { FlashList } from '@shopify/flash-list'
@@ -29,15 +30,17 @@ const ManhwaHorizontalGrid = ({
                 <Title title={title}/>
                 <ViewAllButton onPress={onViewAll} />
             </Row>
-            <FlashList
-                data={manhwas}
-                horizontal={true}
-                estimatedItemSize={wp(80)}
-                drawDistance={wp(140)}
-                showsHorizontalScrollIndicator={false}
-                keyExtractor={(item: Manhwa) => item.manhwa_id.toString()}
-                renderItem={({item}) => <ManhwaCard marginRight={6} manhwa={item} showRating={true} />}
-            />
+            <View style={{width: '100%', height: AppConstants.MANHWA_COVER_DIMENSION.height + 150}} >
+                <FlashList
+                    data={manhwas}
+                    horizontal={true}
+                    estimatedItemSize={wp(80)}
+                    drawDistance={wp(140)}
+                    showsHorizontalScrollIndicator={false}
+                    keyExtractor={(item: Manhwa) => item.manhwa_id.toString()}
+                    renderItem={({item}) => <ManhwaCard marginRight={6} manhwa={item} showRating={true} />}
+                />
+            </View>
         </View>
     )
 }

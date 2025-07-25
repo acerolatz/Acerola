@@ -21,6 +21,7 @@ import {
     Platform,
     Pressable,
     ScrollView,
+    StyleSheet,
     Text,
     TextInput,
     View
@@ -30,6 +31,7 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import * as mime from 'react-native-mime-types';
 import Toast from 'react-native-toast-message';
 import * as yup from 'yup';
+import Row from '../util/Row';
 
 
 
@@ -208,7 +210,8 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
                 form_data.title,
                 form_data.bugType,
                 device,
-                form_data.descr.trim() === '' ? null : form_data.descr.trim()
+                form_data.descr.trim() === '' ? null : form_data.descr.trim(),
+                photos.length > 0
             )            
 
             if (bug_id === null) {
@@ -295,19 +298,22 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
                 />
                 {errors.descr && (<Text style={AppStyle.error}>{errors.descr.message}</Text>)}            
 
-                {/* Report Button */}
-                <Pressable onPress={handleSubmit(onSubmit)} style={[AppStyle.formButton, {backgroundColor: Colors.BugReportColor}]} >
-                    {
-                        isLoading ? 
-                        <ActivityIndicator size={32} color={Colors.backgroundColor} /> :
-                        <Text style={AppStyle.formButtonText} >Report</Text>
-                    }
-                </Pressable>
 
-                {/* Bug Images */}
-                <Pressable onPress={handlePickPhoto} style={[AppStyle.formButton, {backgroundColor: Colors.BugReportColor}]} >                
-                    <Text style={AppStyle.formButtonText} >Images (optional)</Text>
-                </Pressable>
+                <Row style={{gap: 10, width: '100%', marginTop: 8}} >
+                    {/* Bug Images */}
+                    <Pressable onPress={handlePickPhoto} style={styles.button} >
+                        <Text style={AppStyle.formButtonText} >Images</Text>
+                    </Pressable>
+
+                    {/* Report Button */}
+                    <Pressable onPress={handleSubmit(onSubmit)} style={styles.button} >
+                        {
+                            isLoading ? 
+                            <ActivityIndicator size={32} color={Colors.backgroundColor} /> :
+                            <Text style={AppStyle.formButtonText} >Report</Text>
+                        }
+                    </Pressable>
+                </Row>
         
                 {
                     photos.length > 0 &&
@@ -329,3 +335,14 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
 }
 
 export default BugReportForm
+
+const styles = StyleSheet.create({
+    button: {
+        flex: 1,
+        height: 52,
+        borderRadius: 4,
+        backgroundColor: Colors.BugReportColor,
+        alignItems: "center",
+        justifyContent: "center"
+    }
+})

@@ -1,4 +1,4 @@
-import { Author, Chapter, Genre, Manhwa, ManhwaAuthor, ManhwaGenre } from '@/helpers/types';
+import { Author, Chapter, Collection, Genre, Manhwa, ManhwaAuthor, ManhwaGenre } from '@/helpers/types';
 import { secondsSince } from '@/helpers/util';
 import * as SQLite from 'expo-sqlite';
 import DeviceInfo from 'react-native-device-info';
@@ -16,6 +16,12 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       CREATE TABLE IF NOT EXISTS app_info (
           name TEXT NOT NULL PRIMARY KEY,
           value TEXT NOT NULL
+      );
+
+      CREATE TABLE IF NOT EXISTS collections (
+        collection_id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        descr TEXT
       );
 
       CREATE TABLE IF NOT EXISTS update_history (
@@ -59,17 +65,14 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
           author_id INTEGER NOT NULL,
           manhwa_id INTEGER NOT NULL,
           role TEXT NOT NULL,
-          CONSTRAINT manhwa_authors_pkey PRIMARY KEY (manhwa_id, author_id, role),          
-          CONSTRAINT manhwa_authors_author_id_fkey FOREIGN KEY (author_id) REFERENCES authors (author_id) ON UPDATE CASCADE ON DELETE CASCADE,
-          CONSTRAINT manhwa_authors_manhwa_id_fkey FOREIGN KEY (manhwa_id) REFERENCES manhwas (manhwa_id) ON UPDATE CASCADE ON DELETE CASCADE
+          CONSTRAINT manhwa_authors_pkey PRIMARY KEY (manhwa_id, author_id, role)          
       );
 
       CREATE TABLE IF NOT EXISTS manhwa_genres (
           genre_id INTEGER NOT NULL,
           manhwa_id INTEGER NOT NULL,
           CONSTRAINT manhwa_genres_pkey PRIMARY KEY (manhwa_id, genre_id),
-          CONSTRAINT manhwa_genres_genre_id_fkey FOREIGN KEY (genre_id) REFERENCES genres (genre_id) ON UPDATE CASCADE ON DELETE CASCADE,        
-          CONSTRAINT manhwa_genres_manhwa_id_fkey FOREIGN KEY (manhwa_id) REFERENCES manhwas (manhwa_id) ON UPDATE CASCADE ON DELETE CASCADE
+          CONSTRAINT manhwa_genres_genre_id_fkey FOREIGN KEY (genre_id) REFERENCES genres (genre_id) ON UPDATE CASCADE ON DELETE CASCADE
       );
 
       CREATE TABLE IF NOT EXISTS chapters (
@@ -84,16 +87,14 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       CREATE TABLE IF NOT EXISTS reading_status (
           manhwa_id INTEGER NOT NULL PRIMARY KEY,
           status TEXT NOT NULL,
-          updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          CONSTRAINT fk_reading_status_manhwa FOREIGN KEY (manhwa_id) REFERENCES manhwas (manhwa_id) ON UPDATE CASCADE ON DELETE CASCADE
+          updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
       
       CREATE TABLE IF NOT EXISTS reading_history (
           manhwa_id INTEGER NOT NULL,      
           chapter_id INTEGER NOT NULL,
           readed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          PRIMARY KEY (manhwa_id, chapter_id),              
-          FOREIGN KEY (manhwa_id) REFERENCES manhwas (manhwa_id) ON UPDATE CASCADE ON DELETE CASCADE
+          PRIMARY KEY (manhwa_id, chapter_id)          
       );   
       
       CREATE INDEX IF NOT EXISTS idx_chapters_manhwa_id ON chapters(manhwa_id);
@@ -117,7 +118,8 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
         ('device', 'null'),
         ('read_mode', 'List'),
         ('first_run', '1'),
-        ('has_new_manhwas', '0')
+        ('has_new_manhwas', '0'),
+        ('last_sync_time', '')
       ON CONFLICT (name)
       DO NOTHING;
 
@@ -160,6 +162,24 @@ export async function dbListTable(db: SQLite.SQLiteDatabase, table: string) {
   r ? r.forEach(i => console.log(i)) : null
 }
 
+
+export async function dbGetLastDatabaseUpdateTimestamp(db: SQLite.SQLiteDatabase): Promise<string | null> {
+  const r = await db.getFirstAsync<{value: string}>(
+    'SELECT value FROM app_info WHERE name = ?',
+    'last_sync_time'
+  ).catch(error => console.log("error dbGetLastDatabaseUpdateTimestamp", error))
+
+  return r?.value && r.value.trim() !== '' ? r.value : null
+}
+
+
+export async function dbSetLastDatabaseUpdateTimestamp(db: SQLite.SQLiteDatabase, value: string) {
+  console.log("set last sync", value)
+  await db.runAsync(
+    'UPDATE app_info SET value = ? WHERE name = ?;',
+    [value, 'last_sync_time']
+  ).catch(error => console.log("error dbSetLastDatabaseUpdateTimestamp", error))
+}
 
 export async function dbClearDatabase(db: SQLite.SQLiteDatabase) {
     await db.runAsync('DELETE FROM manhwas;').catch(error => console.log("error dbClearDatabase manhwas", error))
@@ -386,6 +406,34 @@ async function dbUpsertAltTitles(db: SQLite.SQLiteDatabase, titles: (number | st
 }
 
 
+export async function dbUpsertCollections(db: SQLite.SQLiteDatabase, collections: Collection[]) {
+  const placeholders = collections.map(() => '(?,?,?)').join(',');  
+  const params = collections.flatMap(i => [
+    i.collection_id, 
+    i.name, 
+    i.descr
+  ]); 
+  await db.runAsync(
+    `
+      INSERT OR REPLACE INTO collections (
+        collection_id,
+        name,
+        descr
+      )
+      VALUES ${placeholders};
+    `,
+    params
+  ).catch(error => console.log("error dbUpsertCollections", error))
+}
+
+
+export async function dbReadCollections(db: SQLite.SQLiteDatabase): Promise<Collection[]> {
+  const r = await db.getAllAsync<Collection>(
+    'SELECT * FROM collections;'
+  ).catch(error => console.log("dbReadCollections", error))
+  return r ? r : [];
+}
+
 async function dbUpsertManhwas(db: SQLite.SQLiteDatabase, manhwas: Manhwa[]) {
   const placeholders = manhwas.map(() => '(?,?,?,?,?,?,?,?,?)').join(',');  
   const params = manhwas.flatMap(i => [
@@ -523,11 +571,21 @@ export async function dbUpdateDatabase(db: SQLite.SQLiteDatabase) {
     console.log('[UPDATING DATABASE]')
 
     const response_time_start = Date.now()
-    const manhwas: Manhwa[] = await spGetManhwas()
+
+    const last_update: string | null = await dbGetLastDatabaseUpdateTimestamp(db)
+    console.log("last sync", last_update)
+    const manhwas: Manhwa[] = await spGetManhwas(last_update)
     const response_time_end = Date.now()
 
-    if (manhwas.length == 0) { return }    
+    if (manhwas.length == 0) {
+      console.log(
+        "[DATABASE UPDATED]", 
+        "[SUPABASE] ->", (response_time_end - response_time_start) / 1000        
+      )
+      return
+    }
 
+    await dbSetLastDatabaseUpdateTimestamp(db, new Date().toISOString())
     await dbClearDatabase(db)
     await dbUpsertManhwas(db, manhwas)
 
@@ -981,8 +1039,7 @@ export async function dbGetReadingHistory(
       SELECT
           m.manhwa_id,
           m.title,
-          m.cover_image_url,
-          MAX(rh.readed_at) AS last_readed_at
+          m.cover_image_url
       FROM 
           reading_history AS rh
       JOIN 
@@ -992,7 +1049,7 @@ export async function dbGetReadingHistory(
       GROUP BY
           m.manhwa_id
       ORDER BY
-          last_readed_at DESC
+          readed_at DESC
       LIMIT ?
       OFFSET ?;
     `,

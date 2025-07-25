@@ -12,11 +12,9 @@ import { ActivityIndicator, Linking, Pressable, SafeAreaView, ScrollView, StyleS
 import Toast from 'react-native-toast-message'
 
 
-const TEXT = "All images featured in our application are self-hosted on Cloudflare's storage services. This infrastructure ensures reliable and efficient delivery of content to our users.\n\nIt is important to note that while we self-host these images, their original sources are various public scanlator groups across the internet.\n\nWe wish to emphasize that all content made available through our application is exclusively derived from chapters that scanlators have publicly released under their free access tiers.\n\nWe understand that some scanlator groups operate subscription models or paid access systems for certain chapters. However, we strictly adhere to providing only content that has been made freely and publicly accessible by these scanlators.\n\nWe do not host or provide access to any content that requires a paid subscription or is restricted by a paywall from its original scanlator source."
-
 const ScansPage = () => {
 
-    const { scans, setScans } = useScanState()
+    const { scans, setScans, title, setTitle } = useScanState()
     const [loading, setLoading] = useState(false)
 
     useEffect(
@@ -24,13 +22,16 @@ const ScansPage = () => {
             const init = async () => {
                 if (scans.length == 0) {
                     setLoading(true)
-                    await spFetchScans().then(v => setScans(v))
+                        const r = await spFetchScans()
+                        const t = r.find(i => i.name === 'title') 
+                        setScans(r.filter(i => i.name != "title"))
+                        setTitle(t ? t.url : null)
                     setLoading(false)
                 }
             }
             init()
         },
-        []
+        [scans]
     )
 
     const openUrl = async (url: string) => {
@@ -62,7 +63,7 @@ const ScansPage = () => {
             <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps={'always'} >
                 <View style={styles.donateButton} >
                     <Text style={[AppStyle.textRegular, {fontSize: 20, color: Colors.backgroundColor}]} >                        
-                        {TEXT}
+                        {title}
                     </Text>
                 </View>
                 {

@@ -7,15 +7,18 @@ const {
     height: deviceHeight
 } = Dimensions.get('window');
 
+
 export function wp(percentage: number) {
     const width = deviceWidth;
     return (percentage * width) / 100;
 }
 
+
 export function hp(percentage: number) {
     const height = deviceHeight;
     return (percentage * height) / 100;
 }
+
 
 export function getItemGridDimensions(
     horizontalPadding: number,
@@ -29,11 +32,13 @@ export function getItemGridDimensions(
     return {width, height}
 }
 
+
 export function formatTimestamp(timestamp: string): string {    
     const date = new Date(timestamp);
     const options = { month: 'long', day: 'numeric', year: 'numeric' };    
     return date.toLocaleDateString('en-US', options as any);
 }
+
 
 export function secondsSince(dateTimeString: string): number {
     const inputDate = new Date(dateTimeString);
@@ -41,6 +46,7 @@ export function secondsSince(dateTimeString: string): number {
     const diff = now.getTime() - inputDate.getTime()
     return Math.floor(diff / 1000)
 }
+
 
 export async function hasInternetAvailable(): Promise<boolean> {
     const state: NetInfoState = await NetInfo.fetch()

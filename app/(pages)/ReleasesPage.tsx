@@ -51,8 +51,7 @@ const Releases = () => {
                 <Row style={{width: '100%', justifyContent: "space-between"}} >
                     <Text style={[AppStyle.textHeader, {color: Colors.backgroundColor}]} >{item.version}</Text>
                     <Ionicons name='download-outline' size={28} color={Colors.backgroundColor} />
-                </Row>            
-                {item.descr && <Text style={AppStyle.textRegular}>{item.descr}</Text>}            
+                </Row>
             </Pressable>
         )
     }
@@ -77,7 +76,7 @@ const Releases = () => {
             <AppVersion/>
             <FlatList
                 data={allReleases}
-                keyExtractor={(item) => item.release_id.toString()}
+                keyExtractor={(item) => item.url}
                 showsVerticalScrollIndicator={false}
                 renderItem={renderItem}
             />

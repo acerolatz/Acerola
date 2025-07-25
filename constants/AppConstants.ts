@@ -3,8 +3,8 @@
 export const AppConstants = {
     APP_NAME: "Acerola",
     MANHWA_COVER_DIMENSION: {
-        width: 260,
-        height: 360
+        width: 300,
+        height: 440
     },
     HIT_SLOP: {
         left: 10,
@@ -27,6 +27,8 @@ export const AppConstants = {
         'Re-Reading',
         'None'
     ],
+    MENU_WIDTH: 250,
+    MENU_ANIMATION_TIME: 300,
     CHAPTER_PAGE_HEADER_HEIGHT: 160,
     CHAPTER_PAGE_FOOTER_HEIGHT: 500,
     BORDER_RADIUS: 4,
@@ -40,7 +42,7 @@ export const AppConstants = {
     REQ_MANGA_TITLE_MIN_LENGTH: 3,
     REQ_MANGA_TITLE_MAX_LENGTH: 1024,
     REQ_MANGA_DESCR_MAX_LENGTH: 512,
-    DEBUG_MODE: false,
+    DEBUG_MODE: true,
     PORNHWA_REDDIT_URL: "https://www.reddit.com/r/pornhwa/",
     GITHUB_URL: "https://github.com/acerolatz/Acerola",
     email: "acerola.app@proton.me"

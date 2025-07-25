@@ -71,7 +71,7 @@ const RequestManhwaForm = () => {
     <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
         <ScrollView style={{flex: 1}} keyboardShouldPersistTaps='always' >
             {/* Manga Name */}
-            <Text style={AppStyle.inputHeaderText}>Name</Text>
+            <Text style={AppStyle.inputHeaderText}>Manhwa</Text>
             <Controller
                 control={control}
                 name="manga_title"

@@ -15,8 +15,9 @@ export const supabase = createClient(supabaseUrl, supabaseKey as any, {
 });
 
 
-export async function spGetManhwas(): Promise<Manhwa[]> {
-    const { data, error } = await supabase.from("mv_manhwas").select("*")
+export async function spGetManhwas(p_last_sync_time: string | null): Promise<Manhwa[]> {
+    const { data, error } = await supabase
+        .rpc("get_manhwas", { p_last_sync_time })
     
     if (error) {
         console.log("error spGetManhwas", error)
@@ -87,16 +88,17 @@ export async function spUpdateManhwaViews(p_manhwa_id: number) {
 
 export async function spGetReleases(): Promise<AppRelease[]> {
     const { data, error } = await supabase
-        .from("releases")
-        .select("release_id, version, url, descr, created_at")
+        .from("app_infos")
+        .select("name, value")
         .order("created_at", {ascending: false})
+        .eq("type", "release")
         
     if (error) { 
         console.log("error spGetAllAppVersions", error)
         return [] 
     }    
 
-    return data as AppRelease[]
+    return data.map(r => {return {version: r.name, url: r.value}})
 }
 
 
@@ -115,6 +117,7 @@ export async function spFetchChapterImages(chapter_id: number): Promise<ChapterI
     return data
 }
 
+
 export async function spRequestManhwa(manhwa: string, message: string | null) {
     const { error } = await supabase
         .from("manhwa_requests")
@@ -125,15 +128,17 @@ export async function spRequestManhwa(manhwa: string, message: string | null) {
     }
 }
 
+
 export async function spReportBug(
     title: string, 
     bug_type: string,
     device: string | null,
-    descr: string | null
+    descr: string | null,
+    has_images: boolean
 ): Promise<number | null> {
     const { data, error } = await supabase
         .from("bug_reports")
-        .insert([{title, descr, bug_type, device}])
+        .insert([{title, descr, bug_type, device, has_images}])
         .select("bug_id")
         .single()
     
@@ -145,17 +150,19 @@ export async function spReportBug(
     return data.bug_id
 }
 
+
 export async function spGetDonationMethods(): Promise<DonateMethod[]> {
     const { data, error } = await supabase
-        .from("donate_methods")
-        .select("method, value, action")
+        .from("app_infos")
+        .select("name, value, action")
+        .eq("type", "donation")
 
     if (error) {
         console.log("error spGetDonationMethods", error)
         return []
     }
 
-    return data
+    return data.map(i => {return {action: i.action, method: i.name, value: i.value}})
 }
 
 
@@ -173,6 +180,7 @@ export async function spFetchManhwaAltName(manhwa_id: number): Promise<string[]>
 
     return data.map(i => i.title)
 }
+
 
 export async function spFetchRandomManhwaCards(p_limit: number = 30): Promise<ManhwaCard[]> {
     const { data, error } = await supabase
@@ -200,16 +208,33 @@ export async function spAddNewManhwaRating(manhwa_id: number, user_id: string, r
 
 export async function spFetchScans(): Promise<Scan[]> {
     const { data, error } = await supabase
-        .from("scans")
-        .select("name, url")
+        .from("app_infos")
+        .select("name, value")
+        .eq("type", "scan")        
 
     if (error) {
         console.log("error spFetchScans", error)
         return []
     }
     
+    return data.map(s => {return {name: s.name, url: s.value}})
+}
+
+
+export async function spFetchEulaAndDisclaimer(): Promise<{name: string, value: string}[]> {
+    const { data, error } = await supabase
+        .from("app_infos")
+        .select("name, value")
+        .or('name.eq.eula, name.eq.disclaimer')
+
+    if (error) {
+        console.log("error spFetchEulaAndDisclaimer", error)
+        return []
+    }
+
     return data
 }
+
 
 export async function spSearchManhwas(p_search_term: string, p_offset: number = 0, p_limit: number = 30): Promise<Manhwa[]> {
     const { data, error } = await supabase
@@ -222,6 +247,7 @@ export async function spSearchManhwas(p_search_term: string, p_offset: number = 
 
     return data
 }
+
 
 export async function spFetchCollections(): Promise<Collection[]> {
     const { data, error } = await supabase

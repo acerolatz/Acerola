@@ -105,10 +105,12 @@ const ManhwaPage = () => {
   return (
     <SafeAreaView style={[AppStyle.safeArea, styles.container]} >
       <ScrollView style={{flex: 1}} keyboardShouldPersistTaps={'always'} showsVerticalScrollIndicator={false} >
+
         {/* Header */}
         <LinearGradient 
             colors={[manhwa.color, Colors.backgroundColor]}
             style={styles.linearBackground} />
+
         <View style={styles.topBar} >
             <HomeButton color={manhwa.color} />
             <View style={{flexDirection: 'row', alignItems: "center", justifyContent: "center", gap: 16}} >
@@ -119,11 +121,10 @@ const ManhwaPage = () => {
         </View>
 
         {/* Manga Info */}
-        <View style={styles.mangaContainer}>
+        <View style={styles.manhwaContainer}>
             <View style={{width: '100%'}} >
               <Image
                 source={manhwa.cover_image_url}
-                cachePolicy={'disk'}
                 contentFit='cover'
                 style={styles.image} />
               {
@@ -190,7 +191,7 @@ const styles = StyleSheet.create({
     paddingVertical: hp(4),
     paddingBottom: 20
   },
-  mangaContainer: {
+  manhwaContainer: {
     width: '100%', 
     gap: 10, 
     alignItems: "center", 

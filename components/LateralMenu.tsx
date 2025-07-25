@@ -220,8 +220,8 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
 
                 <Option 
                     onPress={openDisclaimer} 
-                    title='EULA' 
-                    iconName='receipt-outline'
+                    title='EULA / Disclaimer' 
+                    iconName='reader-outline'
                     showLoading={false}
                     iconColor={Colors.disclaimerColor}
                 />

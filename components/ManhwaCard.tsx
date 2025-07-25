@@ -61,8 +61,8 @@ const ManhwaCard = ({
                 <Image
                     source={manhwa.cover_image_url} 
                     contentFit='cover'
-                    cachePolicy={'disk'}
-                    style={[{borderRadius: 8, width, height}]}/>
+                    style={[{borderRadius: 4, width, height}]}
+                />
             </Pressable>
             <View style={styles.container} >
                 <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 20}]}>{manhwa.title}</Text>
