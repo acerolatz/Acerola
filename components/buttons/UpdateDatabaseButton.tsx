@@ -49,10 +49,14 @@ const UpdateDatabaseButton = ({
         } else {
             Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE)
             try {
-                await dbUpdateDatabase(db)
-                Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED)
-                router.replace("/(pages)/HomePage")
-                return
+                const n = await dbUpdateDatabase(db)
+                if (n > 0) {
+                    Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED)
+                    router.replace("/(pages)/HomePage")
+                    return
+                } else {
+                    Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED1)
+                }                
             } catch (error) {
                 console.log(error)
             }

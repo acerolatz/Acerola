@@ -15,6 +15,10 @@ export const ToastMessages = {
             text1: "Sync completed", 
             type: "info"
         },
+        SYNC_LOCAL_DATABASE_COMPLETED1: {
+            text1: "Already synced", 
+            type: "info"
+        },
         UNABLE_TO_OPEN_BROWSER: {
             text1: "Unable to open the browser", 
             type: "error"

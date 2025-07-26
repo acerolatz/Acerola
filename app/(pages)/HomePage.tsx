@@ -51,12 +51,10 @@ const HomePage = () => {
 
     useEffect(
         () => {
-            let isCancelled = false
             const init = async () => {
                 const g = await dbReadGenres(db)
                 const l = await dbReadManhwasOrderedByUpdateAt(db, 0, 30)
                 const m = await dbReadManhwasOrderedByViews(db, 0, 30)
-                if (isCancelled) { return }
 
                 setGenres(g)
                 setLatestUpdates(l)
@@ -68,19 +66,16 @@ const HomePage = () => {
                         c = await spFetchCollections()
                         await dbUpsertCollections(db, c)
                     }
-                    if (isCancelled) { return }
                     setCollections(c)
                 }
 
                 if (cards.length == 0) {
                     const r = await spFetchRandomManhwaCards(32)
-                    if (isCancelled) { return }
                     setCards(r)
                 }
             }
 
             init()
-            return () => { isCancelled = true }
         },
         [db]
     )

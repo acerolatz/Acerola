@@ -174,7 +174,6 @@ export async function dbGetLastDatabaseUpdateTimestamp(db: SQLite.SQLiteDatabase
 
 
 export async function dbSetLastDatabaseUpdateTimestamp(db: SQLite.SQLiteDatabase, value: string) {
-  console.log("set last sync", value)
   await db.runAsync(
     'UPDATE app_info SET value = ? WHERE name = ?;',
     [value, 'last_sync_time']
@@ -567,22 +566,22 @@ async function dbUpsertManhwaAuthors(db: SQLite.SQLiteDatabase, manhwaAuthor: Ma
     ).catch(error => console.log("error dbUpsertManhwaAuthors", error));
 }
 
-export async function dbUpdateDatabase(db: SQLite.SQLiteDatabase) {
+export async function dbUpdateDatabase(db: SQLite.SQLiteDatabase): Promise<number> {
     console.log('[UPDATING DATABASE]')
 
     const response_time_start = Date.now()
 
-    const last_update: string | null = await dbGetLastDatabaseUpdateTimestamp(db)
-    console.log("last sync", last_update)
+    const last_update: string | null = await dbGetLastDatabaseUpdateTimestamp(db)    
     const manhwas: Manhwa[] = await spGetManhwas(last_update)
     const response_time_end = Date.now()
 
     if (manhwas.length == 0) {
       console.log(
-        "[DATABASE UPDATED]", 
-        "[SUPABASE] ->", (response_time_end - response_time_start) / 1000        
+        "[DATABASE UPDATED]",
+        "[SUPABASE] ->", (response_time_end - response_time_start) / 1000,
+        "[MANHWAS] ->", manhwas.length     
       )
-      return
+      return manhwas.length
     }
 
     await dbSetLastDatabaseUpdateTimestamp(db, new Date().toISOString())
@@ -620,8 +619,10 @@ export async function dbUpdateDatabase(db: SQLite.SQLiteDatabase) {
     console.log(
       "[DATABASE UPDATED]", 
       "[SUPABASE] ->", (response_time_end - response_time_start) / 1000,
-      "| [SQLITE] ->", (end - response_time_end) / 1000
+      "| [SQLITE] ->", (end - response_time_end) / 1000,
+      "| [MANHWAS] ->", manhwas.length
     )
+    return manhwas.length
 }
 
 

@@ -42,6 +42,21 @@ export async function spNewRun(user_id: string, device: string) {
     }
 }
 
+export async function spFetchLastDatabaseUpdate(): Promise<Date | null> {
+    const { data, error } = await supabase
+        .from("app_infos")
+        .select("created_at")
+        .eq("name", "last_sync_time")
+        .single()
+
+    if (error) {
+        console.log("error spFetchLastDatabaseUpdate", error)
+        return null
+    }
+    
+    return new Date(data.created_at)
+}
+
 
 export async function spFetchNews(page: number = 0, limit: number = 10): Promise<Post[]> {
     const { data, error } = await supabase
