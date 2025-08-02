@@ -19,10 +19,6 @@ Acerola is free to use. If you'd like to support server costs, donations are wel
 
 - Sync: Keep your local library up-to-date by tapping the sync button on the home page to fetch the latest data from the cloud.
 
-# Usability
-
-The app's interface is entirely in English and is designed to be intuitive. If you're familiar with mobile apps, you'll find it easy to use. Screenshots are provided below to give you a preview.
-
 # Permissions (Android)
 
 The app's Bug Report feature allows users to attach images. The application will only access the specific images you choose to send.
@@ -36,6 +32,10 @@ The app's Bug Report feature allows users to attach images. The application will
 # APK
 
 The APK is available in the project's 'Releases' tab here on GitHub. Feel free to verify the APK with online analysis tools such as https://www.androidfreeware.net/apk-check or https://sisik.eu/apk-tool. Alternatively, you can use an Android Emulator to safely test the app.
+
+# Usability
+
+The app's interface is entirely in English and is designed to be intuitive. If you're familiar with mobile apps, you'll find it easy to use. Screenshots are provided below to give you a preview.
 
 # Home
 
