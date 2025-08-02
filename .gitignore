@@ -40,3 +40,6 @@ yarn-error.*
 .vscode
 .idea
 .env
+
+# supabase
+lib/supabaseKey.ts

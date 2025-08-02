@@ -722,7 +722,7 @@ export async function dbReadLast3Chapters(
       WHERE
         manhwa_id = ?
       ORDER BY 
-        chapter_name DESC
+        chapter_num DESC
       LIMIT 3;
     `,
     [manhwa_id]
