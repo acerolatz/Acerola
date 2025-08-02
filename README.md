@@ -1,11 +1,45 @@
-# Acerola - Manhwa Reader +18
+# Acerola - Manhwa Reader (NSFW)
 
-<div style='flex-direction: row; display: flex; gap: 10px' >
-   
-   <img width=32 height=32 src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/supabase/supabase-original.svg"/>
-          
-   <img width=32 height=32 src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/cloudflare/cloudflare-original.svg" />
-             
-   <img width=32 height=32 src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/reactnative/reactnative-original.svg" />
 
-</div>
+Acerola is a React Native mobile app for reading adult manhwas (pornhwa), developed with a focus on Android. Testing has not been performed on iOS. If you're interested in working on the iOS version, please contact me, and I can provide access to a test database for development. You can audit the source code and download the latest APK from the Releases section.
+
+# Backend & Infrastructure
+
+- Images are hosted via Cloudflare.
+
+- The database is currently on a free Supabase instance. The need for a more robust instance will be assessed as the project grows.
+
+# Support the Project
+ 
+Acerola is free to use. If you'd like to support server costs, donations are welcome. Donation details for PayPal and Bitcoin are available in the app's menu.
+
+# Features
+
+- Offline Access: The database, with over 500 manhwas, is stored locally on your device for fast performance.
+
+- Sync: Keep your local library up-to-date by tapping the sync button on the home page to fetch the latest data from the cloud.
+
+# Usability
+
+The app's interface is entirely in English and is designed to be intuitive. If you're familiar with mobile apps, you'll find it easy to use. Screenshots are provided below to give you a preview.
+
+# Home
+
+![HomePage](github/images/home.jpg)
+
+# Manhwa Page
+
+![ManhwaPageTrappedInTheAcademysEroge](github/images/academy.jpg)
+![ManhwaPageInTheSummer](github/images/academy2.jpeg)
+![ManhwaPageHusband](github/images/husband.jpg)
+
+# Library
+
+![Library](github/images/library.jpg)
+
+# Chapter Reader
+![ChapterReader](github/images/chapter.jpg)
+
+# Random Manhwas
+
+![Random](github/images/random.jpg)
