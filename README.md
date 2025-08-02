@@ -38,22 +38,21 @@ The APK is available in the project's 'Releases' tab here on GitHub. Feel free t
 The app's interface is entirely in English and is designed to be intuitive. If you're familiar with mobile apps, you'll find it easy to use. Screenshots are provided below to give you a preview.
 
 # Home
-
-![HomePage](github/images/home.jpg)
+<img src="github/images/home.jpg" width=400 />
 
 # Manhwa Page
 
-![ManhwaPageTrappedInTheAcademysEroge](github/images/academy.jpg)
-![ManhwaPageInTheSummer](github/images/academy2.jpeg)
-![ManhwaPageHusband](github/images/husband.jpg)
+<img src="github/images/academy.jpg" width=320 />
+<img src="github/images/academy2.jpeg" width=320 />
 
 # Library
 
-![Library](github/images/library.jpg)
+<img src="github/images/library.jpg" width=400 />
 
 # Chapter Reader
-![ChapterReader](github/images/chapter.jpg)
+
+<img src="github/images/chapter.jpg" width=400 />
 
 # Random Manhwas
 
-![Random](github/images/random.jpg)
+<img src="github/images/random.jpg" width=400 />
