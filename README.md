@@ -23,6 +23,17 @@ Acerola is free to use. If you'd like to support server costs, donations are wel
 
 The app's interface is entirely in English and is designed to be intuitive. If you're familiar with mobile apps, you'll find it easy to use. Screenshots are provided below to give you a preview.
 
+# Permissions (Android)
+
+The app's Bug Report feature allows users to attach images. The application will only access the specific images you choose to send.
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+
+
 # Home
 
 ![HomePage](github/images/home.jpg)
