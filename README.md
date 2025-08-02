@@ -33,6 +33,9 @@ The app's Bug Report feature allows users to attach images. The application will
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
 
+# APK
+
+The APK is available in the project's 'Releases' tab here on GitHub. Feel free to verify the APK with online analysis tools such as https://www.androidfreeware.net/apk-check or https://sisik.eu/apk-tool. Alternatively, you can use an Android Emulator to safely test the app.
 
 # Home
 
