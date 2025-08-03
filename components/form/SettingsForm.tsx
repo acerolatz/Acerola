@@ -2,7 +2,7 @@ import { AppConstants } from '@/constants/AppConstants';
 import { Colors } from '@/constants/Colors';
 import { ToastMessages } from '@/constants/Messages';
 import { clearCache, formatBytes } from '@/helpers/util';
-import { dbSetCacheSize } from '@/lib/database';
+import { dbGetCacheMaxSize, dbSetCacheSize } from '@/lib/database';
 import { AppStyle } from '@/styles/AppStyle';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -80,9 +80,25 @@ const SettingsForm = ({currentMaxCacheSize, currentCacheSize}: SettingsFormProps
     return (
         <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
             <ScrollView style={{flex: 1}} keyboardShouldPersistTaps='always' >
+
+                <View style={{marginTop: 10}} >
+                    <Text style={AppStyle.inputHeaderText}>Cache size: {formatBytes(currentCacheSize)}</Text>
+                </View>
+
+                {/* Clear Cache */}
+                {
+                    isLoading ?
+                    <View style={[AppStyle.formButton, {backgroundColor: Colors.white}]} >
+                        <ActivityIndicator size={32} color={Colors.backgroundColor} />
+                    </View> 
+                    :
+                    <Pressable onPress={clearAppCache} style={[AppStyle.formButton, {backgroundColor: Colors.white}]} >
+                        <Text style={AppStyle.formButtonText} >Clear cache</Text>
+                    </Pressable>
+                }
                 
                 {/* Cache Size */}
-                <Text style={AppStyle.inputHeaderText}>Max cache size (MiB)</Text>
+                <Text style={AppStyle.inputHeaderText}>Max cache size (MB)</Text>
                 <Controller
                     control={control}
                     name="maxCacheSize"
@@ -109,23 +125,7 @@ const SettingsForm = ({currentMaxCacheSize, currentCacheSize}: SettingsFormProps
                     <Pressable onPress={handleSubmit(onSubmit)} style={[AppStyle.formButton, {backgroundColor: Colors.white}]} >
                         <Text style={AppStyle.formButtonText} >Save</Text>
                     </Pressable>
-                }
-
-                <View style={{marginTop: 10}} >
-                    <Text style={AppStyle.inputHeaderText}>Cache size: {formatBytes(currentCacheSize)}</Text>
-                </View>
-
-                {/* Clear Cache */}
-                {
-                    isLoading ?
-                    <View style={[AppStyle.formButton, {backgroundColor: Colors.white}]} >
-                        <ActivityIndicator size={32} color={Colors.backgroundColor} />
-                    </View> 
-                    :
-                    <Pressable onPress={clearAppCache} style={[AppStyle.formButton, {backgroundColor: Colors.white}]} >
-                        <Text style={AppStyle.formButtonText} >Clear cache</Text>
-                    </Pressable>
-                }
+                }                
 
                 <Text style={[AppStyle.textRegular, {color: Colors.neonRed}]}>* Restart Required</Text>
                 

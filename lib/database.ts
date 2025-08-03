@@ -1,6 +1,6 @@
 import { AppConstants } from '@/constants/AppConstants';
 import { Author, Chapter, Collection, Genre, Manhwa, ManhwaAuthor, ManhwaGenre } from '@/helpers/types';
-import { getCacheSizeBytes, secondsSince } from '@/helpers/util';
+import { formatBytes, getCacheSizeBytes, secondsSince } from '@/helpers/util';
 import * as SQLite from 'expo-sqlite';
 import DeviceInfo from 'react-native-device-info';
 import uuid from 'react-native-uuid';
@@ -114,28 +114,36 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       VALUES 
         ('version', 'v1.0.0');        
       
-      INSERT INTO
-        app_info (name, value)
+      INSERT INTO app_info 
+        (name, value)
       VALUES
         ('device', 'null'),
         ('read_mode', 'List'),
         ('first_run', '1'),
         ('has_new_manhwas', '0'),
         ('last_sync_time', '')
-      ON CONFLICT (name)
+      ON CONFLICT 
+        (name)
       DO NOTHING;
 
-      INSERT INTO
+      INSERT INTO 
         update_history (name, refresh_cycle)
       VALUES
         ('server', 60 * 60 * 3),
         ('client', 60 * 3),
-        ('collections', 60 * 60 * 48),
-        ('cache', 1024 * 1024 * 1024)
+        ('collections', 60 * 60 * 48)        
       ON CONFLICT 
         (name)
       DO UPDATE SET 
         refresh_cycle = EXCLUDED.refresh_cycle;
+
+      INSERT INTO 
+        update_history (name, refresh_cycle)
+      VALUES
+        ('cache', 1024 * 1024 * 1024)
+      ON CONFLICT  
+        (name)
+      DO NOTHING;
     `
     ).catch(error => console.log("DATABASE MIGRATION ERROR", error));
     console.log("[DATABASE MIGRATION END]")
@@ -155,12 +163,19 @@ export async function dbSetCacheSize(db: SQLite.SQLiteDatabase, size: number) {
           refresh_cycle = EXCLUDED.refresh_cycle;
       `,
       ['cache', size]
-    ).catch(error => console.log("error dbGetCacheMaxSize", error))
+    ).catch(error => console.log("error dbSetCacheSize", error))
 }
 
 export async function dbGetCacheMaxSize(db: SQLite.SQLiteDatabase): Promise<number> {
   const r = await db.getFirstAsync<{refresh_cycle: number}>(
-    'SELECT refresh_cycle FROM update_history WHERE name = ?;',
+    `
+      SELECT 
+        refresh_cycle 
+      FROM 
+        update_history 
+      WHERE 
+        name = ?;
+    `,
     ['cache']
   ).catch(error => console.log("error dbGetCacheMaxSize", error))
 
@@ -179,16 +194,49 @@ export async function dbShouldClearCache(db: SQLite.SQLiteDatabase): Promise<boo
 }
 
 
+export async function dbCount(db: SQLite.SQLiteDatabase, table: string): Promise<number> {
+  const r = await db.getFirstAsync<{total: number}>(
+    `
+      SELECT 
+        count(*) as total 
+      FROM 
+        ${table};
+    `
+  )
+  return r ? r.total : 0
+}
+
+async function dbGetTotalSizeMiB(db: SQLite.SQLiteDatabase): Promise<number | null> {
+  const r = await db.getFirstAsync<{total_size_mb: number}>(
+    `
+      SELECT 
+        CAST(page_count * page_size AS REAL) / 1024 / 1024 as total_size_mb 
+      FROM 
+        pragma_page_count(), 
+        pragma_page_size();
+      `
+  )
+  return r ? r.total_size_mb : null
+}
+
 export async function dbLog(db: SQLite.SQLiteDatabase) {  
-  [
-    await db.getFirstAsync<{total: number}>('SELECT count(*) as total_manhwas FROM manhwas;'),
-    await db.getFirstAsync<{total: number}>('SELECT count(*) as total_chapters FROM chapters;'),
-    await db.getFirstAsync<{total: number}>('SELECT count(*) as total_genres FROM genres;'),
-    await db.getFirstAsync<{total: number}>('SELECT count(*) as total_manhwa_genres FROM manhwa_genres;'),
-    await db.getFirstAsync<{total: number}>('SELECT count(*) as total_authors FROM authors;'),
-    await db.getFirstAsync<{total: number}>('SELECT count(*) as total_manhwa_authors FROM manhwa_authors;'),
-    await db.getFirstAsync<{total: number}>('SELECT count(*) as total_alt_titles FROM alt_titles;')
+  console.log("=========================")
+  console.log("[ACEROLA DATABASE START]")
+  const r = [
+    'num_tables: ' + (await db.getFirstAsync<{num_tables: number}>(`SELECT count(*) as num_tables FROM sqlite_master WHERE type='table';`))?.num_tables,
+    'size_mib: ' + await dbGetTotalSizeMiB(db),
+    'manhwas: ' + await dbCount(db, 'manhwas'),
+    'chapters: ' + await dbCount(db, 'chapters'),
+    'genres: ' + await dbCount(db, 'genres'),
+    'manhwa_genres: ' + await dbCount(db, 'manhwa_genres'),
+    'authors: ' + await dbCount(db, 'authors'),
+    'manhwa_authors: ' + await dbCount(db, 'manhwa_authors'),
+    'alt_tiles: ' + await dbCount(db, 'alt_titles'),
+    'max_cache_size: ' + await dbGetCacheMaxSize(db) / 1024 / 1024 + ' MB',
+    'current_cache_size: ' + formatBytes(await getCacheSizeBytes())
   ].forEach(i => console.log(i))
+  console.log("[ACEROLA DATABASE END]")
+  console.log("=========================")
 }
 
 

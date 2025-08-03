@@ -32,6 +32,7 @@ import {
     View
 } from 'react-native';
 import Toast from 'react-native-toast-message';
+import { formatNumberWithSuffix } from '../../helpers/util';
 
 
 interface ItemProps {
@@ -149,7 +150,7 @@ const ManhwaPage = () => {
 
             <View style={{flexDirection: 'row', width: '100%', gap: 10, alignItems: "center", justifyContent: "flex-start"}} >
               <Item text={manhwa.status} textColor={Colors.backgroundColor} backgroundColor={manhwa.color} />
-              <Item text={`Views: ${manhwa.views + 1}`} textColor={Colors.backgroundColor} backgroundColor={manhwa.color} />
+              <Item text={`Views: ${formatNumberWithSuffix(manhwa.views + 1)}`} textColor={Colors.backgroundColor} backgroundColor={manhwa.color} />
             </View>
 
             <ManhwaChapterGrid manhwa={manhwa} />

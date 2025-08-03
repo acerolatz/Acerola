@@ -131,3 +131,26 @@ export async function getCacheSizeKB(): Promise<number> {
     const s = await getDirectorySizeBytes(RNFS.CachesDirectoryPath)
     return Math.floor(s / 1024)
 }
+
+export function formatNumberWithSuffix(num: number): string {  
+  if (!num) { return '0'; }
+  
+  const sign = num < 0 ? '-' : '';
+  const absNum = Math.abs(num);
+
+  if (absNum < 1000) {
+    return sign + absNum;
+  }
+
+  const suffixes = ['K', 'M', 'B'];
+
+  const tier = Math.floor(Math.log10(absNum) / 3) - 1;
+  
+  const suffix = suffixes[Math.min(tier, suffixes.length - 1)];
+    
+  const value = (absNum / Math.pow(1000, tier + 1));
+  
+  const formattedValue = value.toFixed(1).replace(/\.0$/, '');
+
+  return `${sign}${formattedValue}${suffix}`;
+}

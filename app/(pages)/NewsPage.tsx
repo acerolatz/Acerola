@@ -124,8 +124,6 @@ const styles = StyleSheet.create({
     item: {
         width: '100%', 
         gap: 20,
-        paddingVertical: hp(2), 
-        paddingHorizontal: wp(2),
         marginBottom: 30
     }
 })

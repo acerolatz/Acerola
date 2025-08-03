@@ -15,7 +15,7 @@ import Row from '../util/Row'
 
 
 const MAX_WIDTH = wp(87)
-const MAX_HEIGHT = hp(85)
+const MAX_HEIGHT = hp(80)
 
 
 interface RandomCardsGridProps {
