@@ -43,6 +43,7 @@ export const Colors = {
   releasesColor: "#F24E4E",
   newsColor: "#F3E9DC",
   redditColor: "#FF4500",
+  documentsColor: "#FF3366",
 
   manhwaStatusTextColor: "#111419",
   manhwaStatusCompleted: "rgba(33, 183, 116, 0.9)",

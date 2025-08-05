@@ -27,6 +27,11 @@ export const AppConstants = {
             TITLE_MAX_LENGTH: 1024,
             DESCR_MAX_LENGTH: 512
         },
+        DOCUMENT: {
+            NAME_MIN_LENGTH: 3,
+            NAME_MAX_LENGTH: 256,
+            DESCR_MAX_LENGTH: 1024
+        },
         SETTINGS: {
             MIN_CACHE_SIZE: 64, // MiB
             MAX_CACHE_SIZE: 256000 // MiB

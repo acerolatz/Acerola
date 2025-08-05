@@ -34,6 +34,11 @@ export function getItemGridDimensions(
 }
 
 
+export function getRelativeHeight(originalWidth: number, originalHeight: number, width: number): number {
+  return width * (originalHeight / originalWidth)
+}
+
+
 export function formatTimestamp(timestamp: string): string {    
     const date = new Date(timestamp);
     const options = { month: 'long', day: 'numeric', year: 'numeric' };    

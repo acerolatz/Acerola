@@ -140,6 +140,10 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
         })
     }
 
+    const openDocuments = () => {
+        router.navigate("/(pages)/DocumentsPage")
+    }
+
     return (
         <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} >
             <View style={styles.container} >
@@ -154,6 +158,14 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
                     iconName='library-outline'
                     showLoading={false}
                     iconColor={Colors.libraryColor}
+                />
+
+                <Option 
+                    onPress={openDocuments} 
+                    title='Documents' 
+                    iconName='folder-outline'
+                    showLoading={false}
+                    iconColor={Colors.documentsColor}
                 />
                 
                 <Option 

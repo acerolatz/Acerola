@@ -5,11 +5,13 @@ import PageActivityIndicator from '@/components/util/PageActivityIndicator'
 import { Colors } from '@/constants/Colors'
 import { ToastMessages } from '@/constants/Messages'
 import { DonateMethod } from '@/helpers/types'
+import { getRelativeHeight, wp } from '@/helpers/util'
 import { spGetDonationMethods } from '@/lib/supabase'
 import { useDonateState } from '@/store/donateState'
 import { AppStyle } from '@/styles/AppStyle'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import * as Clipboard from 'expo-clipboard'
+import { Image } from 'expo-image'
 import React, { useEffect, useState } from 'react'
 import {
   FlatList,
@@ -22,11 +24,15 @@ import {
 import Toast from 'react-native-toast-message'
 
 
+const WIDTH = wp(92)
+const HEIGHT = getRelativeHeight(986, 1030, WIDTH)
+
 
 const Donate = () => {  
 
   const { donates, setDonates } = useDonateState()
   const [loading, setLoading] = useState(false)  
+  const donateImage = require("@/assets/images/donate-green.png")
 
   useEffect(
     () => {
@@ -48,7 +54,6 @@ const Donate = () => {
     },
     []
   )
-
 
   const openUrl = async (url: string) => {
     try {
@@ -105,11 +110,17 @@ const Donate = () => {
     <SafeAreaView style={AppStyle.safeArea} >
         <TopBar title='Donate' titleColor={Colors.donateColor} >
             <ReturnButton color={Colors.donateColor} />
-        </TopBar>
+        </TopBar>        
         <FlatList
             data={donates}
             keyExtractor={(item) => item.value}
             showsVerticalScrollIndicator={false}
+            ListHeaderComponent={
+              <Image 
+                source={donateImage} 
+                style={{width: WIDTH, height: HEIGHT, marginBottom: 20, borderRadius: 4}} 
+                contentFit='cover' />
+            }
             renderItem={renderItem}
         />
     </SafeAreaView>

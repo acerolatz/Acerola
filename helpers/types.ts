@@ -34,6 +34,7 @@ export type Manhwa = {
     status: "OnGoing" | "Completed"
     color: string
     views: number
+    daily_views: number
     rate: number
     genres: Genre[]
     authors: ManhwaAuthor[]
@@ -91,4 +92,20 @@ export type Post = {
     image_width: number | null
     image_height: number | null
     created_at: string
+}
+
+export type Document = {
+    document_id: number
+    name: string
+    descr: string | null
+    parent_document_id: number | null,
+    created_at: string
+}
+
+
+export type DocumentImage = {
+    document_image_id: number
+    document_id: number
+    image_url: string
+    image_index: number
 }

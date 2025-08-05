@@ -58,6 +58,7 @@ const _layout = () => {
               <Stack.Screen name='(pages)/MostViewPage' options={{headerShown: false}} />
               <Stack.Screen name='(pages)/BugReportPage' options={{headerShown: false}} />
               <Stack.Screen name='(pages)/LibraryPage' options={{headerShown: false}} />
+              <Stack.Screen name='(pages)/DocumentsPage' options={{headerShown: false}} />
               <Stack.Screen name='(pages)/DonatePage' options={{headerShown: false}} />              
               <Stack.Screen name='(pages)/RequestManhwaPage' options={{headerShown: false}} />
               <Stack.Screen name='(pages)/ReleasesPage' options={{headerShown: false}} />
