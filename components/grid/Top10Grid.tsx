@@ -1,7 +1,6 @@
 import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
 import { Manhwa } from '@/helpers/types'
-import { useTop10State } from '@/store/top10State'
 import { AppStyle } from '@/styles/AppStyle'
 import { Image } from 'expo-image'
 import { LinearGradient } from 'expo-linear-gradient'
@@ -35,11 +34,9 @@ const Top10Item = ({manhwa, index}: {manhwa: Manhwa, index: number}) => {
 }
 
 
-const Top10Grid = () => {
+const Top10Grid = ({manhwas}: {manhwas: Manhwa[]}) => {
 
-    const { top10Manhwas } = useTop10State()
-
-    if (top10Manhwas.length === 0) {
+    if (manhwas.length === 0) {
         return <></>
     }
     
@@ -50,7 +47,7 @@ const Top10Grid = () => {
             </Row>
             <View style={{width: '100%'}} >
                 <FlatList
-                    data={top10Manhwas}
+                    data={manhwas}
                     horizontal={true}
                     showsHorizontalScrollIndicator={false}
                     keyExtractor={(item: Manhwa) => item.manhwa_id.toString()}

@@ -33,6 +33,7 @@ import {
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { formatNumberWithSuffix } from '../../helpers/util';
+import DonateButton from '@/components/buttons/DonateButton';
 
 
 interface ItemProps {
@@ -115,9 +116,10 @@ const ManhwaPage = () => {
         <View style={styles.topBar} >
             <HomeButton color={manhwa.color} />
             <View style={{flexDirection: 'row', alignItems: "center", justifyContent: "center", gap: 16}} >
-                <BugReportButton color={manhwa.color} title={manhwa.title} />                    
-                <OpenRandomManhwaButton color={manhwa.color} />
-                <ReturnButton color={manhwa.color} />
+              <DonateButton color={manhwa.color} />
+              <BugReportButton color={manhwa.color} title={manhwa.title} />                    
+              <OpenRandomManhwaButton color={manhwa.color} />
+              <ReturnButton color={manhwa.color} />
             </View>
         </View>
 

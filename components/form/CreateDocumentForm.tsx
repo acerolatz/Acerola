@@ -6,7 +6,7 @@ import { spRequestManhwa } from '@/lib/supabase';
 import { AppStyle } from '@/styles/AppStyle';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
     ActivityIndicator,
@@ -49,6 +49,8 @@ interface CreateDocumentFormProps {
 const CreateDocumentForm = ({createDocumentFunc}: CreateDocumentFormProps) => {
         
     const [isLoading, setLoading] = useState(false)
+    const inputRef1 = useRef<TextInput>(null)
+    const inputRef2 = useRef<TextInput>(null)
     
     const {
         control,
@@ -64,66 +66,70 @@ const CreateDocumentForm = ({createDocumentFunc}: CreateDocumentFormProps) => {
     
     const onSubmit = async (form_data: FormData) => {
         Keyboard.dismiss()
+        inputRef1.current?.clear()
+        inputRef2.current?.clear()
         setLoading(true)
         await createDocumentFunc(form_data)
         setLoading(false)
     };
 
-  return (
-    <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
-        <View style={{flex: 1}}>
-            {/* Name */}
-            <Text style={AppStyle.inputHeaderText}>Name</Text>
-            <Controller
-                control={control}
-                name="name"
-                render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                    style={AppStyle.input}
-                    autoCapitalize="words"
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}/>
-                )}
-            />
-            {errors.name && (<Text style={AppStyle.error}>{errors.name.message}</Text>)}
+    return (
+        <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
+            <View style={{flex: 1}}>
+                {/* Name */}
+                <Text style={AppStyle.inputHeaderText}>Name</Text>
+                <Controller
+                    control={control}
+                    name="name"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                        ref={inputRef1}
+                        style={AppStyle.input}
+                        autoCapitalize="words"
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}/>
+                    )}
+                />
+                {errors.name && (<Text style={AppStyle.error}>{errors.name.message}</Text>)}
 
-            {/* Description */}
-            <View style={{flexDirection: 'row', gap: 10, alignItems: "center", justifyContent: "center", alignSelf: 'flex-start'}} >
-                <Text style={AppStyle.inputHeaderText}>Description</Text>
-                <Text style={[AppStyle.textRegular, {fontSize: 12, color: Colors.documentsColor}]}>optional</Text>
+                {/* Description */}
+                <View style={{flexDirection: 'row', gap: 10, alignItems: "center", justifyContent: "center", alignSelf: 'flex-start'}} >
+                    <Text style={AppStyle.inputHeaderText}>Description</Text>
+                    <Text style={[AppStyle.textRegular, {fontSize: 12, color: Colors.documentsColor}]}>optional</Text>
+                </View>
+                <Controller
+                    name="descr"
+                    control={control}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                        ref={inputRef2}
+                        style={[AppStyle.input, {height: hp(10), paddingVertical: 10, textAlignVertical: 'top'}]}                    
+                        multiline={true}
+                        autoCapitalize="sentences"
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}/>
+                    )}
+                />
+                {errors.descr && (<Text style={AppStyle.error}>{errors.descr.message}</Text>)}            
+        
+                {/* Create Button */}
+                {
+                    isLoading ?
+                    <View style={[AppStyle.formButton, {backgroundColor: Colors.documentsColor}]} >
+                        <ActivityIndicator size={32} color={Colors.gray} />
+                    </View> 
+                    :
+                    <Pressable onPress={handleSubmit(onSubmit)} style={[AppStyle.formButton, {backgroundColor: Colors.documentsColor}]} >
+                        <Text style={[AppStyle.formButtonText, {color: Colors.gray}]} >Create</Text>
+                    </Pressable>
+                }
+
+                <View style={{width: '100%', height: 60}} />
             </View>
-            <Controller
-                name="descr"
-                control={control}
-                render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                    style={[AppStyle.input, {height: hp(10), paddingVertical: 10, textAlignVertical: 'top'}]}                    
-                    multiline={true}
-                    autoCapitalize="sentences"
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}/>
-                )}
-            />
-            {errors.descr && (<Text style={AppStyle.error}>{errors.descr.message}</Text>)}            
-    
-            {/* Create Button */}
-            {
-                isLoading ?
-                <View style={[AppStyle.formButton, {backgroundColor: Colors.documentsColor}]} >
-                    <ActivityIndicator size={32} color={Colors.gray} />
-                </View> 
-                :
-                <Pressable onPress={handleSubmit(onSubmit)} style={[AppStyle.formButton, {backgroundColor: Colors.documentsColor}]} >
-                    <Text style={[AppStyle.formButtonText, {color: Colors.gray}]} >Create</Text>
-                </Pressable>
-            }
-
-            <View style={{width: '100%', height: 60}} />
-        </View>
-    </KeyboardAvoidingView>
-  )
+        </KeyboardAvoidingView>
+    )
 }
 
 export default CreateDocumentForm

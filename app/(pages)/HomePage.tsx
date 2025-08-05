@@ -14,10 +14,9 @@ import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
 import { Collection, Genre, Manhwa } from '@/helpers/types'
 import { hp, wp } from '@/helpers/util'
-import { dbCleanTable, dbGetReadingHistory, dbLog, dbReadCollections, dbReadGenres, dbReadManhwasOrderedByUpdateAt, dbReadManhwasOrderedByViews, dbShouldUpdate, dbUpsertCollections } from '@/lib/database'
+import { dbCleanTable, dbGetReadingHistory, dbGetTopDaily10Manhwas, dbReadCollections, dbReadGenres, dbReadManhwasOrderedByUpdateAt, dbReadManhwasOrderedByViews, dbShouldUpdate, dbUpsertCollections } from '@/lib/database'
 import { spFetchCollections, spFetchRandomManhwaCards, spGetTodayTop10 } from '@/lib/supabase'
 import { useManhwaCardsState } from '@/store/randomManhwaState'
-import { useTop10State } from '@/store/top10State'
 import { AppStyle } from '@/styles/AppStyle'
 import { router, useFocusEffect } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
@@ -38,8 +37,8 @@ const HomePage = () => {
     const db = useSQLiteContext()
     
     const { cards, setCards } = useManhwaCardsState()
-    const { top10Manhwas, setTop10Manhwas } = useTop10State()
-
+    
+    const [top10Manhwas, setTop10Manhwas] = useState<Manhwa[]>([])
     const [collections, setCollections] = useState<Collection[]>([])
     const [loading, setLoading] = useState(true)
     const [genres, setGenres] = useState<Genre[]>([])
@@ -60,10 +59,12 @@ const HomePage = () => {
                     const g = await dbReadGenres(db)
                     const l = await dbReadManhwasOrderedByUpdateAt(db, 0, 30)
                     const m = await dbReadManhwasOrderedByViews(db, 0, 30)
+                    const top10 = await dbGetTopDaily10Manhwas(db)
                     
                     setGenres(g)
                     setLatestUpdates(l)
                     setMostView(m)
+                    setTop10Manhwas(top10)
 
                     if (collections.length == 0) {
                         let c = await dbReadCollections(db)
@@ -173,7 +174,7 @@ const HomePage = () => {
                     <GenreGrid genres={genres} />
                     <CollectionGrid collections={collections} />
                     <ContinueReadingGrid manhwas={readingHistoryManhwas} />
-                    <Top10Grid/>
+                    <Top10Grid manhwas={top10Manhwas} />
                     <ManhwaHorizontalGrid
                         title='Latest Updates'
                         onViewAll={() => router.navigate("/(pages)/LatestUpdatesPage")}

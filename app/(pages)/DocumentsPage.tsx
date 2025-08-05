@@ -20,9 +20,8 @@ import PageActivityIndicator from '@/components/util/PageActivityIndicator'
 const DocumentComponent = ({document}: {document: Document}) => {
   return (
     <Pressable style={styles.documentContainer} >
-      <Text style={[AppStyle.textHeader, {color: Colors.backgroundColor, marginBottom: 10}]}>{document.name}</Text>
-      {document.descr && <Text style={AppStyle.textRegular} >{document.descr}</Text>}
-      <Text>Created at: {formatTimestamp(document.created_at)}</Text>
+      <Text style={[AppStyle.textHeader, {color: Colors.backgroundColor}]}>{document.name}</Text>
+      {document.descr && <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor}]} >{document.descr}</Text>}
     </Pressable>
   )
 }
@@ -106,7 +105,7 @@ const Documents = () => {
           enablePanDownToClose={true}
         >
         <BottomSheetView style={styles.contentContainer}>
-          <TopBar title='Create Document' titleColor={Colors.documentsColor} />
+          <TopBar title='New Document' titleColor={Colors.documentsColor} />
           <CreateDocumentForm createDocumentFunc={createDocument} />
         </BottomSheetView>
       </BottomSheet>
