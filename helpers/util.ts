@@ -1,6 +1,7 @@
+import { AppConstants } from '@/constants/AppConstants';
 import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
 import { Dimensions } from "react-native";
-import RNFS from 'react-native-fs';
+import RNFS, { ReadDirItem } from 'react-native-fs';
 
 
 const {
@@ -36,6 +37,10 @@ export function getItemGridDimensions(
 
 export function getRelativeHeight(originalWidth: number, originalHeight: number, width: number): number {
   return width * (originalHeight / originalWidth)
+}
+
+export function getRelativeWidth(originalWidth: number, originalHeight: number, height: number): number {
+  return height * (originalWidth / originalHeight)
 }
 
 

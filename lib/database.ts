@@ -1,5 +1,5 @@
 import { AppConstants } from '@/constants/AppConstants';
-import { Author, Chapter, Collection, Document, DocumentImage, Genre, Manhwa, ManhwaAuthor, ManhwaGenre } from '@/helpers/types';
+import { Author, Chapter, Collection, Genre, Manhwa, ManhwaAuthor, ManhwaGenre } from '@/helpers/types';
 import { formatBytes, getCacheSizeBytes, secondsSince } from '@/helpers/util';
 import * as SQLite from 'expo-sqlite';
 import DeviceInfo from 'react-native-device-info';
@@ -98,24 +98,7 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
           chapter_id INTEGER NOT NULL,
           readed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           PRIMARY KEY (manhwa_id, chapter_id)          
-      );
-
-      CREATE TABLE IF NOT EXISTS documents (
-        document_id INTEGER NOT NULL PRIMARY KEY,
-        name TEXT NOT NULL UNIQUE,
-        descr TEXT,
-        parent_document_id INTEGER,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (parent_document_id) REFERENCES documents(document_id) ON DELETE CASCADE ON UPDATE CASCADE
-      );
-
-      CREATE TABLE IF NOT EXISTS document_images (
-        document_image_id INTEGER NOT NULL PRIMARY KEY,
-        document_id INTEGER NOT NULL,
-        image_url TEXT NOT NULL,
-        image_index INTEGER NOT NULL,
-        FOREIGN KEY (document_id) REFERENCES documents(document_id) ON DELETE CASCADE ON UPDATE CASCADE
-      );
+      );      
       
       CREATE INDEX IF NOT EXISTS idx_chapters_manhwa_id ON chapters(manhwa_id);      
       CREATE INDEX IF NOT EXISTS idx_ma_manhwa_id ON manhwa_authors(manhwa_id);
@@ -126,13 +109,6 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       CREATE INDEX IF NOT EXISTS idx_reading_status_manhwa_id_status ON reading_status (manhwa_id, status);
       CREATE INDEX IF NOT EXISTS idx_reading_history_readed_at ON reading_history(manhwa_id, readed_at DESC);
       CREATE INDEX IF NOT EXISTS idx_alt_titles ON alt_titles(title);
-
-      CREATE INDEX IF NOT EXISTS idx_documents_parent_document_id ON documents(parent_document_id);
-      CREATE INDEX IF NOT EXISTS idx_documents_name ON documents(name);
-      CREATE INDEX IF NOT EXISTS idx_documents_created_at ON documents(created_at);
-
-      CREATE INDEX IF NOT EXISTS idx_document_images_document_id ON document_images(document_id);
-      CREATE INDEX IF NOT EXISTS idx_document_images_document_id_image_index ON document_images(document_id, image_index);
 
       INSERT OR REPLACE INTO 
         app_info (name, value)
@@ -172,139 +148,6 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
     `
     ).catch(error => console.log("DATABASE MIGRATION ERROR", error));
     console.log("[DATABASE MIGRATION END]")
-}
-
-
-export async function dbGetDocument(db: SQLite.SQLiteDatabase, document_id: number): Promise<Document | null> {
-  const r = await db.getFirstAsync<Document>(
-    `
-      SELECT 
-        *
-      FROM
-        documents
-      WHERE
-        document_id = ?;
-    `,
-    [document_id]
-  ).catch(error => console.log("error dbGetDocument", error))
-
-  return r ? r : null
-}
-
-export async function dbCreateDocument(
-  db: SQLite.SQLiteDatabase, 
-  name: string, 
-  descr: string | null, 
-  parent_document_id: number | null = null
-): Promise<Document | null> {
-  const r = await db.getFirstAsync<{document_id: number}>(
-    `
-      INSERT INTO
-        documents (name, descr, parent_document_id)
-      VALUES 
-        (?, ?, ?)
-      RETURNING
-        document_id;
-    `,
-    [name, descr, parent_document_id]
-  ).catch(error => console.log("error dbCreateDocument", error))
-  return r?.document_id ? await dbGetDocument(db, r.document_id) : null
-}
-
-
-export async function dbGetRootDocuments(db: SQLite.SQLiteDatabase, p_offset: number = 0, p_limit: number = 30): Promise<Document[]> {
-  const r = db.getAllAsync<Document>(
-    `
-      SELECT 
-        *
-      FROM 
-        documents
-      WHERE 
-        parent_document_id IS NULL
-      ORDER BY
-        name
-      LIMIT ?
-      OFFSET ?;
-    `,
-    [p_limit, p_offset]
-  )
-
-  return r
-}
-
-
-export async function dbGetDocumentChildrens(
-  db: SQLite.SQLiteDatabase, 
-  document_id: number,
-  p_offset: number = 0,
-  p_limit: number = 30
-): Promise<Document[]> {
-  const r = await db.getAllAsync<Document>(
-    `
-      SELECT
-        *
-      FROM
-        documents
-      WHERE
-        parent_document_id = ?
-      ORDER BY
-        name
-      LIMIT ?
-      OFFSET ?;
-    `,
-    [document_id, p_limit, p_offset]
-  )
-
-  return r
-}
-
-export async function dbGetDocumentImages(db: SQLite.SQLiteDatabase, document_id: number): Promise<DocumentImage[]> {
-  const r = await db.getAllAsync<DocumentImage>(
-    `
-      SELECT
-        *
-      FROM
-        document_images
-      WHERE
-        document_id = ?
-      ORDER BY
-        image_index;
-    `,
-    [document_id]
-  )  
-
-  return r
-}
-
-
-export async function dbUpsertDocumentImages(db: SQLite.SQLiteDatabase, document_id: number, images: DocumentImage[]) {
-  await db.runAsync(
-    `
-      DELETE FROM
-        document_images
-      WHERE
-        document_id = ?;
-    `,
-    [document_id]
-  ).catch(error => console.log("error dbUpsertDocumentImages deleting images", error))
-
-  const placeholders = images.map(() => '(?,?,?)').join(',');  
-  const params = images.flatMap(i => [
-    document_id,
-    i.image_url,
-    i.image_index
-  ]); 
-  await db.runAsync(
-    `
-      INSERT INTO document_images (
-        document_id,
-        image_url,
-        image_index
-      )
-      VALUES ${placeholders};
-    `,
-    params
-  ).catch(error => console.log("error dbUpsertDocumentImages insert images", error))
 }
 
 

@@ -167,7 +167,7 @@ const ChapterPage = () => {
             />
           </Animated.View>
           <AnimatedFlashList
-            data={ loading ? [] : [...['BoxHeader'], ...images, ...['BoxFooter']] as any}
+            data={ loading ? [] : [...['BoxHeader'], ...images, ...['BoxFooter']] as any }
             ref={flashListRef}
             keyExtractor={keyExtractor}
             estimatedItemSize={listTotalHeight}

@@ -65,7 +65,13 @@ export const ToastMessages = {
         THANKS: {
             text1: "Thanks!", 
             type: "success"
-        }        
+        },
+        DOCUMENT_EXISTS: {
+            text1: 'Error',
+            text2: "Document already exists!",
+            type: "error",
+            position: 'top'
+        }
     }
 }
 

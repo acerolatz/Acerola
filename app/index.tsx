@@ -32,7 +32,7 @@ const App = () => {
 
     useEffect(
         () => {
-            async function init() {                
+            async function init() {
                 
                 if (await dbShouldClearCache(db)) {
                     await clearCache()

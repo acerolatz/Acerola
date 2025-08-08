@@ -96,6 +96,7 @@ const SettingsForm = ({currentMaxCacheSize, currentCacheSize}: SettingsFormProps
                         <Text style={AppStyle.formButtonText} >Clear cache</Text>
                     </Pressable>
                 }
+                <Text style={[AppStyle.textRegular, {color: Colors.neonRed}]}>* Restart Required</Text>
                 
                 {/* Cache Size */}
                 <Text style={AppStyle.inputHeaderText}>Max cache size (MB)</Text>
@@ -125,9 +126,7 @@ const SettingsForm = ({currentMaxCacheSize, currentCacheSize}: SettingsFormProps
                     <Pressable onPress={handleSubmit(onSubmit)} style={[AppStyle.formButton, {backgroundColor: Colors.white}]} >
                         <Text style={AppStyle.formButtonText} >Save</Text>
                     </Pressable>
-                }                
-
-                <Text style={[AppStyle.textRegular, {color: Colors.neonRed}]}>* Restart Required</Text>
+                }
                 
                 <View style={{width: '100%', height: 60}} />
             </ScrollView>

@@ -56,15 +56,17 @@ const HomePage = () => {
             let isCancelled = false
             const init = async () => {
                 setLoading(true)
-                    const g = await dbReadGenres(db)
-                    const l = await dbReadManhwasOrderedByUpdateAt(db, 0, 30)
-                    const m = await dbReadManhwasOrderedByViews(db, 0, 30)
-                    const top10 = await dbGetTopDaily10Manhwas(db)
+
+                    const g = genres.length === 0 ? await dbReadGenres(db) : null
+                    const l = latestUpdate.length === 0 ? await dbReadManhwasOrderedByUpdateAt(db, 0, 30) : null
+                    const m = mostView.length === 0 ? await dbReadManhwasOrderedByViews(db, 0, 30) : null
+                    const top10 = top10Manhwas.length === 0 ? await dbGetTopDaily10Manhwas(db) : null
                     
-                    setGenres(g)
-                    setLatestUpdates(l)
-                    setMostView(m)
-                    setTop10Manhwas(top10)
+                    if (isCancelled) { return }
+                    if (g) { setGenres(g) }
+                    if (l) { setLatestUpdates(l) }
+                    if (m) { setMostView(m) }
+                    if (top10) { setTop10Manhwas(top10) }
 
                     if (collections.length == 0) {
                         let c = await dbReadCollections(db)
@@ -78,13 +80,7 @@ const HomePage = () => {
                         setCollections(c)
                     }
 
-                setLoading(false)
-                
-                if (top10Manhwas.length === 0) {
-                    const top10 = await spGetTodayTop10()
-                    if (isCancelled) { return }
-                    setTop10Manhwas(top10)
-                }
+                setLoading(false)             
 
                 if (cards.length == 0) {
                     const r = await spFetchRandomManhwaCards(30)

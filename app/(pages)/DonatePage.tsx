@@ -19,6 +19,7 @@ import {
   Pressable,
   SafeAreaView,
   StyleSheet,
+  View,
   Text
 } from 'react-native'
 import Toast from 'react-native-toast-message'
@@ -32,7 +33,7 @@ const Donate = () => {
 
   const { donates, setDonates } = useDonateState()
   const [loading, setLoading] = useState(false)  
-  const donateImage = require("@/assets/images/donate-green.png")
+  const donateImage = require("@/assets/images/donate-green.webp")
 
   useEffect(
     () => {
@@ -110,19 +111,19 @@ const Donate = () => {
     <SafeAreaView style={AppStyle.safeArea} >
         <TopBar title='Donate' titleColor={Colors.donateColor} >
             <ReturnButton color={Colors.donateColor} />
-        </TopBar>        
-        <FlatList
-            data={donates}
-            keyExtractor={(item) => item.value}
-            showsVerticalScrollIndicator={false}
-            ListHeaderComponent={
-              <Image 
-                source={donateImage} 
-                style={{width: WIDTH, height: HEIGHT, marginBottom: 20, borderRadius: 4}} 
-                contentFit='cover' />
-            }
-            renderItem={renderItem}
-        />
+        </TopBar>
+          <FlatList
+              data={donates}
+              keyExtractor={(item) => item.value}
+              showsVerticalScrollIndicator={false}
+              ListHeaderComponent={
+                <Image 
+                  source={donateImage} 
+                  style={{width: WIDTH, height: HEIGHT, marginBottom: 20, alignSelf: "center"}} 
+                  contentFit='cover' />
+              }
+              renderItem={renderItem}
+          />        
     </SafeAreaView>
   )
 }
