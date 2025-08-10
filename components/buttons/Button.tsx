@@ -7,7 +7,7 @@ import { ActivityIndicator, Pressable, View, ViewStyle } from 'react-native'
 
 interface ButtonProps {
     iconName: string
-    onPress: () => any
+    onPress?: () => any
     iconSize?: number
     iconColor?: string
     style?: ViewStyle
@@ -19,7 +19,7 @@ const Button = ({
   iconName, 
   onPress, 
   style, 
-  iconSize = 28, 
+  iconSize = AppConstants.COMMON.BUTTON.SIZE, 
   iconColor = Colors.white,
   showLoading = true
 }: ButtonProps) => {
@@ -27,9 +27,11 @@ const Button = ({
   const [loading, setLoading] = useState(false)
 
   const p = async () => {
-    setLoading(true)
-    await onPress()
-    setLoading(false)
+    if (onPress) {
+      setLoading(true)
+      await onPress()
+      setLoading(false)
+    }
   }
   
   if (loading) {

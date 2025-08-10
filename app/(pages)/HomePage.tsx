@@ -1,5 +1,5 @@
 import Button from '@/components/buttons/Button'
-import OpenRandomManhwaButton from '@/components/buttons/OpenRandomManhwaButton'
+import RandomManhwaButton from '@/components/buttons/OpenRandomManhwaButton'
 import UpdateDatabaseButton from '@/components/buttons/UpdateDatabaseButton'
 import CollectionGrid from '@/components/grid/CollectionsGrid'
 import ContinueReadingGrid from '@/components/grid/ContinueReadingGrid'
@@ -187,16 +187,16 @@ const HomePage = () => {
             {/* Header */}
             <Row style={{width: '100%', paddingRight: 2, marginTop: 4, marginBottom: 10, justifyContent: "space-between"}} >
                 <AppLogo/>
-                <Row style={{gap: 16}} >
+                <Row style={{gap: 20}} >
                     {
                         !loading &&
                         <>
-                            <UpdateDatabaseButton iconColor={Colors.white} type='client' iconSize={22} />
-                            <Button iconName='search-outline' onPress={searchPress} iconSize={22} iconColor={Colors.white} showLoading={false} />
-                            <OpenRandomManhwaButton color={Colors.white} size={22} backgroundColor='' />
+                            <UpdateDatabaseButton type='client' />
+                            <Button iconName='search-outline' onPress={searchPress} showLoading={false} />
+                            <RandomManhwaButton backgroundColor='transparent' />
                         </>
                     }
-                    <Button iconName='options-outline' onPress={toggleMenu} iconSize={22} iconColor={Colors.white} showLoading={false} />                        
+                    <Button iconName='options-outline' onPress={toggleMenu} iconSize={22} iconColor={Colors.white} showLoading={false} />
                 </Row>
             </Row>
 

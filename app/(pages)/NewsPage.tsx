@@ -1,11 +1,12 @@
 import ReturnButton from '@/components/buttons/ReturnButton'
 import TopBar from '@/components/TopBar'
 import CustomActivityIndicator from '@/components/util/CustomActivityIndicator'
+import Footer from '@/components/util/Footer'
 import Row from '@/components/util/Row'
 import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
 import { Post } from '@/helpers/types'
-import { formatTimestamp, hp, wp } from '@/helpers/util'
+import { formatTimestamp, wp } from '@/helpers/util'
 import { spFetchNews } from '@/lib/supabase'
 import { AppStyle } from '@/styles/AppStyle'
 import Ionicons from '@expo/vector-icons/Ionicons'
@@ -29,7 +30,13 @@ const News = ({news}: {news: Post}) => {
 
     return (
         <Pressable style={styles.item} >
-            {hasImage && <Image style={{width: IMAGE_WIDTH, height: imageHeight , borderRadius: 4}} source={news.image_url} contentFit='cover' />}
+            {
+                hasImage && 
+                <Image 
+                    style={{width: IMAGE_WIDTH, height: imageHeight , borderRadius: AppConstants.COMMON.BORDER_RADIUS}} 
+                    source={news.image_url} 
+                    contentFit='cover' />
+            }
             <Text style={AppStyle.textHeader}>{news.title}</Text>
             <Text style={AppStyle.textRegular}>{text}</Text>
             <Row style={{justifyContent: "space-between"}} >
@@ -92,11 +99,9 @@ const NewsPage = () => {
 
     const renderFooter = () => {
         if (loading && hasResults.current) {
-            return (
-                <CustomActivityIndicator color={Colors.newsColor} />
-            )
+            return <CustomActivityIndicator color={Colors.newsColor} />
         }
-        return <View style={{height: 62}} />
+        return <Footer/>
     }
 
     return (

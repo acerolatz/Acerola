@@ -38,8 +38,7 @@ const Donate = () => {
 
   useEffect(
     () => {
-      let isCancelled = false
-      
+      let isCancelled = false      
       const init = async () => {
         await dbGetUserHistory(db).then(u => setUserHistory(u))
 
@@ -60,7 +59,7 @@ const Donate = () => {
 
       return () => { isCancelled = true }
     },
-    []
+    [db]
   )  
 
   const renderItem = ({item}: {item: DonateMethod}) => {

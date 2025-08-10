@@ -1,11 +1,10 @@
-import { Colors } from "@/constants/Colors"
 import { Manhwa, ManhwaAuthor } from "@/helpers/types"
 import { dbReadMangaAuthors } from "@/lib/database"
 import { AppStyle } from "@/styles/AppStyle"
 import { useRouter } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
 import { useEffect, useRef, useState } from "react"
-import { FlatList, Pressable, StyleSheet, Text } from "react-native"
+import { FlatList, Pressable, Text } from "react-native"
 import Row from "./util/Row"
 
 
@@ -44,8 +43,8 @@ const ManhwaAuthorInfo = ({manhwa}: ManhwaAuthorInfoProps) => {
 
   const renderItem = ({item}: {item: ManhwaAuthor}) => {
     return (
-      <Pressable style={styles.item} onPress={() => openAuthorPage(item)}>
-        <Text style={[AppStyle.textRegular, {color: Colors.white}]} >
+      <Pressable style={AppStyle.defaultGridItem} onPress={() => openAuthorPage(item)}>
+        <Text style={AppStyle.textRegular} >
           {item.role == "Author" ? "Story" : "Art"}: {item.name}
         </Text>
       </Pressable>
@@ -68,15 +67,3 @@ const ManhwaAuthorInfo = ({manhwa}: ManhwaAuthorInfoProps) => {
 }
 
 export default ManhwaAuthorInfo;
-
-const styles = StyleSheet.create({
-  item: {
-      paddingHorizontal: 10,
-      paddingVertical: 12,
-      backgroundColor: Colors.gray,
-      marginRight: 8,
-      borderRadius: 4,
-      alignItems: "center",
-      justifyContent: "center"
-    }
-})

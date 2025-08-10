@@ -44,6 +44,8 @@ const _layout = () => {
           <Stack>
               <Stack.Screen name='index' options={{headerShown: false}} />              
               <Stack.Screen name='(pages)/HomePage' options={{headerShown: false}} />
+              <Stack.Screen name='(pages)/SafeModeHomePage' options={{headerShown: false}} />
+              <Stack.Screen name='(pages)/SafeModeSettings' options={{headerShown: false}} />
               <Stack.Screen name='(pages)/ManhwaPage' options={{headerShown: false}} />
               <Stack.Screen name='(pages)/ManhwaSearch' options={{headerShown: false}} />
               <Stack.Screen name='(pages)/ScansPage' options={{headerShown: false}} />

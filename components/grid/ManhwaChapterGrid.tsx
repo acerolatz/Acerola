@@ -10,6 +10,8 @@ import { useCallback, useEffect, useState } from "react"
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native"
 import CButton from "../buttons/CButton"
 import Row from "../util/Row"
+import { getChapterGridNumColumns, getItemGridDimensions, wp } from "@/helpers/util"
+import { AppConstants } from "@/constants/AppConstants"
 
 
 interface ChapterItemProps {
@@ -26,14 +28,14 @@ const ChapterItem = ({
   index,
   onPress  
 }: ChapterItemProps) => {
-  const bColor = isReaded ? Colors.white : Colors.gray
-  const tColor = isReaded ? Colors.backgroundColor : Colors.white
+  const backgroundColor = isReaded ? Colors.white : Colors.gray
+  const color = isReaded ? Colors.backgroundColor : Colors.white
 
   return (
-    <Pressable       
+    <Pressable
       onPress={() => onPress(index)}
-      style={[styles.chapterItem, {backgroundColor: bColor}]} >
-        <Text style={[AppStyle.textRegular, {color: tColor, fontSize: 14}]}>{chapterName}</Text>
+      style={[styles.chapterItem, {backgroundColor}]} >
+        <Text style={[AppStyle.textRegular, {color, fontSize: 14}]}>{chapterName}</Text>
     </Pressable>
   )
 }
@@ -90,7 +92,13 @@ interface ManhwaChapterGridProps {
 
 
 const PAGE_LIMIT = 96
-
+const { width, height } = getItemGridDimensions(
+  wp(4), 
+  10, 
+  getChapterGridNumColumns(), 
+  42,
+  42
+)
 
 const ManhwaChapterGrid = ({  
   manhwa,
@@ -104,11 +112,12 @@ const ManhwaChapterGrid = ({
   const [currentPage, setCurrentPage] = useState(0)
     
   const [chaptersReadSet, setChaptersReadSet] = useState<Set<number>>(new Set())
-  const maxChapterPageNum = Math.floor(chapters.length / PAGE_LIMIT)
+  const maxChapterPageNum = Math.floor(chapters.length / PAGE_LIMIT)  
 
   useEffect(
     () => {
       let isCancelled = false
+
       async function init() {
         if (!manhwa) { return }
         setLoading(true)
@@ -119,12 +128,9 @@ const ManhwaChapterGrid = ({
       }
 
       init()
-
-      return () => {
-        isCancelled = true
-      }
+      return () => { isCancelled = true }
     },
-    [db, manhwa]
+    [db]
   )
 
   useFocusEffect(
@@ -142,7 +148,9 @@ const ManhwaChapterGrid = ({
       setCurrentChapterIndex(0)
       router.navigate({
         pathname: "/(pages)/ChapterPage",
-        params: {manhwaTitle: manhwa.title}
+        params: {
+          manhwaTitle: manhwa.title
+        }
       })
     }
   }
@@ -152,7 +160,9 @@ const ManhwaChapterGrid = ({
       setCurrentChapterIndex(chapters.length - 1)
       router.navigate({
         pathname: "/(pages)/ChapterPage",
-        params: {manhwaTitle: manhwa.title}
+        params: {
+          manhwaTitle: manhwa.title
+        }
       })
     }
   }
@@ -161,7 +171,9 @@ const ManhwaChapterGrid = ({
     setCurrentChapterIndex(index)
     router.navigate({
       pathname: "/(pages)/ChapterPage", 
-      params: {manhwaTitle: manhwa.title}
+      params: {
+        manhwaTitle: manhwa.title
+      }
     })
   }, [manhwa.manhwa_id])
 
@@ -175,25 +187,23 @@ const ManhwaChapterGrid = ({
 
   if (loading) {
     return (
-      <View style={styles.container} >
-        <View style={{flex: 1, alignItems: "center", justifyContent: "center"}} >
-          <ActivityIndicator size={'large'} color={manhwa.color} />
-        </View>
+      <View style={{width: '100%', alignItems: "center", justifyContent: "center"}} >
+        <ActivityIndicator size={'large'} color={manhwa.color} />
       </View>
     )
-  }
+  }  
 
   if (!manhwa || chapters.length === 0) {
     return <></>
   }
 
   return (    
-        <View style={[styles.container, {gap: 10}]} >          
-            <Row style={{width: '100%', gap: 10}} >
-              <Pressable onPress={readFirst} style={[styles.button, {backgroundColor: manhwa.color, }]}>
+        <View style={styles.container} >
+            <Row style={{gap: 10}} >
+              <Pressable onPress={readFirst} style={[styles.button, {backgroundColor: manhwa.color}]}>
                 <Text style={[AppStyle.textRegular, {color: textColor}]}>Read First</Text>
               </Pressable>
-              <Pressable onPress={readLast} style={[styles.button, {backgroundColor: manhwa.color, }]}>
+              <Pressable onPress={readLast} style={[styles.button, {backgroundColor: manhwa.color}]}>
                 <Text style={[AppStyle.textRegular, {color: textColor}]}>Read Last</Text>
               </Pressable>
             </Row>
@@ -236,16 +246,16 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   chapterItem: {    
-    width: 42, 
-    height: 42, 
-    borderRadius: 4, 
+    width, 
+    height, 
+    borderRadius: AppConstants.COMMON.BORDER_RADIUS, 
     alignItems: "center", 
     justifyContent: "center"    
   },
   chapterGrid: {
     flex: 1, 
     alignItems: "center", 
-    justifyContent: "center", 
+    justifyContent: "flex-start", 
     gap: 10, 
     flexDirection: 'row', 
     flexWrap: 'wrap'

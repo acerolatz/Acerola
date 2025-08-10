@@ -1,7 +1,6 @@
 import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
-import { ToastMessages } from '@/constants/Messages'
-import { hp, wp } from '@/helpers/util'
+import { hp, openUrl, wp } from '@/helpers/util'
 import { dbGetCacheMaxSize } from '@/lib/database'
 import { AppStyle } from '@/styles/AppStyle'
 import Ionicons from '@expo/vector-icons/Ionicons'
@@ -10,14 +9,12 @@ import { useSQLiteContext } from 'expo-sqlite'
 import React, { useState } from 'react'
 import {
     ActivityIndicator,
-    Linking,
     Pressable,
     ScrollView,
     StyleSheet,
     Text,
     View
 } from 'react-native'
-import Toast from 'react-native-toast-message'
 import CloseBtn from './buttons/CloseButton'
 import Row from './util/Row'
 
@@ -109,11 +106,7 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
     }
 
     const openReddit = async () => {
-        try {
-            await Linking.openURL(AppConstants.URLS.REDDIT)
-        } catch (error) {
-          Toast.show(ToastMessages.EN.UNABLE_TO_OPEN_BROWSER)
-        }
+        await openUrl(AppConstants.URLS.REDDIT)
     }
 
     const openNews = () => {
@@ -121,11 +114,7 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
     }
 
     const openGithub = async () => {
-        try {
-            await Linking.openURL(AppConstants.URLS.GITHUB)
-        } catch (error) {
-          Toast.show(ToastMessages.EN.UNABLE_TO_OPEN_BROWSER)
-        }
+        await openUrl(AppConstants.URLS.GITHUB)
     }
 
     const openReleases = () => {
@@ -244,7 +233,7 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
                     iconColor={'white'}
                 />
                 
-                <View style={{height: 82}} />
+                <View style={{height: 52}} />
             </View>            
         </ScrollView>
     )

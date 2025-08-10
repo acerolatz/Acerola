@@ -14,7 +14,12 @@ interface HomeButtonProps {
   backgroundColor?: string
 }
 
-const HomeButton = ({size = 28, color = Colors.white, iconName = 'home', backgroundColor = Colors.backgroundColor}: HomeButtonProps) => {
+const HomeButton = ({
+  size = AppConstants.COMMON.BUTTON.SIZE, 
+  color = Colors.white, 
+  iconName = 'home', 
+  backgroundColor = Colors.backgroundColor
+}: HomeButtonProps) => {
 
   return (
     <Pressable 

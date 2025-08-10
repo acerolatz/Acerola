@@ -1,3 +1,4 @@
+import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
 import { AppStyle } from '@/styles/AppStyle'
 import Ionicons from '@expo/vector-icons/Ionicons'
@@ -17,7 +18,7 @@ interface OpenBugReportButtonProps {
 
 const BugReportButton = ({
     title, 
-    size = 28, 
+    size = AppConstants.COMMON.BUTTON.SIZE, 
     color = Colors.BugReportColor, 
     backgroundColor = Colors.backgroundColor,
     padding = 6

@@ -1,40 +1,32 @@
 import { Colors } from '@/constants/Colors'
 import { AppStyle } from '@/styles/AppStyle'
 import React from 'react'
-import { StyleProp, Text, View, ViewStyle } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 
 
 interface ManhwaStatusComponentProps {
     status: string
-    fontSize?: number
-    paddingVertical?: number
-    paddingHorizontal?: number    
-    borderRadius?: number
-    backgroundColor?: string
-    style?: StyleProp<ViewStyle>
+    backgroundColor: string
 }
 
 
-const ManhwaStatusComponent = ({
-    status,
-    style,
-    backgroundColor = Colors.clayDust,
-    fontSize = 16,
-    paddingVertical = 12,
-    paddingHorizontal = 10,
-    borderRadius = 0
-}: ManhwaStatusComponentProps) => {
+const ManhwaStatusComponent = ({ status, backgroundColor }: ManhwaStatusComponentProps) => {
     return (
-        <View style={[{
-            paddingHorizontal, 
-            paddingVertical,
-            borderRadius,
-            backgroundColor,
-            alignSelf: 'flex-start'
-        }, style]} >
-            <Text style={[AppStyle.textRegular, {color: Colors.manhwaStatusTextColor}, {fontSize}]}>{status}</Text>
+        <View style={[styles.container, {backgroundColor}]} >
+            <Text style={[AppStyle.textRegular, {fontSize: 12, color: Colors.backgroundColor}]}>{status}</Text>
         </View>
     )
 }
 
 export default ManhwaStatusComponent
+
+const styles = StyleSheet.create({
+    container: {
+        position: 'absolute', 
+        left: 6, 
+        top: 6, 
+        borderRadius: 22,
+        paddingHorizontal: 8,
+        paddingVertical: 6
+    }
+})

@@ -7,6 +7,7 @@ import { useSQLiteContext } from 'expo-sqlite'
 import React from 'react'
 import Toast from 'react-native-toast-message'
 import BooleanRotatingButton from './BooleanRotatingButton'
+import { AppConstants } from '@/constants/AppConstants'
 
 
 interface UpdateDatabaseProps {
@@ -17,7 +18,7 @@ interface UpdateDatabaseProps {
 
 
 const UpdateDatabaseButton = ({
-    iconSize = 28, 
+    iconSize = AppConstants.COMMON.BUTTON.SIZE, 
     iconColor = Colors.white,
     type
 }: UpdateDatabaseProps) => {

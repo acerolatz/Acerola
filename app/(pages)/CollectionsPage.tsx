@@ -23,7 +23,7 @@ const CollectionsPage = () => {
             }
             init()
         },
-        []
+        [db]
     )    
 
     const onCollectionPress = async (collection: Collection) => {

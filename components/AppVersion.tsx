@@ -14,6 +14,7 @@ const AppVersion = () => {
     useEffect(
         () => {
             const init = async () => {
+                if (localVersion) { return }
                 await dbGetAppVersion(db).then(v => setLocalVersion(v))
             }
             init()

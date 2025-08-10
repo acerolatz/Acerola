@@ -3,7 +3,7 @@ import PageActivityIndicator from '@/components/util/PageActivityIndicator';
 import Row from '@/components/util/Row';
 import { ToastMessages } from '@/constants/Messages';
 import { clearCache } from '@/helpers/util';
-import { dbFirstRun, dbSetLastRefresh, dbShouldClearCache, dbShouldUpdate, dbUpdateDatabase } from '@/lib/database';
+import { dbFirstRun, dbIsSafeModeEnabled, dbReadInfo, dbSetLastRefresh, dbShouldClearCache, dbShouldUpdate, dbUpdateDatabase } from '@/lib/database';
 import { AppStyle } from '@/styles/AppStyle';
 import {
     LeagueSpartan_200ExtraLight,
@@ -52,11 +52,18 @@ const App = () => {
                     await dbSetLastRefresh(db, 'client')
                     const n = await dbUpdateDatabase(db)
                     n > 0 ?
-                        Toast.show({ text1: "Sync completed", text2: `Total: ${n} Manhwas`, type: "info" }) :
+                        Toast.show({ text1: "Sync completed", type: "info" }) :
                         Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED)
                 }
-                                
-                router.replace("/(pages)/HomePage")
+
+                const safeModeEnabled = await dbIsSafeModeEnabled(db)
+
+                if (safeModeEnabled) {
+                    router.replace("/(pages)/SafeModeHomePage")
+                } else {
+                    router.replace("/(pages)/HomePage")
+                }
+
             }
             init()
         },
@@ -71,10 +78,6 @@ const App = () => {
 
     return (
         <SafeAreaView style={AppStyle.safeArea} >
-            <Row style={styles.container} >
-                <AppLogo/>
-                <Ionicons name='options-outline' size={22} color={'white'} />
-            </Row>
             <PageActivityIndicator/>
         </SafeAreaView>
     )

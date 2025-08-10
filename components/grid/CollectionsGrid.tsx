@@ -48,7 +48,7 @@ const CollectionGrid = ({collections}: {collections: Collection[]}) => {
             <FlatList
                 data={collections}
                 horizontal={true}
-                initialNumToRender={10}
+                initialNumToRender={30}
                 showsHorizontalScrollIndicator={false}
                 keyExtractor={(item) => item.collection_id.toString()}
                 renderItem={renderItem}

@@ -69,7 +69,10 @@ export const AppConstants = {
             }
         },
         CHAPTER_START_MILESTONE: 32,
-        CHAPTER_MILESTONE_INCREMENT: 92
+        CHAPTER_MILESTONE_INCREMENT: 92,
+        BUTTON: {
+            SIZE: 22
+        }
     },
     URLS: {
         REDDIT: "https://www.reddit.com/r/pornhwa/",

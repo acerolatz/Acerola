@@ -15,7 +15,7 @@ interface ReturnButtonProps {
 
 
 const ReturnButton = ({
-  size = 28, 
+  size = AppConstants.COMMON.BUTTON.SIZE, 
   color = Colors.yellow, 
   onPress,
   backgroundColor = Colors.almostBlack
@@ -52,7 +52,6 @@ export default ReturnButton
 
 const styles = StyleSheet.create({
   container: {
-    padding: 6,
     borderRadius: 4
   }
 })

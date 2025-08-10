@@ -2,7 +2,7 @@ import AddToLibray from '@/components/AddToLibray';
 import ManhwaAlternativeNames from '@/components/AltNames';
 import BugReportButton from '@/components/buttons/BugReportButton';
 import HomeButton from '@/components/buttons/HomeButton';
-import OpenRandomManhwaButton from '@/components/buttons/OpenRandomManhwaButton';
+import RandomManhwaButton from '@/components/buttons/OpenRandomManhwaButton';
 import ReturnButton from '@/components/buttons/ReturnButton';
 import ManhwaChapterGrid from '@/components/grid/ManhwaChapterGrid';
 import ManhwaAuthorInfo from '@/components/ManhwaAuthorInfo';
@@ -37,13 +37,8 @@ import {
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { formatNumberWithSuffix } from '../../helpers/util';
-import DonateButton from '@/components/buttons/DonateButton';
-import { useDonateState } from '@/store/donateState';
-import CustomActivityIndicator from '@/components/util/CustomActivityIndicator';
-import { FlatList } from 'react-native';
-import DonateComponent from '@/components/DonateComponent';
 import Row from '@/components/util/Row';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import ManhwaIdComponent from '@/components/ManhwaIdComponent';
 
 
 interface ItemProps {
@@ -67,8 +62,7 @@ const ManhwaPage = () => {
   const params = useLocalSearchParams()
   const manhwa_id: number = params.manhwa_id as any
   const [manhwa, setManhwa] = useState<Manhwa | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [altNames, setAltNames] = useState<string[]>([])  
+  const [altNames, setAltNames] = useState<string[]>([])
 
   useEffect(
     () => {
@@ -108,7 +102,7 @@ const ManhwaPage = () => {
 
   if (!manhwa) {
     return (
-      <SafeAreaView style={[AppStyle.safeArea, styles.container]} >
+      <SafeAreaView style={AppStyle.safeArea} >
         <PageActivityIndicator/>
       </SafeAreaView>
     )
@@ -117,54 +111,54 @@ const ManhwaPage = () => {
   return (
     <SafeAreaView style={[AppStyle.safeArea, styles.container]} >
       <ScrollView style={{flex: 1}} keyboardShouldPersistTaps={'always'} showsVerticalScrollIndicator={false} >
+        <LinearGradient colors={[manhwa.color, Colors.backgroundColor]} style={styles.linearBackground} />
 
-        {/* Header */}
-        <LinearGradient 
-            colors={[manhwa.color, Colors.backgroundColor]}
-            style={styles.linearBackground} />
-
-        <View style={styles.topBar} >
-            <HomeButton color={Colors.backgroundColor} iconName='home-outline' size={22} backgroundColor='transparent' />
-            <View style={{flexDirection: 'row', alignItems: "center", justifyContent: "center", gap: 14}} >
-              <BugReportButton color={Colors.backgroundColor} title={manhwa.title} size={22} backgroundColor='transparent' /> 
-              <OpenRandomManhwaButton color={Colors.backgroundColor} size={22} backgroundColor='transparent' />
-              <ReturnButton color={Colors.backgroundColor} size={22} backgroundColor='transparent' />
-            </View>
-        </View>
-
-        {/* Manga Info */}
+        {/* Top */}
+        <Row style={styles.topBar} >
+            <HomeButton color={Colors.backgroundColor} iconName='home-outline' backgroundColor='transparent' />
+            <Row style={{gap: 20}} >
+              <BugReportButton color={Colors.backgroundColor} title={manhwa.title} backgroundColor='transparent' /> 
+              <RandomManhwaButton color={Colors.backgroundColor} backgroundColor='transparent' />
+              <ReturnButton color={Colors.backgroundColor} backgroundColor='transparent' />
+            </Row>
+        </Row>
+        
         <View style={styles.manhwaContainer}>
-            <View style={{width: '100%'}} >
-              <Image
-                source={manhwa.cover_image_url}
-                contentFit='cover'
-                style={styles.image} />
-              {
-                AppConstants.COMMON.DEBUG_MODE &&
-                <View style={{position: 'absolute', left: 6, top: 6, borderRadius: 4, width: 42, height: 42, backgroundColor: Colors.backgroundColor, alignItems: "center", justifyContent: "center"}} >
-                    <Text style={AppStyle.textRegular}>{manhwa.manhwa_id}</Text>
-                </View>
-              }
-            </View>
-            <View style={{alignSelf: "flex-start", gap: 8}} >
-              <Text style={AppStyle.textMangaTitle}>{manhwa!.title}</Text>
-              <ManhwaAlternativeNames names={altNames} />
-              <Text style={AppStyle.textRegular}>{manhwa.descr}</Text>
-            </View>
-            <Text style={[AppStyle.textRegular, {alignSelf: "flex-start"}]}>Last update: {formatTimestamp(manhwa.updated_at)}</Text>
-            <ManhwaAuthorInfo manhwa={manhwa} />
-            <ManhwaGenreInfo manhwa={manhwa} />
-            <AddToLibray 
-              manhwa={manhwa} 
-              textColor={Colors.backgroundColor} 
-              backgroundColor={manhwa.color} />
 
-            <View style={{flexDirection: 'row', width: '100%', gap: 10, alignItems: "center", justifyContent: "flex-start"}} >
-              <Item text={manhwa.status} textColor={Colors.backgroundColor} backgroundColor={manhwa.color} />
-              <Item text={`Views: ${formatNumberWithSuffix(manhwa.views + 1)}`} textColor={Colors.backgroundColor} backgroundColor={manhwa.color} />
-            </View>
+          {/* Manhwa Image */}
+          <View style={{width: '100%'}} >
+            <Image
+              source={manhwa.cover_image_url}
+              contentFit='cover'
+              style={styles.image} />
+            <ManhwaIdComponent manhwa_id={manhwa.manhwa_id} />
+          </View>
 
-            <ManhwaChapterGrid manhwa={manhwa} />
+          {/* Title, Summary and Last Update */}
+          <View style={{alignSelf: "flex-start", gap: 8}} >
+            <Text style={AppStyle.textMangaTitle}>{manhwa!.title}</Text>
+            <ManhwaAlternativeNames names={altNames} />
+            <Text style={AppStyle.textRegular}>{manhwa.descr}</Text>
+          </View>
+          <Text style={[AppStyle.textRegular, {alignSelf: "flex-start"}]}>Last update: {formatTimestamp(manhwa.updated_at)}</Text>
+          
+          {/* Genre and Authors Info */}
+          <ManhwaAuthorInfo manhwa={manhwa} />
+          <ManhwaGenreInfo manhwa={manhwa} />
+
+          <AddToLibray 
+            manhwa={manhwa} 
+            textColor={Colors.backgroundColor} 
+            backgroundColor={manhwa.color} />
+
+          {/* Status (OnGoing or Completed) and Num Views */}
+          <Row style={{gap: 10}} >
+            <Item text={manhwa.status} textColor={Colors.backgroundColor} backgroundColor={manhwa.color} />
+            <Item text={`Views: ${formatNumberWithSuffix(manhwa.views + 1)}`} textColor={Colors.backgroundColor} backgroundColor={manhwa.color} />
+          </Row>
+
+          {/* Chapter Grid */}
+          <ManhwaChapterGrid manhwa={manhwa} />
         </View>          
       </ScrollView>
     </SafeAreaView>
@@ -194,9 +188,7 @@ const styles = StyleSheet.create({
     flex: 1
   },
   topBar: {
-    width: '100%',     
-    flexDirection: 'row', 
-    alignItems: "center", 
+    width: '100%',
     justifyContent: "space-between", 
     marginTop: 10,
     paddingHorizontal: wp(4),

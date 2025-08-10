@@ -1,5 +1,5 @@
 import { AppConstants } from '@/constants/AppConstants';
-import { Author, Chapter, Collection, Genre, Manhwa, ManhwaAuthor, ManhwaGenre, UserHistory } from '@/helpers/types';
+import { Author, Chapter, Collection, Genre, Manhwa, ManhwaAuthor, ManhwaGenre, Todo, UserHistory } from '@/helpers/types';
 import { formatBytes, getCacheSizeBytes, secondsSince } from '@/helpers/util';
 import * as SQLite from 'expo-sqlite';
 import DeviceInfo from 'react-native-device-info';
@@ -95,7 +95,7 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       CREATE TABLE IF NOT EXISTS reading_status (
           manhwa_id INTEGER NOT NULL PRIMARY KEY,
           status TEXT NOT NULL,
-          updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
       
       CREATE TABLE IF NOT EXISTS reading_history (
@@ -103,8 +103,15 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
           chapter_id INTEGER NOT NULL,
           readed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           PRIMARY KEY (manhwa_id, chapter_id)          
-      );      
-      
+      );
+
+      CREATE TABLE IF NOT EXISTS todos (
+        todo_id INTEGER NOT NULL PRIMARY KEY,
+        title TEXT NOT NULL,
+        completed INTEGER NOT NULL DEFAULT 0 CHECK (completed IN (0, 1)),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+            
       CREATE INDEX IF NOT EXISTS idx_chapters_manhwa_id ON chapters(manhwa_id);      
       CREATE INDEX IF NOT EXISTS idx_ma_manhwa_id ON manhwa_authors(manhwa_id);
       CREATE INDEX IF NOT EXISTS idx_manhwas_status ON manhwas(status);
@@ -126,7 +133,9 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
         ('device', 'null'),
         ('first_run', '1'),
         ('last_sync_time', ''),
-        ('should_ask_for_donation', '1')
+        ('should_ask_for_donation', '1'),
+        ('password', ''),
+        ('is_safe_mode_on', '0')
       ON CONFLICT 
         (name)
       DO NOTHING;
@@ -299,6 +308,21 @@ export async function dbReadInfo(db: SQLite.SQLiteDatabase, name: string): Promi
   return r?.value ? r.value : null
 }
 
+export async function dbCreateInfo(db: SQLite.SQLiteDatabase, name: string, value: string) {
+  await db.runAsync(
+    `
+      INSERT INTO 
+        app_info (name, value) 
+      VALUES 
+        (?,?)
+      ON CONFLICT
+        (name)
+      DO UPDATE SET
+        value = EXCLUDED.value;
+      `,
+      [name, value]
+  ).catch(error => console.log("error dbCreateInfo", error))
+}
 
 export async function dbSetInfo(db: SQLite.SQLiteDatabase, name: string, value: string) {
   await db.runAsync(
@@ -1312,7 +1336,7 @@ export async function dbIsChapterMilestoneReached(db: SQLite.SQLiteDatabase): Pr
   if (!currentMilestone) {
     await dbCreateNumericInfo(db, 'current_chapter_milestone', AppConstants.COMMON.CHAPTER_START_MILESTONE)
     currentMilestone = AppConstants.COMMON.CHAPTER_START_MILESTONE
-  }
+  }  
 
   if (readChaptersCount >= currentMilestone) {
     await dbSetNumericInfo(db, 'current_chapter_milestone', readChaptersCount + AppConstants.COMMON.CHAPTER_MILESTONE_INCREMENT)    
@@ -1330,4 +1354,130 @@ export async function dbShouldAskForDonation(db: SQLite.SQLiteDatabase): Promise
 
 export async function dbSetShouldAskForDonation(db: SQLite.SQLiteDatabase, value: string) {
   await dbSetInfo(db, 'should_ask_for_donation', value)
+}
+
+
+export async function dbIsSafeModeEnabled(db: SQLite.SQLiteDatabase): Promise<boolean> {
+  const r = await dbReadInfo(db, 'is_safe_mode_on')
+  return r === '1'
+}
+
+
+export async function dbSetSafeModeState(db: SQLite.SQLiteDatabase, state: boolean) {
+  await dbSetInfo(db, 'is_safe_mode_on', state ? '1' : '0')
+}
+
+
+export async function dbReadTodos(
+  db: SQLite.SQLiteDatabase,
+  completed: boolean | null = null
+): Promise<Todo[]> {
+  if (completed === null) {
+    const r = await db.getAllAsync<Todo>(
+      `
+        SELECT
+          *
+        FROM 
+          todos
+        ORDER BY
+          completed ASC, created_at DESC;
+      `
+    ).catch(error => console.log("error dbReadTodos", error))
+    return r ? r : []
+  }
+  const r = await db.getAllAsync<Todo>(
+      `
+        SELECT
+          *
+        FROM 
+          todos
+        WHERE
+          completed = ?
+        ORDER BY
+          created_at DESC;        
+      `,
+      [completed ? 1 : 0]
+  ).catch(error => console.log("error dbReadTodos", error))
+  return r ? r : []
+}
+
+export async function dbReadTodoById(db: SQLite.SQLiteDatabase, todo_id: number): Promise<Todo | null> {
+  const r = await db.getFirstAsync<Todo>(
+    'SELECT * FROM todos WHERE todo_id = ?;',
+    [todo_id]
+  ).catch(error => console.log("error dbReadTodoById", error))
+  return r ? r : null
+}
+
+export async function dbCreateTodo(db: SQLite.SQLiteDatabase, title: string): Promise<Todo | null> {
+  const r = await db.getFirstAsync<{todo_id: number}>(
+    `
+      INSERT INTO todos (
+        title
+      )
+      VALUES 
+        (?)
+      RETURNING
+        todo_id;
+    `,
+    [title]
+  ).catch(error => console.log("error dbCreateTodo", error))
+  
+  if (r?.todo_id) {
+    return await dbReadTodoById(db, r.todo_id)
+  }
+
+  return null
+}
+
+export async function dbDeleteCompletedTodos(db: SQLite.SQLiteDatabase) {
+  await db.runAsync(
+    'DELETE FROM todos WHERE completed = 1;'
+  ).catch(error => console.log("error dbDeleteCompletedTodos", error))
+}
+
+export async function dbUpdateTodo(db: SQLite.SQLiteDatabase, todo_id: number, title: string, completed: number): Promise<boolean> {
+  const r = await db.runAsync(
+    `
+      UPDATE 
+        todos 
+      SET
+        title = ?,
+        completed = ?        
+      WHERE
+        todo_id = ?;
+    `,
+    [title, completed, todo_id]
+  ).catch(error => {console.log("error dbUpdateTodo", error); return false})
+  return r !== false
+}
+
+
+export async function dbDeleteTodo(db: SQLite.SQLiteDatabase, todo_id: number): Promise<boolean> {
+  const r = await db.runAsync(
+    'DELETE FROM todos WHERE todo_id = ?;',
+    [todo_id]
+  ).catch(error => {console.log("error dbDeleteTodo", error); return false})
+  return r !== false
+}
+
+
+export async function dbReadSafeModePassword(db: SQLite.SQLiteDatabase): Promise<string> {
+  const password = await dbReadInfo(db, 'password')
+  if (!password) {
+    await dbCreateInfo(db, 'password', '')
+    return ''
+  }
+  return password
+}
+
+
+export async function dbCreateSafeModePassword(db: SQLite.SQLiteDatabase, password: string) {
+  await dbCreateInfo(db, 'password', password)
+}
+
+
+export async function dbCheckPassword(db: SQLite.SQLiteDatabase, password: string): Promise<boolean> {
+  const p = await dbReadSafeModePassword(db)
+  return p === password
 }

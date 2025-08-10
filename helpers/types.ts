@@ -100,3 +100,11 @@ export type UserHistory = {
     chapters: number
     images: number
 }
+
+
+export type Todo = {
+    todo_id: number
+    title: string
+    completed: number
+    created_at: string
+}

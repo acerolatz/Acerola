@@ -4,6 +4,7 @@ import Column from '@/components/util/Column'
 import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
 import { ToastMessages } from '@/constants/Messages'
+import { openUrl } from '@/helpers/util'
 import { spFetchScans } from '@/lib/supabase'
 import { useScanState } from '@/store/scansState'
 import { AppStyle } from '@/styles/AppStyle'
@@ -34,15 +35,7 @@ const ScansPage = () => {
             init()
         },
         [scans]
-    )
-
-    const openUrl = async (url: string) => {
-        try {
-            await Linking.openURL(url)
-        } catch (error) {
-          Toast.show(ToastMessages.EN.UNABLE_TO_OPEN_BROWSER)
-        }
-    };
+    )    
 
     if (loading) {
         return (
@@ -70,7 +63,7 @@ const ScansPage = () => {
                 </View>
                 {
                     scans.map((item, index) => 
-                        <Pressable key={index} onPress={() => openUrl(item.url)} style={styles.donateButton} >
+                        <Pressable key={index} onPress={async () => openUrl(item.url)} style={styles.donateButton} >
                             <Column style={styles.donateTitleContainer} >
                                 <Text style={[AppStyle.textHeader, {color: Colors.backgroundColor}]}>{item.name}</Text>
                                 <Ionicons name='globe-outline' size={28} color={Colors.backgroundColor} />

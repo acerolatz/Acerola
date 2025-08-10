@@ -1,8 +1,8 @@
 import { AppConstants } from '@/constants/AppConstants';
 import { Colors } from '@/constants/Colors';
 import { ToastMessages } from '@/constants/Messages';
-import { clearCache, formatBytes } from '@/helpers/util';
-import { dbGetCacheMaxSize, dbSetCacheSize } from '@/lib/database';
+import { clearCache, formatBytes, hasOnlyDigits } from '@/helpers/util';
+import { dbCreateSafeModePassword, dbGetCacheMaxSize, dbIsSafeModeEnabled, dbSetCacheSize, dbSetSafeModeState } from '@/lib/database';
 import { AppStyle } from '@/styles/AppStyle';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -22,10 +22,12 @@ import {
 import RNRestart from 'react-native-restart';
 import Toast from 'react-native-toast-message';
 import * as yup from 'yup';
+import Row from '../util/Row';
 
 
 interface FormData {
     maxCacheSize: number
+    safeModePassword: string
 }
 
 
@@ -39,13 +41,19 @@ const schema = yup.object().shape({
 interface SettingsFormProps {
     currentMaxCacheSize: number
     currentCacheSize: number
+    safeModePassword: string
+    safeModeOn: boolean
 } 
 
 
-const SettingsForm = ({currentMaxCacheSize, currentCacheSize}: SettingsFormProps) => {
+const SettingsForm = ({currentMaxCacheSize, currentCacheSize, safeModePassword, safeModeOn}: SettingsFormProps) => {
         
     const db = useSQLiteContext()
     const [isLoading, setLoading] = useState(false)
+    const [currentSafeModePassword, setCurrentSafeModePassword] = useState(safeModePassword)
+    const [confirmPassword, setConfirmPassword] = useState(safeModePassword)
+    const [isSafeModeOn, setIsSafeModeOn] = useState(safeModeOn)
+    const [loadingSafeModeConfig, setLoadingSafeModeConfig] = useState(false)
 
     const {
         control,
@@ -54,7 +62,7 @@ const SettingsForm = ({currentMaxCacheSize, currentCacheSize}: SettingsFormProps
     } = useForm<FormData>({
         resolver: yupResolver(schema as any),
         defaultValues: {            
-            maxCacheSize: currentMaxCacheSize,
+            maxCacheSize: currentMaxCacheSize            
         },
     });
     
@@ -73,22 +81,94 @@ const SettingsForm = ({currentMaxCacheSize, currentCacheSize}: SettingsFormProps
     };
 
     const clearAppCache = async () => {
+        Keyboard.dismiss()
         await clearCache()
         RNRestart.Restart();
+    }
+
+    const isValidPassword = (p: string): boolean  => {
+        return p.trim().length >= 4 && hasOnlyDigits(p)
+    }
+
+
+    const submitPassword = async () => {
+        Keyboard.dismiss()
+        setLoadingSafeModeConfig(true)
+            const check1 = isValidPassword(currentSafeModePassword)
+            const check2 = isValidPassword(confirmPassword)
+            const check3 = currentSafeModePassword.trim() === confirmPassword.trim()
+            if (!(check1 && check2 && check3)) {
+                Toast.show({text1: "Invalid Password", text2: "Min 4 characters and passwords must match", type: 'error', visibilityTime: 3500})
+                setLoadingSafeModeConfig(false)
+                return
+            } 
+            await dbCreateSafeModePassword(db, currentSafeModePassword.trim())
+            if (isSafeModeOn) {
+                setIsSafeModeOn(false)
+                await dbSetSafeModeState(db, false)
+                Toast.show({text1: "Safe Mode Disabled!", type: "success"})
+            } else {
+                setIsSafeModeOn(true)
+                await dbSetSafeModeState(db, true)
+                Toast.show({text1: "Safe Mode Enabled!", type: "success"})
+            }            
+        setLoadingSafeModeConfig(false)
     }
 
     return (
         <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
             <ScrollView style={{flex: 1}} keyboardShouldPersistTaps='always' >
                 <View style={{gap: 20}} >
+
+                    <View>
+                        <Row style={{gap: 10, alignSelf: 'flex-start'}} >
+                            <Text style={AppStyle.inputHeaderText}>Safe Mode</Text>
+                            <Text style={[AppStyle.inputHeaderText, {color: Colors.neonRed}]}>{isSafeModeOn ? 'enabled' : 'disabled'}</Text>
+                        </Row>
+                        <Text style={AppStyle.textRegular}>When safe mode is enabled, the app will function as a simple to-do list. To unlock the main (pornhwa) app, you will need the numeric password you define below.</Text>
+                        <Text style={[AppStyle.textRegular, {color: Colors.neonRed}]}>Your changes will be applied when the app restarts.</Text>
+                        
+                        <Text style={AppStyle.inputHeaderText} >Safe Mode Password</Text>
+                        <TextInput
+                            style={AppStyle.input}
+                            keyboardType='numeric'
+                            maxLength={8}
+                            onChangeText={setCurrentSafeModePassword}
+                            value={currentSafeModePassword.toString()}/>
+
+                        <Text style={AppStyle.inputHeaderText} >Confirm Safe Mode Password</Text>
+                        <TextInput
+                            style={AppStyle.input}
+                            keyboardType='numeric'
+                            maxLength={8}
+                            onChangeText={setConfirmPassword}
+                            value={confirmPassword.toString()}/>
+
+                        {
+                            loadingSafeModeConfig ?
+                            <View style={[AppStyle.formButton, {backgroundColor: Colors.white}]} >
+                                <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor}]}>{safeModeOn ? 'Disable' : 'Enable'} Safe Mode</Text>
+                            </View>
+                            :
+                            <Pressable onPress={submitPassword} style={[AppStyle.formButton, {backgroundColor: Colors.white}]} >
+                                <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor}]}>{isSafeModeOn ? 'Disable' : 'Enable'} Safe Mode</Text>
+                            </Pressable>
+
+                        }                        
+                    </View>
+
+                    <View style={{width: '100%', height: 2, backgroundColor: Colors.white, borderRadius: AppConstants.COMMON.BORDER_RADIUS}} />
+                    
                     <View>
                         <Text style={AppStyle.inputHeaderText}>Cache size: {formatBytes(currentCacheSize)}</Text>
                         {/* Clear Cache */}
-                        <Pressable onPress={clearAppCache} style={[AppStyle.formButton, {backgroundColor: Colors.white}]} >
-                            <Text style={AppStyle.formButtonText} >Clear cache</Text>
+                        <Pressable onPress={clearAppCache} style={[AppStyle.formButton, {backgroundColor: Colors.white, marginTop: 0}]} >
+                            <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor}]} >Clear Cache</Text>
                         </Pressable>                
                         <Text style={[AppStyle.textRegular, {color: Colors.neonRed, marginTop: 6}]}>* Restart Required</Text>
                     </View>
+
+                    <View style={{width: '100%', height: 2, backgroundColor: Colors.white, borderRadius: AppConstants.COMMON.BORDER_RADIUS}} />
                     
                     <View>
                         {/* Cache Size */}
@@ -115,10 +195,11 @@ const SettingsForm = ({currentMaxCacheSize, currentCacheSize}: SettingsFormProps
                             </View> 
                             :
                             <Pressable onPress={handleSubmit(onSubmit)} style={[AppStyle.formButton, {backgroundColor: Colors.white}]} >
-                                <Text style={AppStyle.formButtonText} >Save</Text>
+                                <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor}]} >Save</Text>
                             </Pressable>
                         }
-                    </View>
+                    </View>                
+
                 </View>
                 
                 <View style={{width: '100%', height: 52}} />

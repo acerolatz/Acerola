@@ -42,14 +42,14 @@ const ManhwaGenreInfo = ({manhwa}: ManhwaGenreInfoProps) => {
 
   const renderItem = ({item}: {item: Genre}) => {
     return (
-      <Pressable style={styles.item} onPress={() => openGenrePage(item)}>
-        <Text style={[AppStyle.textRegular, {color: Colors.white}]} >{item.genre}</Text>
+      <Pressable style={AppStyle.defaultGridItem} onPress={() => openGenrePage(item)}>
+        <Text style={AppStyle.textRegular} >{item.genre}</Text>
       </Pressable>
     )
   }
 
   return (
-    <View style={styles.container} >
+    <View style={{width: '100%'}} >
       <FlatList 
         ref={flatListRef}
         data={genres}
@@ -62,20 +62,4 @@ const ManhwaGenreInfo = ({manhwa}: ManhwaGenreInfoProps) => {
   )
 }
 
-export 
-default ManhwaGenreInfo;
-
-const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-  },
-  item: {
-    paddingHorizontal: 10,
-    paddingVertical: 12,
-    backgroundColor: Colors.gray,
-    marginRight: 8,
-    borderRadius: 4,
-    alignItems: "center",
-    justifyContent: "center"
-  }
-})
+export default ManhwaGenreInfo;

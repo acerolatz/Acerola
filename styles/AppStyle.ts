@@ -82,5 +82,14 @@ export const AppStyle = StyleSheet.create({
     center: {
         alignItems: "center",
         justifyContent: "center"
+    },
+    defaultGridItem: {
+        paddingHorizontal: 10,
+        paddingVertical: 12,
+        backgroundColor: Colors.gray,
+        marginRight: 8,
+        borderRadius: 4,
+        alignItems: "center",
+        justifyContent: "center"
     }
 })

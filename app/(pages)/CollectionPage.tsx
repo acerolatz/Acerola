@@ -38,9 +38,7 @@ const CollectionPage = () => {
                 setLoading(false)
             }
             init()
-            return () => {
-                isCancelled = true
-            }
+            return () => { isCancelled = true }
         },
         []
     )

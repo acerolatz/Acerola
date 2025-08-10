@@ -1,7 +1,10 @@
-import { AppConstants } from '@/constants/AppConstants';
 import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
 import { Dimensions } from "react-native";
-import RNFS, { ReadDirItem } from 'react-native-fs';
+import RNFS from 'react-native-fs';
+import * as Clipboard from 'expo-clipboard'
+import { Linking } from 'react-native';
+import { ToastMessages } from '@/constants/Messages';
+import Toast from 'react-native-toast-message';
 
 
 const {
@@ -163,4 +166,32 @@ export function formatNumberWithSuffix(num: number): string {
   const formattedValue = value.toFixed(1).replace(/\.0$/, '');
 
   return `${sign}${formattedValue}${suffix}`;
+}
+
+
+export function hasOnlyDigits(str: string): boolean {
+  const regex = /^\d+$/;
+  return regex.test(str);
+}
+
+export async function openUrl(url: string) {
+  try {
+      await Linking.openURL(url)
+  } catch (error) {
+    Toast.show(ToastMessages.EN.UNABLE_TO_OPEN_BROWSER)
+  }
+};
+
+
+export async function copyToClipboard(value: string) {
+  await Clipboard.setStringAsync(value);
+  Toast.show(ToastMessages.EN.COPIED_TO_CLIPBOARD)
+}
+
+
+export function getChapterGridNumColumns(): number {
+  const width = wp(92)
+  if (width >= 400) { return 8 }
+  if (width >= 360) { return 7 }
+  return 4
 }

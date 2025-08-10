@@ -1,29 +1,15 @@
-import { Linking, Pressable, StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, Text } from 'react-native'
 import React from 'react'
 import { DonateMethod } from '@/helpers/types'
-import * as Clipboard from 'expo-clipboard'
 import Column from './util/Column'
 import { AppStyle } from '@/styles/AppStyle'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { Colors } from '@/constants/Colors'
-import { ToastMessages } from '@/constants/Messages'
-import Toast from 'react-native-toast-message'
+import { copyToClipboard, openUrl } from '@/helpers/util'
+
 
 const DonateComponent = ({item}: {item: DonateMethod}) => {  
-    const iconName = item.action == "copy" ? "copy-outline" : "globe-outline"
-
-    const openUrl = async (url: string) => {
-        try {
-            await Linking.openURL(url)
-        } catch (error) {
-          Toast.show(ToastMessages.EN.UNABLE_TO_OPEN_BROWSER)
-        }
-      };
-    
-      const copyToClipboard = async (value: string) => {
-        await Clipboard.setStringAsync(value);
-        Toast.show(ToastMessages.EN.COPIED_TO_CLIPBOARD)
-    }
+    const iconName = item.action == "copy" ? "copy-outline" : "globe-outline"    
 
     const onPress = async (donate: DonateMethod) => {
         switch (donate.action) {
@@ -49,22 +35,24 @@ const DonateComponent = ({item}: {item: DonateMethod}) => {
     )
 }
 
+
 export default DonateComponent
 
+
 const styles = StyleSheet.create({
-    donateButton: {
-        maxWidth: '100%', 
-        padding: 10, 
-        borderRadius: 4, 
-        backgroundColor: Colors.donateColor, 
-        marginBottom: 10,
-        gap: 10
-    },
-    donateTitleContainer: {
-        width: "100%", 
-        flexDirection: 'row', 
-        alignItems: "center", 
-        gap: 10, 
-        justifyContent: "space-between"
-    }
+  donateButton: {
+      maxWidth: '100%', 
+      padding: 10, 
+      borderRadius: 4, 
+      backgroundColor: Colors.donateColor, 
+      marginBottom: 10,
+      gap: 10
+  },
+  donateTitleContainer: {
+      width: "100%", 
+      flexDirection: 'row', 
+      alignItems: "center", 
+      gap: 10, 
+      justifyContent: "space-between"
+  }
 })

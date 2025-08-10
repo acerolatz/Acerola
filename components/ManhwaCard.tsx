@@ -14,6 +14,8 @@ import {
     ViewStyle
 } from 'react-native';
 import ChapterLink from './chapter/ChapterLink';
+import ManhwaIdComponent from './ManhwaIdComponent';
+import ManhwaStatusComponent from './ManhwaStatusComponent';
 
 
 interface ManhwaCardProps {
@@ -84,16 +86,9 @@ const ManhwaCard = ({
             </View>
             {
                 showManhwaStatus &&
-                <View style={[styles.manhwaStatus, {backgroundColor: mangaStatusColor,}]} >
-                    <Text style={[AppStyle.textRegular, {fontSize: 12, color: Colors.backgroundColor}]}>{manhwa.status}</Text>
-                </View>
+                <ManhwaStatusComponent backgroundColor={mangaStatusColor} status={manhwa.status} />
             }
-            {
-                AppConstants.COMMON.DEBUG_MODE &&
-                <View style={{position: 'absolute', right: 6, top: 6, borderRadius: AppConstants.COMMON.BORDER_RADIUS, width: 42, height: 42, backgroundColor: Colors.backgroundColor, alignItems: "center", justifyContent: "center"}} >
-                    <Text style={AppStyle.textRegular}>{manhwa.manhwa_id}</Text>
-                </View>
-            }
+            <ManhwaIdComponent manhwa_id={manhwa.manhwa_id} position='r' />
         </View>
     )
 }
@@ -106,13 +101,5 @@ const styles = StyleSheet.create({
     container: {
         paddingVertical: 10,  
         width: '100%'
-    },
-    manhwaStatus: {
-        position: 'absolute', 
-        left: 6, 
-        top: 6, 
-        borderRadius: 22,
-        paddingHorizontal: 8,
-        paddingVertical: 6
-    }
+    }    
 })

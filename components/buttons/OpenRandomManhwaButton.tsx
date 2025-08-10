@@ -18,8 +18,8 @@ interface RandomManhwaButtonProps {
 }
 
 
-const OpenRandomManhwaButton = ({
-    size = 28, 
+const RandomManhwaButton = ({
+    size = AppConstants.COMMON.BUTTON.SIZE, 
     color = Colors.white,
     backgroundColor = Colors.backgroundColor,
     onPress
@@ -58,12 +58,11 @@ const OpenRandomManhwaButton = ({
     )
 }
 
-export default OpenRandomManhwaButton
+export default RandomManhwaButton
 
 
 const styles = StyleSheet.create({
     container: {
-        padding: 6,         
         borderRadius: 4
     }
 })

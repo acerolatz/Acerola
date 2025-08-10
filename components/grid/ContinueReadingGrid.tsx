@@ -6,6 +6,7 @@ import { FlatList, Pressable, StyleSheet, View } from 'react-native'
 import Title from '../Title'
 import ViewAllButton from '../buttons/ViewAllButton'
 import Row from '../util/Row'
+import { AppConstants } from '@/constants/AppConstants'
 
 
 const Item = ({item} : {item: Manhwa}) => {
@@ -19,7 +20,10 @@ const Item = ({item} : {item: Manhwa}) => {
 
     return (
         <Pressable onPress={onPress} style={{marginRight: 4}} >
-            <Image style={{width: 80, height: 120, borderRadius: 4}} contentFit='cover' source={item.cover_image_url} />
+            <Image 
+                style={styles.image} 
+                contentFit='cover' 
+                source={item.cover_image_url} />
         </Pressable>
     )   
 }
@@ -59,5 +63,10 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
         gap: 10        
+    },
+    image: {
+        width: 80, 
+        height: 120, 
+        borderRadius: AppConstants.COMMON.BORDER_RADIUS
     }
 })
