@@ -8,20 +8,24 @@ import ManhwaHorizontalGrid from '@/components/grid/ManhwaHorizontalGrid'
 import RandomCardsGrid from '@/components/grid/RandomCardsGrid'
 import Top10Grid from '@/components/grid/Top10Grid'
 import LateralMenu from '@/components/LateralMenu'
+import TopBar from '@/components/TopBar'
 import AppLogo from '@/components/util/Logo'
 import Row from '@/components/util/Row'
 import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
 import { Collection, Genre, Manhwa } from '@/helpers/types'
 import { hp, wp } from '@/helpers/util'
-import { dbCleanTable, dbGetReadingHistory, dbGetTopDaily10Manhwas, dbReadCollections, dbReadGenres, dbReadManhwasOrderedByUpdateAt, dbReadManhwasOrderedByViews, dbShouldUpdate, dbUpsertCollections } from '@/lib/database'
+import { dbCleanTable, dbGetReadingHistory, dbIsChapterMilestoneReached, dbGetReadChaptersCount, dbReadCollections, dbReadGenres, dbReadManhwasOrderedByUpdateAt, dbReadManhwasOrderedByViews, dbSetShouldAskForDonation, dbShouldUpdate, dbUpsertCollections } from '@/lib/database'
 import { spFetchCollections, spFetchRandomManhwaCards, spGetTodayTop10 } from '@/lib/supabase'
 import { useManhwaCardsState } from '@/store/randomManhwaState'
+import { useTop10ManhwasState } from '@/store/top10State'
 import { AppStyle } from '@/styles/AppStyle'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
 import { router, useFocusEffect } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Animated, Pressable, SafeAreaView, ScrollView, StyleSheet, View } from 'react-native'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Animated, Pressable, Text, SafeAreaView, ScrollView, StyleSheet, View } from 'react-native'
 
 
 const SCREEN_WIDTH = wp(100)
@@ -35,10 +39,12 @@ const HomePage = () => {
     const menuVisible = useRef(false)
     
     const db = useSQLiteContext()
+    const initDone = useRef(false)      
+    const bottomSheetRef = useRef<BottomSheet>(null);
     
     const { cards, setCards } = useManhwaCardsState()
     
-    const [top10Manhwas, setTop10Manhwas] = useState<Manhwa[]>([])
+    const { top10manhwas, setTop10manhwas } = useTop10ManhwasState()
     const [collections, setCollections] = useState<Collection[]>([])
     const [loading, setLoading] = useState(true)
     const [genres, setGenres] = useState<Genre[]>([])
@@ -50,57 +56,69 @@ const HomePage = () => {
         const r = await spFetchRandomManhwaCards(32)
         setCards(r)
     }
+
+    const updateCollections = async () => {
+        let c = await dbReadCollections(db)
+        const shouldUpdate = await dbShouldUpdate(db, 'collections')
+        if (c.length === 0 || shouldUpdate) {
+            c = await spFetchCollections()
+            await dbCleanTable(db, 'collections')
+            await dbUpsertCollections(db, c)
+        }
+        setCollections(c)
+    }
+
+    const updateTop10 = async () => {
+        if (top10manhwas.length === 0) {
+            const t = await spGetTodayTop10()
+            setTop10manhwas(t)
+        }
+    }
+
+    const updateRandomCards = async () => {
+        if (cards.length == 0) {
+            const r = await spFetchRandomManhwaCards(30)
+            setCards(r)
+        }
+    }
     
     useEffect(
         () => {
-            let isCancelled = false
+            if (initDone.current) { return }
             const init = async () => {
+                initDone.current = true
+
                 setLoading(true)
+                    await Promise.all([
+                        dbReadGenres(db),
+                        dbReadManhwasOrderedByUpdateAt(db, 0, 30),
+                        dbReadManhwasOrderedByViews(db, 0, 30)
+                    ]).then(([g, l, m]) => {
+                        setGenres(g)
+                        setLatestUpdates(l)
+                        setMostView(m)
+                    })
+                setLoading(false)
 
-                    const g = genres.length === 0 ? await dbReadGenres(db) : null
-                    const l = latestUpdate.length === 0 ? await dbReadManhwasOrderedByUpdateAt(db, 0, 30) : null
-                    const m = mostView.length === 0 ? await dbReadManhwasOrderedByViews(db, 0, 30) : null
-                    const top10 = top10Manhwas.length === 0 ? await dbGetTopDaily10Manhwas(db) : null
-                    
-                    if (isCancelled) { return }
-                    if (g) { setGenres(g) }
-                    if (l) { setLatestUpdates(l) }
-                    if (m) { setMostView(m) }
-                    if (top10) { setTop10Manhwas(top10) }
-
-                    if (collections.length == 0) {
-                        let c = await dbReadCollections(db)
-                        const shouldUpdateCollections = await dbShouldUpdate(db, 'collections')
-                        if (c.length == 0 || shouldUpdateCollections) {
-                            c = await spFetchCollections()
-                            if (isCancelled) { return }
-                            await dbCleanTable(db, 'collections')
-                            await dbUpsertCollections(db, c)
-                        }
-                        setCollections(c)
-                    }
-
-                setLoading(false)             
-
-                if (cards.length == 0) {
-                    const r = await spFetchRandomManhwaCards(30)
-                    if (isCancelled) { return }
-                    setCards(r)
-                }                
+                await Promise.all([
+                    updateTop10(),
+                    updateCollections(),
+                    updateRandomCards()
+                ])
             }
-
             init()
-            return () => { isCancelled = true }
         },
         [db]
-    )    
+    )
 
     useFocusEffect(
         useCallback(
             () => {
                 const reload = async () => {
-                    const h = await dbGetReadingHistory(db, 0, 32)
-                    setReadingHistoryManhwas(h)
+                    await dbIsChapterMilestoneReached(db)
+                        .then(s => s ? handleOpenBottomSheet() : null)
+                    await dbGetReadingHistory(db, 0, 32)
+                        .then(v => setReadingHistoryManhwas(v))
                 }
                 reload()
             },
@@ -111,32 +129,32 @@ const HomePage = () => {
     const openMenu = () => {
         Animated.timing(menuAnim, {
             toValue: 0,
-            duration: AppConstants.PAGES.HOME.MENU_ANIMATION_TIME,      
-            useNativeDriver: false
+            duration: AppConstants.PAGES.HOME.MENU_ANIMATION_TIME,
+            useNativeDriver: true
         }).start(() => {
             menuVisible.current = true
         })
         Animated.timing(backgroundAnim, {
             toValue: 0,
             duration: AppConstants.PAGES.HOME.MENU_ANIMATION_TIME * 1.2,
-            useNativeDriver: false
-        }).start(() => {})
+            useNativeDriver: true
+        }).start()
     }
 
     const closeMenu = () => {
         Animated.timing(menuAnim, {
             toValue: -AppConstants.PAGES.HOME.MENU_WIDTH,
             duration: AppConstants.PAGES.HOME.MENU_ANIMATION_TIME,
-            useNativeDriver: false
+            useNativeDriver: true
         }).start(() => {
             menuVisible.current = false
         })
         Animated.timing(backgroundAnim, {
             toValue: -SCREEN_WIDTH,
             duration: AppConstants.PAGES.HOME.MENU_ANIMATION_TIME,
-            useNativeDriver: false
-        }).start(() => {})
-    }  
+            useNativeDriver: true
+        }).start()
+    }
 
     const searchPress = () => {
         router.navigate("/(pages)/ManhwaSearch")
@@ -146,31 +164,49 @@ const HomePage = () => {
         menuVisible.current ? closeMenu() : openMenu()
     }
 
+    const handleOpenBottomSheet = useCallback(() => {
+        bottomSheetRef.current?.expand();
+    }, []);
+
+    const handleCloseBottomSheet = useCallback(() => {
+        bottomSheetRef.current?.close();
+    }, []);
+
+    const neverShowDonationMessageAgain =  async () => {
+        await dbSetShouldAskForDonation(db, '0')
+        handleCloseBottomSheet()
+    }
+
+    const openDonate = () => {
+        handleCloseBottomSheet()
+        router.navigate("/(pages)/DonatePage")
+    }
+
     return (
         <SafeAreaView style={AppStyle.safeArea} >            
             {/* Header */}
             <Row style={{width: '100%', paddingRight: 2, marginTop: 4, marginBottom: 10, justifyContent: "space-between"}} >
                 <AppLogo/>
-                    <Row style={{gap: 10}} >
-                        {
-                            !loading &&
-                            <>
-                                <UpdateDatabaseButton iconColor={Colors.white} type='client' />
-                                <Button iconName='search-outline' onPress={searchPress} iconSize={28} iconColor={Colors.white} showLoading={false} />
-                                <OpenRandomManhwaButton color={Colors.white} size={28} backgroundColor='' />
-                            </>
-                        }
-                        <Button iconName='options-outline' onPress={toggleMenu} iconSize={28} iconColor={Colors.white} showLoading={false} />                        
-                    </Row>
+                <Row style={{gap: 16}} >
+                    {
+                        !loading &&
+                        <>
+                            <UpdateDatabaseButton iconColor={Colors.white} type='client' iconSize={22} />
+                            <Button iconName='search-outline' onPress={searchPress} iconSize={22} iconColor={Colors.white} showLoading={false} />
+                            <OpenRandomManhwaButton color={Colors.white} size={22} backgroundColor='' />
+                        </>
+                    }
+                    <Button iconName='options-outline' onPress={toggleMenu} iconSize={22} iconColor={Colors.white} showLoading={false} />                        
+                </Row>
             </Row>
 
             {/* Main content */}
             <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} >
-                <View style={{gap: 14}} >
+                <View style={{gap: 12}} >
                     <GenreGrid genres={genres} />
                     <CollectionGrid collections={collections} />
                     <ContinueReadingGrid manhwas={readingHistoryManhwas} />
-                    <Top10Grid manhwas={top10Manhwas} />
+                    <Top10Grid manhwas={top10manhwas} />
                     <ManhwaHorizontalGrid
                         title='Latest Updates'
                         onViewAll={() => router.navigate("/(pages)/LatestUpdatesPage")}
@@ -181,10 +217,41 @@ const HomePage = () => {
                         onViewAll={() => router.navigate("/(pages)/MostViewPage")}
                         manhwas={mostView}
                     />
-                    <RandomCardsGrid reloadCards={reloadCards} />
+                    { !loading && <RandomCardsGrid reloadCards={reloadCards} /> }
                     <View style={{width: '100%', height: 20}} />
                 </View>
             </ScrollView>
+
+            <BottomSheet
+                ref={bottomSheetRef}
+                index={-1}
+                handleIndicatorStyle={{backgroundColor: Colors.donateColor}}
+                handleStyle={{backgroundColor: Colors.backgroundSecondary, borderRadius: 20}}
+                backgroundStyle={{backgroundColor: Colors.backgroundSecondary}}
+                
+                enablePanDownToClose={true}
+            >
+                <BottomSheetView style={{paddingHorizontal: wp(4), gap: 10}} >
+                    <TopBar title='Enjoying the app?' titleColor={Colors.donateColor}>
+                        <Pressable onPress={handleCloseBottomSheet} >
+                            <Ionicons name='close-circle-outline' color={Colors.donateColor} size={22} />
+                        </Pressable>
+                    </TopBar>
+                    <Text style={[AppStyle.textRegular, {}]}>Consider making a donation to help keep the servers running.</Text>
+                    <Row style={{gap: 10}} >
+                        <Pressable onPress={handleCloseBottomSheet} style={[styles.button, {backgroundColor: Colors.backgroundSecondary, borderWidth: 1, borderColor: Colors.donateColor}]} >
+                            <Text style={[AppStyle.textRegular, {color: Colors.donateColor}]} >Close</Text>
+                        </Pressable>
+                        <Pressable onPress={openDonate} style={styles.button} >
+                            <Text style={[AppStyle.textRegular, {color: Colors.backgroundSecondary}]} >Donate</Text>
+                        </Pressable>
+                    </Row>
+                    <Pressable onPress={neverShowDonationMessageAgain} >
+                        <Text style={[AppStyle.textRegular, {fontSize: 16, textDecorationLine: 'underline'}]}>Never show again.</Text>
+                    </Pressable>
+                    <View style={{height: 52}} />
+                </BottomSheetView>
+            </BottomSheet>
 
             {/* Lateral Menu */}
             <Animated.View style={[styles.menuBackground, { width: SCREEN_WIDTH, transform: [{ translateX: backgroundAnim }] }]}>
@@ -220,5 +287,13 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
         elevation: 4,        
         zIndex: 90
+    },
+    button: {
+        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
+        backgroundColor: Colors.donateColor,
+        alignItems: "center",
+        justifyContent: "center",
+        flex: 1,
+        height: 52
     }
 })

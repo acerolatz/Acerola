@@ -11,15 +11,16 @@ interface HomeButtonProps {
   size?: number
   color?: string
   iconName?: string
+  backgroundColor?: string
 }
 
-const HomeButton = ({size = 28, color = Colors.white, iconName = 'home'}: HomeButtonProps) => {
+const HomeButton = ({size = 28, color = Colors.white, iconName = 'home', backgroundColor = Colors.backgroundColor}: HomeButtonProps) => {
 
   return (
     <Pressable 
       onPress={() => router.replace('/(pages)/HomePage')} 
       hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE}
-      style={AppStyle.buttonBackground} >
+      style={[AppStyle.buttonBackground, {backgroundColor}]} >
         <Ionicons name={iconName as any} size={size} color={color} />
     </Pressable>
   )

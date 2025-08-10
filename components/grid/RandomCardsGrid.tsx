@@ -70,7 +70,7 @@ const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
         <View style={styles.container} >
             <Row style={{width: '100%', justifyContent: "space-between"}} >
                 <Title title='Random'/>
-                <RotatingButton onPress={debounceReload} iconColor={Colors.white} />
+                <RotatingButton iconSize={24} onPress={debounceReload} iconColor={Colors.white} />
             </Row>
             <View style={{width: '100%', height: MAX_HEIGHT}} >
                 <FlatList

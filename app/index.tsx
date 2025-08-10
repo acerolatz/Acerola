@@ -73,7 +73,7 @@ const App = () => {
         <SafeAreaView style={AppStyle.safeArea} >
             <Row style={styles.container} >
                 <AppLogo/>
-                <Ionicons name='options-outline' size={28} color={'white'} />
+                <Ionicons name='options-outline' size={22} color={'white'} />
             </Row>
             <PageActivityIndicator/>
         </SafeAreaView>

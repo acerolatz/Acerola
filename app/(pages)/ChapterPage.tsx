@@ -6,7 +6,7 @@ import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
 import { Chapter, ChapterImage } from '@/helpers/types'
 import { hp, wp } from '@/helpers/util'
-import { dbUpsertReadingHistory } from '@/lib/database'
+import { dbAddNumericInfo, dbUpsertReadingHistory } from '@/lib/database'
 import { spFetchChapterImages, spUpdateChapterView } from '@/lib/supabase'
 import { useChapterState } from '@/store/chapterState'
 import { FlashList } from '@shopify/flash-list'
@@ -80,6 +80,7 @@ const ChapterPage = () => {
             setListTotalHeight(imgs.length > 0 ? newHeight / imgs.length : hp(40))            
             listTotalHeightRef.value = newHeight + AppConstants.PAGES.CHAPTER.FOOTER_HEIGHT
             footerVisible.value = false
+            dbAddNumericInfo(db, 'images', imgs.length)
           setLoading(false)
         }
         load()

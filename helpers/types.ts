@@ -93,3 +93,10 @@ export type Post = {
     image_height: number | null
     created_at: string
 }
+
+
+export type UserHistory = {
+    manhwas: number
+    chapters: number
+    images: number
+}

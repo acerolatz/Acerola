@@ -11,13 +11,14 @@ interface DonateButtonProps {
   size?: number
   color?: string
   iconName?: string
+  onPress: () => any
 }
 
-const DonateButton = ({size = 28, color = Colors.white}: DonateButtonProps) => {
+const DonateButton = ({onPress, size = 28, color = Colors.white}: DonateButtonProps) => {
 
   return (
     <Pressable 
-      onPress={() => router.replace('/(pages)/DonatePage')} 
+      onPress={onPress} 
       hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE}
       style={AppStyle.buttonBackground} >
         <Ionicons name='cash-outline' size={size} color={color} />

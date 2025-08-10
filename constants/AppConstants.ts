@@ -40,6 +40,10 @@ export const AppConstants = {
             WIDTH: 300,
             HEIGHT: 440
         },
+        APP_VERSION: 'v1.0.0',
+        SERVER_UPDATE_RATE: 60 * 60 * 3, // 3 HOURS
+        CLIENT_UPDATE_RATE: 60 * 3, // 3 MINUTES
+        COLLECTIONS_UPDATE_RATE: 60 * 60 * 48, // 48 HOURS
         DEFAULT_CACHE_SIZE: 1024 * 1024 * 1024, // 1024 MiB
         READING_STATUS: [
             'Completed',
@@ -63,7 +67,9 @@ export const AppConstants = {
                 top: 20,
                 bottom: 20
             }
-        }        
+        },
+        CHAPTER_START_MILESTONE: 32,
+        CHAPTER_MILESTONE_INCREMENT: 92
     },
     URLS: {
         REDDIT: "https://www.reddit.com/r/pornhwa/",

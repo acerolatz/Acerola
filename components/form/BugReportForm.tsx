@@ -305,7 +305,7 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
                     </View>
                     :
                     <Pressable onPress={handleSubmit(onSubmit)} style={[styles.button, {marginBottom: 10}]} >
-                        <Text style={AppStyle.formButtonText} >Report</Text>
+                        <Text style={AppStyle.formButtonText} >Send</Text>
                     </Pressable>
                 }
 

@@ -170,8 +170,9 @@ export async function spReportBug(
 export async function spGetDonationMethods(): Promise<DonateMethod[]> {
     const { data, error } = await supabase
         .from("app_infos")
-        .select("name, value, action")
+        .select("name, value, action, created_at")
         .eq("type", "donation")
+        .order("created_at", {ascending: true})
 
     if (error) {
         console.log("error spGetDonationMethods", error)

@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     padding: 10, 
     borderRadius: 4, 
     backgroundColor: Colors.scansColor, 
-    marginBottom: 20,
+    marginBottom: 10,
     gap: 10
   },
   donateTitleContainer: {

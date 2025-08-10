@@ -80,55 +80,48 @@ const SettingsForm = ({currentMaxCacheSize, currentCacheSize}: SettingsFormProps
     return (
         <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
             <ScrollView style={{flex: 1}} keyboardShouldPersistTaps='always' >
-
-                <View style={{marginTop: 10}} >
-                    <Text style={AppStyle.inputHeaderText}>Cache size: {formatBytes(currentCacheSize)}</Text>
+                <View style={{gap: 20}} >
+                    <View>
+                        <Text style={AppStyle.inputHeaderText}>Cache size: {formatBytes(currentCacheSize)}</Text>
+                        {/* Clear Cache */}
+                        <Pressable onPress={clearAppCache} style={[AppStyle.formButton, {backgroundColor: Colors.white}]} >
+                            <Text style={AppStyle.formButtonText} >Clear cache</Text>
+                        </Pressable>                
+                        <Text style={[AppStyle.textRegular, {color: Colors.neonRed, marginTop: 6}]}>* Restart Required</Text>
+                    </View>
+                    
+                    <View>
+                        {/* Cache Size */}
+                        <Text style={AppStyle.inputHeaderText}>Max cache size (MB)</Text>
+                        <Controller
+                            control={control}
+                            name="maxCacheSize"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                            <TextInput
+                                style={AppStyle.input}
+                                keyboardType='numeric'
+                                maxLength={AppConstants.FORM.SETTINGS.MAX_CACHE_SIZE.toString().length}
+                                onBlur={onBlur}
+                                onChangeText={onChange}
+                                value={value.toString()}/>
+                            )}
+                        />
+                        {errors.maxCacheSize && (<Text style={AppStyle.error}>{errors.maxCacheSize.message}</Text>)}
+                        {/* Save Button */}
+                        {
+                            isLoading ?
+                            <View style={[AppStyle.formButton, {backgroundColor: Colors.white}]} >
+                                <ActivityIndicator size={32} color={Colors.backgroundColor} />
+                            </View> 
+                            :
+                            <Pressable onPress={handleSubmit(onSubmit)} style={[AppStyle.formButton, {backgroundColor: Colors.white}]} >
+                                <Text style={AppStyle.formButtonText} >Save</Text>
+                            </Pressable>
+                        }
+                    </View>
                 </View>
-
-                {/* Clear Cache */}
-                {
-                    isLoading ?
-                    <View style={[AppStyle.formButton, {backgroundColor: Colors.white}]} >
-                        <ActivityIndicator size={32} color={Colors.backgroundColor} />
-                    </View> 
-                    :
-                    <Pressable onPress={clearAppCache} style={[AppStyle.formButton, {backgroundColor: Colors.white}]} >
-                        <Text style={AppStyle.formButtonText} >Clear cache</Text>
-                    </Pressable>
-                }
-                <Text style={[AppStyle.textRegular, {color: Colors.neonRed}]}>* Restart Required</Text>
                 
-                {/* Cache Size */}
-                <Text style={AppStyle.inputHeaderText}>Max cache size (MB)</Text>
-                <Controller
-                    control={control}
-                    name="maxCacheSize"
-                    render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                        style={AppStyle.input}
-                        keyboardType='numeric'
-                        maxLength={AppConstants.FORM.SETTINGS.MAX_CACHE_SIZE.toString().length}
-                        onBlur={onBlur}
-                        onChangeText={onChange}
-                        value={value.toString()}/>
-                    )}
-                />
-                {errors.maxCacheSize && (<Text style={AppStyle.error}>{errors.maxCacheSize.message}</Text>)}
-
-
-                {/* Save Button */}
-                {
-                    isLoading ?
-                    <View style={[AppStyle.formButton, {backgroundColor: Colors.white}]} >
-                        <ActivityIndicator size={32} color={Colors.backgroundColor} />
-                    </View> 
-                    :
-                    <Pressable onPress={handleSubmit(onSubmit)} style={[AppStyle.formButton, {backgroundColor: Colors.white}]} >
-                        <Text style={AppStyle.formButtonText} >Save</Text>
-                    </Pressable>
-                }
-                
-                <View style={{width: '100%', height: 60}} />
+                <View style={{width: '100%', height: 52}} />
             </ScrollView>
         </KeyboardAvoidingView>
     )

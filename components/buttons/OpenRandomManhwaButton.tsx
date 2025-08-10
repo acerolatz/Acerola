@@ -14,19 +14,22 @@ interface RandomManhwaButtonProps {
     size?: number
     color?: string
     backgroundColor?: string
+    onPress?: () => any
 }
 
 
 const OpenRandomManhwaButton = ({
     size = 28, 
     color = Colors.white,
-    backgroundColor = Colors.backgroundColor
+    backgroundColor = Colors.backgroundColor,
+    onPress
 }: RandomManhwaButtonProps) => {
         
     const db = useSQLiteContext()    
     const [loading, setLoading] = useState(false)
 
     const openRandomManhwa = async () => {
+        onPress ? onPress() : null
         setLoading(true)
         const manhwa_id: number | null = await dbGetRandomManhwaId(db)
         if (manhwa_id === null) {
