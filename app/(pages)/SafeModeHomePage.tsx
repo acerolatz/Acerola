@@ -6,33 +6,33 @@ import Row from '@/components/util/Row'
 import AppLogo from '@/components/util/Logo'
 import Button from '@/components/buttons/Button'
 import { Colors } from '@/constants/Colors'
-import { hp, wp } from '@/helpers/util'
+import { formatTimestamp, hp, wp } from '@/helpers/util'
 import { AppConstants } from '@/constants/AppConstants'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useSQLiteContext } from 'expo-sqlite'
 import { Todo } from '@/helpers/types'
-import { dbCreateTodo, dbDeleteCompletedTodos, dbDeleteTodo, dbReadTodos, dbUpdateTodo } from '@/lib/database'
+import { dbCreateTodo, dbDeleteTodo, dbReadTodos, dbUpdateTodo } from '@/lib/database'
 import { TextInput } from 'react-native-gesture-handler'
 import Column from '@/components/util/Column'
 import Toast from 'react-native-toast-message'
 import CustomActivityIndicator from '@/components/util/CustomActivityIndicator'
 import { Keyboard } from 'react-native'
 import PageActivityIndicator from '@/components/util/PageActivityIndicator'
-import LateralMenu from '@/components/LateralMenu'
 import SafeModeLateralMenu from '@/components/SafeModeLateralMenu'
 
 
 const SCREEN_WIDTH = wp(100)
 const SCREEN_HEIGHT = hp(100)
-const PAGE_LIMIT = 30
 
 
 const CreateTodoComponent = ({setTodos}: {setTodos: React.Dispatch<React.SetStateAction<Todo[]>>}) => {
 
     const db = useSQLiteContext()
     const [text, setText] = useState('')
+    const [description, setDescription] = useState('')
     const [loading, setLoading] = useState(false)
     const inputRef = useRef<TextInput>(null)
+    const inputRef1 = useRef<TextInput>(null)    
 
     const create = async () => {
         Keyboard.dismiss()
@@ -41,12 +41,18 @@ const CreateTodoComponent = ({setTodos}: {setTodos: React.Dispatch<React.SetStat
             return
         }
         setLoading(true)
-            const newTodo: Todo | null = await dbCreateTodo(db, text.trim())
+            const newTodo: Todo | null = await dbCreateTodo(
+                db, 
+                text.trim(),
+                description.trim() !== '' ? description.trim() : null
+            )
             if (!newTodo) {
                 Toast.show({text1: "Error", text2: "Could not create todo", type: "error"})
             } else {
                 setText('')
+                setDescription('')
                 inputRef.current?.clear()
+                inputRef1.current?.clear()
                 setTodos(prev => [...[newTodo], ...prev])
             }
         setLoading(false)
@@ -54,23 +60,32 @@ const CreateTodoComponent = ({setTodos}: {setTodos: React.Dispatch<React.SetStat
 
     return (
         <Column style={{gap: 10}} >
-            <Row style={{gap: 10, justifyContent: "flex-start", width: '100%'}} >
-                <Ionicons name='add-outline' size={22} color={Colors.white}/>
+            <Column style={{gap: 10,  width: '100%'}} >
                 <TextInput
                     ref={inputRef}
                     placeholder='Enter tasks, ideas, notes...'
                     placeholderTextColor={Colors.white}
                     autoCapitalize='sentences'
-                    style={{color: Colors.white, width: '80%'}}
+                    style={{color: Colors.white, borderBottomWidth: 1, borderRadius: 4, borderColor: 'white'}}
                     onChangeText={setText}
                 />
-            </Row>
+                <TextInput
+                    ref={inputRef1}
+                    placeholder='description...'
+                    placeholderTextColor={Colors.white}
+                    textAlignVertical='top'
+                    multiline={true}
+                    autoCapitalize='sentences'
+                    style={{color: Colors.white, borderBottomWidth: 0, borderRadius: 4, borderColor: 'white', height: 80}}
+                    onChangeText={setDescription}
+                />
+            </Column>
             <Row>
                 {
                     loading ?
-                    <Pressable onPress={create} style={{flex: 1, height: 52, backgroundColor: Colors.yellow, borderRadius: AppConstants.COMMON.BORDER_RADIUS, alignItems: "center", justifyContent: "center", alignSelf: "flex-start"}} >
+                    <View style={{flex: 1, height: 52, backgroundColor: Colors.yellow, borderRadius: AppConstants.COMMON.BORDER_RADIUS, alignItems: "center", justifyContent: "center", alignSelf: "flex-start"}} >
                         <CustomActivityIndicator color={Colors.yellow} /> 
-                    </Pressable>
+                    </View>
                     :                    
                     <Pressable onPress={create} style={{flex: 1, height: 52, backgroundColor: Colors.yellow, borderRadius: AppConstants.COMMON.BORDER_RADIUS, alignItems: "center", justifyContent: "center", alignSelf: "flex-start"}} >
                         <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor}]} >Create</Text>
@@ -84,16 +99,21 @@ const CreateTodoComponent = ({setTodos}: {setTodos: React.Dispatch<React.SetStat
 
 const TodoComponent = ({todo, setTodos}: {todo: Todo, setTodos: React.Dispatch<React.SetStateAction<Todo[]>>}) => {
 
-    const db = useSQLiteContext()
+    const db = useSQLiteContext()    
     const [isCompleted, setIsCompleted] = useState(todo.completed === 1)
+    const [finishedAt, setFinishedAt] = useState<string | null>(todo.finished_at)
+    const backgroundColor = isCompleted ? Colors.ononokiGreen : Colors.yellow
+    const checkmarkBackgroundColor = isCompleted ? Colors.ononokiGreen : Colors.backgroundColor
 
     const clickCheckbox = async () => {
-        const newStatus = !isCompleted
-        const success = await dbUpdateTodo(db, todo.todo_id, todo.title, newStatus ? 1 : 0)
+        const newStatus: boolean = !isCompleted
+        const newFinishedAt: string | null = newStatus ? new Date().toISOString() : null
+        const success = await dbUpdateTodo(db, todo.todo_id, todo.title, todo.descr, newStatus ? 1 : 0)
         if (!success) {
             Toast.show({text1: "Error", text2: "Could not update to-do", type: "error"})
         } else {
             setIsCompleted(newStatus)
+            setFinishedAt(newFinishedAt)
         }
     }
 
@@ -103,27 +123,28 @@ const TodoComponent = ({todo, setTodos}: {todo: Todo, setTodos: React.Dispatch<R
     }
 
     return (
-        <Pressable onPress={clickCheckbox} style={{flexDirection: 'row', alignItems: "center", justifyContent: "flex-start", gap: 16, marginBottom: 20}} >
-            <View
-                style={{
-                    height: 22, 
-                    width: 22, 
-                    borderRadius: 22, 
-                    borderWidth: 1, 
-                    borderColor: Colors.yellow,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundColor: isCompleted ? Colors.yellow : Colors.backgroundColor
-            }} >
-                {isCompleted && <Ionicons name='checkmark' size={21} color={Colors.backgroundColor} />}
-            </View> 
-            {
-                isCompleted && 
-                <Pressable onPress={deleteTodo} hitSlop={AppConstants.COMMON.HIT_SLOP.NORMAL} >
-                    <Ionicons name='trash-outline' size={18} color={Colors.neonRed} />
-                </Pressable>
-            }
-            <Text style={[AppStyle.textRegular, {maxWidth: '80%'}]}>{todo.title} </Text>
+        <Pressable onPress={clickCheckbox} style={[styles.todoItem, {borderColor: backgroundColor}]} >
+            <Row style={{backgroundColor, width: '100%', paddingHorizontal: 10, paddingVertical: 8, justifyContent: "space-between"}} >
+                <Text style={[AppStyle.textHeader, {color: Colors.backgroundColor, maxWidth: '85%'}]}>{todo.title} </Text>
+                <View style={styles.checkBox} >
+                    <Ionicons name='checkmark' size={20} color={checkmarkBackgroundColor} />
+                </View>
+            </Row>
+            <Column style={{paddingHorizontal: 10, paddingVertical: 8}} >
+                {todo.descr && <Text style={AppStyle.textRegular}>{todo.descr} </Text>}
+                <Row style={{justifyContent: "space-between"}} >
+                    <View>
+                        <Text style={[AppStyle.textRegular, {fontSize: 14}]}>Created at: {formatTimestamp(todo.created_at)}</Text>
+                        {finishedAt && <Text style={[AppStyle.textRegular, {fontSize: 14}]}>Finished at: {formatTimestamp(finishedAt)}</Text>}
+                    </View>
+                    {
+                        isCompleted &&
+                        <Pressable onPress={deleteTodo} hitSlop={AppConstants.COMMON.HIT_SLOP.NORMAL} >
+                            <Ionicons name='trash' size={20} color={Colors.neonRed} />
+                        </Pressable>
+                    }
+                </Row>
+            </Column>
         </Pressable>
     )
 }
@@ -189,7 +210,7 @@ const SafeModeHomePage = () => {
         return (
             <SafeAreaView style={AppStyle.safeArea} >
                 <Row style={{width: '100%', paddingRight: 2, marginTop: 4, marginBottom: 10, justifyContent: "space-between"}} >
-                    <AppLogo name='To do' />
+                    <AppLogo name='To do List' />
                     <Button 
                         iconName='options-outline' 
                         iconSize={22} 
@@ -209,7 +230,7 @@ const SafeModeHomePage = () => {
     return (
         <SafeAreaView style={AppStyle.safeArea} >
             <Row style={{width: '100%', paddingRight: 2, marginTop: 4, marginBottom: 10, justifyContent: "space-between"}} >
-                <AppLogo name='To do' />
+                <AppLogo name='To do List' />
                 <Button 
                     iconName='options-outline' 
                     onPress={toggleMenu}
@@ -265,5 +286,18 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.yellow,
         alignItems: "center",
         justifyContent: "center"
+    },
+    todoItem: {
+        width: '100%',
+        borderWidth: 1,
+        borderRadius: 4,
+        marginBottom: 20
+    },
+    checkBox: {
+        backgroundColor: Colors.backgroundColor, 
+        borderRadius: 20, 
+        alignItems: "center", 
+        justifyContent: "center", 
+        padding: 4
     }
 })

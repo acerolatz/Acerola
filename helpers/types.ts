@@ -29,17 +29,15 @@ export type ManhwaAuthor = {
 export type Manhwa = {
     manhwa_id: number
     title: string
+    views: number
     descr: string
     cover_image_url: string
     status: "OnGoing" | "Completed"
+    updated_at: string
     color: string
-    views: number
-    daily_views: number
-    rate: number
+    chapters: Chapter[]
     genres: Genre[]
     authors: ManhwaAuthor[]
-    chapters: Chapter[]
-    updated_at: string
     alt_titles: string[]
 }
 
@@ -105,6 +103,8 @@ export type UserHistory = {
 export type Todo = {
     todo_id: number
     title: string
+    descr: string | null
     completed: number
     created_at: string
+    finished_at: string | null
 }

@@ -106,8 +106,10 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       CREATE TABLE IF NOT EXISTS todos (
         todo_id INTEGER NOT NULL PRIMARY KEY,
         title TEXT NOT NULL,
+        descr TEXT,
         completed INTEGER NOT NULL DEFAULT 0 CHECK (completed IN (0, 1)),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        finished_at TIMESTAMP DEFAULT NULL
       );
 
       CREATE INDEX IF NOT EXISTS idx_ma_manhwa_id ON manhwa_authors(manhwa_id);
@@ -117,7 +119,7 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       CREATE INDEX IF NOT EXISTS idx_reading_status_manhwa_id_status ON reading_status (manhwa_id, status);
       CREATE INDEX IF NOT EXISTS idx_reading_history_readed_at ON reading_history(manhwa_id, readed_at DESC);
       CREATE INDEX IF NOT EXISTS idx_alt_titles ON alt_titles(title, manhwa_id);
-      
+            
       CREATE INDEX IF NOT EXISTS idx_manhwas_views ON manhwas(views DESC);
       CREATE INDEX IF NOT EXISTS idx_manhwas_updated_at ON manhwas(updated_at DESC);
 
@@ -1412,18 +1414,19 @@ export async function dbReadTodoById(db: SQLite.SQLiteDatabase, todo_id: number)
   return r ? r : null
 }
 
-export async function dbCreateTodo(db: SQLite.SQLiteDatabase, title: string): Promise<Todo | null> {
+export async function dbCreateTodo(db: SQLite.SQLiteDatabase, title: string, descr: string | null = null): Promise<Todo | null> {
   const r = await db.getFirstAsync<{todo_id: number}>(
     `
       INSERT INTO todos (
-        title
+        title,
+        descr
       )
       VALUES 
-        (?)
+        (?, ?)
       RETURNING
         todo_id;
     `,
-    [title]
+    [title, descr]
   ).catch(error => console.log("error dbCreateTodo", error))
   
   if (r?.todo_id) {
@@ -1439,18 +1442,26 @@ export async function dbDeleteCompletedTodos(db: SQLite.SQLiteDatabase) {
   ).catch(error => console.log("error dbDeleteCompletedTodos", error))
 }
 
-export async function dbUpdateTodo(db: SQLite.SQLiteDatabase, todo_id: number, title: string, completed: number): Promise<boolean> {
+export async function dbUpdateTodo(
+  db: SQLite.SQLiteDatabase, 
+  todo_id: number, 
+  title: string, 
+  descr: string | null,
+  completed: number,
+): Promise<boolean> {
   const r = await db.runAsync(
     `
       UPDATE 
         todos 
       SET
         title = ?,
-        completed = ?        
+        descr = ?,
+        completed = ?,
+        finished_at = ?
       WHERE
         todo_id = ?;
     `,
-    [title, completed, todo_id]
+    [title, descr, completed, completed === 1 ? 'CURRENT_TIMESTAMP' : null, todo_id]
   ).catch(error => {console.log("error dbUpdateTodo", error); return false})
   return r !== false
 }

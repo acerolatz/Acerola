@@ -102,6 +102,7 @@ const ManhwaChapterGrid = ({
 }: ManhwaChapterGridProps) => {
   
   const db = useSQLiteContext()
+  const manhwa_id = manhwa.manhwa_id
   const { chapters, setChapters, setCurrentChapterIndex } = useChapterState()
 
   const [loading, setLoading] = useState(false)
@@ -115,9 +116,8 @@ const ManhwaChapterGrid = ({
       let isCancelled = false
 
       async function init() {
-        if (!manhwa) { return }
         setLoading(true)
-          const c = await spFetchChapterList(manhwa.manhwa_id)
+          const c = await spFetchChapterList(manhwa_id)
           if (isCancelled) { return }
           setChapters(c)
         setLoading(false)
@@ -126,17 +126,17 @@ const ManhwaChapterGrid = ({
       init()
       return () => { isCancelled = true }
     },
-    [db]
+    [manhwa_id]
   )
 
   useFocusEffect(
     useCallback(() => {
       const reload = async () => {
-        const r = await dbGetManhwaReadChapters(db, manhwa.manhwa_id)
+        const r = await dbGetManhwaReadChapters(db, manhwa_id)
         setChaptersReadSet(r)
       }
       reload()      
-    }, [db, manhwa])
+    }, [db, manhwa_id])
   )
   
   const readFirst = () => {
@@ -171,7 +171,7 @@ const ManhwaChapterGrid = ({
         manhwaTitle: manhwa.title
       }
     })
-  }, [manhwa.manhwa_id])
+  }, [manhwa_id])
 
   const moveToNextChapterPage = () => {
     setCurrentPage(prev => prev > maxChapterPageNum - 1 ? 0 : prev + 1)
@@ -194,39 +194,39 @@ const ManhwaChapterGrid = ({
   }
 
   return (    
-        <View style={styles.container} >
-            <Row style={{gap: 6}} >
-              <Pressable onPress={readFirst} style={[styles.button, {backgroundColor: manhwa.color}]}>
-                <Text style={[AppStyle.textRegular, {color: textColor}]}>Read First</Text>
-              </Pressable>
-              <Pressable onPress={readLast} style={[styles.button, {backgroundColor: manhwa.color}]}>
-                <Text style={[AppStyle.textRegular, {color: textColor}]}>Read Last</Text>
-              </Pressable>
-            </Row>
-            
-            <ChapterPageSelector
-              currentPage={currentPage}
-              numChapters={chapters.length}
-              manhwaColor={manhwa.color}
-              textColor={textColor}              
-              moveToNextChapterPage={moveToNextChapterPage}
-              moveToPreviousChapterPage={moveToPreviousChapterPage}
-            />
+    <View style={styles.container} >
+      <Row style={{gap: 6}} >
+        <Pressable onPress={readFirst} style={[styles.button, {backgroundColor: manhwa.color}]}>
+          <Text style={[AppStyle.textRegular, {color: textColor}]}>Read First</Text>
+        </Pressable>
+        <Pressable onPress={readLast} style={[styles.button, {backgroundColor: manhwa.color}]}>
+          <Text style={[AppStyle.textRegular, {color: textColor}]}>Read Last</Text>
+        </Pressable>
+      </Row>
+      
+      <ChapterPageSelector
+        currentPage={currentPage}
+        numChapters={chapters.length}
+        manhwaColor={manhwa.color}
+        textColor={textColor}              
+        moveToNextChapterPage={moveToNextChapterPage}
+        moveToPreviousChapterPage={moveToPreviousChapterPage}
+      />
 
-            <View style={styles.chapterGrid}>
-              {
-                chapters.slice(currentPage * PAGE_LIMIT, (currentPage + 1) * PAGE_LIMIT).map(( item, index ) => 
-                  <ChapterItem
-                    index={currentPage * PAGE_LIMIT + index}
-                    onPress={readChapter}
-                    key={item.chapter_id}
-                    chapterName={item.chapter_name}
-                    isReaded={chaptersReadSet.has(item.chapter_id)}
-                  />
-                )
-              }
-            </View>
-        </View>
+      <View style={styles.chapterGrid}>
+        {
+          chapters.slice(currentPage * PAGE_LIMIT, (currentPage + 1) * PAGE_LIMIT).map(( item, index ) => 
+            <ChapterItem
+              index={currentPage * PAGE_LIMIT + index}
+              onPress={readChapter}
+              key={item.chapter_id}
+              chapterName={item.chapter_name}
+              isReaded={chaptersReadSet.has(item.chapter_id)}
+            />
+          )
+        }
+      </View>
+    </View>
   )
 }
 
@@ -249,10 +249,11 @@ const styles = StyleSheet.create({
     justifyContent: "center"    
   },
   chapterGrid: {
-    flex: 1, 
+    width: wp(94),
+    left: wp(1),
     alignItems: "center", 
     justifyContent: "flex-start",
-    gap: 6, 
+    gap: 6,
     flexDirection: 'row', 
     flexWrap: 'wrap'
   },

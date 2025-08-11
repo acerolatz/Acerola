@@ -98,5 +98,5 @@ const styles = StyleSheet.create({
         height: 52,
         borderRadius: AppConstants.COMMON.BORDER_RADIUS,
         borderWidth: 0
-    }
+    }    
 })
