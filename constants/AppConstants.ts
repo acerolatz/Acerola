@@ -36,6 +36,7 @@ export const AppConstants = {
         APP_NAME: "Acerola",
         DEBUG_MODE: false,
         BORDER_RADIUS: 4,
+        MARGIN: 6,
         MANHWA_COVER_DIMENSION: {
             WIDTH: 300,
             HEIGHT: 440

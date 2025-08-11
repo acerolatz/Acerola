@@ -2,7 +2,7 @@ import { AppConstants } from '@/constants/AppConstants';
 import { Colors } from '@/constants/Colors';
 import { ToastMessages } from '@/constants/Messages';
 import { clearCache, formatBytes, hasOnlyDigits } from '@/helpers/util';
-import { dbCreateSafeModePassword, dbGetCacheMaxSize, dbIsSafeModeEnabled, dbSetCacheSize, dbSetSafeModeState } from '@/lib/database';
+import { dbCreateSafeModePassword, dbSetCacheSize, dbSetSafeModeState } from '@/lib/database';
 import { AppStyle } from '@/styles/AppStyle';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -71,9 +71,7 @@ const SettingsForm = ({currentMaxCacheSize, currentCacheSize, safeModePassword, 
         if (
             form_data.maxCacheSize < AppConstants.FORM.SETTINGS.MIN_CACHE_SIZE ||
             form_data.maxCacheSize > AppConstants.FORM.SETTINGS.MAX_CACHE_SIZE
-        ) {
-            return
-        }
+        ) { return }
         setLoading(true)
             await dbSetCacheSize(db, form_data.maxCacheSize * 1024 * 1024)
             Toast.show(ToastMessages.EN.GENERIC_SUCCESS)
@@ -90,7 +88,6 @@ const SettingsForm = ({currentMaxCacheSize, currentCacheSize, safeModePassword, 
         return p.trim().length >= 4 && hasOnlyDigits(p)
     }
 
-
     const submitPassword = async () => {
         Keyboard.dismiss()
         setLoadingSafeModeConfig(true)
@@ -98,7 +95,12 @@ const SettingsForm = ({currentMaxCacheSize, currentCacheSize, safeModePassword, 
             const check2 = isValidPassword(confirmPassword)
             const check3 = currentSafeModePassword.trim() === confirmPassword.trim()
             if (!(check1 && check2 && check3)) {
-                Toast.show({text1: "Invalid Password", text2: "Min 4 characters and passwords must match", type: 'error', visibilityTime: 3500})
+                Toast.show({
+                    text1: "Invalid Password", 
+                    text2: "Min 4 characters and passwords must match", 
+                    type: 'error', 
+                    visibilityTime: 3500
+                })
                 setLoadingSafeModeConfig(false)
                 return
             } 
@@ -117,7 +119,7 @@ const SettingsForm = ({currentMaxCacheSize, currentCacheSize, safeModePassword, 
 
     return (
         <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
-            <ScrollView style={{flex: 1}} keyboardShouldPersistTaps='always' >
+            <ScrollView style={{flex: 1}} keyboardShouldPersistTaps='always' showsVerticalScrollIndicator={false} >
                 <View style={{gap: 20}} >
 
                     <View>
@@ -132,7 +134,6 @@ const SettingsForm = ({currentMaxCacheSize, currentCacheSize, safeModePassword, 
                         <TextInput
                             style={AppStyle.input}
                             keyboardType='numeric'
-                            maxLength={8}
                             onChangeText={setCurrentSafeModePassword}
                             value={currentSafeModePassword.toString()}/>
 
@@ -140,7 +141,6 @@ const SettingsForm = ({currentMaxCacheSize, currentCacheSize, safeModePassword, 
                         <TextInput
                             style={AppStyle.input}
                             keyboardType='numeric'
-                            maxLength={8}
                             onChangeText={setConfirmPassword}
                             value={confirmPassword.toString()}/>
 

@@ -1,4 +1,5 @@
 import { AppConstants } from '@/constants/AppConstants';
+import { Colors } from '@/constants/Colors';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Pressable, StyleSheet } from 'react-native';
@@ -6,13 +7,18 @@ import { Animated, Pressable, StyleSheet } from 'react-native';
 
 interface BooleanRotatingButtonProps {
     onPress: () => any
-    iconSize: number
-    iconColor: string
+    iconSize?: number
+    iconColor?: string
     iconName?: string
 }
 
 
-const BooleanRotatingButton = ({onPress, iconSize, iconColor, iconName = 'sync'}: BooleanRotatingButtonProps) => {
+const BooleanRotatingButton = ({
+    onPress, 
+    iconSize = AppConstants.COMMON.BUTTON.SIZE, 
+    iconColor = Colors.white, 
+    iconName = 'sync'
+}: BooleanRotatingButtonProps) => {
     const [isRotating, setIsRotating] = useState(false)
     const rotateValue = new Animated.Value(0);
 

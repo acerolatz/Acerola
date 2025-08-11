@@ -90,10 +90,10 @@ const Donate = () => {
               <>
                 {
                   userHistory &&
-                  <View style={{ marginBottom: 10, gap: 10}} >
+                  <View style={{ marginBottom: AppConstants.COMMON.MARGIN, gap: AppConstants.COMMON.MARGIN}} >
                       <Text style={[AppStyle.textHeader, {color: Colors.donateColor, fontSize: 20}]}>Activity history</Text>
                       <ScrollView style={{width: '100%'}} showsHorizontalScrollIndicator={false} horizontal={true} >
-                        <Row style={{gap: 10, height: 52}} >
+                        <Row style={{gap: AppConstants.COMMON.MARGIN}} >
                             <View style={styles.item} >
                               <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor, textAlign: "center"}]} >{formatNumberWithSuffix(userHistory.images)} images</Text>
                             </View>
@@ -111,7 +111,7 @@ const Donate = () => {
                   donateImageUrl && 
                   <Image 
                     source={donateImageUrl} 
-                    style={{width: WIDTH, height: HEIGHT, marginBottom: 10, alignSelf: "center", borderRadius: AppConstants.COMMON.BORDER_RADIUS}} 
+                    style={{width: WIDTH, height: HEIGHT, marginBottom: AppConstants.COMMON.MARGIN, alignSelf: "center", borderRadius: AppConstants.COMMON.BORDER_RADIUS}} 
                     contentFit='cover' />
                 }
               </>
@@ -129,10 +129,9 @@ const styles = StyleSheet.create({
   donateButton: {
     maxWidth: '100%', 
     padding: 10, 
-    borderRadius: 4, 
+    borderRadius: AppConstants.COMMON.BORDER_RADIUS, 
     backgroundColor: Colors.donateColor, 
-    marginBottom: 20,
-    gap: 10
+    marginBottom: AppConstants.COMMON.MARGIN,
   },
   donateTitleContainer: {
     width: "100%", 
@@ -142,8 +141,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between"
   },
   item: {
-    flex: 1,
-    width: wp(31),
+    paddingHorizontal: 20,
     height: 52,
     borderRadius: AppConstants.COMMON.BORDER_RADIUS,
     backgroundColor: Colors.donateColor,

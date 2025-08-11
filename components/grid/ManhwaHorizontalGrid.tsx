@@ -38,7 +38,7 @@ const ManhwaHorizontalGrid = ({
                     drawDistance={wp(140)}
                     showsHorizontalScrollIndicator={false}
                     keyExtractor={(item: Manhwa) => item.manhwa_id.toString()}
-                    renderItem={({item}) => <ManhwaCard marginRight={6} manhwa={item}/>}
+                    renderItem={({item}) => <ManhwaCard manhwa={item}/>}
                 />
             </View>
         </View>

@@ -41,7 +41,7 @@ export const Colors = {
   scansColor: "#4682A9",
   chatColor: "#E14434",
   releasesColor: "#F24E4E",
-  newsColor: "#F3E9DC",
+  newsColor: "#F5DEB3",
   redditColor: "#FF4500",
   documentsColor: "#FF3366",
   backgroundSecondary: "#0b0d0fff",

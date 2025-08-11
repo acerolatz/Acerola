@@ -8,37 +8,34 @@ import ManhwaChapterGrid from '@/components/grid/ManhwaChapterGrid';
 import ManhwaAuthorInfo from '@/components/ManhwaAuthorInfo';
 import ManhwaGenreInfo from '@/components/ManhwaGenreInfo';
 import PageActivityIndicator from '@/components/util/PageActivityIndicator';
-import { AppConstants } from '@/constants/AppConstants';
 import { Colors } from '@/constants/Colors';
 import { ToastMessages } from '@/constants/Messages';
-import { DonateMethod, Manhwa } from '@/helpers/types';
+import { Manhwa } from '@/helpers/types';
 import { formatTimestamp, hp, wp } from '@/helpers/util';
 import { dbGetManhwaAltNames, dbReadManhwaById, dbUpdateManhwaViews } from '@/lib/database';
-import { spGetDonationMethods, spUpdateManhwaViews } from '@/lib/supabase';
+import { spUpdateManhwaViews } from '@/lib/supabase';
 import { AppStyle } from '@/styles/AppStyle';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
-import BottomSheet, { BottomSheetFlatList, BottomSheetView } from '@gorhom/bottom-sheet';
 import React, {
     useEffect,
-    useMemo,
-    useRef,
     useState
 } from 'react';
-import {
-  Pressable,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View
+import {  
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { formatNumberWithSuffix } from '../../helpers/util';
 import Row from '@/components/util/Row';
 import ManhwaIdComponent from '@/components/ManhwaIdComponent';
+import Footer from '@/components/util/Footer';
+import { AppConstants } from '@/constants/AppConstants';
 
 
 interface ItemProps {
@@ -135,12 +132,12 @@ const ManhwaPage = () => {
           </View>
 
           {/* Title, Summary and Last Update */}
-          <View style={{alignSelf: "flex-start", gap: 8}} >
+          <View style={{alignSelf: "flex-start", gap: 10, marginBottom: 10}} >
             <Text style={AppStyle.textMangaTitle}>{manhwa!.title}</Text>
             <ManhwaAlternativeNames names={altNames} />
             <Text style={AppStyle.textRegular}>{manhwa.descr}</Text>
+            <Text style={[AppStyle.textRegular, {alignSelf: "flex-start"}]}>Last update: {formatTimestamp(manhwa.updated_at)}</Text>
           </View>
-          <Text style={[AppStyle.textRegular, {alignSelf: "flex-start"}]}>Last update: {formatTimestamp(manhwa.updated_at)}</Text>
           
           {/* Genre and Authors Info */}
           <ManhwaAuthorInfo manhwa={manhwa} />
@@ -152,13 +149,15 @@ const ManhwaPage = () => {
             backgroundColor={manhwa.color} />
 
           {/* Status (OnGoing or Completed) and Num Views */}
-          <Row style={{gap: 10}} >
+          <Row style={{gap: AppConstants.COMMON.MARGIN}} >
             <Item text={manhwa.status} textColor={Colors.backgroundColor} backgroundColor={manhwa.color} />
             <Item text={`Views: ${formatNumberWithSuffix(manhwa.views + 1)}`} textColor={Colors.backgroundColor} backgroundColor={manhwa.color} />
           </Row>
 
           {/* Chapter Grid */}
           <ManhwaChapterGrid manhwa={manhwa} />
+
+          <Footer/>
         </View>          
       </ScrollView>
     </SafeAreaView>
@@ -182,7 +181,7 @@ const styles = StyleSheet.create({
   },
   item: {
     height: 52,
-    borderRadius: 4,
+    borderRadius: AppConstants.COMMON.BORDER_RADIUS,
     alignItems: "center",
     justifyContent: "center",
     flex: 1
@@ -197,16 +196,15 @@ const styles = StyleSheet.create({
   },
   manhwaContainer: {
     width: '100%', 
-    gap: 10, 
+    gap: AppConstants.COMMON.MARGIN, 
     alignItems: "center", 
-    paddingHorizontal: wp(4), 
-    paddingBottom: hp(8)
+    paddingHorizontal: wp(4)    
   },
   image: {
     width: '100%',
     maxWidth: wp(92),
     height: 520, 
-    borderRadius: 4
+    borderRadius: AppConstants.COMMON.BORDER_RADIUS
   },
   bottomSheetContainer: {
     flex: 1,

@@ -7,6 +7,7 @@ import React from 'react'
 import { FlatList, View } from 'react-native'
 import ManhwaCard from '../ManhwaCard'
 import CustomActivityIndicator from '../util/CustomActivityIndicator'
+import Footer from '../util/Footer'
 
 
 interface MangaGridProps {
@@ -72,7 +73,7 @@ const ManhwaGrid = ({
                 </View> 
             )
         }
-        return <View style={{height: 60}} />
+        return <Footer/>
     }
 
     if (listMode == "FlashList") {

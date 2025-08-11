@@ -87,7 +87,7 @@ export const AppStyle = StyleSheet.create({
         paddingHorizontal: 10,
         paddingVertical: 12,
         backgroundColor: Colors.gray,
-        marginRight: 8,
+        marginRight: AppConstants.COMMON.MARGIN,
         borderRadius: 4,
         alignItems: "center",
         justifyContent: "center"

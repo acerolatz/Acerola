@@ -63,6 +63,6 @@ export default RandomManhwaButton
 
 const styles = StyleSheet.create({
     container: {
-        borderRadius: 4
+        borderRadius: AppConstants.COMMON.BORDER_RADIUS
     }
 })

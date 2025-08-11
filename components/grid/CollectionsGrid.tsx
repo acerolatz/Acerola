@@ -7,6 +7,7 @@ import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 import ViewAllButton from '../buttons/ViewAllButton'
 import Title from '../Title'
 import Row from '../util/Row'
+import { AppConstants } from '@/constants/AppConstants'
 
 
 
@@ -72,6 +73,6 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         borderRadius: 4,
         backgroundColor: Colors.yellow,
-        marginRight: 10
+        marginRight: AppConstants.COMMON.MARGIN
     }
 })

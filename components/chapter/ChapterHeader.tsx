@@ -3,14 +3,12 @@ import { wp } from '@/helpers/util'
 import { Image } from 'expo-image'
 import { router } from 'expo-router'
 import React from 'react'
-import { Pressable, StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import TopBar from '../TopBar'
 import BugReportButton from '../buttons/BugReportButton'
 import ReturnButton from '../buttons/ReturnButton'
 import Row from '../util/Row'
 import ChangeChapter from './ChangeChapter'
-import Ionicons from '@expo/vector-icons/Ionicons'
-import { Colors } from '@/constants/Colors'
 
 
 interface ChapterHeaderProps {

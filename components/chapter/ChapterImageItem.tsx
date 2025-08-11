@@ -2,9 +2,8 @@
 import { AppConstants } from '@/constants/AppConstants';
 import { ChapterImage } from '@/helpers/types';
 import { wp } from '@/helpers/util';
-import { dbAddNumericInfo } from '@/lib/database';
 import { Image } from 'expo-image';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { PixelRatio, View } from 'react-native';
 
 

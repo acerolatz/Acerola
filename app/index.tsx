@@ -1,9 +1,14 @@
-import AppLogo from '@/components/util/Logo';
 import PageActivityIndicator from '@/components/util/PageActivityIndicator';
-import Row from '@/components/util/Row';
 import { ToastMessages } from '@/constants/Messages';
 import { clearCache } from '@/helpers/util';
-import { dbFirstRun, dbIsSafeModeEnabled, dbReadInfo, dbSetLastRefresh, dbShouldClearCache, dbShouldUpdate, dbUpdateDatabase } from '@/lib/database';
+import { 
+    dbFirstRun, 
+    dbIsSafeModeEnabled, 
+    dbSetLastRefresh, 
+    dbShouldClearCache, 
+    dbShouldUpdate, 
+    dbUpdateDatabase 
+} from '@/lib/database';
 import { AppStyle } from '@/styles/AppStyle';
 import {
     LeagueSpartan_200ExtraLight,
@@ -11,12 +16,11 @@ import {
     LeagueSpartan_600SemiBold,
     useFonts
 } from '@expo-google-fonts/league-spartan';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
 import { router } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import React, { useEffect } from 'react';
-import { SafeAreaView, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 
@@ -33,7 +37,6 @@ const App = () => {
     useEffect(
         () => {
             async function init() {
-                
                 if (await dbShouldClearCache(db)) {
                     await clearCache()
                 }
@@ -52,18 +55,15 @@ const App = () => {
                     await dbSetLastRefresh(db, 'client')
                     const n = await dbUpdateDatabase(db)
                     n > 0 ?
-                        Toast.show({ text1: "Sync completed", type: "info" }) :
-                        Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED)
-                }
+                        Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED) :
+                        Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED1)
+                }                
 
-                const safeModeEnabled = await dbIsSafeModeEnabled(db)
-
-                if (safeModeEnabled) {
+                if (await dbIsSafeModeEnabled(db)) {
                     router.replace("/(pages)/SafeModeHomePage")
                 } else {
                     router.replace("/(pages)/HomePage")
                 }
-
             }
             init()
         },
@@ -84,12 +84,3 @@ const App = () => {
 }
 
 export default App
-
-const styles = StyleSheet.create({
-    container: {
-        paddingRight: 2, 
-        marginTop: 10, 
-        marginBottom: 10, 
-        justifyContent: "space-between"
-    }
-})

@@ -6,6 +6,7 @@ import { AppStyle } from '@/styles/AppStyle'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { Colors } from '@/constants/Colors'
 import { copyToClipboard, openUrl } from '@/helpers/util'
+import { AppConstants } from '@/constants/AppConstants'
 
 
 const DonateComponent = ({item}: {item: DonateMethod}) => {  
@@ -41,18 +42,17 @@ export default DonateComponent
 
 const styles = StyleSheet.create({
   donateButton: {
-      maxWidth: '100%', 
-      padding: 10, 
-      borderRadius: 4, 
-      backgroundColor: Colors.donateColor, 
-      marginBottom: 10,
-      gap: 10
+    maxWidth: '100%', 
+    padding: 10,
+    borderRadius: AppConstants.COMMON.BORDER_RADIUS, 
+    backgroundColor: Colors.donateColor, 
+    marginBottom: AppConstants.COMMON.MARGIN      
   },
   donateTitleContainer: {
-      width: "100%", 
-      flexDirection: 'row', 
-      alignItems: "center", 
-      gap: 10, 
-      justifyContent: "space-between"
+    width: "100%", 
+    flexDirection: 'row', 
+    alignItems: "center", 
+    gap: 10, 
+    justifyContent: "space-between"
   }
 })

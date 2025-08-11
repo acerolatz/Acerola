@@ -19,7 +19,7 @@ const Item = ({item} : {item: Manhwa}) => {
     }, [item.manhwa_id]);
 
     return (
-        <Pressable onPress={onPress} style={{marginRight: 4}} >
+        <Pressable onPress={onPress} style={{marginRight: AppConstants.COMMON.MARGIN}} >
             <Image 
                 style={styles.image} 
                 contentFit='cover' 
@@ -62,7 +62,7 @@ export default ContinueReadingGrid
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        gap: 10        
+        gap: 10
     },
     image: {
         width: 80, 

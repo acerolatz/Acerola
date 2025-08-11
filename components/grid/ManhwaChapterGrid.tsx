@@ -10,8 +10,13 @@ import { useCallback, useEffect, useState } from "react"
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native"
 import CButton from "../buttons/CButton"
 import Row from "../util/Row"
-import { getChapterGridNumColumns, getItemGridDimensions, wp } from "@/helpers/util"
 import { AppConstants } from "@/constants/AppConstants"
+import { getChapterGridNumColumns, wp } from "@/helpers/util"
+
+
+const PAGE_LIMIT = 96
+const NUM_COLUMNS = getChapterGridNumColumns()
+const ITEM_SIZE = (wp(92) - AppConstants.COMMON.MARGIN * (NUM_COLUMNS - 1)) / NUM_COLUMNS
 
 
 interface ChapterItemProps {
@@ -59,22 +64,22 @@ const ChapterPageSelector = ({
   numChapters
 }: ChapterPageSelectorProps) => {
   return (
-    <View style={{width: '100%', gap: 10, flexDirection: 'row'}} >
-      <View style={{flex: 1, alignItems: "center", justifyContent: "center", height: 52, borderRadius: 4, backgroundColor: manhwaColor}} >
+    <View style={{width: '100%', gap: AppConstants.COMMON.MARGIN, flexDirection: 'row'}} >
+      <View style={{flex: 1, alignItems: "center", justifyContent: "center", height: 52, borderRadius: AppConstants.COMMON.BORDER_RADIUS, backgroundColor: manhwaColor}} >
           <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor}]} >Chapters: {numChapters}</Text>
       </View>
-      <View style={{flex: 1, gap: 10, flexDirection: 'row'}} >
+      <View style={{flex: 1, gap: AppConstants.COMMON.MARGIN, flexDirection: 'row'}} >
         <CButton 
-          style={{flex: 1, height: 52, borderRadius: 4, backgroundColor: manhwaColor}} 
+          style={{flex: 1, height: 52, borderRadius: AppConstants.COMMON.BORDER_RADIUS, backgroundColor: manhwaColor}} 
           iconColor={textColor}
           iconName="chevron-back-outline"
           onPress={moveToPreviousChapterPage}
         />
-        <View style={{flex: 1, alignItems: "center", justifyContent: "center", height: 52, borderRadius: 4, borderWidth: 1, borderColor: manhwaColor}}>
+        <View style={{flex: 1, alignItems: "center", justifyContent: "center", height: 52, borderRadius: AppConstants.COMMON.BORDER_RADIUS, borderWidth: 1, borderColor: manhwaColor}}>
           <Text style={[AppStyle.textRegular, {color: manhwaColor}]}>{currentPage + 1}</Text>
         </View>
         <CButton 
-          style={{flex: 1, height: 52, borderRadius: 4, backgroundColor: manhwaColor}} 
+          style={{flex: 1, height: 52, borderRadius: AppConstants.COMMON.BORDER_RADIUS, backgroundColor: manhwaColor}} 
           iconColor={textColor}
           iconName="chevron-forward-outline"
           onPress={moveToNextChapterPage}
@@ -90,15 +95,6 @@ interface ManhwaChapterGridProps {
   textColor?: string
 }
 
-
-const PAGE_LIMIT = 96
-const { width, height } = getItemGridDimensions(
-  wp(4), 
-  10, 
-  getChapterGridNumColumns(), 
-  42,
-  42
-)
 
 const ManhwaChapterGrid = ({  
   manhwa,
@@ -199,7 +195,7 @@ const ManhwaChapterGrid = ({
 
   return (    
         <View style={styles.container} >
-            <Row style={{gap: 10}} >
+            <Row style={{gap: 6}} >
               <Pressable onPress={readFirst} style={[styles.button, {backgroundColor: manhwa.color}]}>
                 <Text style={[AppStyle.textRegular, {color: textColor}]}>Read First</Text>
               </Pressable>
@@ -239,15 +235,15 @@ export default ManhwaChapterGrid;
 const styles = StyleSheet.create({
   container: {
     width: '100%', 
-    gap: 10, 
+    gap: 6, 
     flexWrap: 'wrap', 
     flexDirection: 'row', 
     alignItems: "center", 
     justifyContent: "center"
   },
   chapterItem: {    
-    width, 
-    height, 
+    width: ITEM_SIZE, 
+    height: ITEM_SIZE, 
     borderRadius: AppConstants.COMMON.BORDER_RADIUS, 
     alignItems: "center", 
     justifyContent: "center"    
@@ -255,8 +251,8 @@ const styles = StyleSheet.create({
   chapterGrid: {
     flex: 1, 
     alignItems: "center", 
-    justifyContent: "flex-start", 
-    gap: 10, 
+    justifyContent: "flex-start",
+    gap: 6, 
     flexDirection: 'row', 
     flexWrap: 'wrap'
   },

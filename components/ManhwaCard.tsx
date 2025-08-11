@@ -36,7 +36,7 @@ const ManhwaCard = ({
     styleProp,
     width = AppConstants.COMMON.MANHWA_COVER_DIMENSION.WIDTH,
     height = AppConstants.COMMON.MANHWA_COVER_DIMENSION.HEIGHT,
-    marginRight = 10,
+    marginRight = AppConstants.COMMON.MARGIN,
     marginBottom = 0,
     showChaptersPreview = true,
     shouldShowChapterDate = true,

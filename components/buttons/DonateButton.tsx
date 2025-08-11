@@ -2,7 +2,6 @@ import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
 import { AppStyle } from '@/styles/AppStyle'
 import Ionicons from '@expo/vector-icons/Ionicons'
-import { router } from 'expo-router'
 import React from 'react'
 import { Pressable } from 'react-native'
 

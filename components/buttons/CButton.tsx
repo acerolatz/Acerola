@@ -1,6 +1,7 @@
+import { AppConstants } from '@/constants/AppConstants'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import React, { useState } from 'react'
-import { ActivityIndicator, Pressable, StyleSheet, View, ViewStyle } from 'react-native'
+import { ActivityIndicator, Pressable, View, ViewStyle } from 'react-native'
 
 
 interface CButtonProps {
@@ -11,7 +12,13 @@ interface CButtonProps {
     onPress: () => any
 }
 
-const CButton = ({iconName, iconColor, style, onPress, iconSize = 28}: CButtonProps) => {
+const CButton = ({
+    iconName, 
+    iconColor, 
+    style, 
+    onPress, 
+    iconSize = AppConstants.COMMON.BUTTON.SIZE
+}: CButtonProps) => {
 
     const [loading, setLoading] = useState(false)
 
@@ -37,5 +44,3 @@ const CButton = ({iconName, iconColor, style, onPress, iconSize = 28}: CButtonPr
 }
 
 export default CButton
-
-const styles = StyleSheet.create({})

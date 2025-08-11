@@ -1,6 +1,7 @@
 import ReturnButton from '@/components/buttons/ReturnButton'
 import TopBar from '@/components/TopBar'
 import Column from '@/components/util/Column'
+import Footer from '@/components/util/Footer'
 import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
 import { ToastMessages } from '@/constants/Messages'
@@ -56,22 +57,22 @@ const ScansPage = () => {
                 <ReturnButton color={Colors.scansColor} />
             </TopBar>
             <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps={'always'} >
-                <View style={styles.donateButton} >
+                <View style={styles.scanButton} >
                     <Text style={[AppStyle.textRegular, {fontSize: 20, color: AppConstants.TEXT.COLOR.DARK}]} >
                         {title}
                     </Text>
                 </View>
                 {
                     scans.map((item, index) => 
-                        <Pressable key={index} onPress={async () => openUrl(item.url)} style={styles.donateButton} >
-                            <Column style={styles.donateTitleContainer} >
+                        <Pressable key={index} onPress={async () => openUrl(item.url)} style={styles.scanButton} >
+                            <Column style={styles.scanTitleContainer} >
                                 <Text style={[AppStyle.textHeader, {color: Colors.backgroundColor}]}>{item.name}</Text>
-                                <Ionicons name='globe-outline' size={28} color={Colors.backgroundColor} />
+                                <Ionicons name='globe-outline' size={AppConstants.COMMON.BUTTON.SIZE} color={Colors.backgroundColor} />
                             </Column>
                         </Pressable>
                     )
                 }
-                <View style={{height: 62}} />
+                <Footer/>
             </ScrollView>
         </SafeAreaView>
     )
@@ -81,19 +82,19 @@ const ScansPage = () => {
 export default ScansPage
 
 const styles = StyleSheet.create({
-    donateButton: {
-    maxWidth: '100%', 
-    padding: 10, 
-    borderRadius: 4, 
-    backgroundColor: Colors.scansColor, 
-    marginBottom: 10,
-    gap: 10
-  },
-  donateTitleContainer: {
-    width: "100%", 
-    flexDirection: 'row', 
-    alignItems: "center", 
-    gap: 10, 
-    justifyContent: "space-between"
-  }
+    scanButton: {
+        maxWidth: '100%', 
+        padding: 10,
+        borderRadius: AppConstants.COMMON.BORDER_RADIUS, 
+        backgroundColor: Colors.scansColor, 
+        marginBottom: AppConstants.COMMON.MARGIN,
+        gap: 10
+    },
+    scanTitleContainer: {
+        width: "100%", 
+        flexDirection: 'row', 
+        alignItems: "center", 
+        gap: 10, 
+        justifyContent: "space-between"
+    }
 })

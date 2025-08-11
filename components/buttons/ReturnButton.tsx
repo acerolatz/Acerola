@@ -27,8 +27,8 @@ const ReturnButton = ({
     if (router.canGoBack()) {
       try {
         router.back()
-      } catch (e) {
-        console.log(e)
+      } catch (error) {
+        console.log("error tryGoBack", error)
         router.replace("/(pages)/HomePage")
       }
     } else {

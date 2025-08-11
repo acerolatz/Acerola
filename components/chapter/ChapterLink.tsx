@@ -59,8 +59,8 @@ const ChapterLink = ({
     if (loading) {
         return (
             <View style={[styles.chapterLink, style]} >
-                <ActivityIndicator size={20} color={Colors.white} />
-            </View>    
+                <ActivityIndicator size={24} color={Colors.white} />
+            </View>
         )
     }
 
@@ -84,6 +84,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: "center",        
         justifyContent: "space-between",
-        paddingRight: 4
+        paddingRight: 4,
+        height: 24
     }
 })

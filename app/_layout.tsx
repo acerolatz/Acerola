@@ -11,26 +11,23 @@ import Toast from 'react-native-toast-message';
 
 const TOAST_CONFIG = {
   success: ({ text1, text2 }: {text1: string, text2: string}) => (
-    <View style={styles.toast}>
+    <View style={[styles.toast, {borderColor: Colors.ononokiGreen}]}>
       <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 18}]}>{text1}</Text>
-      {text2 && <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 16}]}>{text2}</Text>}
-      <View style={{position: 'absolute', left: 0, top: 0, borderTopLeftRadius: 4, borderBottomLeftRadius: 4, backgroundColor: Colors.ononokiGreen, height: 66, width: 5}} />
+      {text2 && <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 16}]}>{text2}</Text>}      
     </View>
   ),
   
   error: ({ text1, text2 }: {text1: string, text2: string}) => (
-    <View style={styles.toast}>
+    <View style={[styles.toast, {borderColor: Colors.neonRed}]}>
       <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 18}]}>{text1}</Text>
-      {text2 && <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 16}]}>{text2}</Text>}
-      <View style={{position: 'absolute', left: 0, top: 0, borderTopLeftRadius: 4, borderBottomLeftRadius: 4, backgroundColor: Colors.neonRed, height: 66, width: 5}} />
+      {text2 && <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 16}]}>{text2}</Text>}      
     </View>
   ),
   
   info: ({ text1, text2 }: {text1: string, text2: string}) => (
-    <View style={styles.toast}>
+    <View style={[styles.toast, {borderColor: Colors.yellow}]}>
       <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 18}]}>{text1}</Text>
-      {text2 && <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 16}]}>{text2}</Text>}
-      <View style={{position: 'absolute', left: 0, top: 0, borderTopLeftRadius: 4, borderBottomLeftRadius: 4, backgroundColor: Colors.yellow, height: 66, width: 5}} />
+      {text2 && <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 16}]}>{text2}</Text>}      
     </View>
   )
 };
@@ -84,13 +81,14 @@ export default _layout
 
 const styles = StyleSheet.create({
   toast: {
-    height: 66, 
-    width: '90%', 
+    height: 66,
+    width: '92%',
     alignItems: "flex-start",
     justifyContent: "center",
     paddingHorizontal: 12, 
     paddingVertical: 6, 
-    borderRadius: 4, 
-    backgroundColor: Colors.gray
+    borderRadius: 4,
+    backgroundColor: "#1f2226",
+    borderLeftWidth: 6
   }
 })
