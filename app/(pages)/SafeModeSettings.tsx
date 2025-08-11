@@ -34,10 +34,12 @@ const SafeModeSettings = () => {
                 <ReturnButton color='white' />
             </TopBar>
             <View style={{flex: 1}} >
-                <Text style={[AppStyle.textHeader, {marginBottom: 10}]}>Password</Text>
+                <Text style={[AppStyle.textRegular, {color: Colors.neonRed, marginBottom: 10}]}>You need the password to access the settings.</Text>
                 <TextInput
                     style={AppStyle.input}
                     autoCapitalize='none'
+                    secureTextEntry={true}
+                    placeholder='password'
                     onChangeText={setText}
                     value={text}
                 />

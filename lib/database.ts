@@ -1342,7 +1342,7 @@ export async function dbIsChapterMilestoneReached(db: SQLite.SQLiteDatabase): Pr
     await dbCreateNumericInfo(db, 'current_chapter_milestone', AppConstants.COMMON.CHAPTER_START_MILESTONE)
     currentMilestone = AppConstants.COMMON.CHAPTER_START_MILESTONE
   }  
-
+  
   if (readChaptersCount >= currentMilestone) {
     await dbSetNumericInfo(db, 'current_chapter_milestone', readChaptersCount + AppConstants.COMMON.CHAPTER_MILESTONE_INCREMENT)    
     return true

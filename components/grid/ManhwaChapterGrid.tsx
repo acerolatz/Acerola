@@ -119,6 +119,7 @@ const ManhwaChapterGrid = ({
         setLoading(true)
           const c = await spFetchChapterList(manhwa_id)
           if (isCancelled) { return }
+          setCurrentPage(0)
           setChapters(c)
         setLoading(false)
       }

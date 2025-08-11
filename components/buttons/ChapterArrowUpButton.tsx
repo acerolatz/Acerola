@@ -21,12 +21,12 @@ const ChapterArrowUpButton = ({onPress}: ChapterArrowUpButtonProps) => {
 export default ChapterArrowUpButton
 
 const styles = StyleSheet.create({
-    arrowUp: {
-      position: 'absolute',
-      bottom: 80,
-      right: 12,
-      padding: 6,
-      borderRadius: 32,
-      backgroundColor: 'rgba(255, 255, 255, 0.3)'
-    }
+  arrowUp: {
+    position: 'absolute',
+    bottom: 62,
+    right: 12,
+    padding: 6,
+    borderRadius: 32,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)'
+  }
 })

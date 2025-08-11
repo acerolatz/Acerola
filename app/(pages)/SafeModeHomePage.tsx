@@ -1,4 +1,4 @@
-import { Animated, FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import { SafeAreaView } from 'react-native'
 import { AppStyle } from '@/styles/AppStyle'
@@ -18,7 +18,7 @@ import Toast from 'react-native-toast-message'
 import CustomActivityIndicator from '@/components/util/CustomActivityIndicator'
 import { Keyboard } from 'react-native'
 import PageActivityIndicator from '@/components/util/PageActivityIndicator'
-import SafeModeLateralMenu from '@/components/SafeModeLateralMenu'
+import { router } from 'expo-router'
 
 
 const SCREEN_WIDTH = wp(100)
@@ -59,7 +59,7 @@ const CreateTodoComponent = ({setTodos}: {setTodos: React.Dispatch<React.SetStat
     }
 
     return (
-        <Column style={{gap: 10}} >
+        <Column style={{gap: 10, marginBottom: 20}} >
             <Column style={{gap: 10,  width: '100%'}} >
                 <TextInput
                     ref={inputRef}
@@ -71,12 +71,12 @@ const CreateTodoComponent = ({setTodos}: {setTodos: React.Dispatch<React.SetStat
                 />
                 <TextInput
                     ref={inputRef1}
-                    placeholder='description...'
+                    placeholder='description (optional)...'
                     placeholderTextColor={Colors.white}
                     textAlignVertical='top'
                     multiline={true}
                     autoCapitalize='sentences'
-                    style={{color: Colors.white, borderBottomWidth: 0, borderRadius: 4, borderColor: 'white', height: 80}}
+                    style={{color: Colors.white, borderBottomWidth: 1, borderRadius: 4, borderColor: 'white', height: 80}}
                     onChangeText={setDescription}
                 />
             </Column>
@@ -154,11 +154,7 @@ const SafeModeHomePage = () => {
 
     const db = useSQLiteContext()
     const [todos, setTodos] = useState<Todo[]>([])
-    const [loading, setLoading] = useState(false)
-
-    const menuAnim = useRef(new Animated.Value(-AppConstants.PAGES.HOME.MENU_WIDTH)).current 
-    const backgroundAnim = useRef(new Animated.Value(-SCREEN_WIDTH)).current
-    const menuVisible = useRef(false)
+    const [loading, setLoading] = useState(false)    
 
     useEffect(
         () => {
@@ -170,40 +166,10 @@ const SafeModeHomePage = () => {
             init()
         },
         [db]
-    )
+    )    
 
-    const openMenu = () => {
-        Animated.timing(menuAnim, {
-            toValue: 0,
-            duration: AppConstants.PAGES.HOME.MENU_ANIMATION_TIME,
-            useNativeDriver: true
-        }).start(() => {
-            menuVisible.current = true
-        })
-        Animated.timing(backgroundAnim, {
-            toValue: 0,
-            duration: AppConstants.PAGES.HOME.MENU_ANIMATION_TIME * 1.2,
-            useNativeDriver: true
-        }).start()
-    }
-    
-    const closeMenu = () => {
-        Animated.timing(menuAnim, {
-            toValue: -AppConstants.PAGES.HOME.MENU_WIDTH,
-            duration: AppConstants.PAGES.HOME.MENU_ANIMATION_TIME,
-            useNativeDriver: true
-        }).start(() => {
-            menuVisible.current = false
-        })
-        Animated.timing(backgroundAnim, {
-            toValue: -SCREEN_WIDTH,
-            duration: AppConstants.PAGES.HOME.MENU_ANIMATION_TIME,
-            useNativeDriver: true
-        }).start()
-    }
-
-    const toggleMenu = () => {
-        menuVisible.current ? closeMenu() : openMenu()
+    const openSettings = () => {
+        router.navigate("/SafeModeSettings")
     }
 
     if (loading) {
@@ -232,27 +198,23 @@ const SafeModeHomePage = () => {
             <Row style={{width: '100%', paddingRight: 2, marginTop: 4, marginBottom: 10, justifyContent: "space-between"}} >
                 <AppLogo name='To do List' />
                 <Button 
-                    iconName='options-outline' 
-                    onPress={toggleMenu}
+                    iconName='settings-outline' 
+                    onPress={openSettings}
                     iconSize={22} 
                     iconColor={Colors.white} 
                     showLoading={false} />
             </Row>
-            <View style={{flex: 1, gap: 10}} >
-                <CreateTodoComponent setTodos={setTodos} />
+            <View style={{flex: 1, gap: 10}} >                
                 <FlatList
                     data={todos}
                     keyExtractor={(item) => item.todo_id.toString()}
                     renderItem={renderItem}
+                    keyboardShouldPersistTaps='always'
+                    showsVerticalScrollIndicator={false}
+                    ListHeaderComponent={<CreateTodoComponent setTodos={setTodos} />}
                     ListFooterComponent={<View style={{height: 52}} />}
                 />
             </View>
-            <Animated.View style={[styles.menuBackground, { width: SCREEN_WIDTH, transform: [{ translateX: backgroundAnim }] }]}>
-                <Pressable onPress={closeMenu} style={{width: '100%', height: '100%'}} />
-            </Animated.View>
-            <Animated.View style={[styles.sideMenu, { width: AppConstants.PAGES.HOME.MENU_WIDTH, transform: [{ translateX: menuAnim }] }]}>
-                <SafeModeLateralMenu closeMenu={closeMenu}/>
-            </Animated.View>
         </SafeAreaView>
     )
 }

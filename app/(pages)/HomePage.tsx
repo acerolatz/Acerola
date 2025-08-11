@@ -9,6 +9,7 @@ import RandomCardsGrid from '@/components/grid/RandomCardsGrid'
 import Top10Grid from '@/components/grid/Top10Grid'
 import LateralMenu from '@/components/LateralMenu'
 import TopBar from '@/components/TopBar'
+import Footer from '@/components/util/Footer'
 import AppLogo from '@/components/util/Logo'
 import Row from '@/components/util/Row'
 import { AppConstants } from '@/constants/AppConstants'
@@ -249,7 +250,7 @@ const HomePage = () => {
                     <Pressable onPress={neverShowDonationMessageAgain} >
                         <Text style={[AppStyle.textRegular, {fontSize: 16, textDecorationLine: 'underline'}]}>Never show again.</Text>
                     </Pressable>
-                    <View style={{height: 52}} />
+                    <Footer/>
                 </BottomSheetView>
             </BottomSheet>
 

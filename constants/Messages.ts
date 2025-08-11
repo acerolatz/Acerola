@@ -29,20 +29,16 @@ export const ToastMessages = {
         },
         INVALID_MANHWA: {
             text1: "Error", 
-            text2: "invalid manhwa", 
+            text2: "Invalid manhwa", 
             type: "error"
-        },
-        NO_MORE_COMMMENTS: {
-            text1: "No more comments to load.", 
-            type: "info"
-        },
+        },        
         COMMENT_DELETED: {
             text1: "Deleted!", 
             type: "success"
         },
         NO_MANGAS: {
-            text1: "No manhwas!", 
-            text2: "Try update the database", 
+            text1: "No manhwas",
+            text2: "Try to update the database", 
             type: "info"
         },
         OPERATION_CANCELLED: {
@@ -63,8 +59,17 @@ export const ToastMessages = {
             type: 'error'
         },
         THANKS: {
-            text1: "Thanks!", 
+            text1: "Thanks!",
             type: "success"
+        },
+        BUG_REPORT_THANKS: {
+            text1: "Thank you for helping improve the app!",
+            type: 'success'
+        },
+        MANHWA_REQUEST_THANKS: {
+            text1: "Thanks for your request!",
+            text2: "We’ll consider adding it.",
+            type: 'success'
         },
         DOCUMENT_EXISTS: {
             text1: 'Error',

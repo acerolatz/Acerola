@@ -42,8 +42,8 @@ const UpdateDatabaseButton = ({
         if (!shouldUpdate && hasMangas) {
             const secondsUntilRefresh = await dbCheckSecondsSinceLastRefresh(db, type)
             Toast.show({
-                text1: "Wait ⌛", 
-                text2: `You can try again in ${secondsUntilRefresh} seconds`, 
+                text1: "Warning", 
+                text2: `You can try again in ${secondsUntilRefresh} seconds.`,
                 type: 'info',
                 visibilityTime: 3000
             })
@@ -53,8 +53,8 @@ const UpdateDatabaseButton = ({
                 const n = await dbUpdateDatabase(db)
                 if (n > 0) {
                     Toast.show({
-                        text1: "Sync completed", 
-                        text2: `Total: ${n} Manhwas`,
+                        text1: "Sync completed",
+                        text2: `Num manhwas: ${n}`,
                         type: "info"
                     })
                     router.replace("/(pages)/HomePage")

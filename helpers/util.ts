@@ -193,5 +193,5 @@ export function getChapterGridNumColumns(): number {
   const width = wp(92)
   if (width >= 400) { return 8 }
   if (width >= 360) { return 7 }
-  return 4
+  return 5
 }

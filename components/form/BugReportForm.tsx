@@ -171,9 +171,10 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
     const handlePickPhoto = async () => {
         if (photos.length >= AppConstants.FORM.BUG_REPORT.MAX_IMAGES) {
             Toast.show({
-                text1: "Wait", 
-                text2: `Max ${AppConstants.FORM.BUG_REPORT.MAX_IMAGES} images`}
-            )
+                text1: "Warning",
+                text2: `Max ${AppConstants.FORM.BUG_REPORT.MAX_IMAGES} images`,
+                type: "info"
+            })
             return
         }
 
@@ -228,7 +229,7 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
                     await uploadToSupabase(photos[i], bug_id_str)
                 }
             }            
-            Toast.show(ToastMessages.EN.THANKS)
+            Toast.show(ToastMessages.EN.BUG_REPORT_THANKS)
             router.back()
         setLoading(false)
     };
@@ -242,8 +243,8 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
         return (
             <View style={{marginRight: 10}} >
                 <Image source={{uri: item}} style={{width: 200, height: 312, borderRadius: 4}} contentFit='cover' />
-                <Pressable onPress={onPress} style={{position: "absolute", right: 6, top: 6, padding: 6, backgroundColor: Colors.BugReportColor, borderRadius: 4}} hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE} >
-                    <Ionicons name='trash-bin' size={20} color={Colors.backgroundColor} />
+                <Pressable onPress={onPress} style={{position: "absolute", left: 8, top: 8, padding: 6, backgroundColor: Colors.BugReportColor, borderRadius: 4}} hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE} >
+                    <Ionicons name='trash-outline' size={18} color={Colors.backgroundColor} />
                 </Pressable>
             </View>
         )        
@@ -316,7 +317,7 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
         
                 {
                     photos.length > 0 &&
-                    <View style={{width: '100%', marginTop: 20, gap: 20}} >
+                    <View style={{width: '100%', marginTop: 10}} >
                         <FlatList
                             data={photos}
                             keyExtractor={(item) => item}
