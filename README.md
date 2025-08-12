@@ -28,7 +28,7 @@ The APK is available in the project's Releases tab here on GitHub. Feel free to 
 
 # Safe Mode
 
-Safe Mode can be enabled in the settings. With Safe Mode enabled, the app behaves like a simple to-do list. To access the main content (pornhwa), you must enter the password you previously set.
+When Safe Mode is enabled, it behaves like a simple to-do list, and you can only access the pornhwas with a password you set yourself. Safe Mode can be enabled in the settings.
 
 If you forget the password, it cannot be reset or recovered. You must delete the app data via Android or iOS settings to regain access to the main content.
 
