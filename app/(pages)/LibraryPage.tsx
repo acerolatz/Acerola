@@ -75,11 +75,9 @@ const Library = () => {
             manhwas={manhwas}
             loading={loading}          
             numColumns={2}
-            hasResults={true}
             shouldShowChapterDate={false}
             showManhwaStatus={false}
             onEndReached={onEndReached}
-            listMode='FlashList'
             color={Colors.libraryColor}
           />
         </View>

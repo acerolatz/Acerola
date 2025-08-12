@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
         alignItems: "center",
         justifyContent: "center",
-        borderRadius: 4,
+        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
         backgroundColor: Colors.yellow,
         marginRight: AppConstants.COMMON.MARGIN
     }

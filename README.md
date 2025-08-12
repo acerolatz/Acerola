@@ -30,7 +30,7 @@ The APK is available in the project's Releases tab here on GitHub. Feel free to 
 
 Safe Mode can be enabled in the settings. With Safe Mode enabled, the app behaves like a simple to-do list. To access the main content (pornhwa), you must enter the password you previously set.
 
-If you forget the password, it cannot be reset or recovered. To regain access to the main content, you must delete the app data via Android or iOS settings and restart the app.
+If you forget the password, it cannot be reset or recovered. You must delete the app data via Android or iOS settings to regain access to the main content.
 
 <div style="display: flex; flex-wrap: wrap; gap: 2%;">
   <img style='max-width: 720px' src="github/images/settings.webp" width="49%" alt="Academy Image 1" />

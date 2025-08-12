@@ -23,6 +23,7 @@ interface ChapterItemProps {
   isReaded: boolean
   chapterName: string
   index: number
+  manhwaColor: string
   onPress: (index: number) => void
 }
 
@@ -31,10 +32,11 @@ const ChapterItem = ({
   isReaded,    
   chapterName,
   index,
+  manhwaColor,
   onPress  
 }: ChapterItemProps) => {
-  const backgroundColor = isReaded ? Colors.white : Colors.gray
-  const color = isReaded ? Colors.backgroundColor : Colors.white
+  const backgroundColor = isReaded ? manhwaColor : Colors.backgroundSecondary
+  const color = isReaded ? Colors.backgroundSecondary : Colors.white
 
   return (
     <Pressable
@@ -218,6 +220,7 @@ const ManhwaChapterGrid = ({
         {
           chapters.slice(currentPage * PAGE_LIMIT, (currentPage + 1) * PAGE_LIMIT).map(( item, index ) => 
             <ChapterItem
+              manhwaColor={manhwa.color}
               index={currentPage * PAGE_LIMIT + index}
               onPress={readChapter}
               key={item.chapter_id}
@@ -261,7 +264,7 @@ const styles = StyleSheet.create({
   button: {
     flex: 1,     
     height: 52, 
-    borderRadius: 4, 
+    borderRadius: AppConstants.COMMON.BORDER_RADIUS, 
     alignItems: "center", 
     justifyContent: "center"
   }

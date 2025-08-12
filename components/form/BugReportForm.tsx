@@ -31,6 +31,7 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import * as mime from 'react-native-mime-types';
 import Toast from 'react-native-toast-message';
 import * as yup from 'yup';
+import Footer from '../util/Footer';
 
 
 
@@ -70,22 +71,24 @@ interface FormData {
 
 const BugItem = ({item, isSelected, onChange}: {item: BugType, isSelected: boolean, onChange: (b: BugType) => any}) => {
     
-    const onPress = () => {
-        onChange(item)
-    }    
+    const onPress = () => { onChange(item) }
+
+    const backgroundColor = isSelected ? Colors.BugReportColor : Colors.backgroundSecondary
+    const color = isSelected ? Colors.backgroundColor : Colors.white
 
     return (
         <Pressable 
         onPress={onPress}
         style={{
-            height: 42, 
+            height: 42,
             alignItems: "center", 
             justifyContent: "center", 
             paddingHorizontal: 12, 
-            borderRadius: 4,
-            marginRight: 10,
-            backgroundColor: isSelected ? Colors.BugReportColor : Colors.gray }} >
-            <Text style={AppStyle.textRegular} >{item}</Text>
+            borderRadius: AppConstants.COMMON.BORDER_RADIUS,
+            marginRight: AppConstants.COMMON.MARGIN,
+            backgroundColor
+        }} >
+            <Text style={[AppStyle.textRegular, {color}]} >{item}</Text>
         </Pressable>
     )
 }
@@ -97,6 +100,7 @@ const BugTypeSelector = ({value, onChange}: {value: BugType, onChange: (b: BugTy
                 data={BUT_TYPE_LIST}
                 horizontal={true}
                 keyExtractor={(item, index) => index.toString()}
+                showsHorizontalScrollIndicator={false}
                 renderItem={({item}) => <BugItem isSelected={value === item} item={item} onChange={onChange} />}
             />
         </View>
@@ -241,9 +245,9 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
         }
 
         return (
-            <View style={{marginRight: 10}} >
-                <Image source={{uri: item}} style={{width: 200, height: 312, borderRadius: 4}} contentFit='cover' />
-                <Pressable onPress={onPress} style={{position: "absolute", left: 8, top: 8, padding: 6, backgroundColor: Colors.BugReportColor, borderRadius: 4}} hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE} >
+            <View style={{marginRight: AppConstants.COMMON.MARGIN}} >
+                <Image source={{uri: item}} style={styles.image} contentFit='cover' />
+                <Pressable onPress={onPress} style={styles.removeImageButton} hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE} >
                     <Ionicons name='trash-outline' size={18} color={Colors.backgroundColor} />
                 </Pressable>
             </View>
@@ -255,6 +259,7 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
             <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='always' >
                 {/* Title */}
                 <Text style={AppStyle.inputHeaderText}>Title</Text>
+                {errors.title && (<Text style={AppStyle.error}>{errors.title.message}</Text>)}
                 <Controller
                     control={control}
                     name="title"
@@ -267,9 +272,9 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
                         value={value}/>
                     )}
                 />
-                {errors.title && (<Text style={AppStyle.error}>{errors.title.message}</Text>)}
 
                 {/* BugType */}
+                {errors.bugType && (<Text style={AppStyle.error}>{errors.bugType.message}</Text>)}
                 <Controller
                     name="bugType"
                     control={control}
@@ -277,13 +282,13 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
                         <BugTypeSelector  value={value} onChange={onChange} />
                     )}
                 />
-                {errors.bugType && (<Text style={AppStyle.error}>{errors.bugType.message}</Text>)}
                 
                 {/* Description */}
                 <View style={{flexDirection: 'row', gap: 10, alignItems: "center", justifyContent: "center", alignSelf: 'flex-start'}} >
                     <Text style={AppStyle.inputHeaderText}>Description</Text>
                     <Text style={[AppStyle.textRegular, {fontSize: 12, color: Colors.neonRed}]}>optional</Text>
                 </View>
+                {errors.descr && (<Text style={AppStyle.error}>{errors.descr.message}</Text>)}            
                 <Controller
                     name="descr"
                     control={control}
@@ -297,7 +302,6 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
                         value={value}/>
                     )}
                 />
-                {errors.descr && (<Text style={AppStyle.error}>{errors.descr.message}</Text>)}            
 
                 {
                     isLoading ?
@@ -314,7 +318,6 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
                 <Pressable onPress={handlePickPhoto} style={styles.button} >
                     <Text style={AppStyle.formButtonText} >Images (optional)</Text>
                 </Pressable>
-        
                 {
                     photos.length > 0 &&
                     <View style={{width: '100%', marginTop: 10}} >
@@ -327,8 +330,7 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
                         />
                     </View>
                 }
-
-                <View style={{height: 62}} />
+                <Footer/>
             </ScrollView>
         </KeyboardAvoidingView>
     )
@@ -340,9 +342,22 @@ const styles = StyleSheet.create({
     button: {
         flex: 1,
         height: 52,
-        borderRadius: 4,
+        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
         backgroundColor: Colors.BugReportColor,
         alignItems: "center",
         justifyContent: "center"
-    }
+    },
+    image: {
+        width: 200, 
+        height: 312, 
+        borderRadius: AppConstants.COMMON.BORDER_RADIUS
+    },
+    removeImageButton: {
+        position: "absolute", 
+        left: 8, 
+        top: 8, 
+        padding: 6, 
+        backgroundColor: Colors.BugReportColor, 
+        borderRadius: AppConstants.COMMON.BORDER_RADIUS
+    } 
 })

@@ -16,7 +16,18 @@ import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
 import { Collection, Genre, Manhwa } from '@/helpers/types'
 import { hp, wp } from '@/helpers/util'
-import { dbCleanTable, dbGetReadingHistory, dbIsChapterMilestoneReached, dbGetReadChaptersCount, dbReadCollections, dbReadGenres, dbReadManhwasOrderedByUpdateAt, dbReadManhwasOrderedByViews, dbSetShouldAskForDonation, dbShouldUpdate, dbUpsertCollections } from '@/lib/database'
+import { 
+    dbCleanTable, 
+    dbGetReadingHistory, 
+    dbIsChapterMilestoneReached, 
+    dbReadCollections, 
+    dbReadGenres, 
+    dbReadManhwasOrderedByUpdateAt, 
+    dbReadManhwasOrderedByViews, 
+    dbSetShouldAskForDonation, 
+    dbShouldUpdate, 
+    dbUpsertCollections 
+} from '@/lib/database'
 import { spFetchCollections, spFetchRandomManhwaCards, spGetTodayTop10 } from '@/lib/supabase'
 import { useManhwaCardsState } from '@/store/randomManhwaState'
 import { useTop10ManhwasState } from '@/store/top10State'
@@ -25,12 +36,15 @@ import Ionicons from '@expo/vector-icons/Ionicons'
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
 import { router, useFocusEffect } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Animated, Pressable, Text, SafeAreaView, ScrollView, StyleSheet, View } from 'react-native'
 
 
 const SCREEN_WIDTH = wp(100)
 const SCREEN_HEIGHT = hp(100)
+
+const MAX_RANDOM_MANHWA_CARD_WIDTH = wp(87)
+const MAX_RANDOM_MANHWA_CARD_HEIGHT = hp(80)
 
 const PAGE_LIMIT = 32
 
@@ -56,7 +70,12 @@ const HomePage = () => {
 
     const reloadCards = async () => {
         const r = await spFetchRandomManhwaCards(PAGE_LIMIT)
-        setCards(r)
+        setCards(r.map(c => {
+            const normalizedHeight = c.height > MAX_RANDOM_MANHWA_CARD_HEIGHT ? MAX_RANDOM_MANHWA_CARD_HEIGHT : c.height
+            let normalizedWidth = (normalizedHeight * c.width) / c.height
+            normalizedWidth = normalizedWidth > MAX_RANDOM_MANHWA_CARD_WIDTH ? MAX_RANDOM_MANHWA_CARD_WIDTH : normalizedWidth
+            return {...c, normalizedWidth, normalizedHeight}
+        }))
     }
 
     const updateCollections = async () => {
@@ -79,17 +98,15 @@ const HomePage = () => {
 
     const updateRandomCards = async () => {
         if (cards.length == 0) {
-            const r = await spFetchRandomManhwaCards(PAGE_LIMIT)
-            setCards(r)
+            await reloadCards()
         }
     }
     
     useEffect(
         () => {
             if (initDone.current) { return }
+            initDone.current = true
             const init = async () => {
-                initDone.current = true
-
                 setLoading(true)
                     await Promise.all([
                         dbReadGenres(db),
@@ -185,20 +202,20 @@ const HomePage = () => {
     }
 
     return (
-        <SafeAreaView style={AppStyle.safeArea} >            
+        <SafeAreaView style={AppStyle.safeArea} >
             {/* Header */}
-            <Row style={{width: '100%', paddingRight: 2, marginTop: 4, marginBottom: 10, justifyContent: "space-between"}} >
+            <Row style={styles.header} >
                 <AppLogo/>
                 <Row style={{gap: 20}} >
                     {
                         !loading &&
                         <>
                             <UpdateDatabaseButton type='client' />
-                            <Button iconName='search-outline' onPress={searchPress} showLoading={false} />
-                            <RandomManhwaButton backgroundColor='transparent' />
+                            <Button iconName='search-outline' onPress={searchPress} />
+                            <RandomManhwaButton />
                         </>
                     }
-                    <Button iconName='options-outline' onPress={toggleMenu} iconSize={22} iconColor={Colors.white} showLoading={false} />
+                    <Button iconName='options-outline' onPress={toggleMenu} />
                 </Row>
             </Row>
 
@@ -220,45 +237,45 @@ const HomePage = () => {
                         manhwas={mostView}
                     />
                     { !loading && <RandomCardsGrid reloadCards={reloadCards} /> }
-                    <View style={{width: '100%', height: 20}} />
+                    <Footer height={20} />
                 </View>
             </ScrollView>
 
+            {/* Ask For Donation BottomSheet */}
             <BottomSheet
                 ref={bottomSheetRef}
                 index={-1}
-                handleIndicatorStyle={{backgroundColor: Colors.donateColor}}
-                handleStyle={{backgroundColor: Colors.backgroundSecondary, borderRadius: 20}}
-                backgroundStyle={{backgroundColor: Colors.backgroundSecondary}}
-                enablePanDownToClose={true}
-            >
-                <BottomSheetView style={{paddingHorizontal: wp(4), gap: 10}} >
+                handleIndicatorStyle={styles.handleIndicatorStyle}
+                handleStyle={styles.handleStyle}
+                backgroundStyle={styles.bottomSheetBackgroundStyle}
+                enablePanDownToClose={true}>
+                <BottomSheetView style={styles.bottomSheetContainer} >
                     <TopBar title='Enjoying the app?' titleColor={Colors.donateColor}>
                         <Pressable onPress={handleCloseBottomSheet} >
-                            <Ionicons name='close-circle-outline' color={Colors.donateColor} size={22} />
+                            <Ionicons name='close-circle-outline' color={Colors.donateColor} size={24} />
                         </Pressable>
                     </TopBar>
-                    <Text style={[AppStyle.textRegular, {}]}>Consider making a donation to help keep the servers running.</Text>
+                    <Text style={AppStyle.textRegular}>Consider making a donation to help keep the servers running.</Text>
                     <Row style={{gap: 10}} >
-                        <Pressable onPress={handleCloseBottomSheet} style={[styles.button, {backgroundColor: Colors.backgroundSecondary, borderWidth: 1, borderColor: Colors.donateColor}]} >
+                        <Pressable onPress={handleCloseBottomSheet} style={[styles.button, {backgroundColor: Colors.backgroundColor, borderWidth: 1, borderColor: Colors.donateColor}]} >
                             <Text style={[AppStyle.textRegular, {color: Colors.donateColor}]} >Close</Text>
                         </Pressable>
                         <Pressable onPress={openDonate} style={styles.button} >
-                            <Text style={[AppStyle.textRegular, {color: Colors.backgroundSecondary}]} >Donate</Text>
+                            <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor}]} >Donate</Text>
                         </Pressable>
                     </Row>
                     <Pressable onPress={neverShowDonationMessageAgain} >
                         <Text style={[AppStyle.textRegular, {fontSize: 16, textDecorationLine: 'underline'}]}>Never show again.</Text>
                     </Pressable>
-                    <Footer height={42}/>
+                    <Footer height={62}/>
                 </BottomSheetView>
             </BottomSheet>
 
             {/* Lateral Menu */}
-            <Animated.View style={[styles.menuBackground, { width: SCREEN_WIDTH, transform: [{ translateX: backgroundAnim }] }]}>
-                <Pressable onPress={closeMenu} style={{width: '100%', height: '100%'}} />
+            <Animated.View style={[styles.menuBackground, { transform: [{ translateX: backgroundAnim }] }]}>
+                <Pressable onPress={closeMenu} style={styles.lateralMenuBackground} />
             </Animated.View>
-            <Animated.View style={[styles.sideMenu, { width: AppConstants.PAGES.HOME.MENU_WIDTH, transform: [{ translateX: menuAnim }] }]}>
+            <Animated.View style={[styles.sideMenu, { transform: [{ translateX: menuAnim }] }]}>
                 <LateralMenu closeMenu={closeMenu}/>
             </Animated.View>
         </SafeAreaView>
@@ -270,18 +287,30 @@ export default HomePage
 
 
 const styles = StyleSheet.create({
+    lateralMenuBackground: {
+        width: '100%', 
+        height: '100%'
+    },
+    header: {
+        width: '100%',
+        paddingRight: 2, 
+        marginTop: 4, 
+        marginBottom: 10, 
+        justifyContent: "space-between"
+    },
     sideMenu: {
         position: 'absolute',
         top: 0,
         bottom: 0,
         left: 0,        
         backgroundColor: Colors.backgroundColor,
+        width: AppConstants.PAGES.HOME.MENU_WIDTH,
         elevation: 5,        
         zIndex: 100
     },
     menuBackground: {
-        position: 'absolute',
         width: SCREEN_WIDTH,
+        position: 'absolute',
         height: SCREEN_HEIGHT * 1.2,
         top: 0,
         left: 0,        
@@ -296,5 +325,21 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         flex: 1,
         height: 52
+    },
+    bottomSheetContainer: {
+        paddingHorizontal: wp(4), 
+        paddingTop: 10,
+        gap: 10
+    },
+    handleStyle: {
+        backgroundColor: Colors.backgroundSecondary, 
+        borderTopLeftRadius: AppConstants.COMMON.BORDER_RADIUS, 
+        borderTopEndRadius: AppConstants.COMMON.BORDER_RADIUS
+    },
+    handleIndicatorStyle: {
+        backgroundColor: Colors.donateColor
+    },
+    bottomSheetBackgroundStyle: {
+        backgroundColor: Colors.backgroundColor
     }
 })

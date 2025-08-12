@@ -1,5 +1,6 @@
 import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
+import { AppStyle } from '@/styles/AppStyle'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import React, { useState } from 'react'
 import { StyleSheet } from 'react-native'
@@ -31,9 +32,9 @@ const ReadingStatusPicker = ({
             style={[styles.dropDownContainer, {backgroundColor}]}
             dropDownContainerStyle={{backgroundColor: Colors.backgroundColor, borderWidth: 2, borderColor: backgroundColor}}
             labelStyle={{color: Colors.backgroundColor}}                
-            textStyle={styles.text}
+            textStyle={AppStyle.textRegular}
             placeholder='Reading Status'
-            placeholderStyle={styles.placeholderText}
+            placeholderStyle={AppStyle.textRegular}
             ArrowUpIconComponent={() => {return <Ionicons name='chevron-up' size={20} color={Colors.backgroundColor} />}}
             ArrowDownIconComponent={() => {return <Ionicons name='chevron-down' size={20} color={Colors.backgroundColor} />}}
             value={value as any}
@@ -54,16 +55,7 @@ const ReadingStatusPicker = ({
 export default ReadingStatusPicker
 
 
-const styles = StyleSheet.create({
-    text: {
-        fontFamily: "LeagueSpartan_400Regular", 
-        fontSize: 18
-    },
-    placeholderText: {
-        color: Colors.white, 
-        fontSize: 18, 
-        fontFamily: "LeagueSpartan_400Regular"
-    },
+const styles = StyleSheet.create({    
     dropDownContainer: {
         height: 52, 
         borderRadius: AppConstants.COMMON.BORDER_RADIUS,

@@ -52,15 +52,13 @@ const ManhwaSearch = () => {
             hasResults.current = m.length > 0
             setManhwas(m)
           setLoading(false)
+          isInitialized.current = true
         }
-        isInitialized.current = true
       }
       init()
-      return () => {
-        isCancelled = true
-      }
+      return () => { isCancelled = true }
     },
-    []
+    [db]
   )
 
   const handleSearch = async (value: string) => {
@@ -116,7 +114,7 @@ const ManhwaSearch = () => {
         <ReturnButton color={Colors.yellow} />
       </TopBar>
       <View style={{flex: 1, gap: 10}} >
-        <SearchBar onChangeValue={debounceSearch} color={Colors.yellow} placeholder='manhwa' />
+        <SearchBar onChangeValue={debounceSearch} color={Colors.yellow} placeholder='pornhwa' />
         <View style={{flex: 1}} >
           <FlashList
               ref={flashListRef}

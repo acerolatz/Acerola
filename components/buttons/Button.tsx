@@ -21,7 +21,7 @@ const Button = ({
   style, 
   iconSize = AppConstants.COMMON.BUTTON.SIZE, 
   iconColor = Colors.white,
-  showLoading = true
+  showLoading = false
 }: ButtonProps) => {
 
   const [loading, setLoading] = useState(false)

@@ -127,7 +127,7 @@ export default NewsPage
 
 const styles = StyleSheet.create({
     item: {
-        width: '100%', 
+        width: '100%',
         gap: 20,
         marginBottom: 30
     }

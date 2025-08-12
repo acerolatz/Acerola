@@ -70,6 +70,8 @@ export type ManhwaCard = {
     image_url: string
     width: number
     height: number
+    normalizedWidth: number
+    normalizedHeight: number
 }
 
 export type Scan = {

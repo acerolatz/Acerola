@@ -62,14 +62,14 @@ const CreateTodoComponent = ({setTodos}: {setTodos: React.Dispatch<React.SetStat
     }
 
     return (
-        <Column style={{gap: 10, marginBottom: 20}} >
+        <Column style={{gap: 10, marginBottom: 10}} >
             <Column style={{gap: 10,  width: '100%'}} >
                 <TextInput
                     ref={inputRef}
                     placeholder='Enter tasks, ideas, notes...'
                     placeholderTextColor={Colors.white}
                     autoCapitalize='sentences'
-                    style={{color: Colors.white, borderBottomWidth: 1, borderRadius: 4, borderColor: 'white'}}
+                    style={styles.input}
                     onChangeText={setText}
                 />
                 <TextInput
@@ -79,7 +79,7 @@ const CreateTodoComponent = ({setTodos}: {setTodos: React.Dispatch<React.SetStat
                     textAlignVertical='top'
                     multiline={true}
                     autoCapitalize='sentences'
-                    style={{color: Colors.white, borderBottomWidth: 1, borderRadius: 4, borderColor: 'white', height: 80}}
+                    style={styles.inputLarge}
                     onChangeText={setDescription}
                 />
             </Column>
@@ -126,14 +126,14 @@ const TodoComponent = ({todo, setTodos}: {todo: Todo, setTodos: React.Dispatch<R
     }
 
     return (
-        <Pressable onPress={clickCheckbox} style={[styles.todoItem, {borderColor: backgroundColor}]} >
-            <Row style={{backgroundColor, width: '100%', paddingHorizontal: 10, paddingVertical: 8, justifyContent: "space-between"}} >
+        <Pressable onPress={clickCheckbox} style={styles.todoItem} >
+            <Row style={[styles.todoItemTop, {backgroundColor}]} >
                 <Text style={[AppStyle.textHeader, {color: Colors.backgroundColor, maxWidth: '85%'}]}>{todo.title} </Text>
                 <View style={styles.checkBox} >
                     <Ionicons name='checkmark' size={20} color={checkmarkBackgroundColor} />
                 </View>
             </Row>
-            <Column style={{paddingHorizontal: 10, paddingVertical: 8}} >
+            <Column style={[styles.todoItemBottom, {borderColor: backgroundColor}]} >
                 {todo.descr && <Text style={AppStyle.textRegular}>{todo.descr} </Text>}
                 <Row style={{justifyContent: "space-between"}} >
                     <View>
@@ -200,13 +200,9 @@ const SafeModeHomePage = () => {
     if (loading) {
         return (
             <SafeAreaView style={AppStyle.safeArea} >
-                <Row style={{width: '100%', paddingRight: 2, marginTop: 4, marginBottom: 10, justifyContent: "space-between"}} >
+                <Row style={styles.topBar} >
                     <AppLogo name='To do List' />
-                    <Button 
-                        iconName='options-outline' 
-                        iconSize={22} 
-                        iconColor={Colors.white} 
-                        showLoading={false} />
+                    <Button iconName='settings-outline' />
                 </Row>
                 <PageActivityIndicator color={Colors.yellow} />
             </SafeAreaView>
@@ -217,19 +213,13 @@ const SafeModeHomePage = () => {
         return <TodoComponent todo={item} setTodos={setTodos} />
     }
 
-
     return (
         <SafeAreaView style={AppStyle.safeArea} >
-            <Row style={{width: '100%', paddingRight: 2, marginTop: 4, marginBottom: 10, justifyContent: "space-between"}} >
+            <Row style={styles.topBar} >
                 <AppLogo name='To do List' />
-                <Button 
-                    iconName='settings-outline' 
-                    onPress={handleOpenBottomSheet}
-                    iconSize={22} 
-                    iconColor={Colors.white} 
-                    showLoading={false} />
+                <Button iconName='settings-outline' onPress={handleOpenBottomSheet} />
             </Row>
-            <View style={{flex: 1, gap: 10}} >                
+            <View style={{flex: 1, gap: 10}} >
                 <FlatList
                     data={todos}
                     keyExtractor={(item) => item.todo_id.toString()}
@@ -237,26 +227,24 @@ const SafeModeHomePage = () => {
                     keyboardShouldPersistTaps='always'
                     showsVerticalScrollIndicator={false}
                     ListHeaderComponent={<CreateTodoComponent setTodos={setTodos} />}
-                    ListFooterComponent={<View style={{height: 52}} />}
+                    ListFooterComponent={<Footer/>}
                 />
             </View>
             <BottomSheet
                 ref={bottomSheetRef}
                 index={-1}
-                handleIndicatorStyle={{backgroundColor: Colors.yellow}}
-                handleStyle={{backgroundColor: Colors.backgroundSecondary, borderTopLeftRadius: 20, borderTopRightRadius: 20}}
-                backgroundStyle={{backgroundColor: Colors.backgroundColor}}
-                enablePanDownToClose={true}
-            >
-                <BottomSheetView style={{paddingHorizontal: wp(4), gap: 10, height: hp(85)}} >
+                handleIndicatorStyle={styles.handleIndicatorStyle}
+                handleStyle={styles.handleStyle}
+                backgroundStyle={styles.backgroundStyle}
+                enablePanDownToClose={true}>
+                <BottomSheetView style={styles.bottomSheetContainer} >
                     <TopBar title='Settings' titleColor={Colors.yellow}>
                         <Pressable onPress={handleCloseBottomSheet} >
                             <Ionicons name='close-circle-outline' color={Colors.yellow} size={28} />
                         </Pressable>
                     </TopBar>
-                    <Text style={[AppStyle.textRegular, {}]}>Consider making a donation to help keep the servers running.</Text>
                     <View style={{width: '100%'}} >
-                        <Text style={[AppStyle.textRegular, {color: Colors.neonRed, marginBottom: 10}]}>You need the password to access the settings.</Text>
+                        <Text style={[AppStyle.textRegular, {color: Colors.neonRed, marginBottom: 10}]}>A password is required to access the settings.</Text>
                         <TextInput
                             style={AppStyle.input}
                             autoCapitalize='none'
@@ -266,11 +254,11 @@ const SafeModeHomePage = () => {
                             onChangeText={setText}
                             value={text}
                         />
-                        <Pressable onPress={checkPassword} style={[AppStyle.formButton, {backgroundColor: Colors.backgroundColor, borderWidth: 1, borderColor: Colors.yellow}]} >
-                            <Text style={[AppStyle.textRegular, {color: Colors.yellow}]} >OK</Text>
+                        <Pressable onPress={checkPassword} style={AppStyle.formButton} >
+                            <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor}]} >OK</Text>
                         </Pressable>
                     </View>
-                    <Footer height={52}/>
+                    <Footer/>
                 </BottomSheetView>
             </BottomSheet>
         </SafeAreaView>
@@ -280,6 +268,13 @@ const SafeModeHomePage = () => {
 export default SafeModeHomePage
 
 const styles = StyleSheet.create({
+    topBar: {
+        width: '100%', 
+        paddingRight: 2, 
+        marginTop: 4, 
+        marginBottom: 10, 
+        justifyContent: "space-between"
+    },
     sideMenu: {
         position: 'absolute',
         top: 0,
@@ -309,8 +304,6 @@ const styles = StyleSheet.create({
     },
     todoItem: {
         width: '100%',
-        borderWidth: 1,
-        borderRadius: 4,
         marginBottom: 20
     },
     checkBox: {
@@ -319,5 +312,52 @@ const styles = StyleSheet.create({
         alignItems: "center", 
         justifyContent: "center", 
         padding: 4
+    },
+    bottomSheetContainer: {
+        paddingTop: 10,
+        paddingHorizontal: wp(4), 
+        gap: 10,
+        height: hp(85)
+    },
+    handleStyle: {
+        backgroundColor: Colors.backgroundSecondary, 
+        borderTopLeftRadius: 20, 
+        borderTopRightRadius: 20
+    },
+    handleIndicatorStyle: {
+        backgroundColor: Colors.yellow
+    },
+    backgroundStyle: {
+        backgroundColor: Colors.backgroundColor
+    },
+    input: {
+        color: Colors.white, 
+        paddingLeft: 10,
+        paddingVertical: 20,
+        backgroundColor: Colors.backgroundSecondary,
+        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
+    },
+    inputLarge: {
+        color: Colors.white,
+        paddingLeft: 10,
+        backgroundColor: Colors.backgroundSecondary,
+        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
+        height: 80
+    },
+    todoItemTop: {
+        width: '100%', 
+        borderTopRightRadius: AppConstants.COMMON.BORDER_RADIUS, 
+        borderTopLeftRadius: AppConstants.COMMON.BORDER_RADIUS, 
+        paddingHorizontal: 10, 
+        paddingVertical: 8,
+        justifyContent: "space-between"
+    },
+    todoItemBottom: {
+        paddingHorizontal: 10, 
+        paddingVertical: 8, 
+        borderWidth: 1, 
+        borderTopWidth: 0,
+        borderBottomLeftRadius: AppConstants.COMMON.BORDER_RADIUS, 
+        borderBottomRightRadius: AppConstants.COMMON.BORDER_RADIUS
     }
 })

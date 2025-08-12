@@ -35,7 +35,7 @@ const SearchBar = ({ onChangeValue, style, placeholder = 'search', color = 'whit
                 style={styles.icon}
                 onPress={clearText} 
                 hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE} >
-                <Ionicons name='close-circle-outline' size={28} color={color} />
+                <Ionicons name='close-circle-outline' size={24} color={color} />
             </Pressable>
         </View>
     )
@@ -47,8 +47,8 @@ const styles = StyleSheet.create({
     input: {
         paddingHorizontal: 10,
         height: 52,
-        borderRadius: 4,
-        backgroundColor: Colors.gray,
+        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
+        backgroundColor: Colors.backgroundSecondary,
         fontSize: 18,
         color: Colors.white,
         fontFamily: "LeagueSpartan_400Regular"

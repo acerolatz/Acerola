@@ -42,11 +42,11 @@ const Releases = () => {
             <Pressable onPress={async () => openUrl(item.url)} style={styles.item}>
                 <Row style={{width: '100%', justifyContent: "space-between"}} >
                     <Text style={[AppStyle.textHeader, {color: Colors.backgroundColor}]} >{item.version}</Text>
-                    <Ionicons name='download-outline' size={28} color={Colors.backgroundColor} />
+                    <Ionicons name='download-outline' size={24} color={Colors.backgroundColor} />
                 </Row>
                 {
                     item.action &&
-                    <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor, fontSize: 20}]} >{item.action}</Text>
+                    <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor}]} >{item.action}</Text>
                 }
             </Pressable>
         )

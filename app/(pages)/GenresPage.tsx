@@ -10,7 +10,14 @@ import { AppStyle } from '@/styles/AppStyle'
 import { router } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
 import React, { useEffect, useState } from 'react'
-import { FlatList, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native'
+import { 
+    FlatList, 
+    Pressable, 
+    SafeAreaView, 
+    StyleSheet, 
+    Text, 
+    View 
+} from 'react-native'
 
 
 const NUM_COLUMNS = 2
@@ -59,13 +66,13 @@ const GenresPage = () => {
             <TopBar title="Genres">
                 <ReturnButton/>
             </TopBar>
-            <View style={{flex: 1, width: '100%'}} >
+            <View style={{width: '100%'}} >
                 <FlatList
                     data={genres}
                     numColumns={2}
                     keyExtractor={(item) => item.genre_id.toString()}
                     showsVerticalScrollIndicator={false}
-                    initialNumToRender={20}
+                    initialNumToRender={30}
                     renderItem={renderItem}
                     ListFooterComponent={<Footer/>}
                 />

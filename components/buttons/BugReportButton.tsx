@@ -20,7 +20,7 @@ const BugReportButton = ({
     title, 
     size = AppConstants.COMMON.BUTTON.SIZE, 
     color = Colors.BugReportColor, 
-    backgroundColor = Colors.backgroundColor,
+    backgroundColor = 'transparent',
     padding = 6
 }: OpenBugReportButtonProps) => {
 

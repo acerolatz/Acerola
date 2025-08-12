@@ -18,7 +18,7 @@ const ReturnButton = ({
   size = AppConstants.COMMON.BUTTON.SIZE, 
   color = Colors.yellow, 
   onPress,
-  backgroundColor = Colors.almostBlack
+  backgroundColor = 'transparent'
 }: ReturnButtonProps) => {
 
   const router = useRouter();

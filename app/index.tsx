@@ -19,14 +19,16 @@ import {
 import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
 import { router } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { SafeAreaView } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 
 const App = () => {
 
-    const db = useSQLiteContext()    
+    const db = useSQLiteContext()
+
+    const isInitialized = useRef(false)
 
     let [fontsLoaded] = useFonts({
         LeagueSpartan_200ExtraLight,
@@ -36,6 +38,8 @@ const App = () => {
 
     useEffect(
         () => {
+            if (isInitialized.current) { return }
+            isInitialized.current = true
             async function init() {
                 if (await dbShouldClearCache(db)) {
                     await clearCache()
@@ -48,15 +52,13 @@ const App = () => {
                     Toast.show(ToastMessages.EN.NO_INTERNET)
                     router.replace("/(pages)/HomePage")
                     return
-                }                
+                }
 
                 if (await dbShouldUpdate(db, 'server')) {
                     Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE)
                     await dbSetLastRefresh(db, 'client')
-                    const n = await dbUpdateDatabase(db)
-                    n > 0 ?
-                        Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED) :
-                        Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED1)
+                    await dbUpdateDatabase(db)
+                    Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED)
                 }                
 
                 if (await dbIsSafeModeEnabled(db)) {
@@ -68,13 +70,7 @@ const App = () => {
             init()
         },
         [db]
-    )  
-
-    if (!fontsLoaded) {
-        return (
-            <SafeAreaView style={AppStyle.safeArea}/>
-        )
-    }
+    )
 
     return (
         <SafeAreaView style={AppStyle.safeArea} >

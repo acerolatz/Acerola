@@ -22,6 +22,7 @@ import { AppConstants } from '@/constants/AppConstants'
 import { dbGetUserHistory } from '@/lib/database'
 import { useSQLiteContext } from 'expo-sqlite'
 import Row from '@/components/util/Row'
+import Footer from '@/components/util/Footer'
 
 
 const WIDTH = wp(92)
@@ -51,7 +52,11 @@ const Donate = () => {
           const d = await spGetDonationMethods()
           if (isCancelled) { return }
           setDonates(d)
-          setDonateImageUrl(d.find(i => i.method === 'donation-banner')?.value)
+          const img_url = d.find(i => i.method === 'donation-banner')?.value
+          if (img_url) {
+            await Image.prefetch(img_url)
+            setDonateImageUrl(img_url)
+          }
         setLoading(false)
       }
       
@@ -111,12 +116,12 @@ const Donate = () => {
                   donateImageUrl && 
                   <Image 
                     source={donateImageUrl} 
-                    style={{width: WIDTH, height: HEIGHT, marginBottom: AppConstants.COMMON.MARGIN, alignSelf: "center", borderRadius: AppConstants.COMMON.BORDER_RADIUS}} 
+                    style={styles.image} 
                     contentFit='cover' />
                 }
               </>
             }
-            ListFooterComponent={<View style={{height: 62}} />}
+            ListFooterComponent={<Footer/>}
             renderItem={renderItem}
         />
     </SafeAreaView>
@@ -147,5 +152,12 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.donateColor,
     alignItems: "center",
     justifyContent: "center"
+  },
+  image: {
+    width: WIDTH, 
+    height: HEIGHT, 
+    marginBottom: AppConstants.COMMON.MARGIN, 
+    alignSelf: "center", 
+    borderRadius: AppConstants.COMMON.BORDER_RADIUS
   }
 })

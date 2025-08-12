@@ -72,6 +72,7 @@ const RequestManhwaForm = () => {
         <ScrollView style={{flex: 1}} keyboardShouldPersistTaps='always' >
             {/* Manga Name */}
             <Text style={AppStyle.inputHeaderText}>Manhwa</Text>
+            {errors.manga_title && (<Text style={AppStyle.error}>{errors.manga_title.message}</Text>)}
             <Controller
                 control={control}
                 name="manga_title"
@@ -84,13 +85,13 @@ const RequestManhwaForm = () => {
                     value={value}/>
                 )}
             />
-            {errors.manga_title && (<Text style={AppStyle.error}>{errors.manga_title.message}</Text>)}
 
             {/* Description */}
             <View style={{flexDirection: 'row', gap: 10, alignItems: "center", justifyContent: "center", alignSelf: 'flex-start'}} >
                 <Text style={AppStyle.inputHeaderText}>Message</Text>
                 <Text style={[AppStyle.textRegular, {fontSize: 12, color: Colors.requestMangaColor}]}>optional</Text>
             </View>
+            {errors.descr && (<Text style={AppStyle.error}>{errors.descr.message}</Text>)}            
             <Controller
                 name="descr"
                 control={control}
@@ -104,7 +105,6 @@ const RequestManhwaForm = () => {
                     value={value}/>
                 )}
             />
-            {errors.descr && (<Text style={AppStyle.error}>{errors.descr.message}</Text>)}            
     
             {/* Request Button */}
             {

@@ -21,7 +21,7 @@ interface RandomManhwaButtonProps {
 const RandomManhwaButton = ({
     size = AppConstants.COMMON.BUTTON.SIZE, 
     color = Colors.white,
-    backgroundColor = Colors.backgroundColor,
+    backgroundColor = 'transparent',
     onPress
 }: RandomManhwaButtonProps) => {
         

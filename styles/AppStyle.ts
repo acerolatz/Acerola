@@ -49,9 +49,9 @@ export const AppStyle = StyleSheet.create({
         backgroundColor: Colors.almostBlack  
     },
     input: {
-        backgroundColor: Colors.gray1,
+        backgroundColor: Colors.backgroundSecondary,
         borderRadius: AppConstants.COMMON.BORDER_RADIUS,
-        height: 50,
+        height: 52,
         paddingHorizontal: 10,
         color: AppConstants.TEXT.COLOR.LIGHT,
         fontSize: AppConstants.TEXT.SIZE.REGULAR,
@@ -68,7 +68,9 @@ export const AppStyle = StyleSheet.create({
         color: AppConstants.TEXT.COLOR.ERROR,
         alignSelf: "flex-start",
         fontSize: AppConstants.TEXT.SIZE.LIGTH,
-        fontFamily: AppConstants.TEXT.FONT.LIGHT
+        fontFamily: AppConstants.TEXT.FONT.REGULAR,
+        bottom: 4,
+        marginBottom: 6
     },
     formButton: {
         width: '100%',
@@ -76,8 +78,8 @@ export const AppStyle = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         height: 50,
-        borderRadius: 4,
-        backgroundColor: Colors.orange
+        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
+        backgroundColor: Colors.yellow
     },
     center: {
         alignItems: "center",
@@ -86,9 +88,9 @@ export const AppStyle = StyleSheet.create({
     defaultGridItem: {
         paddingHorizontal: 10,
         paddingVertical: 12,
-        backgroundColor: Colors.gray,
+        backgroundColor: Colors.backgroundSecondary,
         marginRight: AppConstants.COMMON.MARGIN,
-        borderRadius: 4,
+        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
         alignItems: "center",
         justifyContent: "center"
     }

@@ -2,6 +2,7 @@ import { AppConstants } from '@/constants/AppConstants';
 import { Colors } from '@/constants/Colors';
 import { Manhwa } from '@/helpers/types';
 import { dbGetManhwaReadingStatus, dbUpdateManhwaReadingStatus } from '@/lib/database';
+import { AppStyle } from '@/styles/AppStyle';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useSQLiteContext } from 'expo-sqlite';
 import React, { useEffect, useRef, useState } from 'react';
@@ -61,12 +62,12 @@ const AddToLibray = ({
                 style={[styles.dropDownContainer, {backgroundColor}]}
                 dropDownContainerStyle={{backgroundColor: Colors.backgroundColor, borderWidth: 2, borderColor: backgroundColor}}
                 labelStyle={{color: textColor}}
-                textStyle={styles.text}
+                textStyle={AppStyle.textRegular}
                 showArrowIcon={true}
                 ArrowUpIconComponent={() => {return <Ionicons name='chevron-up' size={20} color={Colors.backgroundColor} />}}
                 ArrowDownIconComponent={() => {return <Ionicons name='chevron-down' size={20} color={Colors.backgroundColor} />}}
                 placeholder='Add To Library'
-                placeholderStyle={[styles.placeholder, {color: textColor}]}
+                placeholderStyle={[AppStyle.textRegular, {color: textColor}]}
                 value={value as any}
                 items={items}
                 setOpen={setOpen}
@@ -85,15 +86,6 @@ const AddToLibray = ({
 export default AddToLibray
 
 const styles = StyleSheet.create({
-    placeholder: {        
-        fontSize: 18, 
-        fontFamily: "LeagueSpartan_400Regular"
-    },
-    text: {
-        fontFamily: "LeagueSpartan_400Regular", 
-        fontSize: 18, 
-        color: Colors.white
-    },
     dropDownContainer: {
         height: 52,
         borderRadius: AppConstants.COMMON.BORDER_RADIUS,

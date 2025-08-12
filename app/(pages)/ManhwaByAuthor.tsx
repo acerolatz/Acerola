@@ -7,7 +7,7 @@ import { dbReadManhwasByAuthorId } from '@/lib/database'
 import { AppStyle } from '@/styles/AppStyle'
 import { useLocalSearchParams } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { SafeAreaView } from 'react-native'
 
 
@@ -22,23 +22,25 @@ const ManhwaByAuthor = () => {
     
     const [manhwas, setManhwas] = useState<Manhwa[]>([])
     const [loading, setLoading] = useState(false)
+
+    const isInitialized = useRef(false)
     
     useEffect(
         () => {
             let isCancelled = false
+            if (isInitialized.current) { return }
+            isInitialized.current = true
             async function init() {
-                if (manhwas.length === 0) {
-                    setLoading(true)
-                        const m = await dbReadManhwasByAuthorId(db, author_id)
-                        if (isCancelled) { return }
-                        setManhwas(m)
-                    setLoading(false)
-                }
+                setLoading(true)
+                    const m = await dbReadManhwasByAuthorId(db, author_id)
+                    if (isCancelled) { return }
+                    setManhwas(m)
+                setLoading(false)
             }
             init()
             return () => { isCancelled = true }
         },
-        [db, manhwas, author_id]
+        [db]
     )    
 
     return (
@@ -50,8 +52,6 @@ const ManhwaByAuthor = () => {
                 manhwas={manhwas}
                 numColumns={2}
                 loading={loading}
-                hasResults={true}
-                listMode='FlatList'
                 showChaptersPreview={false}
             />
         </SafeAreaView>

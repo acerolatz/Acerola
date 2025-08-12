@@ -1,5 +1,6 @@
 import TopBar from '@/components/TopBar'
 import ReturnButton from '@/components/buttons/ReturnButton'
+import Footer from '@/components/util/Footer'
 import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
 import { Collection } from '@/helpers/types'
@@ -9,7 +10,15 @@ import { AppStyle } from '@/styles/AppStyle'
 import { router } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
 import React, { useEffect, useState } from 'react'
-import { FlatList, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native'
+import { 
+    FlatList, 
+    Pressable, 
+    SafeAreaView, 
+    StyleSheet, 
+    Text, 
+    View 
+} from 'react-native'
+
 
 const NUM_COLUMNS = 2
 const ITEM_WIDTH = (wp(92) - AppConstants.COMMON.MARGIN * (NUM_COLUMNS - 1)) / NUM_COLUMNS
@@ -64,7 +73,7 @@ const CollectionsPage = () => {
                 showsVerticalScrollIndicator={false}
                 numColumns={2}
                 renderItem={renderItem}
-                ListFooterComponent={<View style={{height: 62}} />}
+                ListFooterComponent={<Footer/>}
             />
         </SafeAreaView>
     )

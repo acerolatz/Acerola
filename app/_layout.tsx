@@ -1,3 +1,4 @@
+import { AppConstants } from '@/constants/AppConstants';
 import { Colors } from '@/constants/Colors';
 import { dbMigrate } from '@/lib/database';
 import { AppStyle } from '@/styles/AppStyle';
@@ -11,23 +12,26 @@ import Toast from 'react-native-toast-message';
 
 const TOAST_CONFIG = {
   success: ({ text1, text2 }: {text1: string, text2: string}) => (
-    <View style={[styles.toast, {borderColor: Colors.ononokiGreen}]}>
+    <View style={styles.toast}>
       <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 18}]}>{text1}</Text>
-      {text2 && <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 16}]}>{text2}</Text>}      
+      {text2 && <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 16}]}>{text2}</Text>}
+      <View style={[styles.leftBar, {backgroundColor: Colors.ononokiGreen}]} />
     </View>
   ),
   
   error: ({ text1, text2 }: {text1: string, text2: string}) => (
-    <View style={[styles.toast, {borderColor: Colors.neonRed}]}>
+    <View style={styles.toast}>
       <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 18}]}>{text1}</Text>
-      {text2 && <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 16}]}>{text2}</Text>}      
+      {text2 && <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 16}]}>{text2}</Text>}
+      <View style={[styles.leftBar, {backgroundColor: Colors.neonRed}]} />
     </View>
   ),
   
   info: ({ text1, text2 }: {text1: string, text2: string}) => (
-    <View style={[styles.toast, {borderColor: Colors.yellow}]}>
+    <View style={styles.toast}>
       <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 18}]}>{text1}</Text>
-      {text2 && <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 16}]}>{text2}</Text>}      
+      {text2 && <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 16}]}>{text2}</Text>}
+      <View style={[styles.leftBar, {backgroundColor: Colors.yellow}]} />
     </View>
   )
 };
@@ -84,10 +88,18 @@ const styles = StyleSheet.create({
     width: '92%',
     alignItems: "flex-start",
     justifyContent: "center",
-    paddingHorizontal: 12, 
-    paddingVertical: 6, 
-    borderRadius: 4,
-    backgroundColor: "#1f2226",
-    borderLeftWidth: 6
+    paddingLeft: 12,
+    paddingRight: 4,
+    borderRadius: AppConstants.COMMON.BORDER_RADIUS,
+    backgroundColor: "#1f2226"    
+  },
+  leftBar: {
+    position: 'absolute', 
+    left: 0, 
+    top: 0, 
+    width: 6,
+    height: '100%', 
+    borderTopLeftRadius: AppConstants.COMMON.BORDER_RADIUS, 
+    borderBottomLeftRadius: AppConstants.COMMON.BORDER_RADIUS
   }
 })

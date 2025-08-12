@@ -15,6 +15,7 @@ import {
     Platform,
     Pressable,
     ScrollView,
+    StyleSheet,
     Text,
     TextInput,
     View
@@ -158,7 +159,7 @@ const SettingsForm = ({currentMaxCacheSize, currentCacheSize, safeModePassword, 
                         }                        
                     </View>
 
-                    <View style={{width: '100%', height: 2, backgroundColor: Colors.white, borderRadius: AppConstants.COMMON.BORDER_RADIUS}} />
+                    <View style={styles.line} />
                     
                     <View>
                         <Text style={AppStyle.inputHeaderText}>Cache size: {formatBytes(currentCacheSize)}</Text>
@@ -169,11 +170,12 @@ const SettingsForm = ({currentMaxCacheSize, currentCacheSize, safeModePassword, 
                         <Text style={[AppStyle.textRegular, {color: Colors.neonRed, marginTop: 6}]}>* Restart Required</Text>
                     </View>
 
-                    <View style={{width: '100%', height: 2, backgroundColor: Colors.white, borderRadius: AppConstants.COMMON.BORDER_RADIUS}} />
+                    <View style={styles.line} />
                     
                     <View>
                         {/* Cache Size */}
                         <Text style={AppStyle.inputHeaderText}>Max cache size (MB)</Text>
+                        {errors.maxCacheSize && (<Text style={AppStyle.error}>{errors.maxCacheSize.message}</Text>)}
                         <Controller
                             control={control}
                             name="maxCacheSize"
@@ -187,7 +189,6 @@ const SettingsForm = ({currentMaxCacheSize, currentCacheSize, safeModePassword, 
                                 value={value.toString()}/>
                             )}
                         />
-                        {errors.maxCacheSize && (<Text style={AppStyle.error}>{errors.maxCacheSize.message}</Text>)}
                         {/* Save Button */}
                         {
                             isLoading ?
@@ -208,3 +209,13 @@ const SettingsForm = ({currentMaxCacheSize, currentCacheSize, safeModePassword, 
 }
 
 export default SettingsForm
+
+
+const styles = StyleSheet.create({
+    line: {
+        width: '100%', 
+        height: 2, 
+        backgroundColor: Colors.white, 
+        borderRadius: AppConstants.COMMON.BORDER_RADIUS
+    }
+})

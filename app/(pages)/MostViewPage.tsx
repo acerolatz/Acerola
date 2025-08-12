@@ -60,13 +60,10 @@ const MostView = () => {
       </TopBar>
       <ManhwaGrid
         manhwas={manhwas}
-        hasResults={true}
         loading={loading}
         numColumns={2}
-        showChaptersPreview={true}
         shouldShowChapterDate={false}
-        onEndReached={onEndReached}
-        listMode='FlashList'/>
+        onEndReached={onEndReached}/>
     </SafeAreaView>
   )
   

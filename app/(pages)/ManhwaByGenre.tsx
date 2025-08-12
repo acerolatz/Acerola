@@ -25,11 +25,14 @@ const MangaByGenre = () => {
     const [loading, setLoading] = useState(false)
     const hasResults = useRef(true)
     const page = useRef(0)
+    
     const isInitialized = useRef(false)
 
     useEffect(
         () => {
             let isCancelled = false
+            if (isInitialized.current) { return }
+            isInitialized.current = true
             async function init() {
                 setLoading(true)
                     const m = await dbReadManhwasByGenreId(db, genre_id, 0, PAGE_LIMIT)

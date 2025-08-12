@@ -4,15 +4,13 @@ import Column from '@/components/util/Column'
 import Footer from '@/components/util/Footer'
 import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
-import { ToastMessages } from '@/constants/Messages'
 import { openUrl } from '@/helpers/util'
 import { spFetchScans } from '@/lib/supabase'
 import { useScanState } from '@/store/scansState'
 import { AppStyle } from '@/styles/AppStyle'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import React, { useEffect, useState } from 'react'
-import { ActivityIndicator, Linking, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
-import Toast from 'react-native-toast-message'
+import { ActivityIndicator, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
 
 
 const ScansPage = () => {
@@ -58,7 +56,7 @@ const ScansPage = () => {
             </TopBar>
             <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps={'always'} >
                 <View style={styles.scanButton} >
-                    <Text style={[AppStyle.textRegular, {fontSize: 20, color: AppConstants.TEXT.COLOR.DARK}]} >
+                    <Text style={[AppStyle.textRegular, {color: AppConstants.TEXT.COLOR.DARK}]} >
                         {title}
                     </Text>
                 </View>

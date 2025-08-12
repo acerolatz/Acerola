@@ -1,6 +1,5 @@
 import { Colors } from '@/constants/Colors'
 import { Manhwa, ManhwaCard } from '@/helpers/types'
-import { hp, wp } from '@/helpers/util'
 import { spFetchManhwaById, spUpdateManhwaCardView } from '@/lib/supabase'
 import { useManhwaCardsState } from '@/store/randomManhwaState'
 import { AppStyle } from '@/styles/AppStyle'
@@ -20,9 +19,6 @@ import { AppConstants } from '@/constants/AppConstants'
 import CustomActivityIndicator from '../util/CustomActivityIndicator'
 
 
-const MAX_WIDTH = wp(87)
-const MAX_HEIGHT = hp(80)
-
 
 interface RandomCardsGridProps {
     reloadCards: () => any
@@ -31,11 +27,8 @@ interface RandomCardsGridProps {
 const ManhwaRandomCard = ({card}: {card: ManhwaCard}) => {
 
     const db = useSQLiteContext()
-    const height = card.height > MAX_HEIGHT ? MAX_HEIGHT : card.height
-    let width = (height * card.width) / card.height
-    width = width > MAX_WIDTH ? MAX_WIDTH : width
 
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false)    
 
     const onPress = async () => {
         const hasManhwa = await dbHasManhwa(db, card.manhwa_id)
@@ -59,16 +52,28 @@ const ManhwaRandomCard = ({card}: {card: ManhwaCard}) => {
 
     if (loading) {
         return (
-            <View style={{width, height, marginRight: AppConstants.COMMON.MARGIN, alignItems: 'center', justifyContent: "center"}} >
+            <View style={{
+                width: card.normalizedWidth, 
+                height: card.normalizedHeight, 
+                alignItems: 'center',
+                justifyContent: "center"
+            }} >
                 <CustomActivityIndicator/>
             </View>
         )
     }
 
     return (
-        <Pressable onPress={() => onPress()} style={{marginRight: AppConstants.COMMON.MARGIN}} >
-            <Image source={card.image_url} style={{width, height, borderRadius: 12}} contentFit='cover' />
-            <View style={{maxWidth: '90%', position: 'absolute', top: 6, left: 6, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, backgroundColor: Colors.yellow, borderWidth: 1, borderColor: Colors.backgroundColor}} >
+        <Pressable onPress={() => onPress()} >
+            <Image 
+                source={card.image_url} 
+                style={{
+                    width: card.normalizedWidth, 
+                    height: card.normalizedHeight, 
+                    borderRadius: AppConstants.COMMON.BORDER_RADIUS
+                }} 
+                contentFit='cover' />
+            <View style={styles.manhwaTitleContainer} >
                 <Text numberOfLines={1} style={[AppStyle.textRegular, {color: Colors.backgroundColor}]}>{card.title}</Text>
             </View>
         </Pressable>
@@ -78,8 +83,8 @@ const ManhwaRandomCard = ({card}: {card: ManhwaCard}) => {
 const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
     
     const { cards } = useManhwaCardsState()
-    const flatListRef = useRef<FlatList<ManhwaCard>>(null)    
-    
+    const flatListRef = useRef<FlatList<ManhwaCard>>(null)
+
     const reload = async () => {
         await reloadCards()
         flatListRef.current?.scrollToIndex({index: 0, animated: true})
@@ -108,10 +113,11 @@ const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
                 <Title title='Random'/>
                 <RotatingButton onPress={debounceReload} />
             </Row>
-            <View style={{width: '100%', height: MAX_HEIGHT}} >
+            <View style={{width: '100%'}} >
                 <FlatList
                     ref={flatListRef}
                     data={cards}
+                    ItemSeparatorComponent={() => <View style={{ width: AppConstants.COMMON.MARGIN }} />}
                     initialNumToRender={4}
                     onEndReachedThreshold={3}
                     showsHorizontalScrollIndicator={false}
@@ -130,5 +136,17 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         gap: 10
+    },
+    manhwaTitleContainer: {
+        maxWidth: '90%', 
+        position: 'absolute', 
+        top: 6, 
+        left: 6, 
+        paddingHorizontal: 12, 
+        paddingVertical: 8, 
+        borderRadius: AppConstants.COMMON.BORDER_RADIUS, 
+        backgroundColor: Colors.yellow, 
+        borderWidth: 1, 
+        borderColor: Colors.backgroundColor
     }
 })

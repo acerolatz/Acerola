@@ -59,7 +59,7 @@ const ManhwaPage = () => {
   const params = useLocalSearchParams()
   const manhwa_id: number = params.manhwa_id as any
   const [manhwa, setManhwa] = useState<Manhwa | null>(null)
-  const [altNames, setAltNames] = useState<string[]>([])
+  const [altNames, setAltNames] = useState<string[]>([])  
 
   useEffect(
     () => {
@@ -69,8 +69,8 @@ const ManhwaPage = () => {
           Toast.show(ToastMessages.EN.INVALID_MANHWA)
           router.replace("/(pages)/HomePage")
           return
-        }
-
+        }        
+        
         const m = await dbReadManhwaById(db, manhwa_id)
         if (!m) {
           Toast.show(ToastMessages.EN.INVALID_MANHWA)
@@ -108,41 +108,42 @@ const ManhwaPage = () => {
   return (
     <SafeAreaView style={[AppStyle.safeArea, styles.container]} >
       <ScrollView style={{flex: 1}} keyboardShouldPersistTaps={'always'} showsVerticalScrollIndicator={false} >
+
         <LinearGradient colors={[manhwa.color, Colors.backgroundColor]} style={styles.linearBackground} />
 
         {/* Top */}
         <Row style={styles.topBar} >
-            <HomeButton color={Colors.backgroundColor} iconName='home-outline' backgroundColor='transparent' />
+            <HomeButton color={Colors.backgroundColor} iconName='home-outline'/>
             <Row style={{gap: 20}} >
-              <BugReportButton color={Colors.backgroundColor} title={manhwa.title} backgroundColor='transparent' /> 
-              <RandomManhwaButton color={Colors.backgroundColor} backgroundColor='transparent' />
-              <ReturnButton color={Colors.backgroundColor} backgroundColor='transparent' />
+              <BugReportButton color={Colors.backgroundColor} title={manhwa.title}/> 
+              <RandomManhwaButton color={Colors.backgroundColor}/>
+              <ReturnButton color={Colors.backgroundColor}/>
             </Row>
         </Row>
         
+        {/* Main Content */}
         <View style={styles.manhwaContainer}>
-
           {/* Manhwa Image */}
           <View style={{width: '100%'}} >
-            <Image
-              source={manhwa.cover_image_url}
-              contentFit='cover'
-              style={styles.image} />
+            <Image source={manhwa.cover_image_url} contentFit='cover' style={styles.image} />
             <ManhwaIdComponent manhwa_id={manhwa.manhwa_id} />
           </View>
 
           {/* Title, Summary and Last Update */}
-          <View style={{alignSelf: "flex-start", gap: 10, marginBottom: 10}} >
+          <View style={{alignSelf: "flex-start"}} >
             <Text style={AppStyle.textMangaTitle}>{manhwa!.title}</Text>
             <ManhwaAlternativeNames names={altNames} />
             <Text style={AppStyle.textRegular}>{manhwa.descr}</Text>
-            <Text style={[AppStyle.textRegular, {alignSelf: "flex-start"}]}>Last update: {formatTimestamp(manhwa.updated_at)}</Text>
+            <Text style={[AppStyle.textRegular, {alignSelf: "flex-start", marginTop: 6}]}>
+              last update: {formatTimestamp(manhwa.updated_at)}
+            </Text>
           </View>
           
           {/* Genre and Authors Info */}
           <ManhwaAuthorInfo manhwa={manhwa} />
           <ManhwaGenreInfo manhwa={manhwa} />
 
+          {/* Libray */}
           <AddToLibray 
             manhwa={manhwa} 
             textColor={Colors.backgroundColor} 
@@ -150,15 +151,15 @@ const ManhwaPage = () => {
 
           {/* Status (OnGoing or Completed) and Num Views */}
           <Row style={{gap: AppConstants.COMMON.MARGIN}} >
-            <Item text={manhwa.status} textColor={Colors.backgroundColor} backgroundColor={manhwa.color} />
-            <Item text={`Views: ${formatNumberWithSuffix(manhwa.views + 1)}`} textColor={Colors.backgroundColor} backgroundColor={manhwa.color} />
+            <Item text={manhwa.status} backgroundColor={manhwa.color} />
+            <Item text={`Views: ${formatNumberWithSuffix(manhwa.views + 1)}`} backgroundColor={manhwa.color} />
           </Row>
 
           {/* Chapter Grid */}
           <ManhwaChapterGrid manhwa={manhwa} />
-
           <Footer/>
-        </View>          
+        </View>
+
       </ScrollView>
     </SafeAreaView>
   )
@@ -177,7 +178,7 @@ const styles = StyleSheet.create({
     width: wp(100),
     left: 0,    
     top: 0,
-    height: hp(100)
+    height: hp(95)
   },
   item: {
     height: 52,
@@ -204,7 +205,7 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: wp(92),
     height: 520, 
-    borderRadius: AppConstants.COMMON.BORDER_RADIUS
+    borderRadius: 42
   },
   bottomSheetContainer: {
     flex: 1,

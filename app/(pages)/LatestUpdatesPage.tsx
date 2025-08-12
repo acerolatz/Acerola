@@ -60,11 +60,8 @@ const LatestUpdatesPage = () => {
         manhwas={manhwas}
         loading={loading}
         numColumns={2}
-        hasResults={true}
-        showChaptersPreview={true}
         shouldShowChapterDate={false}
         onEndReached={onEndReached}
-        listMode='FlashList'
       />
     </SafeAreaView>
   )

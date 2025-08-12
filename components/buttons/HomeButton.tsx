@@ -18,7 +18,7 @@ const HomeButton = ({
   size = AppConstants.COMMON.BUTTON.SIZE, 
   color = Colors.white, 
   iconName = 'home', 
-  backgroundColor = Colors.backgroundColor
+  backgroundColor = 'transparent'
 }: HomeButtonProps) => {
 
   return (

@@ -34,7 +34,7 @@ const Option = ({onPress, title, iconName, backgroundColor}: OptionProps) => {
             onPress={onPress}
             style={styles.optionButton} 
             hitSlop={AppConstants.COMMON.HIT_SLOP.NORMAL} >
-            <View style={{padding: 6, backgroundColor, borderRadius: AppConstants.COMMON.BORDER_RADIUS}} >
+            <View style={{padding: 8, backgroundColor, borderRadius: AppConstants.COMMON.BORDER_RADIUS}} >
                 <Ionicons name={iconName as any} size={26} color={Colors.backgroundColor} />
             </View>
             <Text style={[[AppStyle.textRegular, {fontSize: 16}]]}>{title}</Text>
