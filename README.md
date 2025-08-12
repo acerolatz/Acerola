@@ -38,9 +38,10 @@ If you’d like to help cover server costs, donations are welcome. Details are a
 Safe Mode can be enabled in the settings. With Safe Mode enabled, the app behaves like a simple to-do list. To access the main content (pornhwa), you must enter the password you previously set.
 
 If you forget the password, it cannot be reset or recovered. To regain access to the main content, you must delete the app data via Android or iOS settings and restart the app.
+
 <div style="display: flex; flex-wrap: wrap; gap: 2%;">
-  <img style='max-width: 720px' src="github/images/settings.jpg" width="49%" alt="Academy Image 1" />
-  <img style='max-width: 720px' src="github/images/todo.jpg" width="49%" alt="Academy Image 2" />
+  <img style='max-width: 720px' src="github/images/settings.webp" width="49%" alt="Academy Image 1" />
+  <img style='max-width: 720px' src="github/images/todo.webp" width="49%" alt="Academy Image 2" />
 </div>
 
 # Usability
@@ -49,17 +50,17 @@ The interface is entirely in English and designed to be intuitive.
 If you’ve used mobile apps before, you’ll find it easy to navigate.
 Screenshots are included below for reference.
 
-<img src="github/images/home.jpg" style='max-width: 720px' />
+<img src="github/images/home.webp" style='max-width: 720px' />
 
 <div style="display: flex; flex-wrap: wrap; gap: 2%;">
-  <img style='max-width: 720px' src="github/images/academy.jpg" width="49%" alt="Academy Image 1" />
-  <img style='max-width: 720px' src="github/images/academy2.jpg" width="49%" alt="Academy Image 2" />
+  <img style='max-width: 720px' src="github/images/academy.webp" width="49%" alt="Academy Image 1" />
+  <img style='max-width: 720px' src="github/images/academy2.webp" width="49%" alt="Academy Image 2" />
 </div>
 
-<img src="github/images/library.jpg" style='max-width: 720px' />
+<img src="github/images/library.webp" style='max-width: 720px' />
 
-<img src="github/images/chapter.jpg" style='max-width: 720px' />
+<img src="github/images/chapter.webp" style='max-width: 720px' />
 
-<img src="github/images/menu.jpg" style='max-width: 720px' />
+<img src="github/images/menu.webp" style='max-width: 720px' />
 
-<img src="github/images/random.jpg" style='max-width: 720px' />
+<img src="github/images/random.webp" style='max-width: 720px' />
