@@ -1,21 +1,16 @@
 # Acerola - Manhwa Reader (NSFW)
 
-
-Acerola is a React Native mobile app for reading adult manhwas (pornhwa), developed with a focus on Android. Testing has not been performed on iOS. If you're interested in working on the iOS version, please contact me, and I can provide access to a test database for development. You can audit the source code and download the latest APK from the Releases section.
+Acerola is a React Native mobile app for reading adult manhwas (pornhwa), developed with a focus on Android. It has not been tested on iOS. If you're interested in working on the iOS version, please contact me, and I can provide access to a test database for development. You can audit the source code and download the latest APK from the Releases section.
 
 # Backend & Infrastructure
 
-- Images are hosted via Cloudflare.
+- Images: Hosted and delivered via Cloudflare infrastructure.
 
-- The database is currently on a free Supabase instance. The need for a more robust instance will be assessed as the project grows.
+- Database: Uses a free Supabase instance (may be upgraded as the project grows).
 
-- Offline Access: The database, containing over 500 manhwas, is stored locally on your device for fast performance.
+- Local First: A database of 550+ manhwas is stored locally for fast performance.
 
-- Sync: Keep your local library up-to-date by tapping the sync button on the home page to fetch the latest data from the cloud.
-
-# Support the Project
- 
-Acerola is free to use. If you'd like to support server costs, donations are welcome. Donation details for PayPal and Bitcoin are available in the app's menu.
+- Sync: Tap the sync button on the home page to fetch the latest data from the cloud
 
 # Permissions (Android)
 
@@ -29,33 +24,42 @@ The app's Bug Report feature allows users to attach images. The application will
 
 # APK
 
-The APK is available in the project's 'Releases' tab here on GitHub. Feel free to verify the APK with online analysis tools such as https://www.androidfreeware.net/apk-check or https://sisik.eu/apk-tool. Alternatively, you can use an Android Emulator to safely test the app.
+The APK is available in the project's Releases tab here on GitHub. Feel free to verify the APK with online analysis tools such as https://www.androidfreeware.net/apk-check or https://sisik.eu/apk-tool. Alternatively, you can use an Android Emulator to safely test the app.
+
+
+# Support the Project
+ 
+Acerola is free to use.
+
+If you’d like to help cover server costs, donations are welcome. Details are available in the app’s menu.
+
+# Safe Mode
+
+Safe Mode can be enabled in the settings. With Safe Mode enabled, the app behaves like a simple to-do list. To access the main content (pornhwa), you must enter the password you previously set.
+
+If you forget the password, it cannot be reset or recovered. To regain access to the main content, you must delete the app data via Android or iOS settings and restart the app.
+<div style="display: flex; flex-wrap: wrap; gap: 2%;">
+  <img style='max-width: 720px' src="github/images/settings.jpg" width="49%" alt="Academy Image 1" />
+  <img style='max-width: 720px' src="github/images/todo.jpg" width="49%" alt="Academy Image 2" />
+</div>
 
 # Usability
 
-The app's interface is entirely in English and is designed to be intuitive. If you're familiar with mobile apps, you'll find it easy to use. Screenshots are provided below to give you a preview.
+The interface is entirely in English and designed to be intuitive.
+If you’ve used mobile apps before, you’ll find it easy to navigate.
+Screenshots are included below for reference.
 
-# Home
 <img src="github/images/home.jpg" style='max-width: 720px' />
 
-# Manhwa Page
 <div style="display: flex; flex-wrap: wrap; gap: 2%;">
   <img style='max-width: 720px' src="github/images/academy.jpg" width="49%" alt="Academy Image 1" />
-  <img style='max-width: 720px' src="github/images/academy2.jpeg" width="49%" alt="Academy Image 2" />
+  <img style='max-width: 720px' src="github/images/academy2.jpg" width="49%" alt="Academy Image 2" />
 </div>
-
-# Library
 
 <img src="github/images/library.jpg" style='max-width: 720px' />
 
-# Chapter Reader
-
 <img src="github/images/chapter.jpg" style='max-width: 720px' />
 
-# Menu
-
 <img src="github/images/menu.jpg" style='max-width: 720px' />
-
-# Random Manhwas
 
 <img src="github/images/random.jpg" style='max-width: 720px' />

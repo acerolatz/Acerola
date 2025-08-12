@@ -23,6 +23,7 @@ import RNRestart from 'react-native-restart';
 import Toast from 'react-native-toast-message';
 import * as yup from 'yup';
 import Row from '../util/Row';
+import Footer from '../util/Footer';
 
 
 interface FormData {
@@ -128,6 +129,7 @@ const SettingsForm = ({currentMaxCacheSize, currentCacheSize, safeModePassword, 
                             <Text style={[AppStyle.inputHeaderText, {color: Colors.neonRed}]}>{isSafeModeOn ? 'enabled' : 'disabled'}</Text>
                         </Row>
                         <Text style={AppStyle.textRegular}>When safe mode is enabled, the app will function as a simple to-do list. To unlock the main (pornhwa) app, you will need the numeric password you define below.</Text>
+                        <Text style={[AppStyle.textRegular, {color: Colors.neonRed}]}>If you forget the password, it cannot be reset or recovered. You will need to delete the app data via Android or iOS settings to regain access to the main content.</Text>
                         <Text style={[AppStyle.textRegular, {color: Colors.neonRed}]}>Your changes will be applied when the app restarts.</Text>
                         
                         <Text style={AppStyle.inputHeaderText} >Safe Mode Password</Text>
@@ -198,11 +200,9 @@ const SettingsForm = ({currentMaxCacheSize, currentCacheSize, safeModePassword, 
                                 <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor}]} >Save</Text>
                             </Pressable>
                         }
-                    </View>                
-
+                    </View>
+                    <Footer/>
                 </View>
-                
-                <View style={{width: '100%', height: 52}} />
             </ScrollView>
         </KeyboardAvoidingView>
     )
