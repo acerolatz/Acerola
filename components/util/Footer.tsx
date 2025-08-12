@@ -1,9 +1,9 @@
 import { View } from 'react-native'
 import React from 'react'
 
-const Footer = () => {
+const Footer = ({height = 52}: {height?: number}) => {
   return (
-    <View style={{height: 52}} />
+    <View style={{height}} />
   )
 }
 

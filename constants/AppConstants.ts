@@ -34,7 +34,7 @@ export const AppConstants = {
     },
     COMMON: {
         APP_NAME: "Acerola",
-        DEBUG_MODE: true,
+        DEBUG_MODE: false,
         BORDER_RADIUS: 4,
         MARGIN: 6,
         MANHWA_COVER_DIMENSION: {
@@ -84,7 +84,7 @@ export const AppConstants = {
             LIGTH: 14,
             REGULAR: 18,
             SEMIBOLD: 24,
-            BOLD: 28
+            BOLD: 26
         },        
         FONT: {
             LIGHT: "LeagueSpartan_200ExtraLight",

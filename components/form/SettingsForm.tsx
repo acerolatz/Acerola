@@ -122,15 +122,14 @@ const SettingsForm = ({currentMaxCacheSize, currentCacheSize, safeModePassword, 
         <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
             <ScrollView style={{flex: 1}} keyboardShouldPersistTaps='always' showsVerticalScrollIndicator={false} >
                 <View style={{gap: 20}} >
-
                     <View>
                         <Row style={{gap: 10, alignSelf: 'flex-start'}} >
                             <Text style={AppStyle.inputHeaderText}>Safe Mode</Text>
                             <Text style={[AppStyle.inputHeaderText, {color: Colors.neonRed}]}>{isSafeModeOn ? 'enabled' : 'disabled'}</Text>
                         </Row>
-                        <Text style={AppStyle.textRegular}>When safe mode is enabled, the app will function as a simple to-do list. To unlock the main (pornhwa) app, you will need the numeric password you define below.</Text>
-                        <Text style={[AppStyle.textRegular, {color: Colors.neonRed}]}>If you forget the password, it cannot be reset or recovered. You will need to delete the app data via Android or iOS settings to regain access to the main content.</Text>
-                        <Text style={[AppStyle.textRegular, {color: Colors.neonRed}]}>Your changes will be applied when the app restarts.</Text>
+                        <Text style={AppStyle.textRegular}>When safe mode is enabled, {AppConstants.COMMON.APP_NAME} will function as a simple to-do list. To unlock the main content, you will need the numeric password you define below.</Text>
+                        <Text style={[AppStyle.textRegular, {color: Colors.neonRed}]}>If you forget the password, it cannot be reset or recovered. You must delete the app data via {Platform.OS} settings to regain access to the main content.</Text>
+                        <Text style={[AppStyle.textRegular, {color: Colors.neonRed}]}>Changes to Safe Mode settings will be applied when the app restarts.</Text>
                         
                         <Text style={AppStyle.inputHeaderText} >Safe Mode Password</Text>
                         <TextInput

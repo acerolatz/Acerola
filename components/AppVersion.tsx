@@ -29,7 +29,7 @@ const AppVersion = () => {
     return (
         <View>
             <Text style={[AppStyle.textRegular, {marginBottom: 10, color: Colors.releasesColor}]} >
-                Your app version: {localVersion}
+                Your app version is {localVersion}
             </Text>
         </View>        
     )

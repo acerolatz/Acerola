@@ -230,7 +230,6 @@ const HomePage = () => {
                 handleIndicatorStyle={{backgroundColor: Colors.donateColor}}
                 handleStyle={{backgroundColor: Colors.backgroundSecondary, borderRadius: 20}}
                 backgroundStyle={{backgroundColor: Colors.backgroundSecondary}}
-                
                 enablePanDownToClose={true}
             >
                 <BottomSheetView style={{paddingHorizontal: wp(4), gap: 10}} >
@@ -251,7 +250,7 @@ const HomePage = () => {
                     <Pressable onPress={neverShowDonationMessageAgain} >
                         <Text style={[AppStyle.textRegular, {fontSize: 16, textDecorationLine: 'underline'}]}>Never show again.</Text>
                     </Pressable>
-                    <Footer/>
+                    <Footer height={42}/>
                 </BottomSheetView>
             </BottomSheet>
 

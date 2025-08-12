@@ -26,13 +26,6 @@ The app's Bug Report feature allows users to attach images. The application will
 
 The APK is available in the project's Releases tab here on GitHub. Feel free to verify the APK with online analysis tools such as https://www.androidfreeware.net/apk-check or https://sisik.eu/apk-tool. Alternatively, you can use an Android Emulator to safely test the app.
 
-
-# Support the Project
- 
-Acerola is free to use.
-
-If you’d like to help cover server costs, donations are welcome. Details are available in the app’s menu.
-
 # Safe Mode
 
 Safe Mode can be enabled in the settings. With Safe Mode enabled, the app behaves like a simple to-do list. To access the main content (pornhwa), you must enter the password you previously set.
@@ -44,11 +37,15 @@ If you forget the password, it cannot be reset or recovered. To regain access to
   <img style='max-width: 720px' src="github/images/todo.webp" width="49%" alt="Academy Image 2" />
 </div>
 
+# Support the Project
+ 
+Acerola is free to use.
+
+If you’d like to help cover server costs, donations are welcome. Details are available in the app’s menu.
+
 # Usability
 
-The interface is entirely in English and designed to be intuitive.
-If you’ve used mobile apps before, you’ll find it easy to navigate.
-Screenshots are included below for reference.
+The interface is entirely in English and designed to be intuitive. You’ll find it easy to navigate. Screenshots are included below for reference.
 
 <img src="github/images/home.webp" style='max-width: 720px' />
 

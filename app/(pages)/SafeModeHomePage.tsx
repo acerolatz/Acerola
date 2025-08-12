@@ -1,5 +1,5 @@
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { SafeAreaView } from 'react-native'
 import { AppStyle } from '@/styles/AppStyle'
 import Row from '@/components/util/Row'
@@ -11,7 +11,7 @@ import { AppConstants } from '@/constants/AppConstants'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useSQLiteContext } from 'expo-sqlite'
 import { Todo } from '@/helpers/types'
-import { dbCreateTodo, dbDeleteTodo, dbReadTodos, dbUpdateTodo } from '@/lib/database'
+import { dbCheckPassword, dbCreateTodo, dbDeleteTodo, dbReadTodos, dbUpdateTodo } from '@/lib/database'
 import { TextInput } from 'react-native-gesture-handler'
 import Column from '@/components/util/Column'
 import Toast from 'react-native-toast-message'
@@ -19,6 +19,9 @@ import CustomActivityIndicator from '@/components/util/CustomActivityIndicator'
 import { Keyboard } from 'react-native'
 import PageActivityIndicator from '@/components/util/PageActivityIndicator'
 import { router } from 'expo-router'
+import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
+import TopBar from '@/components/TopBar'
+import Footer from '@/components/util/Footer'
 
 
 const SCREEN_WIDTH = wp(100)
@@ -154,7 +157,9 @@ const SafeModeHomePage = () => {
 
     const db = useSQLiteContext()
     const [todos, setTodos] = useState<Todo[]>([])
-    const [loading, setLoading] = useState(false)    
+    const [loading, setLoading] = useState(false)
+    const [text, setText] = useState('')
+    const bottomSheetRef = useRef<BottomSheet>(null)
 
     useEffect(
         () => {
@@ -166,11 +171,31 @@ const SafeModeHomePage = () => {
             init()
         },
         [db]
-    )    
+    )
 
-    const openSettings = () => {
-        router.navigate("/SafeModeSettings")
+    const checkPassword = async () => {
+        Keyboard.dismiss()
+        const success = await dbCheckPassword(db, text)
+        if (success) {
+            Toast.show({text1: "Success!", type: "success"})
+            router.replace("/HomePage")
+        } else {
+            Toast.show({
+                text1: "Error", 
+                text2: "Invalid password", 
+                type: "error"
+            })
+        }
     }
+
+    const handleOpenBottomSheet = useCallback(() => {
+        Keyboard.dismiss()
+        bottomSheetRef.current?.expand();
+    }, []);
+    
+    const handleCloseBottomSheet = useCallback(() => {
+        bottomSheetRef.current?.close();
+    }, []);
 
     if (loading) {
         return (
@@ -199,7 +224,7 @@ const SafeModeHomePage = () => {
                 <AppLogo name='To do List' />
                 <Button 
                     iconName='settings-outline' 
-                    onPress={openSettings}
+                    onPress={handleOpenBottomSheet}
                     iconSize={22} 
                     iconColor={Colors.white} 
                     showLoading={false} />
@@ -215,6 +240,39 @@ const SafeModeHomePage = () => {
                     ListFooterComponent={<View style={{height: 52}} />}
                 />
             </View>
+            <BottomSheet
+                ref={bottomSheetRef}
+                index={-1}
+                handleIndicatorStyle={{backgroundColor: Colors.yellow}}
+                handleStyle={{backgroundColor: Colors.backgroundSecondary, borderTopLeftRadius: 20, borderTopRightRadius: 20}}
+                backgroundStyle={{backgroundColor: Colors.backgroundColor}}
+                enablePanDownToClose={true}
+            >
+                <BottomSheetView style={{paddingHorizontal: wp(4), gap: 10, height: hp(85)}} >
+                    <TopBar title='Settings' titleColor={Colors.yellow}>
+                        <Pressable onPress={handleCloseBottomSheet} >
+                            <Ionicons name='close-circle-outline' color={Colors.yellow} size={28} />
+                        </Pressable>
+                    </TopBar>
+                    <Text style={[AppStyle.textRegular, {}]}>Consider making a donation to help keep the servers running.</Text>
+                    <View style={{width: '100%'}} >
+                        <Text style={[AppStyle.textRegular, {color: Colors.neonRed, marginBottom: 10}]}>You need the password to access the settings.</Text>
+                        <TextInput
+                            style={AppStyle.input}
+                            autoCapitalize='none'
+                            secureTextEntry={true}
+                            placeholder='password'
+                            placeholderTextColor={'white'}
+                            onChangeText={setText}
+                            value={text}
+                        />
+                        <Pressable onPress={checkPassword} style={[AppStyle.formButton, {backgroundColor: Colors.backgroundColor, borderWidth: 1, borderColor: Colors.yellow}]} >
+                            <Text style={[AppStyle.textRegular, {color: Colors.yellow}]} >OK</Text>
+                        </Pressable>
+                    </View>
+                    <Footer height={52}/>
+                </BottomSheetView>
+            </BottomSheet>
         </SafeAreaView>
     )
 }

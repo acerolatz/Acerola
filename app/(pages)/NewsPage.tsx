@@ -102,7 +102,7 @@ const NewsPage = () => {
             return <CustomActivityIndicator color={Colors.newsColor} />
         }
         return <Footer/>
-    }
+    }    
 
     return (
         <SafeAreaView style={AppStyle.safeArea} >

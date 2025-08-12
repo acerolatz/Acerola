@@ -6,9 +6,8 @@ import { AppStyle } from '@/styles/AppStyle'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { router } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
-import React, { useState } from 'react'
+import React from 'react'
 import {
-    ActivityIndicator,
     Pressable,
     SafeAreaView,
     ScrollView,
@@ -18,60 +17,29 @@ import {
 } from 'react-native'
 import CloseBtn from './buttons/CloseButton'
 import TopBar from './TopBar'
-
-
-
-const ICON_SIZE = 26
+import Footer from './util/Footer'
 
 
 interface OptionProps {
     onPress: () => void
-    iconColor?: string
+    backgroundColor: string
     title: string
     iconName: string
-    showLoading?: boolean
 }
 
 
-const Option = ({onPress, title, iconName, iconColor = Colors.white, showLoading = true}: OptionProps) => {
-
-    const [loading, setLoading] = useState(false)
-
-    const p = async () => {
-        setLoading(true)
-        await onPress()
-        setLoading(false)
-    }
-
-    if (loading && showLoading) {
-        return (
-            <View
-                style={styles.link}
-                hitSlop={AppConstants.COMMON.HIT_SLOP.NORMAL} >
-                <View style={{padding: 5, backgroundColor: iconColor, borderRadius: 4}} >
-                    <ActivityIndicator size={ICON_SIZE} color={Colors.backgroundColor} />
-                </View>
-                <Text style={[[AppStyle.textRegular, {fontSize: 16}]]}>{title}</Text>
-            </View>
-        )    
-    }
-
+const Option = ({onPress, title, iconName, backgroundColor}: OptionProps) => {    
     return (
         <Pressable 
-            onPress={p} 
-            style={styles.link} 
+            onPress={onPress}
+            style={styles.optionButton} 
             hitSlop={AppConstants.COMMON.HIT_SLOP.NORMAL} >
-            <View style={{padding: 8, backgroundColor: iconColor, borderRadius: AppConstants.COMMON.BORDER_RADIUS}} >
-                <Ionicons name={iconName as any} size={ICON_SIZE} color={Colors.backgroundColor} />
+            <View style={{padding: 6, backgroundColor, borderRadius: AppConstants.COMMON.BORDER_RADIUS}} >
+                <Ionicons name={iconName as any} size={26} color={Colors.backgroundColor} />
             </View>
             <Text style={[[AppStyle.textRegular, {fontSize: 16}]]}>{title}</Text>
         </Pressable>
     )
-}
-
-
-interface LateralMenuProps {
-    closeMenu: () => any
 }
 
 const readingHistoryPage = () => {
@@ -118,7 +86,11 @@ const openReleases = () => {
     router.navigate("/(pages)/ReleasesPage")
 }
 
-    
+
+interface LateralMenuProps {
+    closeMenu: () => any
+}
+
 const LateralMenu = ({closeMenu}: LateralMenuProps) => {
         
     const db = useSQLiteContext()    
@@ -137,104 +109,91 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
             </TopBar>
             <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} >
                 <View style={styles.container} >
-
                     <Option 
                         onPress={libraryPage} 
                         title='Library' 
-                        iconName='library-outline'
-                        showLoading={false}
-                        iconColor={Colors.libraryColor}
+                        iconName='library-outline'                        
+                        backgroundColor={Colors.libraryColor}
                     />                
                     
                     <Option 
                         onPress={readingHistoryPage} 
                         title='Reading History' 
-                        iconName='book-outline'
-                        showLoading={false}
-                        iconColor={Colors.readingHistoryColor}
+                        iconName='book-outline'                        
+                        backgroundColor={Colors.readingHistoryColor}
                     />
 
                     <Option 
                         onPress={openDonate} 
                         title='Donate' 
-                        iconName='cash-outline'
-                        showLoading={false}
-                        iconColor={Colors.donateColor}
+                        iconName='cash-outline'                        
+                        backgroundColor={Colors.donateColor}
                     />
 
                     <Option 
                         onPress={openNews} 
                         title='News' 
-                        iconName='newspaper-outline'
-                        showLoading={false}
-                        iconColor={Colors.newsColor}
+                        iconName='newspaper-outline'                        
+                        backgroundColor={Colors.newsColor}
                     />
 
                     <Option 
                         onPress={openManhwaRequest} 
                         title='Request Manhwa'
                         iconName='megaphone-outline'
-                        showLoading={false}
-                        iconColor={Colors.requestMangaColor}
+                        backgroundColor={Colors.requestMangaColor}
                     />
 
                     <Option 
                         onPress={openReleases} 
                         title='Releases' 
-                        iconName='git-branch-outline'
-                        showLoading={false}
-                        iconColor={Colors.releasesColor}
+                        iconName='git-branch-outline'                        
+                        backgroundColor={Colors.releasesColor}
                     />
 
                     <Option 
                         onPress={openBugReport} 
                         title='Bug Report' 
-                        iconName='bug-outline'
-                        showLoading={false}
-                        iconColor={Colors.BugReportColor}
+                        iconName='bug-outline'                        
+                        backgroundColor={Colors.BugReportColor}
                     />
 
                     <Option 
                         onPress={scansPage} 
                         title='Scans' 
-                        iconName='earth-outline'
-                        showLoading={false}
-                        iconColor={Colors.scansColor}
+                        iconName='earth-outline'                        
+                        backgroundColor={Colors.scansColor}
                     />
 
                     <Option 
                         onPress={openReddit} 
                         title='Reddit' 
-                        iconName='logo-reddit'
-                        showLoading={false}
-                        iconColor={Colors.redditColor}
+                        iconName='logo-reddit'                        
+                        backgroundColor={Colors.redditColor}
                     />
 
                     <Option 
                         onPress={openGithub} 
                         title='GitHub' 
-                        iconName='logo-github'
-                        showLoading={false}
-                        iconColor={Colors.white}
+                        iconName='logo-github'                        
+                        backgroundColor={Colors.white}
                     />
 
                     <Option 
                         onPress={openDisclaimer} 
                         title='EULA / Disclaimer' 
-                        iconName='reader-outline'
-                        showLoading={false}
-                        iconColor={Colors.disclaimerColor}
+                        iconName='reader-outline'                        
+                        backgroundColor={Colors.disclaimerColor}
                     />
 
                     <Option 
                         onPress={openSettings} 
                         title='Settings' 
-                        iconName='settings-outline'
-                        showLoading={false}
-                        iconColor={'white'}
+                        iconName='settings-outline'                        
+                        backgroundColor={'white'}
                     />
                     
-                    <View style={{height: 52}} />
+                    <Footer/>
                 </View>            
             </ScrollView>
         </SafeAreaView>
@@ -248,7 +207,7 @@ const styles = StyleSheet.create({
         flex: 1,
         gap: 12
     },
-    link: {
+    optionButton: {
         width: '100%',
         gap: 12,
         flexDirection: 'row',

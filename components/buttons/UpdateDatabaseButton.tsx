@@ -54,7 +54,7 @@ const UpdateDatabaseButton = ({
                 if (n > 0) {
                     Toast.show({
                         text1: "Sync completed",
-                        text2: `Num manhwas: ${n}`,
+                        text2: `Pornhwas: ${n}`,
                         type: "info"
                     })
                     router.replace("/(pages)/HomePage")
