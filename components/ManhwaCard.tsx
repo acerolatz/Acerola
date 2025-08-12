@@ -33,7 +33,7 @@ interface ManhwaCardProps {
 
 const ManhwaCard = ({
     manhwa,
-    styleProp,
+    styleProp,    
     width = AppConstants.COMMON.MANHWA_COVER_DIMENSION.WIDTH,
     height = AppConstants.COMMON.MANHWA_COVER_DIMENSION.HEIGHT,
     marginRight = AppConstants.COMMON.MARGIN,
@@ -67,7 +67,7 @@ const ManhwaCard = ({
                 <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 20}]}>{manhwa.title}</Text>
                 {
                     showChaptersPreview && 
-                    manhwa.chapters &&
+                    manhwa.chapters &&                    
                     <View style={{gap: 12, marginTop: 6}} >
                         {manhwa.chapters.map(
                             (item, index) => 

@@ -44,6 +44,21 @@ export async function spNewRun(user_id: string, device: string) {
 }
 
 
+export async function spFetchManhwaById(manhwa_id: number): Promise<Manhwa | null> {
+    const { data, error } = await supabase
+        .from("mv_manhwas")
+        .select('*')
+        .eq("manhwa_id", manhwa_id)
+        .single()
+
+    if (error) {
+        console.log("error spFetchManhwaById", error)
+        return null
+    }
+
+    return data
+}
+
 export async function spFetchNews(page: number = 0, limit: number = 10): Promise<Post[]> {
     const { data, error } = await supabase
         .from("news")

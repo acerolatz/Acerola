@@ -34,7 +34,7 @@ export const AppConstants = {
     },
     COMMON: {
         APP_NAME: "Acerola",
-        DEBUG_MODE: false,
+        DEBUG_MODE: true,
         BORDER_RADIUS: 4,
         MARGIN: 6,
         MANHWA_COVER_DIMENSION: {

@@ -497,7 +497,7 @@ export async function dbUpsertManhwa(db: SQLite.SQLiteDatabase, manhwa: Manhwa) 
       manhwa.views, 
       manhwa.updated_at
     ]
-  ).catch(error => console.log("error dbUpsertManhwa", error));
+  ).catch(error => console.log("error dbUpsertManhwa", error));  
 
   // Genres
   await dbUpsertManhwaGenres(db, manhwa.genres.map(g => {return {genre: g.genre, genre_id: g.genre_id, manhwa_id: manhwa.manhwa_id}}))
@@ -507,11 +507,32 @@ export async function dbUpsertManhwa(db: SQLite.SQLiteDatabase, manhwa: Manhwa) 
   await dbUpsertManhwaAuthors(db, manhwa.authors.map(a => {return {author_id: a.author_id, manhwa_id: manhwa.manhwa_id, name: a.name, role: a.role}}))
   
   // Chapters
-  await dbUpsertChapter(db, manhwa.chapters)
+  await dbUpsertChapter(db, manhwa.chapters.map(i => {return {...i, manhwa_id: manhwa.manhwa_id}}))
+    
+  await dbUpsertAltTitles(
+    db, 
+    manhwa.manhwa_id, 
+    manhwa.alt_titles ? [manhwa.title, ...manhwa.alt_titles] : [manhwa.title]
+  )
 }
 
 
-async function dbUpsertAltTitles(db: SQLite.SQLiteDatabase, titles: (number | string)[]) {  
+async function dbUpsertAltTitles(db: SQLite.SQLiteDatabase, manhwa_id: number, titles: string[]) {  
+  const placeholders = titles.map(() => `(${manhwa_id},?)`).join(',');
+
+  await db.runAsync(
+    `
+      INSERT OR REPLACE INTO alt_titles (
+        manhwa_id,
+        title
+      )
+      VALUES ${placeholders};
+    `,
+    titles
+  ).catch(error =>  console.log("error dbUpsertAltTitles", error))
+}
+
+async function dbUpsertAltTitlesBatch(db: SQLite.SQLiteDatabase, titles: (number | string)[]) {
   let placeholders = ''
   const p = '(?, ?), '
   for (let i = 0; i < titles.length / 2; i++) {
@@ -743,7 +764,7 @@ export async function dbUpdateDatabase(db: SQLite.SQLiteDatabase): Promise<numbe
       
     })
 
-    await dbUpsertAltTitles(db, titles)
+    await dbUpsertAltTitlesBatch(db, titles)
               
     await dbUpsertGenres(db, Array.from(genres))
     await dbUpsertManhwaGenres(db, manhwaGenres)
@@ -789,7 +810,7 @@ export async function dbHasManhwa(db: SQLite.SQLiteDatabase, manhwa_id: number):
         manhwa_id = ?;
     `,
     [manhwa_id]  
-  ).catch(error => console.log('dbHasManhwa', error));
+  ).catch(error => {console.log('dbHasManhwa', error); return null});
   return row !== null
 }
 

@@ -1,17 +1,23 @@
 import { Colors } from '@/constants/Colors'
-import { ManhwaCard } from '@/helpers/types'
+import { Manhwa, ManhwaCard } from '@/helpers/types'
 import { hp, wp } from '@/helpers/util'
-import { spUpdateManhwaCardView } from '@/lib/supabase'
+import { spFetchManhwaById, spUpdateManhwaCardView } from '@/lib/supabase'
 import { useManhwaCardsState } from '@/store/randomManhwaState'
 import { AppStyle } from '@/styles/AppStyle'
 import { Image } from 'expo-image'
 import { router } from 'expo-router'
 import { debounce } from 'lodash'
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 import Title from '../Title'
 import RotatingButton from '../buttons/RotatingButton'
 import Row from '../util/Row'
+import { useSQLiteContext } from 'expo-sqlite'
+import { dbHasManhwa, dbUpsertManhwa } from '@/lib/database'
+import Toast from 'react-native-toast-message'
+import { ToastMessages } from '@/constants/Messages'
+import { AppConstants } from '@/constants/AppConstants'
+import CustomActivityIndicator from '../util/CustomActivityIndicator'
 
 
 const MAX_WIDTH = wp(87)
@@ -22,16 +28,58 @@ interface RandomCardsGridProps {
     reloadCards: () => any
 }
 
+const ManhwaRandomCard = ({card}: {card: ManhwaCard}) => {
+
+    const db = useSQLiteContext()
+    const height = card.height > MAX_HEIGHT ? MAX_HEIGHT : card.height
+    let width = (height * card.width) / card.height
+    width = width > MAX_WIDTH ? MAX_WIDTH : width
+
+    const [loading, setLoading] = useState(false)
+
+    const onPress = async () => {
+        const hasManhwa = await dbHasManhwa(db, card.manhwa_id)
+        if (!hasManhwa) {
+            setLoading(true)
+                const m: Manhwa | null = await spFetchManhwaById(card.manhwa_id)
+                if (!m) {
+                    Toast.show(ToastMessages.EN.INVALID_MANHWA)
+                    return
+                }
+                await dbUpsertManhwa(db, m)
+            setLoading(false)
+        }
+        spUpdateManhwaCardView(card.manhwa_id)
+        router.navigate({
+            pathname: '/ManhwaPage', 
+            params: {
+                manhwa_id: card.manhwa_id
+        }})
+    }
+
+    if (loading) {
+        return (
+            <View style={{width, height, marginRight: AppConstants.COMMON.MARGIN, alignItems: 'center', justifyContent: "center"}} >
+                <CustomActivityIndicator/>
+            </View>
+        )
+    }
+
+    return (
+        <Pressable onPress={() => onPress()} style={{marginRight: AppConstants.COMMON.MARGIN}} >
+            <Image source={card.image_url} style={{width, height, borderRadius: 12}} contentFit='cover' />
+            <View style={{maxWidth: '90%', position: 'absolute', top: 6, left: 6, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, backgroundColor: Colors.yellow, borderWidth: 1, borderColor: Colors.backgroundColor}} >
+                <Text numberOfLines={1} style={[AppStyle.textRegular, {color: Colors.backgroundColor}]}>{card.title}</Text>
+            </View>
+        </Pressable>
+    )
+}
+
 const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
     
     const { cards } = useManhwaCardsState()
     const flatListRef = useRef<FlatList<ManhwaCard>>(null)    
     
-    const onPress = async (manhwa_id: number) => {
-        spUpdateManhwaCardView(manhwa_id)
-        router.navigate({pathname: '/ManhwaPage', params: {manhwa_id}})
-    }
-
     const reload = async () => {
         await reloadCards()
         flatListRef.current?.scrollToIndex({index: 0, animated: true})
@@ -39,20 +87,8 @@ const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
 
     const debounceReload = debounce(reload, 800)
 
-    const renderItem = ({item, index}: {item: ManhwaCard, index: number}) => {
-
-        const height = item.height > MAX_HEIGHT ? MAX_HEIGHT : item.height
-        let width = (height * item.width) / item.height
-        width = width > MAX_WIDTH ? MAX_WIDTH : width
-
-        return (
-            <Pressable onPress={() => onPress(item.manhwa_id)} style={{marginRight: 4}} >
-                <Image source={item.image_url} style={{width, height, borderRadius: 12}} contentFit='cover' />
-                <View style={{maxWidth: '90%', position: 'absolute', top: 6, left: 6, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, backgroundColor: Colors.yellow, borderWidth: 1, borderColor: Colors.backgroundColor}} >
-                    <Text numberOfLines={1} style={[AppStyle.textRegular, {color: Colors.backgroundColor}]}>{item.title}</Text>
-                </View>
-            </Pressable>
-        )
+    const renderItem = ({item}: {item: ManhwaCard}) => {
+        return <ManhwaRandomCard card={item} />
     }
 
     if (cards.length === 0) {

@@ -32,6 +32,7 @@ import { Animated, Pressable, Text, SafeAreaView, ScrollView, StyleSheet, View }
 const SCREEN_WIDTH = wp(100)
 const SCREEN_HEIGHT = hp(100)
 
+const PAGE_LIMIT = 32
 
 const HomePage = () => {
 
@@ -54,7 +55,7 @@ const HomePage = () => {
     const [readingHistoryManhwas, setReadingHistoryManhwas] = useState<Manhwa[]>([])
 
     const reloadCards = async () => {
-        const r = await spFetchRandomManhwaCards(32)
+        const r = await spFetchRandomManhwaCards(PAGE_LIMIT)
         setCards(r)
     }
 
@@ -78,7 +79,7 @@ const HomePage = () => {
 
     const updateRandomCards = async () => {
         if (cards.length == 0) {
-            const r = await spFetchRandomManhwaCards(30)
+            const r = await spFetchRandomManhwaCards(PAGE_LIMIT)
             setCards(r)
         }
     }
@@ -92,8 +93,8 @@ const HomePage = () => {
                 setLoading(true)
                     await Promise.all([
                         dbReadGenres(db),
-                        dbReadManhwasOrderedByUpdateAt(db, 0, 30),
-                        dbReadManhwasOrderedByViews(db, 0, 30)
+                        dbReadManhwasOrderedByUpdateAt(db, 0, PAGE_LIMIT),
+                        dbReadManhwasOrderedByViews(db, 0, PAGE_LIMIT)
                     ]).then(([g, l, m]) => {
                         setGenres(g)
                         setLatestUpdates(l)
@@ -118,7 +119,7 @@ const HomePage = () => {
                 const reload = async () => {
                     await dbIsChapterMilestoneReached(db)
                         .then(s => s ? handleOpenBottomSheet() : null)
-                    await dbGetReadingHistory(db, 0, 32)
+                    await dbGetReadingHistory(db, 0, PAGE_LIMIT)
                         .then(v => setReadingHistoryManhwas(v))
                 }
                 reload()

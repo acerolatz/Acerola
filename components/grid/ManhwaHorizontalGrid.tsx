@@ -34,11 +34,11 @@ const ManhwaHorizontalGrid = ({
                 <FlashList
                     data={manhwas}
                     horizontal={true}
-                    estimatedItemSize={wp(80)}
-                    drawDistance={wp(140)}
+                    estimatedItemSize={AppConstants.COMMON.MANHWA_COVER_DIMENSION.WIDTH}
+                    drawDistance={wp(150)}
                     showsHorizontalScrollIndicator={false}
                     keyExtractor={(item: Manhwa) => item.manhwa_id.toString()}
-                    renderItem={({item}) => <ManhwaCard manhwa={item}/>}
+                    renderItem={({item}) => <ManhwaCard manhwa={item} />}
                 />
             </View>
         </View>
