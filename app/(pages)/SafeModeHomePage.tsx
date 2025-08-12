@@ -183,7 +183,7 @@ const SafeModeHomePage = () => {
             Toast.show({
                 text1: "Error", 
                 text2: "Invalid password", 
-                type: "error"
+                type: "error1"
             })
         }
     }
@@ -194,6 +194,8 @@ const SafeModeHomePage = () => {
     }, []);
     
     const handleCloseBottomSheet = useCallback(() => {
+        setText('')
+        Keyboard.dismiss()
         bottomSheetRef.current?.close();
     }, []);
 
@@ -246,7 +248,7 @@ const SafeModeHomePage = () => {
                     <View style={{width: '100%'}} >
                         <Text style={[AppStyle.textRegular, {color: Colors.neonRed, marginBottom: 10}]}>A password is required to access the settings.</Text>
                         <TextInput
-                            style={AppStyle.input}
+                            style={[AppStyle.input, {backgroundColor: Colors.backgroundColor}]}
                             autoCapitalize='none'
                             secureTextEntry={true}
                             placeholder='password'
@@ -254,9 +256,14 @@ const SafeModeHomePage = () => {
                             onChangeText={setText}
                             value={text}
                         />
-                        <Pressable onPress={checkPassword} style={AppStyle.formButton} >
-                            <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor}]} >OK</Text>
-                        </Pressable>
+                        <Row style={{gap: AppConstants.COMMON.MARGIN}} >
+                            <Pressable onPress={handleCloseBottomSheet} style={[styles.button, {backgroundColor: Colors.backgroundSecondary, borderWidth: 1, borderColor: Colors.yellow}]} >
+                                <Text style={AppStyle.textRegular} >Cancel</Text>
+                            </Pressable>
+                            <Pressable onPress={checkPassword} style={styles.button} >
+                                <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor}]} >OK</Text>
+                            </Pressable>
+                        </Row>
                     </View>
                     <Footer/>
                 </BottomSheetView>
@@ -295,12 +302,13 @@ const styles = StyleSheet.create({
         zIndex: 90
     },
     button: {
-        width: '100%',
-        height: 52,
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
-        backgroundColor: Colors.yellow,
+        flex: 1,
+        marginTop: 10,
         alignItems: "center",
-        justifyContent: "center"
+        justifyContent: "center",
+        height: 50,
+        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
+        backgroundColor: Colors.yellow
     },
     todoItem: {
         width: '100%',
@@ -321,14 +329,14 @@ const styles = StyleSheet.create({
     },
     handleStyle: {
         backgroundColor: Colors.backgroundSecondary, 
-        borderTopLeftRadius: 20, 
-        borderTopRightRadius: 20
+        borderTopLeftRadius: 12, 
+        borderTopRightRadius: 12
     },
     handleIndicatorStyle: {
         backgroundColor: Colors.yellow
     },
     backgroundStyle: {
-        backgroundColor: Colors.backgroundColor
+        backgroundColor: Colors.backgroundSecondary
     },
     input: {
         color: Colors.white, 

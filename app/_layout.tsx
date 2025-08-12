@@ -18,6 +18,14 @@ const TOAST_CONFIG = {
       <View style={[styles.leftBar, {backgroundColor: Colors.ononokiGreen}]} />
     </View>
   ),
+
+  success1: ({ text1, text2 }: {text1: string, text2: string}) => (
+    <View style={[styles.toast, {backgroundColor: Colors.backgroundColor}]}>
+      <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 18}]}>{text1}</Text>
+      {text2 && <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 16}]}>{text2}</Text>}
+      <View style={[styles.leftBar, {backgroundColor: Colors.ononokiGreen}]} />
+    </View>
+  ),
   
   error: ({ text1, text2 }: {text1: string, text2: string}) => (
     <View style={styles.toast}>
@@ -26,9 +34,25 @@ const TOAST_CONFIG = {
       <View style={[styles.leftBar, {backgroundColor: Colors.neonRed}]} />
     </View>
   ),
+
+  error1: ({ text1, text2 }: {text1: string, text2: string}) => (
+    <View style={[styles.toast, {backgroundColor: Colors.backgroundColor}]}>
+      <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 18}]}>{text1}</Text>
+      {text2 && <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 16}]}>{text2}</Text>}
+      <View style={[styles.leftBar, {backgroundColor: Colors.neonRed}]} />
+    </View>
+  ),
   
   info: ({ text1, text2 }: {text1: string, text2: string}) => (
     <View style={styles.toast}>
+      <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 18}]}>{text1}</Text>
+      {text2 && <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 16}]}>{text2}</Text>}
+      <View style={[styles.leftBar, {backgroundColor: Colors.yellow}]} />
+    </View>
+  ),
+
+  info1: ({ text1, text2 }: {text1: string, text2: string}) => (
+    <View style={[styles.toast, {backgroundColor: Colors.backgroundColor}]}>
       <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 18}]}>{text1}</Text>
       {text2 && <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 16}]}>{text2}</Text>}
       <View style={[styles.leftBar, {backgroundColor: Colors.yellow}]} />

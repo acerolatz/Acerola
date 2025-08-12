@@ -257,7 +257,7 @@ const HomePage = () => {
                     </TopBar>
                     <Text style={AppStyle.textRegular}>Consider making a donation to help keep the servers running.</Text>
                     <Row style={{gap: 10}} >
-                        <Pressable onPress={handleCloseBottomSheet} style={[styles.button, {backgroundColor: Colors.backgroundColor, borderWidth: 1, borderColor: Colors.donateColor}]} >
+                        <Pressable onPress={handleCloseBottomSheet} style={[styles.button, {backgroundColor: Colors.backgroundSecondary, borderWidth: 1, borderColor: Colors.donateColor}]} >
                             <Text style={[AppStyle.textRegular, {color: Colors.donateColor}]} >Close</Text>
                         </Pressable>
                         <Pressable onPress={openDonate} style={styles.button} >
@@ -333,13 +333,13 @@ const styles = StyleSheet.create({
     },
     handleStyle: {
         backgroundColor: Colors.backgroundSecondary, 
-        borderTopLeftRadius: AppConstants.COMMON.BORDER_RADIUS, 
-        borderTopEndRadius: AppConstants.COMMON.BORDER_RADIUS
+        borderTopLeftRadius: 12, 
+        borderTopEndRadius: 12
     },
     handleIndicatorStyle: {
         backgroundColor: Colors.donateColor
     },
     bottomSheetBackgroundStyle: {
-        backgroundColor: Colors.backgroundColor
+        backgroundColor: Colors.backgroundSecondary
     }
 })

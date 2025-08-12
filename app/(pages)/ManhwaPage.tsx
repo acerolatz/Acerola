@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     width: wp(100),
     left: 0,    
     top: 0,
-    height: hp(95)
+    height: hp(98)
   },
   item: {
     height: 52,
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: wp(92),
     height: 520, 
-    borderRadius: 42
+    borderRadius: AppConstants.COMMON.BORDER_RADIUS
   },
   bottomSheetContainer: {
     flex: 1,
