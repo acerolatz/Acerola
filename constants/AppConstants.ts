@@ -84,8 +84,7 @@ export const AppConstants = {
         ]
     },
     URLS: {
-        REDDIT: "https://www.reddit.com/r/pornhwa/",
-        GITHUB: "https://github.com/acerolatz/Acerola"
+        REDDIT: "https://www.reddit.com/r/pornhwa/"        
     },
     TEXT: {
         SIZE: {
