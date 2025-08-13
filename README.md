@@ -12,7 +12,7 @@ Acerola is a React Native mobile app for reading adult Manhwa (Pornhwa). Current
 
 - Sync: Tap the sync button on the home page to fetch the latest data from the cloud.
 
-# Permissions (Android)
+# Permissions
 
 The Bug Report feature allows users to attach images. Only the images you choose to send will be accessed.
 
