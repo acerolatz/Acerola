@@ -32,7 +32,7 @@ const UpdateDatabaseButton = ({
             return 
         }        
 
-        const shouldUpdate = await dbShouldUpdate(db, type)
+        const shouldUpdate = await dbShouldUpdate(db, type) || AppConstants.COMMON.DEBUG_MODE
         let hasMangas = true
 
         if (!shouldUpdate) {
