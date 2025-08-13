@@ -60,12 +60,9 @@ const CollectionPage = () => {
             </TopBar>
             <ManhwaGrid
                 manhwas={manhwas}
-                numColumns={2}
                 showChaptersPreview={false}
-                hasResults={true}
                 loading={loading}
-                onEndReached={onEndReached}
-                listMode='FlashList'/>
+                onEndReached={onEndReached}/>
         </SafeAreaView>
     )
 }

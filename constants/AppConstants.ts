@@ -20,7 +20,7 @@ export const AppConstants = {
             TITLE_MAX_LENGTH: 256,
             DESCR_MAX_LENGTH: 1024,
             BUG_TYPE_MAX_LENGTH: 64,
-            MAX_IMAGES: 3,
+            MAX_IMAGES: 5
         },
         MANHWA_REQUEST: {
             TITLE_MIN_LENGTH: 3,
@@ -34,7 +34,7 @@ export const AppConstants = {
     },
     COMMON: {
         APP_NAME: "Acerola",
-        DEBUG_MODE: true,
+        DEBUG_MODE: false,
         BORDER_RADIUS: 4,
         MARGIN: 6,
         MANHWA_COVER_DIMENSION: {
@@ -75,12 +75,12 @@ export const AppConstants = {
             SIZE: 22
         },
         BUT_TYPE_LIST: [
-            "Bug",
-            "Other",
+            "Bug",            
             "Sugestion",
             "Broken",
             "ImagesOutOfOrder",
-            "MissingImages"
+            "MissingImages",
+            "Other"
         ]
     },
     URLS: {

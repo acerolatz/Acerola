@@ -6,20 +6,20 @@ import { Pressable, StyleSheet, TextInput, View, ViewStyle } from 'react-native'
 
 
 interface SearchBarProps {
-    onChangeValue: (value: string) => any
+    onChangeText: (text: string) => any
     placeholder?: string
     color?: string
     style?: ViewStyle
 }
 
 
-const SearchBar = ({ onChangeValue, style, placeholder = 'search', color = 'white' }: SearchBarProps) => {    
+const SearchBar = ({ onChangeText, style, placeholder = 'search', color = 'white' }: SearchBarProps) => {    
 
     const inputRef = useRef<TextInput>(null)
 
     const clearText = () => {
         inputRef.current?.clear()
-        onChangeValue('')
+        onChangeText('')
     }
 
     return (
@@ -29,7 +29,7 @@ const SearchBar = ({ onChangeValue, style, placeholder = 'search', color = 'whit
                 placeholder={placeholder}
                 placeholderTextColor={color}
                 style={[styles.input, {color}]}
-                onChangeText={onChangeValue}
+                onChangeText={onChangeText}
             />
             <Pressable 
                 style={styles.icon}

@@ -45,8 +45,9 @@ export const Colors = {
   redditColor: "#FF4500",
   documentsColor: "#FF3366",
   backgroundSecondary: "#1f2226",
+  sourceCodeColor: 'white',
 
   manhwaStatusTextColor: "#111419",
-  manhwaStatusCompleted: "rgba(33, 183, 116, 0.9)",
-  manhwaStatusOnGoing: "rgba(255, 103, 64, 0.9)"
+  manhwaStatusCompleted: "rgba(33, 183, 116, 0.7)",
+  manhwaStatusOnGoing: "rgba(255, 103, 64, 0.7)"
 };

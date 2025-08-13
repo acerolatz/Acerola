@@ -73,8 +73,7 @@ const Library = () => {
           <ReadingStatusPicker onChangeValue={onChangeValue}/>
           <ManhwaGrid
             manhwas={manhwas}
-            loading={loading}          
-            numColumns={2}
+            loading={loading}
             shouldShowChapterDate={false}
             showManhwaStatus={false}
             onEndReached={onEndReached}

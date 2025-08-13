@@ -131,10 +131,13 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
             if (photos.length > 0) {
                 const bug_id_str = bug_id.toString()
                 Toast.show({text1: "Uploading images...", type: "info"})
-                await Promise.all(photos.map(photo => uploadBugScreenshot(photo, bug_id_str)));
+                await Promise.all(photos.map((
+                    photo: string, 
+                    index: number
+                ) => uploadBugScreenshot(photo, bug_id_str, index)));
             }
 
-            Toast.show(ToastMessages.EN.BUG_REPORT_THANKS)
+            Toast.show(ToastMessages.EN.THANKS)
             router.back()
         setLoading(false)
     };
@@ -142,6 +145,7 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
     return (
         <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
             <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='always' >
+                
                 {/* Title */}
                 <Text style={AppStyle.inputHeaderText}>Title</Text>
                 {errors.title && (<Text style={AppStyle.error}>{errors.title.message}</Text>)}
@@ -179,7 +183,7 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
                     control={control}
                     render={({ field: { onChange, onBlur, value } }) => (
                     <TextInput
-                        style={[AppStyle.input, {height: hp(20), paddingVertical: 10, textAlignVertical: 'top'}]}                    
+                        style={[AppStyle.input, {height: hp(20), paddingVertical: 10, textAlignVertical: 'top'}]}
                         multiline={true}
                         autoCapitalize="sentences"
                         onBlur={onBlur}
@@ -187,22 +191,30 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
                         value={value}/>
                     )}
                 />
-
+                
+                {/* Buttons */}
                 {
                     isLoading ?
-                    <View style={[styles.button, {marginBottom: 10}]} >
-                        <ActivityIndicator size={32} color={Colors.backgroundColor} />
-                    </View>
+                    <>
+                        <View style={[styles.button, {marginBottom: 10}]} >
+                            <ActivityIndicator size={32} color={Colors.backgroundColor} />
+                        </View>
+                        <View style={styles.button} >
+                            <Text style={AppStyle.formButtonText} >Images (optional)</Text>
+                        </View>
+                    </>
                     :
-                    <Pressable onPress={handleSubmit(onSubmit)} style={[styles.button, {marginBottom: 10}]} >
-                        <Text style={AppStyle.formButtonText} >Send</Text>
-                    </Pressable>
+                    <>
+                        <Pressable onPress={handleSubmit(onSubmit)} style={[styles.button, {marginBottom: 10}]} >
+                            <Text style={AppStyle.formButtonText} >Send</Text>
+                        </Pressable>
+                        <Pressable onPress={handlePickPhoto} style={styles.button} >
+                            <Text style={AppStyle.formButtonText} >Images (optional)</Text>
+                        </Pressable>
+                    </>
                 }
 
-                {/* Bug Images */}
-                <Pressable onPress={handlePickPhoto} style={styles.button} >
-                    <Text style={AppStyle.formButtonText} >Images (optional)</Text>
-                </Pressable>
+                {/* Photos */}
                 {
                     photos.length > 0 &&
                     <View style={{width: '100%', marginTop: 10}} >

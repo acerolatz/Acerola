@@ -3,6 +3,7 @@ import ManhwaCard from '@/components/ManhwaCard'
 import SearchBar from '@/components/SearchBar'
 import TopBar from '@/components/TopBar'
 import CustomActivityIndicator from '@/components/util/CustomActivityIndicator'
+import Footer from '@/components/util/Footer'
 import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
 import { Manhwa } from '@/helpers/types'
@@ -84,19 +85,6 @@ const ManhwaSearch = () => {
     setLoading(false)
   }
 
-  const renderItem = ({item}: {item: Manhwa}) => {
-    return (
-        <ManhwaCard 
-            showChaptersPreview={false}
-            showManhwaStatus={true}
-            width={width} 
-            height={height} 
-            marginBottom={6} 
-            manhwa={item}
-        />
-    )
-  }
-
   const renderFooter = () => {
       if (loading && hasResults) {
           return (
@@ -105,7 +93,7 @@ const ManhwaSearch = () => {
               </View> 
           )
       }
-      return <View style={{height: 60}} />
+      return <Footer/>
   }
 
   return (
@@ -114,7 +102,7 @@ const ManhwaSearch = () => {
         <ReturnButton color={Colors.yellow} />
       </TopBar>
       <View style={{flex: 1, gap: 10}} >
-        <SearchBar onChangeValue={debounceSearch} color={Colors.yellow} placeholder='pornhwa' />
+        <SearchBar onChangeText={debounceSearch} color={Colors.yellow} placeholder='pornhwa' />
         <View style={{flex: 1}} >
           <FlashList
               ref={flashListRef}
@@ -127,7 +115,14 @@ const ManhwaSearch = () => {
               onEndReached={onEndReached}
               scrollEventThrottle={4}
               onEndReachedThreshold={2}
-              renderItem={renderItem}
+              renderItem={({item}) => <ManhwaCard 
+                showChaptersPreview={false}
+                showManhwaStatus={true}
+                width={width} 
+                height={height} 
+                marginBottom={AppConstants.COMMON.MARGIN} 
+                manhwa={item}
+              />}
               ListFooterComponent={renderFooter}
               />
         </View>      

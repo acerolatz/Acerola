@@ -1,13 +1,13 @@
 import { AppConstants } from '@/constants/AppConstants';
 import { Colors } from '@/constants/Colors';
-import { dbMigrate } from '@/lib/database';
 import { AppStyle } from '@/styles/AppStyle';
 import { Stack } from 'expo-router';
-import { SQLiteProvider } from 'expo-sqlite';
 import React from 'react';
 import { StatusBar, StyleSheet, Text, View } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
+import { SQLiteProvider } from 'expo-sqlite';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { dbMigrate } from '@/lib/database';
 
 
 const TOAST_CONFIG = {
@@ -61,49 +61,51 @@ const TOAST_CONFIG = {
 };
 
 
-const _layout = () => {
+const RootLayout = () => {
+
   return (
-      <GestureHandlerRootView style={{flex: 1, backgroundColor: Colors.backgroundColor}} >
-        <StatusBar hidden={true} barStyle={'light-content'} animated={true}/>
-        <SQLiteProvider databaseName='acerola.db' onInit={dbMigrate}>
-          <Stack>
-              <Stack.Screen name='index' options={{headerShown: false}} />              
-              <Stack.Screen name='(pages)/HomePage' options={{headerShown: false}} />
-              <Stack.Screen name='(pages)/SafeModeHomePage' options={{headerShown: false}} />
-              <Stack.Screen name='(pages)/ManhwaPage' options={{headerShown: false}} />
-              <Stack.Screen name='(pages)/ManhwaSearch' options={{headerShown: false}} />
-              <Stack.Screen name='(pages)/ScansPage' options={{headerShown: false}} />
-              <Stack.Screen name='(pages)/ChapterPage' options={{headerShown: false}} />
-              <Stack.Screen name='(pages)/GenresPage' options={{headerShown: false}} />
-              <Stack.Screen name='(pages)/CollectionsPage' options={{headerShown: false}} />
-              <Stack.Screen name='(pages)/CollectionPage' options={{headerShown: false}} />
-              <Stack.Screen name='(pages)/ManhwaByGenre' options={{headerShown: false}} />
-              <Stack.Screen name='(pages)/ManhwaByAuthor' options={{headerShown: false}} />
-              <Stack.Screen name='(pages)/ReadingHistoryPage' options={{headerShown: false}} />
-              <Stack.Screen name='(pages)/LatestUpdatesPage' options={{headerShown: false}} />
-              <Stack.Screen name='(pages)/MostViewPage' options={{headerShown: false}} />
-              <Stack.Screen name='(pages)/BugReportPage' options={{headerShown: false}} />
-              <Stack.Screen name='(pages)/LibraryPage' options={{headerShown: false}} />
-              <Stack.Screen name='(pages)/DonatePage' options={{headerShown: false}} />              
-              <Stack.Screen name='(pages)/RequestManhwaPage' options={{headerShown: false}} />
-              <Stack.Screen name='(pages)/ReleasesPage' options={{headerShown: false}} />
-              <Stack.Screen name='(pages)/NewsPage' options={{headerShown: false}} />
-              <Stack.Screen name='(pages)/DisclaimerPage' options={{headerShown: false}} />
-              <Stack.Screen name='(pages)/Settings' options={{headerShown: false}} />              
-          </Stack>
-          <Toast 
-            position='bottom' 
-            config={TOAST_CONFIG as any} 
-            bottomOffset={60} 
-            visibilityTime={2500} 
-            avoidKeyboard={true} 
-            swipeable={true}/>
-        </SQLiteProvider>
-      </GestureHandlerRootView>    
+    <SQLiteProvider databaseName="acerola.db" onInit={dbMigrate}>
+      <GestureHandlerRootView style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
+        <StatusBar hidden={true} barStyle={'light-content'} />
+        <Stack>
+          <Stack.Screen name='index' options={{headerShown: false}} />              
+          <Stack.Screen name='(pages)/HomePage' options={{headerShown: false}} />
+          <Stack.Screen name='(pages)/SafeModeHomePage' options={{headerShown: false}} />
+          <Stack.Screen name='(pages)/ManhwaPage' options={{headerShown: false}} />
+          <Stack.Screen name='(pages)/ManhwaSearch' options={{headerShown: false}} />
+          <Stack.Screen name='(pages)/ScansPage' options={{headerShown: false}} />
+          <Stack.Screen name='(pages)/ChapterPage' options={{headerShown: false}} />
+          <Stack.Screen name='(pages)/GenresPage' options={{headerShown: false}} />
+          <Stack.Screen name='(pages)/CollectionsPage' options={{headerShown: false}} />
+          <Stack.Screen name='(pages)/CollectionPage' options={{headerShown: false}} />
+          <Stack.Screen name='(pages)/ManhwaByGenre' options={{headerShown: false}} />
+          <Stack.Screen name='(pages)/ManhwaByAuthor' options={{headerShown: false}} />
+          <Stack.Screen name='(pages)/ReadingHistoryPage' options={{headerShown: false}} />
+          <Stack.Screen name='(pages)/LatestUpdatesPage' options={{headerShown: false}} />
+          <Stack.Screen name='(pages)/MostViewPage' options={{headerShown: false}} />
+          <Stack.Screen name='(pages)/BugReportPage' options={{headerShown: false}} />
+          <Stack.Screen name='(pages)/LibraryPage' options={{headerShown: false}} />
+          <Stack.Screen name='(pages)/DonatePage' options={{headerShown: false}} />              
+          <Stack.Screen name='(pages)/RequestManhwaPage' options={{headerShown: false}} />
+          <Stack.Screen name='(pages)/ReleasesPage' options={{headerShown: false}} />
+          <Stack.Screen name='(pages)/SourceCodePage' options={{headerShown: false}} />
+          <Stack.Screen name='(pages)/NewsPage' options={{headerShown: false}} />
+          <Stack.Screen name='(pages)/DisclaimerPage' options={{headerShown: false}} />
+          <Stack.Screen name='(pages)/Settings' options={{headerShown: false}} />              
+        </Stack>
+        <Toast
+          position='bottom' 
+          config={TOAST_CONFIG as any} 
+          bottomOffset={60} 
+          visibilityTime={2500}
+          avoidKeyboard={true}
+          swipeable={true}/>
+        </GestureHandlerRootView>
+    </SQLiteProvider>
   )
 }
 
-export default _layout
+export default RootLayout
 
 
 const styles = StyleSheet.create({

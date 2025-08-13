@@ -65,8 +65,13 @@ const DisclaimerPage = () => {
         )
     }
 
-    return <></>
-
+    return (
+        <SafeAreaView style={AppStyle.safeArea} >
+            <TopBar title='EULA' titleColor={Colors.disclaimerColor} >
+                <ReturnButton color={Colors.disclaimerColor} />
+            </TopBar>
+        </SafeAreaView>
+    )
 }
 
 

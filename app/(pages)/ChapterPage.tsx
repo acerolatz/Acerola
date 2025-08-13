@@ -85,7 +85,7 @@ const ChapterPage = () => {
         }
         load()
         return () => { isCancelled = true; };
-    }, [currentChapterIndex, chapters, db])
+    }, [currentChapterIndex, chapters, db])    
     
     const scrollToTop = () => {
       flashListRef.current?.scrollToOffset({ animated: false, offset: 0 })

@@ -30,7 +30,7 @@ const ManhwaHorizontalGrid = ({
                 <Title title={title}/>
                 <ViewAllButton onPress={onViewAll} />
             </Row>
-            <View style={{width: '100%', height: AppConstants.COMMON.MANHWA_COVER_DIMENSION.HEIGHT + 150}} >
+            <View style={{width: '100%', height: AppConstants.COMMON.MANHWA_COVER_DIMENSION.HEIGHT + 134}} >
                 <FlashList
                     data={manhwas}
                     horizontal={true}

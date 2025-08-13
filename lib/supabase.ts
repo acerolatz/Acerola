@@ -1,5 +1,5 @@
 import { AppConstants } from "@/constants/AppConstants";
-import { AppRelease, Chapter, ChapterImage, Collection, DonateMethod, Manhwa, ManhwaCard, Post, Scan } from "@/helpers/types";
+import { AppRelease, Chapter, ChapterImage, Collection, DonateMethod, Manhwa, ManhwaCard, Post, Scan, SourceCodeLink } from "@/helpers/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createClient } from '@supabase/supabase-js';
 import * as RNLocalize from 'react-native-localize';
@@ -313,7 +313,7 @@ export async function spGetTodayTop10(): Promise<Manhwa[]> {
     return data as Manhwa[]
 }
 
-export const uploadBugScreenshot = async (uri: string, bug_id: string) => {
+export const uploadBugScreenshot = async (uri: string, bug_id: string, index: number) => {
     try {
         const mimeType = mime.lookup(uri) || 'image/jpeg';
         const ext = mime.extension(mimeType) || 'jpg';
@@ -325,7 +325,7 @@ export const uploadBugScreenshot = async (uri: string, bug_id: string) => {
         });            
 
         const fileData = await RNFS.readFile(compressedUri, 'base64');
-        const filePath = `${bug_id}/${Date.now()}.${ext}`;
+        const filePath = `${bug_id}/${index}.${ext}`;
 
         const { error } = await supabase
             .storage
@@ -342,3 +342,23 @@ export const uploadBugScreenshot = async (uri: string, bug_id: string) => {
         console.error('error uploadToSupabase', error);
     }        
 };
+
+
+export async function spFetchSourceCodeLinks(): Promise<SourceCodeLink[]> {
+    const { data, error } = await supabase
+        .from("app_infos")
+        .select('name, value')
+        .eq("type", "source")
+
+    if (error) {
+        console.log("error spFetchSourceCodeLinks", error)
+        return []
+    }
+
+    return data.map(
+        s => {return {
+            name: s.name,
+            url: s.value
+        }}
+    )
+}

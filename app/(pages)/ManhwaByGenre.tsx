@@ -68,10 +68,7 @@ const MangaByGenre = () => {
             </TopBar>
             <ManhwaGrid
                 manhwas={manhwas}
-                numColumns={2}
-                loading={loading}
-                hasResults={true}
-                listMode='FlashList'
+                loading={loading}                                
                 showChaptersPreview={false}
                 onEndReached={onEndReached}/>
         </SafeAreaView>

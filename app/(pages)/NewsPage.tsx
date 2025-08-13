@@ -1,5 +1,6 @@
 import ReturnButton from '@/components/buttons/ReturnButton'
 import TopBar from '@/components/TopBar'
+import Column from '@/components/util/Column'
 import CustomActivityIndicator from '@/components/util/CustomActivityIndicator'
 import Footer from '@/components/util/Footer'
 import Row from '@/components/util/Row'
@@ -28,30 +29,56 @@ const News = ({news}: {news: Post}) => {
     const imageHeight = hasImage ? IMAGE_WIDTH * (news.image_height! / news.image_width!) : 0
     const text = expandText ? news.descr : news.descr.length > TEXT_LENGHT_LIMIT ? `${news.descr.slice(0, TEXT_LENGHT_LIMIT)}...` : news.descr
 
-    return (
-        <Pressable style={styles.item} >
-            {
-                hasImage && 
-                <Image 
-                    style={{width: IMAGE_WIDTH, height: imageHeight , borderRadius: AppConstants.COMMON.BORDER_RADIUS}} 
-                    source={news.image_url} 
-                    contentFit='cover' />
-            }
+    const handleTextExpand = () => { setExpandText(prev => !prev) }
+
+    if (!hasImage) {
+        <Column style={styles.item} >
             <Text style={AppStyle.textHeader}>{news.title}</Text>
             <Text style={AppStyle.textRegular}>{text}</Text>
             <Row style={{justifyContent: "space-between"}} >
                 <Text style={AppStyle.textRegular} >{formatTimestamp(news.created_at)}</Text>
                 {
                     news.descr.length > TEXT_LENGHT_LIMIT &&
-                    <Pressable onPress={() => setExpandText(prev => !prev)} hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE} >
+                    <Pressable onPress={handleTextExpand} hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE} >
                         <Row style={{gap: 4}} >
                             <Text style={AppStyle.textRegular}>{expandText ? 'Collapse' : 'Expand'}</Text>
-                            <Ionicons name={expandText ? 'chevron-back' : 'chevron-forward'} color={Colors.newsColor} size={22} />
+                            <Ionicons 
+                                name={expandText ? 'chevron-back' : 'chevron-forward'} 
+                                color={Colors.newsColor} 
+                                style={{marginTop: 3}} 
+                                size={20} />
                         </Row>
                     </Pressable>
                 }
             </Row>
-        </Pressable>
+        </Column>
+    }
+
+    return (
+        <Column style={styles.item} >
+            <Image 
+                style={{width: IMAGE_WIDTH, height: imageHeight , borderRadius: AppConstants.COMMON.BORDER_RADIUS}} 
+                source={news.image_url} 
+                contentFit='cover' />
+            <Text style={AppStyle.textHeader}>{news.title}</Text>
+            <Text style={AppStyle.textRegular}>{text}</Text>
+            <Row style={{justifyContent: "space-between"}} >
+                <Text style={AppStyle.textRegular} >{formatTimestamp(news.created_at)}</Text>
+                {
+                    news.descr.length > TEXT_LENGHT_LIMIT &&
+                    <Pressable onPress={handleTextExpand} hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE} >
+                        <Row style={{gap: 4}} >
+                            <Text style={AppStyle.textRegular}>{expandText ? 'Collapse' : 'Expand'}</Text>
+                            <Ionicons 
+                                name={expandText ? 'chevron-back' : 'chevron-forward'} 
+                                color={Colors.newsColor} 
+                                style={{marginTop: 3}} 
+                                size={20} />
+                        </Row>
+                    </Pressable>
+                }
+            </Row>
+        </Column>
     )
 }
 
@@ -93,10 +120,6 @@ const NewsPage = () => {
         setLoading(false)
     }
 
-    const renderItem = ({item} : {item: Post}) => {
-        return <News news={item} />
-    }
-
     const renderFooter = () => {
         if (loading && hasResults.current) {
             return <CustomActivityIndicator color={Colors.newsColor} />
@@ -115,7 +138,7 @@ const NewsPage = () => {
                     estimatedItemSize={300}
                     keyExtractor={(item) => item.news_id.toString()}
                     onEndReached={onEndReached}
-                    renderItem={renderItem}
+                    renderItem={({item}) => <News news={item} />}
                     ListFooterComponent={renderFooter}
                 />
             </View>

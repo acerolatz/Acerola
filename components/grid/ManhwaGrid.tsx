@@ -1,7 +1,7 @@
 import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
 import { Manhwa } from '@/helpers/types'
-import { getItemGridDimensions, hp, wp } from '@/helpers/util'
+import { getItemGridDimensions, getRelativeHeight, hp, wp } from '@/helpers/util'
 import { FlashList } from '@shopify/flash-list'
 import React from 'react'
 import { FlatList, View } from 'react-native'
@@ -19,6 +19,7 @@ interface MangaGridProps {
     numColumns?: number
     shouldShowChapterDate?: boolean
     showChaptersPreview?: boolean
+    showsVerticalScrollIndicator?: boolean
     listMode?: 'FlashList' | 'FlatList'
     color?: string
     showManhwaStatus?: boolean
@@ -33,20 +34,20 @@ const ManhwaGrid = ({
     loading = false, 
     hasResults = true,
     paddingHorizontal = wp(4),
-    numColumns = 1,
+    numColumns = 2,
     shouldShowChapterDate = true,
+    showsVerticalScrollIndicator = true,
     showChaptersPreview = true,
     listMode = 'FlashList',
     color = Colors.yellow,
     showManhwaStatus = true
 }: MangaGridProps) => {
 
-    const {width, height} = getItemGridDimensions(
-        paddingHorizontal,
-        10,
-        numColumns,
+    const width = (wp(46) - 4)
+    const height = getRelativeHeight(
         AppConstants.COMMON.MANHWA_COVER_DIMENSION.WIDTH,
-        AppConstants.COMMON.MANHWA_COVER_DIMENSION.HEIGHT
+        AppConstants.COMMON.MANHWA_COVER_DIMENSION.HEIGHT,
+        width
     )
 
     const estimatedItemSize = height + (showChaptersPreview ? 180 : 20)
@@ -58,8 +59,9 @@ const ManhwaGrid = ({
                 shouldShowChapterDate={shouldShowChapterDate}
                 showManhwaStatus={showManhwaStatus}
                 width={width} 
-                height={height} 
-                marginBottom={6} 
+                height={height}
+                marginRight={AppConstants.COMMON.MARGIN}
+                marginBottom={10}
                 manhwa={item}
             />
         )
@@ -81,6 +83,7 @@ const ManhwaGrid = ({
             <View style={{flex: 1}} >
                 <FlashList
                     keyboardShouldPersistTaps={'always'}
+                    showsVerticalScrollIndicator={showsVerticalScrollIndicator}
                     data={manhwas}
                     numColumns={numColumns}
                     keyExtractor={(item) => item.manhwa_id.toString()}
@@ -100,6 +103,7 @@ const ManhwaGrid = ({
     return (
         <View style={{flex: 1}} >
             <FlatList
+                showsVerticalScrollIndicator={showsVerticalScrollIndicator}
                 keyboardShouldPersistTaps={'always'}
                 data={manhwas}
                 numColumns={numColumns}

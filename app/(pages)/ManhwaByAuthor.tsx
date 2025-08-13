@@ -50,7 +50,6 @@ const ManhwaByAuthor = () => {
             </TopBar>
             <ManhwaGrid
                 manhwas={manhwas}
-                numColumns={2}
                 loading={loading}
                 showChaptersPreview={false}
             />

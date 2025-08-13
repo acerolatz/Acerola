@@ -1,14 +1,4 @@
 import PageActivityIndicator from '@/components/util/PageActivityIndicator';
-import { ToastMessages } from '@/constants/Messages';
-import { clearCache } from '@/helpers/util';
-import { 
-    dbFirstRun, 
-    dbIsSafeModeEnabled, 
-    dbSetLastRefresh, 
-    dbShouldClearCache, 
-    dbShouldUpdate, 
-    dbUpdateDatabase 
-} from '@/lib/database';
 import { AppStyle } from '@/styles/AppStyle';
 import {
     LeagueSpartan_200ExtraLight,
@@ -16,19 +6,29 @@ import {
     LeagueSpartan_600SemiBold,
     useFonts
 } from '@expo-google-fonts/league-spartan';
-import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
-import { router } from 'expo-router';
-import { useSQLiteContext } from 'expo-sqlite';
 import React, { useEffect, useRef } from 'react';
 import { SafeAreaView } from 'react-native';
+import { clearCache } from '@/helpers/util';
+import { ToastMessages } from '@/constants/Messages';
+import {
+  dbFirstRun,
+  dbIsSafeModeEnabled,
+  dbSetLastRefresh,
+  dbShouldClearCache,
+  dbShouldUpdate,
+  dbUpdateDatabase
+} from '@/lib/database';
+import NetInfo from '@react-native-community/netinfo';
 import Toast from 'react-native-toast-message';
+import { router } from 'expo-router';
+import { useSQLiteContext } from 'expo-sqlite';
 
 
-const App = () => {
+const App = () => {        
+
 
     const db = useSQLiteContext()
-
-    const isInitialized = useRef(false)
+    const isInitialized = useRef(false);
 
     let [fontsLoaded] = useFonts({
         LeagueSpartan_200ExtraLight,
@@ -38,28 +38,28 @@ const App = () => {
 
     useEffect(
         () => {
-            if (isInitialized.current) { return }
-            isInitialized.current = true
-            async function init() {
+            if (isInitialized.current) return;
+            isInitialized.current = true;
+            const init = async () => {
                 if (await dbShouldClearCache(db)) {
-                    await clearCache()
+                    await clearCache();
                 }
+        
+                await dbFirstRun(db);
                 
-                await dbFirstRun(db)
-                
-                const state: NetInfoState = await NetInfo.fetch()
+                const state = await NetInfo.fetch();
                 if (!state.isConnected) {
-                    Toast.show(ToastMessages.EN.NO_INTERNET)
-                    router.replace("/(pages)/HomePage")
-                    return
+                    Toast.show(ToastMessages.EN.NO_INTERNET);
+                    router.replace("/(pages)/HomePage");
+                    return;
                 }
-
+                
                 if (await dbShouldUpdate(db, 'server')) {
-                    Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE)
-                    await dbSetLastRefresh(db, 'client')
-                    await dbUpdateDatabase(db)
-                    Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED)
-                }                
+                    Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE);
+                    await dbSetLastRefresh(db, 'client');
+                    await dbUpdateDatabase(db);
+                    Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED);
+                }
 
                 if (await dbIsSafeModeEnabled(db)) {
                     router.replace("/(pages)/SafeModeHomePage")

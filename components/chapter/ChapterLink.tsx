@@ -37,13 +37,14 @@ const ChapterLink = ({
     chapter_created_at,
     chapter_name,
     shouldShowChapterDate = true,    
-    prefix = 'Chapter ',
+    prefix = 'Chapter',
     style
 }: ChapterLinkProps) => {
 
     const { setChapterState } = useChapterState()
-
     const [loading, setLoading] = useState(false)
+    
+    const name = prefix + ' ' + chapter_name
 
     const onPress = useCallback(async () => {
         setLoading(true)
@@ -66,12 +67,10 @@ const ChapterLink = ({
 
     return (
         <Pressable onPress={onPress} style={[styles.chapterLink, style]} >
-            <Text style={AppStyle.textRegular}>{prefix}{chapter_name}</Text>
+            <Text style={AppStyle.textRegular}>{name}</Text>
             {
                 shouldShowChapterDate &&
-                <Text style={AppStyle.textRegular}>
-                    {formatTimestamp(chapter_created_at)}
-                </Text>
+                <Text style={AppStyle.textRegular}>{formatTimestamp(chapter_created_at)}</Text>
             }
         </Pressable>
     )
@@ -82,9 +81,8 @@ export default ChapterLink
 const styles = StyleSheet.create({
     chapterLink: {        
         flexDirection: 'row',
-        alignItems: "center",        
+        alignItems: "center",
         justifyContent: "space-between",
-        paddingRight: 4,
         height: 24
     }
 })

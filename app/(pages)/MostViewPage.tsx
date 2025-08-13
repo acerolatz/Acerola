@@ -61,7 +61,6 @@ const MostView = () => {
       <ManhwaGrid
         manhwas={manhwas}
         loading={loading}
-        numColumns={2}
         shouldShowChapterDate={false}
         onEndReached={onEndReached}/>
     </SafeAreaView>

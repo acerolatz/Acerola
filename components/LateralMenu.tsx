@@ -78,8 +78,8 @@ const openNews = () => {
     router.navigate("/(pages)/NewsPage")
 }
 
-const openGithub = async () => {
-    await openUrl(AppConstants.URLS.GITHUB)
+const openSourceCode = async () => {
+    router.navigate("/(pages)/SourceCodePage")
 }
 
 const openReleases = () => {
@@ -173,10 +173,10 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
                     />
 
                     <Option 
-                        onPress={openGithub} 
-                        title='GitHub' 
-                        iconName='logo-github'                        
-                        backgroundColor={Colors.white}
+                        onPress={openSourceCode} 
+                        title='Source Code' 
+                        iconName='code-slash-outline'                        
+                        backgroundColor={Colors.sourceCodeColor}
                     />
 
                     <Option 

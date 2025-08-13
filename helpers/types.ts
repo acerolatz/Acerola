@@ -111,4 +111,10 @@ export type Todo = {
     finished_at: string | null
 }
 
+
+export type SourceCodeLink = {
+    name: string // GitLab, GitHub etc
+    url: string
+}
+
 export type BugType = "Bug" | "ImagesOutOfOrder" | "MissingImages" | "Broken" | "Other" | "Sugestion"

@@ -221,7 +221,7 @@ const HomePage = () => {
 
             {/* Main content */}
             <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} >
-                <View style={{gap: 12}} >
+                <View style={{gap: 10}} >
                     <GenreGrid genres={genres} />
                     <CollectionGrid collections={collections} />
                     <ContinueReadingGrid manhwas={readingHistoryManhwas} />

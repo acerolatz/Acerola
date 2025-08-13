@@ -59,14 +59,12 @@ const ReadingHistory = () => {
       </TopBar>
       <ManhwaGrid
         manhwas={manhwas}
-        onEndReached={onEndReached}
-        numColumns={2}
         hasResults={hasResults.current}
-        listMode='FlashList'
         showManhwaStatus={false}
-        color={Colors.readingHistoryColor}
-        showChaptersPreview={false}
         loading={loading}
+        showChaptersPreview={false}
+        color={Colors.readingHistoryColor}
+        onEndReached={onEndReached}
       />
     </SafeAreaView>
   )

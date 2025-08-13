@@ -62,7 +62,7 @@ const RequestManhwaForm = () => {
             const m = form_data.descr.trim() == '' ? null : form_data.descr.trim()
             await spRequestManhwa(form_data.manga_title, m)
             Keyboard.dismiss()
-            Toast.show(ToastMessages.EN.MANHWA_REQUEST_THANKS)
+            Toast.show(ToastMessages.EN.THANKS)
             router.back()
         setLoading(false)
     };
