@@ -1,20 +1,20 @@
-# Acerola - Manhwa Reader (NSFW)
+# Acerola - Adult Manhwa Reader (NSFW)
 
-Acerola is a React Native mobile app for reading adult manhwas (pornhwa), developed with a focus on Android. It has not been tested on iOS. If you're interested in working on the iOS version, please contact me, and I can provide access to a test database for development. You can audit the source code and download the latest APK from the Releases section.
+Acerola is a React Native mobile app for reading adult Manhwa (Pornhwa). Currently, only an Android version is available via APK.
 
 # Backend & Infrastructure
 
-- Images: Hosted and delivered via Cloudflare infrastructure.
+- Images: Hosted and delivered by Cloudflare.
 
 - Database: Uses a free Supabase instance (may be upgraded as the project grows).
 
-- Local First: A database of 550+ manhwas is stored locally for fast performance.
+- Local First: A local database with over 570 manhwas is stored on the device to ensure fast performance.
 
-- Sync: Tap the sync button on the home page to fetch the latest data from the cloud
+- Sync: Tap the sync button on the home page to fetch the latest data from the cloud.
 
 # Permissions (Android)
 
-The app's Bug Report feature allows users to attach images. The application will only access the specific images you choose to send.
+The Bug Report feature allows users to attach images. Only the images you choose to send will be accessed.
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
@@ -24,13 +24,13 @@ The app's Bug Report feature allows users to attach images. The application will
 
 # APK
 
-The APK is available in the project's Releases tab here on GitHub. Feel free to verify the APK with online analysis tools such as https://www.androidfreeware.net/apk-check or https://sisik.eu/apk-tool. Alternatively, you can use an Android Emulator to safely test the app.
+To use the Acerola app, download and install the latest APK from the "Releases" tab on GitHub. You can verify the APK with online analysis tools such as https://www.androidfreeware.net/apk-check or https://sisik.eu/apk-tool. Alternatively, use an Android emulator to safely test the app.
 
 # Safe Mode
 
-When Safe Mode is enabled, it behaves like a simple to-do list, and you can only access the pornhwas with a password you set yourself. Safe Mode can be enabled in the settings.
+When Safe Mode is enabled, the app behaves like a simple to-do list, and you can only access the pornhwas with a password you set yourself. Safe Mode can be enabled in the settings.
 
-If you forget the password, it cannot be reset or recovered. You must delete the app data via Android or iOS settings to regain access to the main content.
+If you forget the password, it cannot be reset or recovered. You must clear the app's data via your Android settings to regain access to the main content.
 
 <div style="display: flex; flex-wrap: wrap; gap: 2%;">
   <img style='max-width: 720px' src="github/images/settings.webp" width="49%" alt="Academy Image 1" />
@@ -45,7 +45,7 @@ If you’d like to help cover server costs, donations are welcome. Details are a
 
 # Usability
 
-The interface is entirely in English and designed to be intuitive. You’ll find it easy to navigate. Screenshots are included below for reference.
+The interface is in English and designed for intuitive navigation. Screenshots are included below for a preview.
 
 <img src="github/images/home.webp" style='max-width: 720px' />
 
