@@ -1,10 +1,11 @@
 import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
-import { Dimensions } from "react-native";
+import { Dimensions, PermissionsAndroid } from "react-native";
 import RNFS from 'react-native-fs';
 import * as Clipboard from 'expo-clipboard'
 import { Linking } from 'react-native';
 import { ToastMessages } from '@/constants/Messages';
 import Toast from 'react-native-toast-message';
+import { Platform } from 'react-native';
 
 
 const {
@@ -196,3 +197,33 @@ export function getChapterGridNumColumns(): number {
   if (w >= 360) { return 7 }
   return 6
 }
+
+export const decode = (base64: any): ArrayBuffer => {
+  const binaryString = atob(base64);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes.buffer;
+};
+
+
+export const requestPermissions = async (): Promise<boolean> => {
+  if (Platform.OS !== 'android') return true;
+  try {        
+    const storageGranted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+      {
+        title: "Storage Permission",
+        message: "Acerola needs access to your photos",
+        buttonNeutral: "Ask Me Later",
+        buttonNegative: "Cancel",
+        buttonPositive: "OK"
+      }
+    );
+    return storageGranted === PermissionsAndroid.RESULTS.GRANTED
+  } catch (err) {
+    console.warn(err);
+    return false;
+  }
+};

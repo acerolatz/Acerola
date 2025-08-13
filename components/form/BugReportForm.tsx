@@ -1,13 +1,11 @@
 import { AppConstants } from '@/constants/AppConstants';
 import { Colors } from '@/constants/Colors';
 import { ToastMessages } from '@/constants/Messages';
-import { hp } from '@/helpers/util';
+import { hp, requestPermissions } from '@/helpers/util';
 import { dbReadInfo } from '@/lib/database';
-import { spReportBug, supabase } from '@/lib/supabase';
+import { spReportBug, uploadBugScreenshot } from '@/lib/supabase';
 import { AppStyle } from '@/styles/AppStyle';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import React, { useState } from 'react';
@@ -17,7 +15,6 @@ import {
     FlatList,
     Keyboard,
     KeyboardAvoidingView,
-    PermissionsAndroid,
     Platform,
     Pressable,
     ScrollView,
@@ -26,25 +23,14 @@ import {
     TextInput,
     View
 } from 'react-native';
-import RNFS from 'react-native-fs';
 import { launchImageLibrary } from 'react-native-image-picker';
-import * as mime from 'react-native-mime-types';
 import Toast from 'react-native-toast-message';
 import * as yup from 'yup';
 import Footer from '../util/Footer';
+import { BugType } from '@/helpers/types';
+import BugTypePicker from '../picker/BugTypePicker';
+import BugImage from '../util/BugImage';
 
-
-
-type BugType = "ImagesOutOfOrder" | "MissingImages" | "Broken" | "Other" | "Sugestion"
-
-
-const BUT_TYPE_LIST: BugType[] = [
-    "Other",
-    "Sugestion",
-    "Broken",
-    "ImagesOutOfOrder",
-    "MissingImages"
-]
 
 
 const schema = yup.object().shape({  
@@ -69,97 +55,11 @@ interface FormData {
 }
 
 
-const BugItem = ({item, isSelected, onChange}: {item: BugType, isSelected: boolean, onChange: (b: BugType) => any}) => {
-    
-    const onPress = () => { onChange(item) }
-
-    const backgroundColor = isSelected ? Colors.BugReportColor : Colors.backgroundSecondary
-    const color = isSelected ? Colors.backgroundColor : Colors.white
-
-    return (
-        <Pressable 
-        onPress={onPress}
-        style={{
-            height: 42,
-            alignItems: "center", 
-            justifyContent: "center", 
-            paddingHorizontal: 12, 
-            borderRadius: AppConstants.COMMON.BORDER_RADIUS,
-            marginRight: AppConstants.COMMON.MARGIN,
-            backgroundColor
-        }} >
-            <Text style={[AppStyle.textRegular, {color}]} >{item}</Text>
-        </Pressable>
-    )
-}
-
-const BugTypeSelector = ({value, onChange}: {value: BugType, onChange: (b: BugType) => any}) => {
-    return (
-        <View style={{width: '100%', height: 52}} >
-            <FlatList
-                data={BUT_TYPE_LIST}
-                horizontal={true}
-                keyExtractor={(item, index) => index.toString()}
-                showsHorizontalScrollIndicator={false}
-                renderItem={({item}) => <BugItem isSelected={value === item} item={item} onChange={onChange} />}
-            />
-        </View>
-    )
-}
-
-
 const BugReportForm = ({title}: {title: string | undefined | null}) => {
         
     const db = useSQLiteContext()
     const [isLoading, setLoading] = useState(false)
     const [photos, setPhotos] = useState<string[]>([])
-
-    const requestPermissions = async () => {
-        if (Platform.OS !== 'android') return true;
-        try {        
-            const storageGranted = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-                {
-                    title: "Storage Permission",
-                    message: "Acerola needs access to your photos",
-                    buttonNeutral: "Ask Me Later",
-                    buttonNegative: "Cancel",
-                    buttonPositive: "OK"
-                }
-            );
-            return storageGranted === PermissionsAndroid.RESULTS.GRANTED
-        } catch (err) {
-            console.warn(err);
-            return false;
-        }
-    };
-
-    const decode = (base64: any) => {
-        const binaryString = atob(base64);
-        const bytes = new Uint8Array(binaryString.length);
-        for (let i = 0; i < binaryString.length; i++) {
-          bytes[i] = binaryString.charCodeAt(i);
-        }
-        return bytes.buffer;
-    };
-
-    const uploadToSupabase = async (uri: string, bug_id: string) => {
-        try {
-            const mimeType = mime.lookup(uri) || 'image/jpeg';
-            const fileData = await RNFS.readFile(uri, 'base64');
-            const filePath = `${bug_id}/${Date.now()}.jpg`;
-            const { error } = await supabase
-                .storage
-                .from('bugs-screenshoots')
-                .upload(filePath, decode(fileData), {
-                    contentType: mimeType,
-                    upsert: false
-                });
-            if (error) throw error;
-        } catch (error: any) {
-            console.error('error uploadToSupabase', error);
-        }
-    };
 
     const handleResponse = async (response: any) => {
         if (response.didCancel) {
@@ -186,10 +86,10 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
         await requestPermissions();
     
         launchImageLibrary({
-                mediaType: 'photo',
-                includeBase64: false,        
-            }, (response: any) => {
-                handleResponse(response);
+            mediaType: 'photo',
+            includeBase64: false,        
+        }, (response: any) => {
+            handleResponse(response);
             }
         );
     };
@@ -202,7 +102,7 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
         resolver: yupResolver(schema as any),
         defaultValues: {            
             title: title ? title: '',
-            bugType: 'Other',
+            bugType: 'Bug',
             descr: ''
         },
     });
@@ -211,6 +111,8 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
         setLoading(true)
             Keyboard.dismiss()
             const device = await dbReadInfo(db, 'device')
+
+            // BUG
             const bug_id: number | null = await spReportBug(
                 form_data.title,
                 form_data.bugType,
@@ -229,30 +131,13 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
             if (photos.length > 0) {
                 const bug_id_str = bug_id.toString()
                 Toast.show({text1: "Uploading images...", type: "info"})
-                for (let i = 0; i < photos.length; i++) {
-                    await uploadToSupabase(photos[i], bug_id_str)
-                }
-            }            
+                await Promise.all(photos.map(photo => uploadBugScreenshot(photo, bug_id_str)));
+            }
+
             Toast.show(ToastMessages.EN.BUG_REPORT_THANKS)
             router.back()
         setLoading(false)
     };
-
-    const renderImage = ({item} : {item: string}) => {
-        
-        const onPress = () => {
-            setPhotos(prev => prev.filter(i => i != item))
-        }
-
-        return (
-            <View style={{marginRight: AppConstants.COMMON.MARGIN}} >
-                <Image source={{uri: item}} style={styles.image} contentFit='cover' />
-                <Pressable onPress={onPress} style={styles.removeImageButton} hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE} >
-                    <Ionicons name='trash-outline' size={18} color={Colors.backgroundColor} />
-                </Pressable>
-            </View>
-        )        
-    }
 
     return (
         <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
@@ -279,7 +164,7 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
                     name="bugType"
                     control={control}
                     render={({ field: { onChange, onBlur, value } }) => (
-                        <BugTypeSelector  value={value} onChange={onChange} />
+                        <BugTypePicker value={value} onChange={onChange} />
                     )}
                 />
                 
@@ -326,7 +211,7 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
                             keyExtractor={(item) => item}
                             horizontal={true}
                             showsVerticalScrollIndicator={false}
-                            renderItem={renderImage}
+                            renderItem={({item}) => <BugImage uri={item} setPhotos={setPhotos} />}
                         />
                     </View>
                 }
@@ -346,18 +231,5 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.BugReportColor,
         alignItems: "center",
         justifyContent: "center"
-    },
-    image: {
-        width: 200, 
-        height: 312, 
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS
-    },
-    removeImageButton: {
-        position: "absolute", 
-        left: 8, 
-        top: 8, 
-        padding: 6, 
-        backgroundColor: Colors.BugReportColor, 
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS
-    } 
+    }
 })

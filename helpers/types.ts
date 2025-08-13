@@ -110,3 +110,5 @@ export type Todo = {
     created_at: string
     finished_at: string | null
 }
+
+export type BugType = "Bug" | "ImagesOutOfOrder" | "MissingImages" | "Broken" | "Other" | "Sugestion"

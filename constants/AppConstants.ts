@@ -73,7 +73,15 @@ export const AppConstants = {
         CHAPTER_MILESTONE_INCREMENT: 92,
         BUTTON: {
             SIZE: 22
-        }
+        },
+        BUT_TYPE_LIST: [
+            "Bug",
+            "Other",
+            "Sugestion",
+            "Broken",
+            "ImagesOutOfOrder",
+            "MissingImages"
+        ]
     },
     URLS: {
         REDDIT: "https://www.reddit.com/r/pornhwa/",

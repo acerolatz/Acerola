@@ -3,7 +3,11 @@ import { AppRelease, Chapter, ChapterImage, Collection, DonateMethod, Manhwa, Ma
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createClient } from '@supabase/supabase-js';
 import * as RNLocalize from 'react-native-localize';
+import * as mime from 'react-native-mime-types';
+import { Image as CompressorImage } from 'react-native-compressor';
 import { supabaseKey, supabaseUrl } from "./supabaseKey";
+import RNFS from 'react-native-fs';
+import { decode } from "@/helpers/util";
 
 
 export const supabase = createClient(supabaseUrl, supabaseKey as any, {
@@ -212,6 +216,8 @@ export async function spFetchRandomManhwaCards(p_limit: number = 30): Promise<Ma
         }
 
         return data.map(i => {return {
+            normalizedWidth: i.width,
+            normalizedHeight: i.height,
             manhwa_id: (i.manhwas as any).manhwa_id,
             title: (i.manhwas as any).title,
             image_url: i.image_url,
@@ -306,3 +312,33 @@ export async function spGetTodayTop10(): Promise<Manhwa[]> {
 
     return data as Manhwa[]
 }
+
+export const uploadBugScreenshot = async (uri: string, bug_id: string) => {
+    try {
+        const mimeType = mime.lookup(uri) || 'image/jpeg';
+        const ext = mime.extension(mimeType) || 'jpg';
+
+        const compressedUri = await CompressorImage.compress(uri, {
+            compressionMethod: 'auto',
+            quality: 0.7,
+            disablePngTransparency: mimeType === 'image/png'
+        });            
+
+        const fileData = await RNFS.readFile(compressedUri, 'base64');
+        const filePath = `${bug_id}/${Date.now()}.${ext}`;
+
+        const { error } = await supabase
+            .storage
+            .from('bugs-screenshoots')
+            .upload(filePath, decode(fileData), {
+                contentType: mimeType,
+                upsert: false
+            });
+        
+        await RNFS.unlink(compressedUri);
+
+        if (error) throw error;            
+    } catch (error: any) {
+        console.error('error uploadToSupabase', error);
+    }        
+};
