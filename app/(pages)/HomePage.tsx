@@ -40,18 +40,12 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Animated, Pressable, Text, SafeAreaView, ScrollView, StyleSheet, View } from 'react-native'
 
 
-const SCREEN_WIDTH = wp(100)
-const SCREEN_HEIGHT = hp(100)
-
-const MAX_RANDOM_MANHWA_CARD_WIDTH = wp(87)
-const MAX_RANDOM_MANHWA_CARD_HEIGHT = hp(80)
-
 const PAGE_LIMIT = 32
 
 const HomePage = () => {
 
     const menuAnim = useRef(new Animated.Value(-AppConstants.PAGES.HOME.MENU_WIDTH)).current 
-    const backgroundAnim = useRef(new Animated.Value(-SCREEN_WIDTH)).current
+    const backgroundAnim = useRef(new Animated.Value(-AppConstants.COMMON.SCREEN_WIDTH)).current
     const menuVisible = useRef(false)
     
     const db = useSQLiteContext()
@@ -71,9 +65,14 @@ const HomePage = () => {
     const reloadCards = async () => {
         const r = await spFetchRandomManhwaCards(PAGE_LIMIT)
         setCards(r.map(c => {
-            const normalizedHeight = c.height > MAX_RANDOM_MANHWA_CARD_HEIGHT ? MAX_RANDOM_MANHWA_CARD_HEIGHT : c.height
+            const normalizedHeight = c.height > AppConstants.COMMON.RANDOM_MANHWAS.MAX_HEIGHT ? 
+                AppConstants.COMMON.RANDOM_MANHWAS.MAX_HEIGHT : c.height
+            
             let normalizedWidth = (normalizedHeight * c.width) / c.height
-            normalizedWidth = normalizedWidth > MAX_RANDOM_MANHWA_CARD_WIDTH ? MAX_RANDOM_MANHWA_CARD_WIDTH : normalizedWidth
+
+            normalizedWidth = normalizedWidth > AppConstants.COMMON.RANDOM_MANHWAS.MAX_WIDTH ? 
+                AppConstants.COMMON.RANDOM_MANHWAS.MAX_WIDTH : normalizedWidth
+                
             return {...c, normalizedWidth, normalizedHeight}
         }))
     }
@@ -169,7 +168,7 @@ const HomePage = () => {
             menuVisible.current = false
         })
         Animated.timing(backgroundAnim, {
-            toValue: -SCREEN_WIDTH,
+            toValue: -AppConstants.COMMON.SCREEN_WIDTH,
             duration: AppConstants.PAGES.HOME.MENU_ANIMATION_TIME,
             useNativeDriver: true
         }).start()
@@ -309,9 +308,9 @@ const styles = StyleSheet.create({
         zIndex: 100
     },
     menuBackground: {
-        width: SCREEN_WIDTH,
+        width: AppConstants.COMMON.SCREEN_WIDTH,
         position: 'absolute',
-        height: SCREEN_HEIGHT * 1.2,
+        height: AppConstants.COMMON.SCREEN_HEIGHT * 1.2,
         top: 0,
         left: 0,        
         backgroundColor: 'rgba(0, 0, 0, 0.8)',

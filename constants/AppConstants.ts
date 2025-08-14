@@ -1,3 +1,4 @@
+import { hp, wp } from "@/helpers/util";
 import { Colors } from "./Colors";
 
 
@@ -81,7 +82,26 @@ export const AppConstants = {
             "ImagesOutOfOrder",
             "MissingImages",
             "Other"
-        ]
+        ],
+        SCREEN_WIDTH: wp(100),
+        SCREEN_HEIGHT: hp(100),
+        PADDING_HORIZONTAL: wp(4),
+        PADDING_VERTICAL: hp(4),
+        RANDOM_MANHWAS: {
+            MAX_WIDTH: wp(87),
+            MAX_HEIGHT: hp(80)
+        }
+    },
+    TOAST: {
+        HEIGHT: 66,
+        WIDTH: wp(92),
+        BOTTOM_OFFSET: 60,
+        VISIBILITY_TIME: 2500,
+        POSITION: "bottom"
+    },
+    DONATE_BANNER: {
+        WIDTH: 1024, 
+        HEIGHT: 943
     },
     URLS: {
         REDDIT: "https://www.reddit.com/r/pornhwa/"        

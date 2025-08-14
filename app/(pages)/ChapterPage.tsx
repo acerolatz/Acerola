@@ -5,7 +5,7 @@ import ChapterImageItem from '@/components/chapter/ChapterImageItem'
 import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
 import { Chapter, ChapterImage } from '@/helpers/types'
-import { hp, wp } from '@/helpers/util'
+import { hp } from '@/helpers/util'
 import { dbAddNumericInfo, dbUpsertReadingHistory } from '@/lib/database'
 import { spFetchChapterImages, spUpdateChapterView } from '@/lib/supabase'
 import { useChapterState } from '@/store/chapterState'
@@ -22,9 +22,6 @@ import Animated, {
   withTiming
 } from 'react-native-reanimated'
 
-
-const MAX_WIDTH = wp(100)
-const SCREEN_HEIGHT = hp(100)
 
 const AnimatedFlashList = Animated.createAnimatedComponent(FlashList<ChapterImage>)
 
@@ -69,7 +66,7 @@ const ChapterPage = () => {
             
             let newHeight = 0
             imgs.forEach(img => {
-              const w = Math.min(img.width, MAX_WIDTH)
+              const w = Math.min(img.width, AppConstants.COMMON.SCREEN_WIDTH)
               const h = (w * img.height) / img.width
               newHeight += h              
             })
@@ -108,7 +105,7 @@ const ChapterPage = () => {
     const scrollHandler = useAnimatedScrollHandler({
       onScroll: (event) => {
         headerVisible.value = event.contentOffset.y <= 50
-        footerVisible.value = event.contentOffset.y + SCREEN_HEIGHT >= listTotalHeightRef.value - 100
+        footerVisible.value = event.contentOffset.y + AppConstants.COMMON.SCREEN_HEIGHT >= listTotalHeightRef.value - 100
       }
     })
 

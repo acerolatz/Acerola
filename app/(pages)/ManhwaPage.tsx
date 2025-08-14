@@ -11,7 +11,7 @@ import PageActivityIndicator from '@/components/util/PageActivityIndicator';
 import { Colors } from '@/constants/Colors';
 import { ToastMessages } from '@/constants/Messages';
 import { Manhwa } from '@/helpers/types';
-import { formatTimestamp, hp, wp } from '@/helpers/util';
+import { formatTimestamp, hp } from '@/helpers/util';
 import { dbGetManhwaAltNames, dbReadManhwaById, dbUpdateManhwaViews } from '@/lib/database';
 import { spUpdateManhwaViews } from '@/lib/supabase';
 import { AppStyle } from '@/styles/AppStyle';
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
   },
   linearBackground: {
     position: 'absolute',
-    width: wp(100),
+    width: AppConstants.COMMON.SCREEN_WIDTH,
     left: 0,    
     top: 0,
     height: hp(98)
@@ -191,19 +191,19 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: "space-between", 
     marginTop: 10,
-    paddingHorizontal: wp(4),
-    paddingVertical: hp(4),
+    paddingHorizontal: AppConstants.COMMON.PADDING_HORIZONTAL,
+    paddingVertical: AppConstants.COMMON.PADDING_VERTICAL,
     paddingBottom: 10
   },
   manhwaContainer: {
     width: '100%', 
     gap: AppConstants.COMMON.MARGIN, 
     alignItems: "center", 
-    paddingHorizontal: wp(4)    
+    paddingHorizontal: AppConstants.COMMON.PADDING_HORIZONTAL
   },
   image: {
     width: '100%',
-    maxWidth: wp(92),
+    maxWidth: AppConstants.COMMON.SCREEN_WIDTH - AppConstants.COMMON.PADDING_HORIZONTAL * 2,
     height: 520, 
     borderRadius: AppConstants.COMMON.BORDER_RADIUS
   },

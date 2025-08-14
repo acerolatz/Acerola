@@ -5,7 +5,7 @@ import { Colors } from '@/constants/Colors'
 import { AppStyle } from '@/styles/AppStyle'
 import { useLocalSearchParams } from 'expo-router'
 import React from 'react'
-import { SafeAreaView, StatusBar } from 'react-native'
+import { SafeAreaView } from 'react-native'
 
 
 const BugReport = () => {

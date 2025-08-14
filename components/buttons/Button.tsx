@@ -2,7 +2,12 @@ import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import React, { useState } from 'react'
-import { ActivityIndicator, Pressable, View, ViewStyle } from 'react-native'
+import { 
+  ActivityIndicator, 
+  Pressable, 
+  View, 
+  ViewStyle 
+} from 'react-native'
 
 
 interface ButtonProps {

@@ -10,7 +10,15 @@ import { useScanState } from '@/store/scansState'
 import { AppStyle } from '@/styles/AppStyle'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import React, { useEffect, useState } from 'react'
-import { ActivityIndicator, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { 
+    ActivityIndicator, 
+    Pressable, 
+    SafeAreaView, 
+    ScrollView, 
+    StyleSheet, 
+    Text, 
+    View 
+} from 'react-native'
 
 
 const ScansPage = () => {

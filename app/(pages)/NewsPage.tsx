@@ -17,8 +17,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native'
 
 
-const PAGE_LIMIT = 10
-const IMAGE_WIDTH = wp(88)
+const PAGE_LIMIT = 16
+const IMAGE_WIDTH = AppConstants.COMMON.SCREEN_WIDTH - AppConstants.COMMON.PADDING_HORIZONTAL * 2
 const TEXT_LENGHT_LIMIT = 128
 
 
@@ -136,7 +136,7 @@ const NewsPage = () => {
                 <FlashList
                     data={news}
                     estimatedItemSize={300}
-                    keyExtractor={(item) => item.news_id.toString()}
+                    keyExtractor={(item, index) => item.news_id.toString()}
                     onEndReached={onEndReached}
                     renderItem={({item}) => <News news={item} />}
                     ListFooterComponent={renderFooter}
@@ -152,6 +152,6 @@ const styles = StyleSheet.create({
     item: {
         width: '100%',
         gap: 20,
-        marginBottom: 30
+        marginBottom: 32
     }
 })

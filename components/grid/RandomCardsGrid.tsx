@@ -7,7 +7,7 @@ import { Image } from 'expo-image'
 import { router } from 'expo-router'
 import { debounce } from 'lodash'
 import React, { useRef, useState } from 'react'
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import Title from '../Title'
 import RotatingButton from '../buttons/RotatingButton'
 import Row from '../util/Row'
@@ -17,6 +17,8 @@ import Toast from 'react-native-toast-message'
 import { ToastMessages } from '@/constants/Messages'
 import { AppConstants } from '@/constants/AppConstants'
 import CustomActivityIndicator from '../util/CustomActivityIndicator'
+import { FlashList } from '@shopify/flash-list'
+import { wp } from '@/helpers/util'
 
 
 
@@ -68,7 +70,7 @@ const ManhwaRandomCard = ({card}: {card: ManhwaCard}) => {
             <Image 
                 source={card.image_url} 
                 style={{
-                    width: card.normalizedWidth, 
+                    width: card.normalizedWidth,
                     height: card.normalizedHeight, 
                     borderRadius: AppConstants.COMMON.BORDER_RADIUS
                 }} 
@@ -83,18 +85,14 @@ const ManhwaRandomCard = ({card}: {card: ManhwaCard}) => {
 const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
     
     const { cards } = useManhwaCardsState()
-    const flatListRef = useRef<FlatList<ManhwaCard>>(null)
+    const flatListRef = useRef<FlashList<ManhwaCard>>(null)
 
     const reload = async () => {
         await reloadCards()
         flatListRef.current?.scrollToIndex({index: 0, animated: true})
     }
 
-    const debounceReload = debounce(reload, 800)
-
-    const renderItem = ({item}: {item: ManhwaCard}) => {
-        return <ManhwaRandomCard card={item} />
-    }
+    const debounceReload = debounce(reload, 800)    
 
     if (cards.length === 0) {
         return (
@@ -113,17 +111,18 @@ const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
                 <Title title='Random'/>
                 <RotatingButton onPress={debounceReload} />
             </Row>
-            <View style={{width: '100%'}} >
-                <FlatList
+            <View style={{flex: 1, height: AppConstants.COMMON.RANDOM_MANHWAS.MAX_HEIGHT}} >
+                <FlashList
                     ref={flatListRef}
                     data={cards}
                     ItemSeparatorComponent={() => <View style={{ width: AppConstants.COMMON.MARGIN }} />}
-                    initialNumToRender={4}
+                    drawDistance={wp(150)}
                     onEndReachedThreshold={3}
+                    estimatedItemSize={AppConstants.COMMON.RANDOM_MANHWAS.MAX_WIDTH}
                     showsHorizontalScrollIndicator={false}
                     horizontal={true}
                     keyExtractor={(item: ManhwaCard) => item.manhwa_id.toString()}
-                    renderItem={renderItem}
+                    renderItem={({item}) => <ManhwaRandomCard card={item} />}
                 />
             </View>
         </View>

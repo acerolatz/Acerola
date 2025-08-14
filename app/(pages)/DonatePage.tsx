@@ -26,7 +26,11 @@ import Footer from '@/components/util/Footer'
 
 
 const WIDTH = wp(92)
-const HEIGHT = getRelativeHeight(1024, 943, WIDTH)
+const HEIGHT = getRelativeHeight(
+  AppConstants.DONATE_BANNER.WIDTH, 
+  AppConstants.DONATE_BANNER.HEIGHT, 
+  WIDTH
+)
 
 
 const Donate = () => {  

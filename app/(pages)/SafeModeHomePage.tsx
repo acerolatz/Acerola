@@ -24,10 +24,6 @@ import TopBar from '@/components/TopBar'
 import Footer from '@/components/util/Footer'
 
 
-const SCREEN_WIDTH = wp(100)
-const SCREEN_HEIGHT = hp(100)
-
-
 const CreateTodoComponent = ({setTodos}: {setTodos: React.Dispatch<React.SetStateAction<Todo[]>>}) => {
 
     const db = useSQLiteContext()
@@ -293,8 +289,8 @@ const styles = StyleSheet.create({
     },
     menuBackground: {
         position: 'absolute',
-        width: SCREEN_WIDTH,
-        height: SCREEN_HEIGHT * 1.2,
+        width: AppConstants.COMMON.SCREEN_WIDTH,
+        height: AppConstants.COMMON.SCREEN_HEIGHT * 1.2,
         top: 0,
         left: 0,        
         backgroundColor: 'rgba(0, 0, 0, 0.8)',

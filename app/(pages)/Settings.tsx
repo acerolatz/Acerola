@@ -9,7 +9,7 @@ import { AppStyle } from '@/styles/AppStyle'
 import { useLocalSearchParams } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
 import React, { useEffect, useState } from 'react'
-import { SafeAreaView, StyleSheet } from 'react-native'
+import { SafeAreaView } from 'react-native'
 
 const Settings = () => {
 
@@ -64,5 +64,3 @@ const Settings = () => {
 }
 
 export default Settings
-
-const styles = StyleSheet.create({})

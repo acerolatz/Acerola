@@ -10,7 +10,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { SafeAreaView } from 'react-native'
 
 
-const PAGE_LIMIT = 30
+const PAGE_LIMIT = 32
 
 
 const LatestUpdatesPage = () => {

@@ -94,10 +94,10 @@ const RootLayout = () => {
           <Stack.Screen name='(pages)/Settings' options={{headerShown: false}} />              
         </Stack>
         <Toast
-          position='bottom' 
+          position={AppConstants.TOAST.POSITION as any}
           config={TOAST_CONFIG as any} 
-          bottomOffset={60} 
-          visibilityTime={2500}
+          bottomOffset={AppConstants.TOAST.BOTTOM_OFFSET} 
+          visibilityTime={AppConstants.TOAST.VISIBILITY_TIME}
           avoidKeyboard={true}
           swipeable={true}/>
       </GestureHandlerRootView>
@@ -110,14 +110,14 @@ export default RootLayout
 
 const styles = StyleSheet.create({
   toast: {
-    height: 66,
-    width: '92%',
+    width: AppConstants.TOAST.WIDTH,
+    height: AppConstants.TOAST.HEIGHT,
     alignItems: "flex-start",
     justifyContent: "center",
     paddingLeft: 12,
     paddingRight: 4,
     borderRadius: AppConstants.COMMON.BORDER_RADIUS,
-    backgroundColor: "#1f2226"    
+    backgroundColor: Colors.backgroundSecondary
   },
   leftBar: {
     position: 'absolute', 

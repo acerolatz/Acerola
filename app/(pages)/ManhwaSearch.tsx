@@ -17,10 +17,10 @@ import React, { useEffect, useRef, useState } from 'react'
 import { SafeAreaView, View } from 'react-native'
 
 
-const PAGE_LIMIT = 30
+const PAGE_LIMIT = 32
 
 const {width, height} = getItemGridDimensions(
-  wp(4),
+  AppConstants.COMMON.PADDING_HORIZONTAL,
   10,
   2,
   AppConstants.COMMON.MANHWA_COVER_DIMENSION.WIDTH,

@@ -15,8 +15,7 @@ import {
     Pressable, 
     SafeAreaView, 
     StyleSheet, 
-    Text, 
-    View 
+    Text    
 } from 'react-native'
 
 

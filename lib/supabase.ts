@@ -208,7 +208,7 @@ export async function spFetchRandomManhwaCards(p_limit: number = 30): Promise<Ma
             .from("cards")
             .select("manhwas (title, manhwa_id), width, height, image_url, created_at")
             .order("created_at", {ascending: false})
-            .limit(32)
+            .limit(p_limit)
 
         if (error) {
             console.log("error spFetchRandomManhwaCards", error)
