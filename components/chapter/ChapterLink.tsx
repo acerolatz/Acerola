@@ -19,32 +19,28 @@ import {
 
 interface ChapterLinkProps {
     manhwa_id: number
-    manhwaTitle: string
+    manhwa_title: string
     chapter_id: number
     chapter_name: string
     chapter_created_at: string
     index: number
-    shouldShowChapterDate?: boolean    
-    prefix?: string    
-    style?: StyleProp<ViewStyle>
+    shouldShowChapterDate?: boolean
 }
 
 const ChapterLink = ({
     manhwa_id, 
-    manhwaTitle,
+    manhwa_title,
     index,
     chapter_id,
     chapter_created_at,
     chapter_name,
-    shouldShowChapterDate = true,    
-    prefix = 'Chapter',
-    style
+    shouldShowChapterDate = true
 }: ChapterLinkProps) => {
 
     const { setChapterState } = useChapterState()
     const [loading, setLoading] = useState(false)
     
-    const name = prefix + ' ' + chapter_name
+    const name = 'Chapter ' + chapter_name
 
     const onPress = useCallback(async () => {
         setLoading(true)
@@ -53,24 +49,24 @@ const ChapterLink = ({
         setLoading(false)        
         router.navigate({
             pathname: "/(pages)/ChapterPage",
-            params: {manhwaTitle}
+            params: {manhwaTitle: manhwa_title}
         })
     }, [chapter_id])
 
     if (loading) {
         return (
-            <View style={[styles.chapterLink, style]} >
+            <View style={styles.chapterLink} >
                 <ActivityIndicator size={24} color={Colors.white} />
             </View>
         )
     }
 
     return (
-        <Pressable onPress={onPress} style={[styles.chapterLink, style]} >
+        <Pressable onPress={onPress} style={styles.chapterLink} >
             <Text style={AppStyle.textRegular}>{name}</Text>
             {
                 shouldShowChapterDate &&
-                <Text style={AppStyle.textRegular}>{formatTimestamp(chapter_created_at)}</Text>
+                <Text style={styles.text}>{formatTimestamp(chapter_created_at)}</Text>
             }
         </Pressable>
     )
@@ -84,5 +80,9 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "space-between",
         height: 24
+    },
+    text: {
+        ...AppStyle.textRegular,
+        paddingRight: 6
     }
 })

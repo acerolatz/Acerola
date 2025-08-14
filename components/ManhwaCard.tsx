@@ -13,7 +13,6 @@ import {
 import ChapterLink from './chapter/ChapterLink';
 import ManhwaIdComponent from './ManhwaIdComponent';
 import ManhwaStatusComponent from './ManhwaStatusComponent';
-import { wp } from '@/helpers/util';
 
 
 interface ManhwaCardProps {
@@ -66,7 +65,7 @@ const ManhwaCard = ({
                                 <ChapterLink 
                                     shouldShowChapterDate={shouldShowChapterDate} 
                                     key={item.chapter_id}
-                                    manhwaTitle={manhwa.title}
+                                    manhwa_title={manhwa.title}
                                     manhwa_id={manhwa.manhwa_id}
                                     index={index}
                                     chapter_name={item.chapter_name}

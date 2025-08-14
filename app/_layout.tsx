@@ -65,7 +65,7 @@ const RootLayout = () => {
 
   return (
     <SQLiteProvider databaseName="acerola.db" onInit={dbMigrate}>
-      <GestureHandlerRootView style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
+      <GestureHandlerRootView style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>        
         <StatusBar hidden={true} barStyle={'light-content'} />
         <Stack>
           <Stack.Screen name='index' options={{headerShown: false}} />              
@@ -100,7 +100,7 @@ const RootLayout = () => {
           visibilityTime={2500}
           avoidKeyboard={true}
           swipeable={true}/>
-        </GestureHandlerRootView>
+      </GestureHandlerRootView>
     </SQLiteProvider>
   )
 }
