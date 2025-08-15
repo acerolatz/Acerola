@@ -34,6 +34,7 @@ import {
     spFetchRandomManhwaCards, 
     spGetTodayTop10 
 } from '@/lib/supabase'
+import { useCollectionState } from '@/store/collectionsState'
 import { useManhwaCardsState } from '@/store/randomManhwaState'
 import { useTop10ManhwasState } from '@/store/top10State'
 import { AppStyle } from '@/styles/AppStyle'
@@ -63,7 +64,7 @@ const HomePage = () => {
     const { cards, setCards } = useManhwaCardsState()    
     
     const { top10manhwas, setTop10manhwas } = useTop10ManhwasState()
-    const [collections, setCollections] = useState<Collection[]>([])
+    const { collections, setCollections } = useCollectionState()
     const [loading, setLoading] = useState(true)
     const [genres, setGenres] = useState<Genre[]>([])
     const [latestUpdate, setLatestUpdates] = useState<Manhwa[]>([])
@@ -86,14 +87,10 @@ const HomePage = () => {
     }
 
     const updateCollections = async () => {
-        let c = await dbReadCollections(db)
-        const shouldUpdate = await dbShouldUpdate(db, 'collections')
-        if (c.length === 0 || shouldUpdate) {
-            c = await spFetchCollections()
-            await dbCleanTable(db, 'collections')
-            await dbUpsertCollections(db, c)
+        if (collections.length === 0) {
+            const c = await spFetchCollections()
+            setCollections(c)
         }
-        setCollections(c)
     }
 
     const updateTop10 = async () => {

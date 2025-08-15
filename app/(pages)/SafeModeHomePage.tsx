@@ -236,7 +236,7 @@ const SafeModeHomePage = () => {
                 <BottomSheetView style={styles.bottomSheetContainer} >
                     <TopBar title='Settings'>
                         <CloseBtn onPress={handleCloseBottomSheet}/>
-                    </TopBar>
+                    </TopBar>                    
                     <View style={{flex: 1, gap: AppConstants.COMMON.GAP}} >
                         <Text style={{...Typography.light, color: Colors.neonRed}}>A password is required to access the settings.</Text>
                         <View>

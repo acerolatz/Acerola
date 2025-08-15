@@ -34,7 +34,7 @@ export const AppConstants = {
         }
     },
     DEBUB: {
-        ENABLED: false
+        ENABLED: true
     },
     MANHWA_COVER: {
         WIDTH: 300,

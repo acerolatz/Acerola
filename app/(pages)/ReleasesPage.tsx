@@ -63,7 +63,6 @@ const Releases = () => {
                     showsHorizontalScrollIndicator={false}
                     keyExtractor={(item) => item.url}
                     horizontal={true}
-                    ItemSeparatorComponent={() => <View style={{ width: AppConstants.COMMON.MARGIN }} />}
                     renderItem={({item}) => <SourceCodeButton item={item} />}
                 />
                 <Text style={Typography.semibold} >Packages</Text>

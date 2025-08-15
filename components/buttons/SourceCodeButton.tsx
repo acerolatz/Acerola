@@ -1,11 +1,12 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import React, { useState } from 'react'
-import { SourceCodeLink } from '@/helpers/types'
-import { Colors } from '@/constants/Colors'
 import { AppConstants } from '@/constants/AppConstants'
-import { AppStyle } from '@/styles/AppStyle'
+import { Typography } from '@/constants/typography'
 import Ionicons from '@expo/vector-icons/Ionicons'
-import { openUrl, wp } from '@/helpers/util'
+import { SourceCodeLink } from '@/helpers/types'
+import { AppStyle } from '@/styles/AppStyle'
+import { Colors } from '@/constants/Colors'
+import React, { useState } from 'react'
+import { openUrl } from '@/helpers/util'
 
 
 const SourceCodeButton = ({item}: {item: SourceCodeLink}) => {
@@ -18,21 +19,19 @@ const SourceCodeButton = ({item}: {item: SourceCodeLink}) => {
         setLoading(false)
     }
 
-    let iconName = 'globe-outline'
+    let iconName = 'code-slash-outline'
 
     if (item.name == "GitHub") {
         iconName = 'logo-github'
     } else if (item.name == "GitLab") {
         iconName = 'logo-gitlab'
-    }    
-
-    const showText = iconName === 'globe-outline'
+    }
 
     if (loading) {
         return (
             <View style={styles.container} >
                 <Ionicons name={iconName as any} size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />
-                {showText && <Text style={styles.text}>{item.name}</Text>}
+                <Text style={{...Typography.regular, color: Colors.backgroundColor}}>{item.name}</Text>
             </View>
         )
     }    
@@ -40,7 +39,7 @@ const SourceCodeButton = ({item}: {item: SourceCodeLink}) => {
     return (
         <Pressable onPress={onPress} style={styles.container} >
             <Ionicons name={iconName as any} size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />
-            {showText && <Text style={styles.text}>{item.name}</Text>}
+            <Text style={{...Typography.regular, color: Colors.backgroundColor}}>{item.name}</Text>
         </Pressable>
     )
 }
@@ -49,18 +48,8 @@ export default SourceCodeButton
 
 const styles = StyleSheet.create({
     container: {
-        height: 52,
-        paddingHorizontal: 16,
-        flex: 1,
-        gap: 10,
-        flexDirection: 'row',
-        alignItems: "center",        
-        justifyContent: "center",
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
-        backgroundColor: Colors.yellow
-    },
-    text: {
-        ...AppStyle.textRegular,
-        color: Colors.backgroundColor
-    }
+        ...AppStyle.defaultGridItem,
+        gap: AppConstants.COMMON.GAP,
+        flexDirection: 'row'
+    }    
 })

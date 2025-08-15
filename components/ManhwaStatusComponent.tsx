@@ -1,8 +1,8 @@
 import { AppConstants } from '@/constants/AppConstants'
-import { Colors } from '@/constants/Colors'
-import { AppStyle } from '@/styles/AppStyle'
-import React from 'react'
+import { FontSizes, Typography } from '@/constants/typography'
 import { StyleSheet, Text, View } from 'react-native'
+import { Colors } from '@/constants/Colors'
+import React from 'react'
 
 
 interface ManhwaStatusComponentProps {
@@ -12,11 +12,13 @@ interface ManhwaStatusComponentProps {
 
 const ManhwaStatusComponent = ({ status }: ManhwaStatusComponentProps) => {
 
-    const backgroundColor = status === "Completed" ? Colors.manhwaStatusCompleted : Colors.manhwaStatusOnGoing
+    const backgroundColor = status === "Completed" ? 
+        Colors.manhwaStatusCompleted : 
+        Colors.manhwaStatusOnGoing
 
     return (
         <View style={[styles.container, {backgroundColor}]} >
-            <Text style={[AppStyle.textRegular, {fontSize: 12, color: Colors.backgroundColor}]}>{status}</Text>
+            <Text style={{...Typography.regular ,fontSize: FontSizes.pp, color: Colors.backgroundColor}}>{status}</Text>
         </View>
     )
 }
@@ -28,7 +30,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         left: 6, 
         top: 6,
-        paddingHorizontal: 6,
+        paddingHorizontal: 4,
         paddingVertical: 4,
         borderRadius: AppConstants.COMMON.BORDER_RADIUS
     }

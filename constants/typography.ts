@@ -4,6 +4,7 @@ import { Colors } from "./Colors";
 
 
 export const FontSizes = {
+  pp: hp(1.4),
   xs: hp(1.8),
   sm: hp(2.2),
   md: hp(2.4),

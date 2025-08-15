@@ -26,8 +26,7 @@ import { useSQLiteContext } from 'expo-sqlite';
 import { useAppVersionState } from '@/store/appVersionState';
 
 
-const App = () => {        
-
+const App = () => {
 
     const db = useSQLiteContext()
     const isInitialized = useRef(false);

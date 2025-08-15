@@ -6,39 +6,13 @@ import { StyleSheet } from "react-native";
 
 
 export const AppStyle = StyleSheet.create({
-    textRegular: {
-        fontSize: AppConstants.TEXT.SIZE.REGULAR,
-        color: AppConstants.TEXT.COLOR.LIGHT,
-        fontFamily: AppConstants.TEXT.FONT.REGULAR
-    },
-    textHeader: {
-        fontSize: AppConstants.TEXT.SIZE.SEMIBOLD,
-        color: AppConstants.TEXT.COLOR.LIGHT,
-        fontFamily: AppConstants.TEXT.FONT.REGULAR
-    },
-    textMangaTitle: {
-        fontSize: AppConstants.TEXT.SIZE.BOLD,
-        color: AppConstants.TEXT.COLOR.LIGHT,
-        fontFamily: AppConstants.TEXT.FONT.SEMIBOLD
-    },
-    textLink: {
-        fontSize: AppConstants.TEXT.SIZE.LIGTH,
-        color: AppConstants.TEXT.COLOR.LIGHT,
-        textDecorationLine: "underline",
-        fontFamily: AppConstants.TEXT.FONT.REGULAR
-    },
     safeArea: {
         width: '100%', 
         flex: 1, 
         paddingHorizontal: AppConstants.COMMON.SCREEN_PADDING_HORIZONTAL,
         paddingTop: AppConstants.COMMON.SCREEN_PADDING_VERTICAL,
         backgroundColor: Colors.backgroundColor
-    },
-    formButtonText: {
-        color: Colors.backgroundColor,
-        fontSize: AppConstants.TEXT.SIZE.SEMIBOLD,
-        fontFamily:AppConstants.TEXT.FONT.REGULAR,
-    },
+    },    
     buttonBackground: {
         padding: 6, 
         borderRadius: AppConstants.COMMON.BORDER_RADIUS, 
@@ -69,12 +43,7 @@ export const AppStyle = StyleSheet.create({
         height: hp(20),
         paddingHorizontal: 10,
         color: Colors.white
-    },
-    inputHeaderText: {
-        color: AppConstants.TEXT.COLOR.LIGHT,
-        fontSize: 18,
-        fontFamily: AppConstants.TEXT.FONT.REGULAR
-    },
+    },    
     error: {
         ...Typography.light,
         color: Colors.primary,
@@ -91,11 +60,7 @@ export const AppStyle = StyleSheet.create({
         height: AppConstants.BUTTON.SIZE,
         borderRadius: AppConstants.COMMON.BORDER_RADIUS,
         backgroundColor: Colors.yellow
-    },
-    center: {
-        alignItems: "center",
-        justifyContent: "center"
-    },
+    },    
     defaultGridItem: {
         paddingHorizontal: AppConstants.COMMON.ITEM_PADDING_HORIZONTAL,
         paddingVertical: AppConstants.COMMON.ITEM_PADDING_VERTICAL,
@@ -104,11 +69,7 @@ export const AppStyle = StyleSheet.create({
         borderRadius: AppConstants.COMMON.BORDER_RADIUS,
         backgroundColor: Colors.yellow,
         marginRight: AppConstants.COMMON.MARGIN
-    },
-    defaultGridItemText: {
-        ...Typography.regular,
-        color: Colors.backgroundColor
-    },
+    },            
     buttonCancel: {
         flex: 1,
         height: AppConstants.BUTTON.SIZE,

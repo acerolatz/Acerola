@@ -1,6 +1,6 @@
-import { AppStyle } from '@/styles/AppStyle'
-import React from 'react'
 import { FlatList, Text, View } from 'react-native'
+import { Typography } from '@/constants/typography'
+import React from 'react'
 
 
 interface AltNamesProps {
@@ -11,7 +11,7 @@ const ManhwaAlternativeNames = ({names}: AltNamesProps) => {
 
     if (names.length === 0) {
         return <></>
-    }
+    }    
 
     return (
         <View style={{width: '100%', alignItems: "flex-start"}} >
@@ -20,7 +20,9 @@ const ManhwaAlternativeNames = ({names}: AltNamesProps) => {
                 keyExtractor={(item) => item}
                 horizontal={true}
                 renderItem={({item, index}) => 
-                    <Text key={item} style={[AppStyle.textRegular, {marginRight: 8}]}>{item}{index < names.length - 1 ? ',' : ''}</Text>
+                    <Text key={item} style={{...Typography.light, marginRight: 6}}>
+                        {item}{index < names.length - 1 ? ',' : ''}
+                    </Text>
                 }
             />
         </View>

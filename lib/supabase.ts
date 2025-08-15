@@ -275,7 +275,6 @@ export async function spFetchEulaAndDisclaimer(): Promise<{name: string, value: 
 
 
 export async function spFetchCollections(): Promise<Collection[]> {
-    console.log("fetching collections")
     const { data, error } = await supabase
         .from("collections")
         .select('*')

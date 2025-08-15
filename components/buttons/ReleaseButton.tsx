@@ -8,6 +8,7 @@ import { openUrl } from '@/helpers/util'
 import { Colors } from '@/constants/Colors'
 import { AppConstants } from '@/constants/AppConstants'
 import CustomActivityIndicator from '../util/CustomActivityIndicator'
+import { Typography } from '@/constants/typography'
 
 
 const ReleaseButton = ({release}: {release: AppRelease}) => {
@@ -24,12 +25,12 @@ const ReleaseButton = ({release}: {release: AppRelease}) => {
         return (
             <View style={styles.container}>
                 <Row style={{width: '100%', justifyContent: "space-between"}} >
-                    <Text style={[AppStyle.textHeader, {color: Colors.backgroundColor}]} >{release.version}</Text>
-                    <CustomActivityIndicator size={24} color={Colors.backgroundColor} />
+                    <Text style={{...Typography.regular, color: Colors.backgroundColor}} >{release.version}</Text>
+                    <CustomActivityIndicator size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />
                 </Row>
                 {
                     release.action &&
-                    <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor}]} >{release.action}</Text>
+                    <Text style={{...Typography.regular, color: Colors.backgroundColor}} >{release.action}</Text>
                 }
             </View>
         )
@@ -38,12 +39,12 @@ const ReleaseButton = ({release}: {release: AppRelease}) => {
     return (
         <Pressable onPress={onPress} style={styles.container}>
             <Row style={{width: '100%', justifyContent: "space-between"}} >
-                <Text style={[AppStyle.textHeader, {color: Colors.backgroundColor}]} >{release.version}</Text>
-                <Ionicons name='download-outline' size={24} color={Colors.backgroundColor} />
+                <Text style={{...Typography.regular, color: Colors.backgroundColor}} >{release.version}</Text>
+                <Ionicons name='download-outline' size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />
             </Row>
             {
                 release.action &&
-                <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor}]} >{release.action}</Text>
+                <Text style={{...Typography.regular, color: Colors.backgroundColor}} >{release.action}</Text>
             }
         </Pressable>
     )
@@ -53,10 +54,8 @@ export default ReleaseButton
 
 const styles = StyleSheet.create({
     container: {
-        width: '100%', 
-        padding: 10,
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS, 
-        marginBottom: AppConstants.COMMON.MARGIN,
-        backgroundColor: Colors.yellow
+        ...AppStyle.defaultGridItem,
+        width: '100%',
+        marginBottom: AppConstants.COMMON.MARGIN
     }
 })

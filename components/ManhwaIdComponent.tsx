@@ -1,8 +1,8 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
 import { AppConstants } from '@/constants/AppConstants'
-import { AppStyle } from '@/styles/AppStyle'
+import { StyleSheet, Text, View } from 'react-native'
+import { Typography } from '@/constants/typography'
 import { Colors } from '@/constants/Colors'
+import React from 'react'
 
 
 interface ManhwaIdComponentProps {
@@ -15,11 +15,11 @@ const ManhwaIdComponent = ({manhwa_id, position = 'l'}: ManhwaIdComponentProps) 
     if (AppConstants.DEBUB.ENABLED) {
         return position === 'l' ?        
             <View style={[styles.container, {left: 6}]} >
-                <Text style={AppStyle.textRegular}>{manhwa_id}</Text>
+                <Text style={Typography.regular}>{manhwa_id}</Text>
             </View>
             :
             <View style={[styles.container, {right: 6}]} >
-                <Text style={AppStyle.textRegular}>{manhwa_id}</Text>
+                <Text style={Typography.regular}>{manhwa_id}</Text>
             </View>
         
     }

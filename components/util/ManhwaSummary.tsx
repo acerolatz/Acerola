@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Typography } from '@/constants/typography'
 import { AppConstants } from '@/constants/AppConstants'
 import Ionicons from '@expo/vector-icons/Ionicons'
@@ -17,6 +17,16 @@ const ManhwaSummary = ({summary}: ManhwaSummaryProps) => {
     const t = isTextExpanded ? summary : summary.length > MAX_LENGHT ? summary.slice(0, MAX_LENGHT) + '...' : summary
     const showIcon = summary.length > MAX_LENGHT
     const iconName = isTextExpanded ? 'chevron-up' : 'chevron-down'
+
+    useEffect(
+        () => {
+            const init = () => {
+                setIsTextExpanded(false)
+            }
+            init()
+        },
+        [summary]
+    )
 
     const onPress = () => {
         setIsTextExpanded(prev => !prev)

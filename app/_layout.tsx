@@ -1,6 +1,5 @@
 import { AppConstants } from '@/constants/AppConstants';
 import { Colors } from '@/constants/Colors';
-import { AppStyle } from '@/styles/AppStyle';
 import { Stack } from 'expo-router';
 import React from 'react';
 import { StatusBar, StyleSheet, Text, View } from 'react-native';
@@ -8,53 +7,54 @@ import Toast from 'react-native-toast-message';
 import { SQLiteProvider } from 'expo-sqlite';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { dbMigrate } from '@/lib/database';
+import { Typography } from '@/constants/typography';
 
 
 const TOAST_CONFIG = {
   success: ({ text1, text2 }: {text1: string, text2: string}) => (
     <View style={styles.toast}>
-      <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 18}]}>{text1}</Text>
-      {text2 && <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 16}]}>{text2}</Text>}
+      <Text numberOfLines={1} style={[Typography.regular, {fontSize: 18}]}>{text1}</Text>
+      {text2 && <Text numberOfLines={1} style={[Typography.regular, {fontSize: 16}]}>{text2}</Text>}
       <View style={[styles.leftBar, {backgroundColor: Colors.ononokiGreen}]} />
     </View>
   ),
 
   success1: ({ text1, text2 }: {text1: string, text2: string}) => (
     <View style={[styles.toast, {backgroundColor: Colors.backgroundColor}]}>
-      <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 18}]}>{text1}</Text>
-      {text2 && <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 16}]}>{text2}</Text>}
+      <Text numberOfLines={1} style={[Typography.regular, {fontSize: 18}]}>{text1}</Text>
+      {text2 && <Text numberOfLines={1} style={[Typography.regular, {fontSize: 16}]}>{text2}</Text>}
       <View style={[styles.leftBar, {backgroundColor: Colors.ononokiGreen}]} />
     </View>
   ),
   
   error: ({ text1, text2 }: {text1: string, text2: string}) => (
     <View style={styles.toast}>
-      <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 18}]}>{text1}</Text>
-      {text2 && <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 16}]}>{text2}</Text>}
+      <Text numberOfLines={1} style={[Typography.regular, {fontSize: 18}]}>{text1}</Text>
+      {text2 && <Text numberOfLines={1} style={[Typography.regular, {fontSize: 16}]}>{text2}</Text>}
       <View style={[styles.leftBar, {backgroundColor: Colors.neonRed}]} />
     </View>
   ),
 
   error1: ({ text1, text2 }: {text1: string, text2: string}) => (
     <View style={[styles.toast, {backgroundColor: Colors.backgroundColor}]}>
-      <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 18}]}>{text1}</Text>
-      {text2 && <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 16}]}>{text2}</Text>}
+      <Text numberOfLines={1} style={[Typography.regular, {fontSize: 18}]}>{text1}</Text>
+      {text2 && <Text numberOfLines={1} style={[Typography.regular, {fontSize: 16}]}>{text2}</Text>}
       <View style={[styles.leftBar, {backgroundColor: Colors.neonRed}]} />
     </View>
   ),
   
   info: ({ text1, text2 }: {text1: string, text2: string}) => (
     <View style={styles.toast}>
-      <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 18}]}>{text1}</Text>
-      {text2 && <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 16}]}>{text2}</Text>}
+      <Text numberOfLines={1} style={[Typography.regular, {fontSize: 18}]}>{text1}</Text>
+      {text2 && <Text numberOfLines={1} style={[Typography.regular, {fontSize: 16}]}>{text2}</Text>}
       <View style={[styles.leftBar, {backgroundColor: Colors.yellow}]} />
     </View>
   ),
 
   info1: ({ text1, text2 }: {text1: string, text2: string}) => (
     <View style={[styles.toast, {backgroundColor: Colors.backgroundColor}]}>
-      <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 18}]}>{text1}</Text>
-      {text2 && <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 16}]}>{text2}</Text>}
+      <Text numberOfLines={1} style={[Typography.regular, {fontSize: 18}]}>{text1}</Text>
+      {text2 && <Text numberOfLines={1} style={[Typography.regular, {fontSize: 16}]}>{text2}</Text>}
       <View style={[styles.leftBar, {backgroundColor: Colors.yellow}]} />
     </View>
   )
