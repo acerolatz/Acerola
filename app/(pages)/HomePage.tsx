@@ -1,18 +1,16 @@
+import DonationBottomSheet from '@/components/bottomsheet/DonationBottomSheet'
+import NewAppReleaseBottomSheet from '@/components/bottomsheet/NewAppReleaseBottomSheet'
 import Button from '@/components/buttons/Button'
-import CloseBtn from '@/components/buttons/CloseButton'
 import RandomManhwaButton from '@/components/buttons/OpenRandomManhwaButton'
-import ResetAppButton from '@/components/buttons/ResetAppButton'
 import UpdateDatabaseButton from '@/components/buttons/UpdateDatabaseButton'
 import CollectionGrid from '@/components/grid/CollectionsGrid'
 import ContinueReadingGrid from '@/components/grid/ContinueReadingGrid'
 import GenreGrid from '@/components/grid/GenreGrid'
 import LatestUpdatesGrid from '@/components/grid/LatestUpdatesGrid'
-import ManhwaHorizontalGrid from '@/components/grid/ManhwaHorizontalGrid'
 import MostPopularGrid from '@/components/grid/MostPopularGrid'
 import RandomCardsGrid from '@/components/grid/RandomCardsGrid'
 import Top10Grid from '@/components/grid/Top10Grid'
 import LateralMenu from '@/components/LateralMenu'
-import TopBar from '@/components/TopBar'
 import Column from '@/components/util/Column'
 import Footer from '@/components/util/Footer'
 import AppLogo from '@/components/util/Logo'
@@ -21,37 +19,30 @@ import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
 import { Typography } from '@/constants/typography'
 import { Collection, Genre, Manhwa } from '@/helpers/types'
-import { hp, wp } from '@/helpers/util'
 import { 
     dbCleanTable, 
-    dbGetReadingHistory, 
-    dbIsChapterMilestoneReached, 
+    dbGetReadingHistory,     
     dbReadCollections, 
     dbReadGenres, 
     dbReadManhwasOrderedByUpdateAt, 
-    dbReadManhwasOrderedByViews, 
-    dbSetShouldAskForDonation, 
+    dbReadManhwasOrderedByViews,     
     dbShouldUpdate, 
     dbUpsertCollections 
 } from '@/lib/database'
 import { 
-    spFetchCollections, 
-    spFetchLiveVersion, 
+    spFetchCollections,  
     spFetchRandomManhwaCards, 
     spGetTodayTop10 
 } from '@/lib/supabase'
-import { useAppVersionState } from '@/store/appVersionState'
 import { useManhwaCardsState } from '@/store/randomManhwaState'
 import { useTop10ManhwasState } from '@/store/top10State'
 import { AppStyle } from '@/styles/AppStyle'
-import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
 import { router, useFocusEffect } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { 
     Animated, 
     Pressable, 
-    Text, 
     SafeAreaView, 
     ScrollView, 
     StyleSheet    
@@ -63,20 +54,13 @@ const PAGE_LIMIT = 32
 const HomePage = () => {
 
     const db = useSQLiteContext()
-    
+
     // Lateral Menu
     const menuAnim = useRef(new Animated.Value(-AppConstants.PAGES.HOME.MENU_WIDTH)).current 
     const backgroundAnim = useRef(new Animated.Value(-AppConstants.COMMON.SCREEN_WIDTH)).current
     const menuVisible = useRef(false)    
-
-    const bottomSheetRef = useRef<BottomSheet>(null);
-    const newReleaseBottomSheetRef = useRef<BottomSheet>(null)
     
-    const { cards, setCards } = useManhwaCardsState()
-    const { localVersion } = useAppVersionState()    
-    
-    const shouldShowNewAppVersionWarning = useAppVersionState(s => s.shouldShowNewAppVersionWarning)
-    const setShouldShowNewAppVersionWarning = useAppVersionState(s => s.setShouldShowNewAppVersionWarning)
+    const { cards, setCards } = useManhwaCardsState()    
     
     const { top10manhwas, setTop10manhwas } = useTop10ManhwasState()
     const [collections, setCollections] = useState<Collection[]>([])
@@ -124,17 +108,6 @@ const HomePage = () => {
         setTop10manhwas(t)
     }
 
-    const updateLiveVersion = async () => {
-        const l = await spFetchLiveVersion()
-        if (
-            l !== null && 
-            l != localVersion && 
-            shouldShowNewAppVersionWarning
-        ) {
-            newReleaseBottomSheetRef.current?.expand()
-        }
-    }
-
     const updateRandomCards = async () => {
         if (cards.length == 0) {
             await reloadCards()
@@ -159,8 +132,7 @@ const HomePage = () => {
                 await Promise.all([
                     updateTop10(),
                     updateCollections(),
-                    updateRandomCards(),
-                    updateLiveVersion()
+                    updateRandomCards()
                 ])
             }
             init()
@@ -172,16 +144,11 @@ const HomePage = () => {
         useCallback(
             () => {
                 const reload = async () => {
-                    await dbIsChapterMilestoneReached(db)
-                        .then(s => s ? handleOpenDonationBottomSheet() : null)
                     await dbGetReadingHistory(db, 0, PAGE_LIMIT)
                         .then(v => setReadingHistoryManhwas(v))
                 }
                 reload()
-            },
-            []
-        )
-    )
+            },[]))
 
     const openMenu = () => {
         Animated.timing(menuAnim, {
@@ -221,38 +188,6 @@ const HomePage = () => {
         menuVisible.current ? closeMenu() : openMenu()
     }
 
-    const handleOpenDonationBottomSheet = useCallback(() => {
-        bottomSheetRef.current?.expand();
-    }, []);
-
-    const handleCloseDonationBottomSheet = useCallback(() => {
-        bottomSheetRef.current?.close();        
-    }, []);
-
-    const handleCloseNewReleaseBottomSheet = useCallback(() => {
-        newReleaseBottomSheetRef.current?.close();        
-    }, []);
-
-    const neverShowDonationMessageAgain =  async () => {
-        await dbSetShouldAskForDonation(db, '0')
-        handleCloseDonationBottomSheet()
-    }
-
-    const openDonatePage = () => {
-        handleCloseDonationBottomSheet()
-        router.navigate("/(pages)/DonatePage")
-    }
-
-    const openReleasesPage = () => {
-        handleCloseNewReleaseBottomSheet
-        router.navigate("/(pages)/ReleasesPage")
-    }
-
-    const dismissNewAppVersionWarning = () => {
-        setShouldShowNewAppVersionWarning(false)
-        handleCloseNewReleaseBottomSheet()
-    }
-
     return (
         <SafeAreaView style={AppStyle.safeArea} >
             {/* Header */}
@@ -285,60 +220,9 @@ const HomePage = () => {
                 </Column>
             </ScrollView>
 
-            {/* New App Release Warning */}
-            <BottomSheet
-                ref={newReleaseBottomSheetRef}
-                index={-1}
-                handleIndicatorStyle={styles.handleIndicatorStyle}
-                handleStyle={styles.handleStyle}
-                backgroundStyle={styles.bottomSheetBackgroundStyle}
-                enablePanDownToClose={true}>
-                <BottomSheetView style={styles.bottomSheetContainer} >
-                    <TopBar title='New version available!'>
-                        <CloseBtn onPress={handleCloseNewReleaseBottomSheet}/>
-                    </TopBar>
-                    <Row style={{gap: 10}} >
-                        <Pressable onPress={handleCloseNewReleaseBottomSheet} style={AppStyle.buttonCancel} >
-                            <Text style={[Typography.regular, {color: Colors.yellow}]} >Close</Text>
-                        </Pressable>
-                        <Pressable onPress={openReleasesPage} style={AppStyle.button} >
-                            <Text style={[Typography.regular, {color: Colors.backgroundColor}]} >Update!</Text>
-                        </Pressable>
-                    </Row>
-                    <Pressable onPress={dismissNewAppVersionWarning} >
-                        <Text style={styles.textLink}>Dismiss for now</Text>
-                    </Pressable>
-                    <Footer height={80}/>
-                </BottomSheetView>
-            </BottomSheet>
-
-            {/* Ask For Donation BottomSheet */}
-            <BottomSheet
-                ref={bottomSheetRef}
-                index={-1}
-                handleIndicatorStyle={styles.handleIndicatorStyle}
-                handleStyle={styles.handleStyle}
-                backgroundStyle={styles.bottomSheetBackgroundStyle}
-                enablePanDownToClose={true}>
-                <BottomSheetView style={styles.bottomSheetContainer} >
-                    <TopBar title={AppConstants.DONATION.BOTTOMSHEET.TITLE}>
-                        <CloseBtn onPress={handleCloseDonationBottomSheet}/>
-                    </TopBar>
-                    <Text style={Typography.regular}>{AppConstants.DONATION.BOTTOMSHEET.MESSAGE}</Text>
-                    <Row style={{gap: 10}} >
-                        <Pressable onPress={handleCloseDonationBottomSheet} style={AppStyle.buttonCancel} >
-                            <Text style={[Typography.regular, {color: Colors.yellow}]} >Close</Text>
-                        </Pressable>
-                        <Pressable onPress={openDonatePage} style={AppStyle.button} >
-                            <Text style={[Typography.regular, {color: Colors.backgroundSecondary}]} >Donate</Text>
-                        </Pressable>
-                    </Row>
-                    <Pressable onPress={neverShowDonationMessageAgain} hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE} >
-                        <Text style={styles.textLink}>Never show again.</Text>
-                    </Pressable>
-                    <Footer height={80}/>
-                </BottomSheetView>
-            </BottomSheet>
+            {/* BottomSheet */}
+            <NewAppReleaseBottomSheet/>            
+            <DonationBottomSheet/>
 
             {/* Lateral Menu */}
             <Animated.View style={[styles.menuBackground, { transform: [{ translateX: backgroundAnim }] }]}>

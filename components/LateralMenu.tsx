@@ -104,7 +104,7 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
             </TopBar>
             <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} >
                 <View style={styles.container} >
-                    <View style={{gap: AppConstants.COMMON.GAP * 2}} > 
+                    <View style={{gap: AppConstants.COMMON.GAP * 2.8}} > 
                     
                         <Option 
                             onPress={libraryPage} 
@@ -184,7 +184,8 @@ export default LateralMenu
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: "space-between"
+        justifyContent: "space-between",
+        paddingTop: 10
     },
     optionButton: {
         width: '100%',

@@ -3,19 +3,23 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { SafeAreaView } from 'react-native'
 import { AppStyle } from '@/styles/AppStyle'
 import Row from '@/components/util/Row'
-import AppLogo from '@/components/util/Logo'
 import Button from '@/components/buttons/Button'
 import { Colors } from '@/constants/Colors'
-import { formatTimestamp, hp, wp } from '@/helpers/util'
+import { formatTimestamp, hp } from '@/helpers/util'
 import { AppConstants } from '@/constants/AppConstants'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useSQLiteContext } from 'expo-sqlite'
 import { Todo } from '@/helpers/types'
-import { dbCheckPassword, dbCreateTodo, dbDeleteTodo, dbReadTodos, dbUpdateTodo } from '@/lib/database'
+import { 
+    dbCheckPassword, 
+    dbCreateTodo, 
+    dbDeleteTodo, 
+    dbReadTodos, 
+    dbUpdateTodo 
+} from '@/lib/database'
 import { TextInput } from 'react-native-gesture-handler'
 import Column from '@/components/util/Column'
 import Toast from 'react-native-toast-message'
-import CustomActivityIndicator from '@/components/util/CustomActivityIndicator'
 import { Keyboard } from 'react-native'
 import PageActivityIndicator from '@/components/util/PageActivityIndicator'
 import { router } from 'expo-router'
@@ -24,43 +28,47 @@ import TopBar from '@/components/TopBar'
 import Footer from '@/components/util/Footer'
 import CloseBtn from '@/components/buttons/CloseButton'
 import { Typography } from '@/constants/typography'
+import { ToastMessages } from '@/constants/Messages'
 
 
-const CreateTodoComponent = ({setTodos}: {setTodos: React.Dispatch<React.SetStateAction<Todo[]>>}) => {
+interface CreateTodoComponentProps {
+    setTodos: React.Dispatch<React.SetStateAction<Todo[]>>
+}
+
+
+const CreateTodoComponent = ({setTodos}: CreateTodoComponentProps) => {
 
     const db = useSQLiteContext()
     const [text, setText] = useState('')
     const [description, setDescription] = useState('')
-    const [loading, setLoading] = useState(false)
     const inputRef = useRef<TextInput>(null)
     const inputRef1 = useRef<TextInput>(null)    
 
     const create = async () => {
         Keyboard.dismiss()
         if (text.trim() === '') {
-            Toast.show({text1: "Invalid Task", type: 'error'})
+            Toast.show(ToastMessages.EN.INVALID_TASK)
             return
         }
-        setLoading(true)
-            const newTodo: Todo | null = await dbCreateTodo(
-                db, 
-                text.trim(),
-                description.trim() !== '' ? description.trim() : null
-            )
-            if (!newTodo) {
-                Toast.show({text1: "Error", text2: "Could not create todo", type: "error"})
-            } else {
-                setText('')
-                setDescription('')
-                inputRef.current?.clear()
-                inputRef1.current?.clear()
-                setTodos(prev => [...[newTodo], ...prev])
-            }
-        setLoading(false)
+        const newTodo: Todo | null = await dbCreateTodo(
+            db, 
+            text.trim(),
+            description.trim() !== '' ? description.trim() : null
+        )
+
+        if (!newTodo) {
+            Toast.show(ToastMessages.EN.COULD_NOT_CREATE_TODO)
+        } else {
+            setText('')
+            setDescription('')
+            inputRef.current?.clear()
+            inputRef1.current?.clear()
+            setTodos(prev => [...[newTodo], ...prev])
+        }
     }
 
     return (
-        <Column style={{gap: AppConstants.COMMON.GAP, marginBottom: AppConstants.COMMON.GAP}} >
+        <Column style={styles.createTodoContainer} >
             <Column style={{gap: AppConstants.COMMON.GAP}} >
                 <TextInput
                     ref={inputRef}
@@ -116,23 +124,23 @@ const TodoComponent = ({todo, setTodos}: {todo: Todo, setTodos: React.Dispatch<R
 
     return (
         <Pressable onPress={clickCheckbox} style={styles.todoItem} >
-            <Row style={[styles.todoItemTop, {backgroundColor}]} >
-                <Text style={[AppStyle.textHeader, {color: Colors.backgroundColor, maxWidth: '85%'}]}>{todo.title} </Text>
+            <Row style={{...styles.todoItemTop, backgroundColor}} >
+                <Text style={{...Typography.regularLg, color: Colors.backgroundColor, flexShrink: 1}}>{todo.title}</Text>
                 <View style={styles.checkBox} >
-                    <Ionicons name='checkmark' size={20} color={checkmarkBackgroundColor} />
+                    <Ionicons name='checkmark' size={AppConstants.ICON.SIZE} color={checkmarkBackgroundColor} />
                 </View>
             </Row>
             <Column style={[styles.todoItemBottom, {borderColor: backgroundColor}]} >
                 {todo.descr && <Text style={Typography.regular}>{todo.descr} </Text>}
                 <Row style={{justifyContent: "space-between"}} >
                     <View>
-                        <Text style={[Typography.regular, {fontSize: 14}]}>Created at: {formatTimestamp(todo.created_at)}</Text>
-                        {finishedAt && <Text style={[Typography.regular, {fontSize: 14}]}>Finished at: {formatTimestamp(finishedAt)}</Text>}
+                        <Text style={Typography.light}>Created at: {formatTimestamp(todo.created_at)}</Text>
+                        {finishedAt && <Text style={Typography.light}>Finished at: {formatTimestamp(finishedAt)}</Text>}
                     </View>
                     {
                         isCompleted &&
                         <Pressable onPress={deleteTodo} hitSlop={AppConstants.COMMON.HIT_SLOP.NORMAL} >
-                            <Ionicons name='trash' size={20} color={Colors.neonRed} />
+                            <Ionicons name='trash' size={AppConstants.ICON.SIZE} color={Colors.neonRed} />
                         </Pressable>
                     }
                 </Row>
@@ -151,6 +159,7 @@ const SafeModeHomePage = () => {
 
     const bottomSheetRef = useRef<BottomSheet>(null)
     const [showPassword, setShowPassword] = useState(false)
+    const passwordIcon = showPassword ? "eye-off-outline" : "eye-outline"
 
     useEffect(
         () => {
@@ -168,14 +177,10 @@ const SafeModeHomePage = () => {
         Keyboard.dismiss()
         const success = await dbCheckPassword(db, text)
         if (success) {
-            Toast.show({text1: "Success!", type: "success"})
+            Toast.show(ToastMessages.EN.GENERIC_SUCCESS)
             router.replace("/HomePage")
         } else {
-            Toast.show({
-                text1: "Error", 
-                text2: "Invalid password", 
-                type: "error1"
-            })
+            Toast.show(ToastMessages.EN.INVALID_PASSWORD)
         }
     }
 
@@ -192,22 +197,17 @@ const SafeModeHomePage = () => {
 
     const handleShowPassword = () => {
         setShowPassword(prev => !prev)
-    }
+    }    
 
     if (loading) {
         return (
             <SafeAreaView style={AppStyle.safeArea} >
-                <Row style={styles.topBar} >
-                    <AppLogo name='To do List' />
+                <TopBar title='To do List' >
                     <Button iconName='settings-outline' />
-                </Row>
-                <PageActivityIndicator color={Colors.yellow} />
+                </TopBar>
+                <PageActivityIndicator/>
             </SafeAreaView>
         )
-    }
-
-    const renderItem = ({item}: {item: Todo}) => {
-        return <TodoComponent todo={item} setTodos={setTodos} />
     }    
 
     return (
@@ -219,7 +219,7 @@ const SafeModeHomePage = () => {
                 <FlatList
                     data={todos}
                     keyExtractor={(item) => item.todo_id.toString()}
-                    renderItem={renderItem}
+                    renderItem={({item}) => <TodoComponent todo={item} setTodos={setTodos} />}
                     keyboardShouldPersistTaps='always'
                     showsVerticalScrollIndicator={false}
                     ListHeaderComponent={<CreateTodoComponent setTodos={setTodos} />}
@@ -234,11 +234,11 @@ const SafeModeHomePage = () => {
                 backgroundStyle={styles.backgroundStyle}
                 enablePanDownToClose={true}>
                 <BottomSheetView style={styles.bottomSheetContainer} >
-                    <TopBar title='Settings' titleColor={Colors.yellow}>
+                    <TopBar title='Settings'>
                         <CloseBtn onPress={handleCloseBottomSheet}/>
                     </TopBar>
                     <View style={{flex: 1, gap: AppConstants.COMMON.GAP}} >
-                        <Text style={[Typography.regular, {color: Colors.neonRed}]}>A password is required to access the settings.</Text>
+                        <Text style={{...Typography.light, color: Colors.neonRed}}>A password is required to access the settings.</Text>
                         <View>
                             <TextInput
                                 style={styles.passwordInput}
@@ -252,24 +252,16 @@ const SafeModeHomePage = () => {
                             <Pressable
                                 onPress={handleShowPassword}
                                 hitSlop={AppConstants.COMMON.HIT_SLOP.NORMAL}
-                                style={{
-                                    position: "absolute",
-                                    right: 8,
-                                    top: "50%",
-                                    transform: [{ translateY: -11 }]
-                                }}>
-                                <Ionicons 
-                                    name={showPassword ? "eye-off-outline" : "eye-outline"} 
-                                    size={AppConstants.ICON.SIZE} 
-                                    color={Colors.yellow} />
+                                style={styles.showPasswordIcon}>
+                                <Ionicons name={passwordIcon} size={AppConstants.ICON.SIZE} color={Colors.yellow} />
                             </Pressable>
                         </View>
                         <Row style={{gap: AppConstants.COMMON.MARGIN}} >
                             <Pressable onPress={handleCloseBottomSheet} style={AppStyle.buttonCancel} >
-                                <Text style={[Typography.regular, {color: Colors.yellow}]} >Cancel</Text>
+                                <Text style={{...Typography.regular, color: Colors.yellow}} >Cancel</Text>
                             </Pressable>
                             <Pressable onPress={checkPassword} style={AppStyle.button} >
-                                <Text style={[Typography.regular, {color: Colors.backgroundColor}]} >OK</Text>
+                                <Text style={{...Typography.regular, color: Colors.backgroundColor}} >OK</Text>
                             </Pressable>
                         </Row>
                     </View>
@@ -283,44 +275,13 @@ const SafeModeHomePage = () => {
 export default SafeModeHomePage
 
 const styles = StyleSheet.create({
-    topBar: {
-        width: '100%', 
-        paddingRight: 2, 
-        marginTop: 4, 
-        marginBottom: 10, 
-        justifyContent: "space-between"
-    },
-    sideMenu: {
-        position: 'absolute',
-        top: 0,
-        bottom: 0,
-        left: 0,        
-        backgroundColor: Colors.backgroundColor,
-        elevation: 5,        
-        zIndex: 100
-    },
-    menuBackground: {
-        position: 'absolute',
-        width: AppConstants.COMMON.SCREEN_WIDTH,
-        height: AppConstants.COMMON.SCREEN_HEIGHT * 1.2,
-        top: 0,
-        left: 0,        
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        elevation: 4,        
-        zIndex: 90
-    },
-    button: {
-        flex: 1,
-        marginTop: 10,
-        alignItems: "center",
-        justifyContent: "center",
-        height: 50,
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
-        backgroundColor: Colors.yellow
-    },
     todoItem: {
         width: '100%',
-        marginBottom: 20
+        marginBottom: AppConstants.COMMON.GAP
+    },
+    createTodoContainer: {
+        gap: AppConstants.COMMON.GAP, 
+        marginBottom: AppConstants.COMMON.GAP
     },
     checkBox: {
         backgroundColor: Colors.backgroundColor, 
@@ -348,8 +309,9 @@ const styles = StyleSheet.create({
         width: '100%', 
         borderTopRightRadius: AppConstants.COMMON.BORDER_RADIUS, 
         borderTopLeftRadius: AppConstants.COMMON.BORDER_RADIUS, 
-        paddingHorizontal: 10, 
-        paddingVertical: 8,
+        paddingHorizontal: AppConstants.COMMON.ITEM_PADDING_HORIZONTAL,
+        paddingVertical: AppConstants.COMMON.ITEM_PADDING_VERTICAL,
+        gap: AppConstants.COMMON.GAP,
         justifyContent: "space-between"
     },
     todoItemBottom: {
@@ -364,5 +326,11 @@ const styles = StyleSheet.create({
         ...AppStyle.input, 
         backgroundColor: Colors.backgroundColor, 
         paddingRight: AppConstants.ICON.SIZE * 2
+    },
+    showPasswordIcon: {
+        position: "absolute",
+        right: 8,
+        top: "50%",
+        transform: [{ translateY: -11 }]
     }
 })

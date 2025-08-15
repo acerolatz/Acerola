@@ -1,6 +1,5 @@
 import ReturnButton from '@/components/buttons/ReturnButton'
 import TopBar from '@/components/TopBar'
-import Column from '@/components/util/Column'
 import Footer from '@/components/util/Footer'
 import PageActivityIndicator from '@/components/util/PageActivityIndicator'
 import Row from '@/components/util/Row'

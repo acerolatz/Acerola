@@ -232,8 +232,7 @@ export async function spFetchRandomManhwaCards(p_limit: number = 30): Promise<Ma
         }})
     }
 
-    const { data, error } = await supabase
-        .rpc("get_random_cards", { p_limit })
+    const { data, error } = await supabase.rpc("get_random_cards", { p_limit })
 
     if (error) {
         console.log("error spFetchRandomManhwaCards", error)

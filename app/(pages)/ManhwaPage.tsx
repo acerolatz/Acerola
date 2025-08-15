@@ -118,11 +118,11 @@ const ManhwaPage = () => {
 
         {/* Top */}        
         <Row style={styles.topBar} >
-          <HomeButton color={Colors.white} iconName='home-outline'/>
+          <HomeButton color={Colors.backgroundColor} iconName='home-outline'/>
           <Row style={{gap: AppConstants.ICON.SIZE}} >
-            <BugReportButton title={manhwa.title}/> 
-            <RandomManhwaButton />
-            <ReturnButton color={Colors.white}/>
+            <BugReportButton title={manhwa.title} color={Colors.backgroundColor} /> 
+            <RandomManhwaButton color={Colors.backgroundColor} />
+            <ReturnButton color={Colors.backgroundColor} />
           </Row>
         </Row>
 

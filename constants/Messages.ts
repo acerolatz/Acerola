@@ -87,6 +87,20 @@ export const ToastMessages = {
             text2: "Document already exists!",
             type: "error",
             position: 'top'
+        },
+        INVALID_PASSWORD: {
+            text1: "Error", 
+            text2: "Invalid password", 
+            type: "error1"
+        },
+        INVALID_TASK: {
+            text1: "Invalid Task", 
+            type: 'error'
+        },
+        COULD_NOT_CREATE_TODO: {
+            text1: "Error", 
+            text2: "Could not create todo", 
+            type: "error"
         }
     }
 }

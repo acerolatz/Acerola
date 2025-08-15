@@ -1,8 +1,6 @@
-import { Colors } from '@/constants/Colors'
 import { Manhwa, ManhwaCard } from '@/helpers/types'
 import { spFetchManhwaById, spUpdateManhwaCardView } from '@/lib/supabase'
 import { useManhwaCardsState } from '@/store/randomManhwaState'
-import { AppStyle } from '@/styles/AppStyle'
 import { Image } from 'expo-image'
 import { router } from 'expo-router'
 import { debounce } from 'lodash'

@@ -118,7 +118,7 @@ const RequestManhwaForm = () => {
                     </View> 
                     :
                     <Pressable onPress={handleSubmit(onSubmit)} style={AppStyle.formButton} >
-                        <Text style={Typography.regular} >Send</Text>
+                        <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Send</Text>
                     </Pressable>
                 }
 
