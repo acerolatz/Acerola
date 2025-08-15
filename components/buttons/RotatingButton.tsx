@@ -16,7 +16,7 @@ interface RotatingButtonProps {
 
 const RotatingButton = ({
     iconName = 'reload-outline',
-    iconSize = AppConstants.COMMON.BUTTON.SIZE,
+    iconSize = AppConstants.ICON.SIZE,
     iconColor = Colors.white,
     duration = 500,
     onPress

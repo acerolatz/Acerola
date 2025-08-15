@@ -1,14 +1,11 @@
 import { AppConstants } from "@/constants/AppConstants";
 import { Colors } from "@/constants/Colors";
+import { Typography } from "@/constants/typography";
+import { hp } from "@/helpers/util";
 import { StyleSheet } from "react-native";
 
 
 export const AppStyle = StyleSheet.create({
-    textLight: {
-        fontSize: AppConstants.TEXT.SIZE.LIGTH,
-        color: AppConstants.TEXT.COLOR.LIGHT,
-        fontFamily: AppConstants.TEXT.FONT.LIGHT
-    },
     textRegular: {
         fontSize: AppConstants.TEXT.SIZE.REGULAR,
         color: AppConstants.TEXT.COLOR.LIGHT,
@@ -33,8 +30,8 @@ export const AppStyle = StyleSheet.create({
     safeArea: {
         width: '100%', 
         flex: 1, 
-        paddingHorizontal: AppConstants.COMMON.PADDING_HORIZONTAL,
-        paddingTop: AppConstants.COMMON.PADDING_VERTICAL,
+        paddingHorizontal: AppConstants.COMMON.SCREEN_PADDING_HORIZONTAL,
+        paddingTop: AppConstants.COMMON.SCREEN_PADDING_VERTICAL,
         backgroundColor: Colors.backgroundColor
     },
     formButtonText: {
@@ -48,35 +45,50 @@ export const AppStyle = StyleSheet.create({
         backgroundColor: Colors.almostBlack  
     },
     input: {
+        ...Typography.regular,
         backgroundColor: Colors.backgroundSecondary,
         borderRadius: AppConstants.COMMON.BORDER_RADIUS,
-        height: 52,
+        height: AppConstants.BUTTON.SIZE,
         paddingHorizontal: 10,
-        color: AppConstants.TEXT.COLOR.LIGHT,
-        fontSize: AppConstants.TEXT.SIZE.REGULAR,
-        fontFamily: AppConstants.TEXT.FONT.REGULAR,
-        marginBottom: 10
+        color: Colors.white
+    },
+    inputMedium: {
+        ...Typography.regular,
+        backgroundColor: Colors.backgroundSecondary,
+        textAlignVertical: 'top',
+        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
+        height: hp(12),
+        paddingHorizontal: 10,
+        color: Colors.white
+    },
+    inputLarge: {
+        ...Typography.regular,
+        backgroundColor: Colors.backgroundSecondary,
+        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
+        textAlignVertical: 'top',
+        height: hp(20),
+        paddingHorizontal: 10,
+        color: Colors.white
     },
     inputHeaderText: {
         color: AppConstants.TEXT.COLOR.LIGHT,
-        fontSize: 20,
-        fontFamily: AppConstants.TEXT.FONT.REGULAR,
-        marginBottom: 10
+        fontSize: 18,
+        fontFamily: AppConstants.TEXT.FONT.REGULAR
     },
     error: {
-        color: AppConstants.TEXT.COLOR.ERROR,
-        alignSelf: "flex-start",
-        fontSize: AppConstants.TEXT.SIZE.LIGTH,
-        fontFamily: AppConstants.TEXT.FONT.REGULAR,
-        bottom: 4,
-        marginBottom: 6
+        ...Typography.light,
+        color: Colors.primary,
+        alignSelf: "flex-start"        
+    },
+    textOptional: {
+        ...Typography.light,
+        color: Colors.primary
     },
     formButton: {
         width: '100%',
-        marginTop: 10,
         alignItems: "center",
         justifyContent: "center",
-        height: 50,
+        height: AppConstants.BUTTON.SIZE,
         borderRadius: AppConstants.COMMON.BORDER_RADIUS,
         backgroundColor: Colors.yellow
     },
@@ -85,11 +97,33 @@ export const AppStyle = StyleSheet.create({
         justifyContent: "center"
     },
     defaultGridItem: {
-        paddingHorizontal: 10,
-        paddingVertical: 12,
-        backgroundColor: Colors.backgroundSecondary,
-        marginRight: AppConstants.COMMON.MARGIN,
+        paddingHorizontal: AppConstants.COMMON.ITEM_PADDING_HORIZONTAL,
+        paddingVertical: AppConstants.COMMON.ITEM_PADDING_VERTICAL,
+        alignItems: "center",
+        justifyContent: "center",
         borderRadius: AppConstants.COMMON.BORDER_RADIUS,
+        backgroundColor: Colors.yellow,
+        marginRight: AppConstants.COMMON.MARGIN
+    },
+    defaultGridItemText: {
+        ...Typography.regular,
+        color: Colors.backgroundColor
+    },
+    buttonCancel: {
+        flex: 1,
+        height: AppConstants.BUTTON.SIZE,
+        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
+        backgroundColor: Colors.backgroundSecondary,
+        alignItems: "center",
+        justifyContent: "center",
+        borderWidth: 1,
+        borderColor: Colors.primary
+    },
+    button: {
+        flex: 1,
+        height: AppConstants.BUTTON.SIZE,
+        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
+        backgroundColor: Colors.primary,
         alignItems: "center",
         justifyContent: "center"
     }

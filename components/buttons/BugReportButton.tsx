@@ -18,10 +18,8 @@ interface OpenBugReportButtonProps {
 
 const BugReportButton = ({
     title, 
-    size = AppConstants.COMMON.BUTTON.SIZE, 
-    color = Colors.BugReportColor, 
-    backgroundColor = 'transparent',
-    padding = 6
+    size = AppConstants.ICON.SIZE,
+    color = Colors.white
 }: OpenBugReportButtonProps) => {
 
     const onPress = () => {
@@ -32,7 +30,9 @@ const BugReportButton = ({
     }
 
     return (
-        <Pressable onPress={onPress} style={[AppStyle.buttonBackground, {backgroundColor, padding}]} >
+        <Pressable 
+            onPress={onPress}
+            hitSlop={AppConstants.HIT_SLOP.NORMAL} >
             <Ionicons name='bug-outline' color={color} size={size} />
         </Pressable>
     )

@@ -85,12 +85,8 @@ export type Collection = {
 }
 
 export type Post = {
-    news_id: number
     title: string
-    descr: string
-    image_url: string | null
-    image_width: number | null
-    image_height: number | null
+    message: string
     created_at: string
 }
 
@@ -118,3 +114,15 @@ export type SourceCodeLink = {
 }
 
 export type BugType = "Bug" | "ImagesOutOfOrder" | "MissingImages" | "Broken" | "Other" | "Sugestion"
+
+
+export type ReleaseWrapper = {
+    releases: AppRelease[],
+    source: SourceCodeLink[]
+}
+
+export type Feedback = {
+    title: string
+    descr: string
+    created_at: string
+}

@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
         width: '100%', 
         padding: 10,
         borderRadius: AppConstants.COMMON.BORDER_RADIUS, 
-        backgroundColor: Colors.releasesColor, 
-        marginBottom: AppConstants.COMMON.MARGIN
+        marginBottom: AppConstants.COMMON.MARGIN,
+        backgroundColor: Colors.yellow
     }
 })

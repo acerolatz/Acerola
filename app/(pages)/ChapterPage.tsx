@@ -21,9 +21,12 @@ import Animated, {
   useSharedValue,
   withTiming
 } from 'react-native-reanimated'
+import Toast from 'react-native-toast-message'
 
 
 const AnimatedFlashList = Animated.createAnimatedComponent(FlashList<ChapterImage>)
+const DRAW_DISTANCE = AppConstants.COMMON.IS_TABLET ? hp(100) : hp(330)
+const ON_END_REACHED_THRESHOLD = AppConstants.COMMON.IS_TABLET ? 1 : 3
 
 
 const ChapterPage = () => {
@@ -47,39 +50,59 @@ const ChapterPage = () => {
     const isLastChapter= currentChapterIndex >= chapters.length - 1
     const isFirstChapter= currentChapterIndex === 0  
 
+    const calculateTotalHeight = (imgs: ChapterImage[]) => {
+        let newHeight = 0
+        imgs.forEach(img => {
+          const w = Math.min(img.width, AppConstants.COMMON.SCREEN_WIDTH)
+          const h = (w * img.height) / img.width
+          newHeight += h              
+        })
+        setListTotalHeight(imgs.length > 0 ? newHeight / imgs.length : hp(40))            
+        listTotalHeightRef.value = newHeight + AppConstants.PAGES.CHAPTER.FOOTER_HEIGHT
+    }
+
+    const reloadChapter = async () => {
+      if (loading) { return }
+      Toast.show({text1: "Reloading chapter...", type: 'info'})
+      setImages([])
+      setLoading(true)
+        const imgs: ChapterImage[] = await spFetchChapterImages(currentChapter.chapter_id)
+        if (imgs.length === 0) { setLoading(false); return }
+        await Image.prefetch(imgs.slice(0, 5).map(i => i.image_url))
+        calculateTotalHeight(imgs)
+        setImages(imgs)
+        footerVisible.value = false
+      setLoading(false)
+    }
+
     useEffect(
       () => {
         let isCancelled = false;
+        if (currentChapterIndex < 0 || currentChapterIndex >= chapters.length) {
+          return
+        }
+
         async function load() {
-          if (currentChapterIndex < 0 || currentChapterIndex >= chapters.length) {
-            return
-          }
           setLoading(true)
+            const imgs: ChapterImage[] = await spFetchChapterImages(currentChapter.chapter_id)
+            if (imgs.length === 0) { setImages([]); setLoading(false); return }            
+            
+            if (isCancelled) return;
+
+            await Image.clearMemoryCache();
+            await Promise.all([
+              dbUpsertReadingHistory(db, currentChapter.manhwa_id, currentChapter.chapter_id),
+              dbAddNumericInfo(db, 'images', imgs.length),
+              Image.prefetch(imgs.slice(0, 5).map(i => i.image_url))
+            ])
+
             spUpdateChapterView(currentChapter.chapter_id)
-            await dbUpsertReadingHistory(db, currentChapter.manhwa_id, currentChapter.chapter_id)
-            await Image.clearMemoryCache()
-            const imgs = await spFetchChapterImages(currentChapter.chapter_id)
-            
-            if (isCancelled) return;
-
-            await Image.prefetch(imgs.slice(0, 3).map(i => i.image_url))
-            
-            let newHeight = 0
-            imgs.forEach(img => {
-              const w = Math.min(img.width, AppConstants.COMMON.SCREEN_WIDTH)
-              const h = (w * img.height) / img.width
-              newHeight += h              
-            })
-
-            if (isCancelled) return;
-
+            calculateTotalHeight(imgs)
             setImages(imgs)
-            setListTotalHeight(imgs.length > 0 ? newHeight / imgs.length : hp(40))            
-            listTotalHeightRef.value = newHeight + AppConstants.PAGES.CHAPTER.FOOTER_HEIGHT
             footerVisible.value = false
-            dbAddNumericInfo(db, 'images', imgs.length)
           setLoading(false)
         }
+
         load()
         return () => { isCancelled = true; };
     }, [currentChapterIndex, chapters, db])    
@@ -155,6 +178,7 @@ const ChapterPage = () => {
         <View style={styles.container} >          
           <Animated.View style={animatedHeaderStyle} > 
             <ChapterHeader
+              reloadChapter={reloadChapter}
               isFirstChapter={isFirstChapter}
               isLastChapter={isLastChapter}
               mangaTitle={manhwaTitle}
@@ -170,10 +194,10 @@ const ChapterPage = () => {
             keyExtractor={keyExtractor}
             estimatedItemSize={listTotalHeight}
             renderItem={renderItem}
-            drawDistance={hp(300)}
+            drawDistance={DRAW_DISTANCE}
             scrollEventThrottle={4}
             onScroll={scrollHandler}
-            onEndReachedThreshold={3}
+            onEndReachedThreshold={ON_END_REACHED_THRESHOLD}
           />
           <Animated.View style={animatedFooterStyle} >
             <ChapterFooter
@@ -196,8 +220,8 @@ export default ChapterPage
 
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: Colors.black
+  container: {
+    flex: 1,
+    backgroundColor: Colors.black
   }
 }) 

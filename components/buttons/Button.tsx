@@ -24,7 +24,7 @@ const Button = ({
   iconName, 
   onPress, 
   style, 
-  iconSize = AppConstants.COMMON.BUTTON.SIZE, 
+  iconSize = AppConstants.ICON.SIZE, 
   iconColor = Colors.white,
   showLoading = false
 }: ButtonProps) => {

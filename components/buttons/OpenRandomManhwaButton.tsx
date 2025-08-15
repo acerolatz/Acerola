@@ -6,7 +6,7 @@ import Ionicons from '@expo/vector-icons/Ionicons'
 import { router } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
 import React, { useState } from 'react'
-import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, Pressable } from 'react-native'
 import Toast from 'react-native-toast-message'
 
 
@@ -19,9 +19,8 @@ interface RandomManhwaButtonProps {
 
 
 const RandomManhwaButton = ({
-    size = AppConstants.COMMON.BUTTON.SIZE, 
-    color = Colors.white,
-    backgroundColor = 'transparent',
+    size = AppConstants.ICON.SIZE, 
+    color = Colors.white,    
     onPress
 }: RandomManhwaButtonProps) => {
         
@@ -43,26 +42,15 @@ const RandomManhwaButton = ({
 
     if (loading) {
         return (
-            <View style={[styles.container, {backgroundColor}]} >
-                <ActivityIndicator size={size} color={color} />
-            </View>
+            <ActivityIndicator size={size} color={color} />
         )
     }
 
-    return (
-        <View style={[styles.container, {backgroundColor}]}  >
-            <Pressable onPress={openRandomManhwa} hitSlop={AppConstants.COMMON.HIT_SLOP.NORMAL}>
-                <Ionicons name='dice-outline' size={size} color={color}/>
-            </Pressable>
-        </View>
+    return (        
+        <Pressable onPress={openRandomManhwa} hitSlop={AppConstants.COMMON.HIT_SLOP.NORMAL}>
+            <Ionicons name='dice-outline' size={size} color={color}/>
+        </Pressable>        
     )
 }
 
 export default RandomManhwaButton
-
-
-const styles = StyleSheet.create({
-    container: {
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS
-    }
-})

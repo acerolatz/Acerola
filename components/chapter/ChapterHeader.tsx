@@ -3,12 +3,15 @@ import { wp } from '@/helpers/util'
 import { Image } from 'expo-image'
 import { router } from 'expo-router'
 import React from 'react'
-import { StyleSheet, View } from 'react-native'
+import { Pressable, StyleSheet, View } from 'react-native'
 import TopBar from '../TopBar'
 import BugReportButton from '../buttons/BugReportButton'
 import ReturnButton from '../buttons/ReturnButton'
 import Row from '../util/Row'
 import ChangeChapter from './ChangeChapter'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import RotatingButton from '../buttons/RotatingButton'
+import { AppConstants } from '@/constants/AppConstants'
 
 
 interface ChapterHeaderProps {
@@ -17,6 +20,7 @@ interface ChapterHeaderProps {
   isFirstChapter: boolean
   isLastChapter: boolean
   loading: boolean
+  reloadChapter: () => any
   goToPreviousChapter: () => void
   goToNextChapter: () => void
 }
@@ -28,6 +32,7 @@ const ChapterHeader = ({
   isFirstChapter,
   isLastChapter,
   loading, 
+  reloadChapter,
   goToPreviousChapter, 
   goToNextChapter
 }: ChapterHeaderProps) => {
@@ -41,11 +46,14 @@ const ChapterHeader = ({
 
   return (
     <View style={styles.container} >
-      <TopBar title={mangaTitle} titleColor={'white'} numberOfLines={1} >
-        <ReturnButton onPress={exitChapter} color={'white'}  backgroundColor={'transparent'} />
+      <TopBar title={mangaTitle} titleColor={'white'} >
+        <ReturnButton onPress={exitChapter} color={'white'}/>
       </TopBar>
-      <Row style={styles.row} >
-        <BugReportButton size={32} title={reportTitle} backgroundColor={'transparent'} padding={0} />
+      <Row style={{justifyContent: "space-between"}} >
+        <Row style={{gap: AppConstants.ICON.SIZE}} >
+          <BugReportButton title={reportTitle} />
+          <RotatingButton onPress={reloadChapter} />
+        </Row>
         <ChangeChapter
             isFirstChapter={isFirstChapter}
             currentChapter={currentChapter}
@@ -63,14 +71,9 @@ export default ChapterHeader
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%', 
-    paddingHorizontal: wp(5), 
-    paddingTop: 26, 
-    paddingBottom: 8
-  },
-  row: {
-    width: '100%', 
-    justifyContent: "space-between",
-    marginBottom: 20
-  }
+    width: '100%',
+    gap: AppConstants.COMMON.GAP,
+    paddingHorizontal: AppConstants.COMMON.SCREEN_PADDING_HORIZONTAL, 
+    paddingTop: AppConstants.COMMON.SCREEN_PADDING_VERTICAL
+  }  
 })

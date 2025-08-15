@@ -8,6 +8,7 @@ import ManhwaCard from '../ManhwaCard'
 import Title from '../Title'
 import ViewAllButton from '../buttons/ViewAllButton'
 import Row from '../util/Row'
+import { FontSizes } from '@/constants/typography'
 
 
 interface ManhwaHorizontalGridProps {    
@@ -30,15 +31,15 @@ const ManhwaHorizontalGrid = ({
                 <Title title={title}/>
                 <ViewAllButton onPress={onViewAll} />
             </Row>
-            <View style={{width: '100%', height: AppConstants.COMMON.MANHWA_COVER_DIMENSION.HEIGHT + 134}} >
+            <View style={styles.gridContainer} >
                 <FlashList
                     data={manhwas}
                     horizontal={true}
-                    estimatedItemSize={AppConstants.COMMON.MANHWA_COVER_DIMENSION.WIDTH}
-                    drawDistance={wp(150)}
+                    estimatedItemSize={AppConstants.MANHWA_COVER.WIDTH}
+                    drawDistance={wp(120)}
                     showsHorizontalScrollIndicator={false}
                     keyExtractor={(item: Manhwa) => item.manhwa_id.toString()}
-                    renderItem={({item}) => <ManhwaCard manhwa={item} />}
+                    renderItem={({item}) => <ManhwaCard manhwa={item} showChaptersPreview={false} />}
                 />
             </View>
         </View>
@@ -50,6 +51,11 @@ export default ManhwaHorizontalGrid
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        gap: 10
+        gap: AppConstants.COMMON.GAP
+    },
+    gridContainer: {
+        width: '100%', 
+        height: AppConstants.MANHWA_COVER.HEIGHT
+        // height: AppConstants.MANHWA_COVER.HEIGHT + AppConstants.COMMON.GAP * 3 + FontSizes.xl * 3        
     }
 })

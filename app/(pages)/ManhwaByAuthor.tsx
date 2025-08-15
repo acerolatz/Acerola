@@ -45,8 +45,8 @@ const ManhwaByAuthor = () => {
 
     return (
         <SafeAreaView style={AppStyle.safeArea}>
-            <TopBar title={`${t}: ${author_name}`} titleColor={Colors.yellow} >
-                <ReturnButton color={Colors.yellow} />
+            <TopBar title={`${t}: ${author_name}`} >
+                <ReturnButton/>
             </TopBar>
             <ManhwaGrid
                 manhwas={manhwas}

@@ -8,6 +8,7 @@ import ViewAllButton from '../buttons/ViewAllButton'
 import Title from '../Title'
 import Row from '../util/Row'
 import { AppConstants } from '@/constants/AppConstants'
+import { Typography } from '@/constants/typography'
 
 
 interface GenreGridProps {
@@ -28,8 +29,8 @@ const Item = ({item}: {item: Genre}) => {
     }, [item.genre_id])
     
     return (
-        <Pressable onPress={() => onPress(item)} style={styles.button} >
-            <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor}]} >{item.genre}</Text>
+        <Pressable onPress={() => onPress(item)} style={AppStyle.defaultGridItem} >
+            <Text style={[Typography.regular, {color: Colors.backgroundColor}]} >{item.genre}</Text>
         </Pressable>
     )
 }
@@ -67,17 +68,8 @@ export default GenreGrid
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        gap: 10,
+        gap: AppConstants.COMMON.GAP,
         alignItems: "flex-start"
-    },
-    button: {
-        paddingHorizontal: 10,
-        paddingVertical: 12,
-        alignItems: "center",
-        justifyContent: "center",
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
-        backgroundColor: Colors.yellow,
-        marginRight: AppConstants.COMMON.MARGIN
     }
 })
 

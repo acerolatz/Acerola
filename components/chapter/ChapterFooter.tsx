@@ -1,12 +1,13 @@
 import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
 import { Chapter } from '@/helpers/types'
-import { wp } from '@/helpers/util'
-import { AppStyle } from '@/styles/AppStyle'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { router } from 'expo-router'
 import React from 'react'
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native'
+import Row from '../util/Row'
+import Column from '../util/Column'
+import { Typography } from '@/constants/typography'
 
 
 interface ChapterFooterProps {
@@ -38,49 +39,65 @@ const ChapterFooter = ({
   }
 
   return (
-    <View style={{width: '100%', paddingHorizontal: wp(4)}} >
-        
+    <Column style={styles.container} >
         {/* Chapter Controller Button */}
-        <View style={{flexDirection: 'row', alignItems: "center", gap: 10, justifyContent: "center", marginBottom: 20}} >
-          <Text style={AppStyle.textHeader}>Chapter</Text>
-          <View style={{flexDirection: 'row', alignItems: "center", justifyContent: "center", gap: 10}} >
+        <Row style={styles.chapterSelector} >
+          <Text style={Typography.regular}>Chapter</Text>
+          <Row style={{gap: AppConstants.COMMON.GAP}} >
             {
               !isFirstChapter &&
-              <Pressable onPress={goToPreviousChapter} hitSlop={AppConstants.COMMON.HIT_SLOP.NORMAL} >
-                <Ionicons name='chevron-back' size={24} color={Colors.white} />
+              <Pressable onPress={goToPreviousChapter} hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE} >
+                <Ionicons name='chevron-back' size={AppConstants.ICON.SIZE} color={Colors.white} />
               </Pressable>
             }
             <View style={{alignItems: "center", justifyContent: "center"}} >
               {
                 loading ?
-                <ActivityIndicator size={20} color={Colors.white} /> :
-                <Text style={AppStyle.textHeader}>{currentChapter.chapter_name}</Text>
+                <ActivityIndicator size={AppConstants.ICON.SIZE} color={Colors.white} /> :
+                <Text style={Typography.regular}>{currentChapter.chapter_name}</Text>
               }
             </View>
             {
               !isLastChapter &&
-              <Pressable onPress={goToNextChapter} hitSlop={AppConstants.COMMON.HIT_SLOP.NORMAL}>
-                <Ionicons name='chevron-forward' size={24} color={Colors.white} />
+              <Pressable onPress={goToNextChapter} hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE}>
+                <Ionicons name='chevron-forward' size={AppConstants.ICON.SIZE} color={Colors.white} />
               </Pressable>
             }
-          </View>
-        </View>
+          </Row>
+        </Row>
             
           
         {/* Custom Bug Report Button */}
-        <Pressable onPress={openBugReport} style={{width: '100%', padding: 12, flexDirection: 'row', borderRadius: 4, backgroundColor: Colors.gray}} >
-          <Text style={[AppStyle.textRegular, {fontSize: 18, flex: 0.8}]}>
+        <Pressable onPress={openBugReport} style={styles.button} >
+          <Text style={{...Typography.regular, flexShrink: 1, textAlign: "center"}}>
             If you encounter broken or missing images, please use the bug-report option.
           </Text>
-          <View style={{flex: 0.2, height: 64, alignSelf: "flex-start", alignItems: "center", justifyContent: "center"}} > 
-            <Ionicons name='bug-outline' color={Colors.BugReportColor} size={48} />
-          </View>
+          <Ionicons name='bug-outline' color={Colors.yellow} size={32}/>
         </Pressable>
 
-      </View>
+      </Column>
   )
 }
 
 export default ChapterFooter
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  container: {
+    width: '100%', 
+    paddingHorizontal: AppConstants.COMMON.SCREEN_PADDING_HORIZONTAL,
+    gap: AppConstants.COMMON.GAP * 2
+  },
+  chapterSelector: {
+    gap: AppConstants.COMMON.GAP
+  },  
+  button: {
+    width: '100%',    
+    paddingVertical: AppConstants.COMMON.ITEM_PADDING_VERTICAL,
+    paddingHorizontal: AppConstants.COMMON.ITEM_PADDING_HORIZONTAL,
+    gap: AppConstants.COMMON.GAP * 2,
+    alignItems: "center",    
+    justifyContent: "center",
+    borderRadius: AppConstants.COMMON.BORDER_RADIUS, 
+    backgroundColor: Colors.backgroundSecondary
+  }
+})

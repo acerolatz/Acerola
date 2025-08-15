@@ -5,7 +5,8 @@ import { Colors } from '@/constants/Colors'
 import { AppConstants } from '@/constants/AppConstants'
 import { AppStyle } from '@/styles/AppStyle'
 import Ionicons from '@expo/vector-icons/Ionicons'
-import { openUrl } from '@/helpers/util'
+import { openUrl, wp } from '@/helpers/util'
+
 
 const SourceCodeButton = ({item}: {item: SourceCodeLink}) => {
 
@@ -17,19 +18,29 @@ const SourceCodeButton = ({item}: {item: SourceCodeLink}) => {
         setLoading(false)
     }
 
+    let iconName = 'globe-outline'
+
+    if (item.name == "GitHub") {
+        iconName = 'logo-github'
+    } else if (item.name == "GitLab") {
+        iconName = 'logo-gitlab'
+    }    
+
+    const showText = iconName === 'globe-outline'
+
     if (loading) {
         return (
             <View style={styles.container} >
-                <Text style={[AppStyle.textHeader, {color: Colors.backgroundColor}]}>{item.name}</Text>
-                <Ionicons name='globe-outline' size={AppConstants.COMMON.BUTTON.SIZE} color={Colors.backgroundColor} />
+                <Ionicons name={iconName as any} size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />
+                {showText && <Text style={styles.text}>{item.name}</Text>}
             </View>
         )
-    }
+    }    
 
     return (
         <Pressable onPress={onPress} style={styles.container} >
-            <Text style={[AppStyle.textHeader, {color: Colors.backgroundColor}]}>{item.name}</Text>
-            <Ionicons name='globe-outline' size={AppConstants.COMMON.BUTTON.SIZE} color={Colors.backgroundColor} />
+            <Ionicons name={iconName as any} size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />
+            {showText && <Text style={styles.text}>{item.name}</Text>}
         </Pressable>
     )
 }
@@ -38,13 +49,18 @@ export default SourceCodeButton
 
 const styles = StyleSheet.create({
     container: {
-        width: '100%',
-        padding: 10,
+        height: 52,
+        paddingHorizontal: 16,
+        flex: 1,
+        gap: 10,
         flexDirection: 'row',
-        alignItems: "center",
-        marginBottom: AppConstants.COMMON.MARGIN,
+        alignItems: "center",        
+        justifyContent: "center",
         borderRadius: AppConstants.COMMON.BORDER_RADIUS,
-        justifyContent: "space-between",
-        backgroundColor: Colors.sourceCodeColor
+        backgroundColor: Colors.yellow
+    },
+    text: {
+        ...AppStyle.textRegular,
+        color: Colors.backgroundColor
     }
 })

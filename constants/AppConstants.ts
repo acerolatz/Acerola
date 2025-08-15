@@ -5,7 +5,7 @@ import { Colors } from "./Colors";
 export const AppConstants = {
     PAGES: {
         HOME: {
-            MENU_WIDTH: 250,
+            MENU_WIDTH: wp(65),
             MENU_ANIMATION_TIME: 300
         },
         CHAPTER: {
@@ -33,20 +33,51 @@ export const AppConstants = {
             MAX_CACHE_SIZE: 256000 // MiB
         }
     },
-    COMMON: {
-        APP_NAME: "Acerola",
-        DEBUG_MODE: true,
-        BORDER_RADIUS: 4,
-        MARGIN: 6,
-        MANHWA_COVER_DIMENSION: {
-            WIDTH: 300,
-            HEIGHT: 440
+    DEBUB: {
+        ENABLED: true
+    },
+    MANHWA_COVER: {
+        WIDTH: 300,
+        HEIGHT: 440
+    },
+    DATABASE: {
+        UPDATE_INTERVAL: {
+            SERVER: 60 * 60 * 3, // 3 HOURS,
+            CLIENT: 60 * 3, // 3 MINUTES,
+            COLLECTIONS: 60 * 60 * 48, // 48 HOURS
         },
+        SIZE: {
+            CACHE: 1024 * 1024 * 1024, // 1024 MiB
+        }
+    },
+    HIT_SLOP: {
+        NORMAL: { 
+            left: 10,
+            right: 10,
+            top: 10,
+            bottom: 10
+        },
+        LARGE: {
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: 20
+        }
+    },
+    ICON: {
+        SIZE: wp(5)
+    },
+    BUTTON: {
+        SIZE: hp(6.4)
+    },
+    BOTTOMSHEET_HANDLE_RADIUS: wp(4),
+    COMMON: {
+        IMAGE_TRANSITION: 200,
+        IS_TABLET: Math.min(wp(100), hp(100)) >= 600,
+        APP_NAME: "Acerola",
         APP_VERSION: 'v1.0.0',
-        SERVER_UPDATE_RATE: 60 * 60 * 3, // 3 HOURS
-        CLIENT_UPDATE_RATE: 60 * 3, // 3 MINUTES
-        COLLECTIONS_UPDATE_RATE: 60 * 60 * 48, // 48 HOURS
-        DEFAULT_CACHE_SIZE: 1024 * 1024 * 1024, // 1024 MiB
+        BORDER_RADIUS: wp(1),
+        MARGIN: wp(1.2),
         READING_STATUS: [
             'Completed',
             'Reading',
@@ -72,9 +103,6 @@ export const AppConstants = {
         },
         CHAPTER_START_MILESTONE: 32,
         CHAPTER_MILESTONE_INCREMENT: 92,
-        BUTTON: {
-            SIZE: 22
-        },
         BUT_TYPE_LIST: [
             "Bug",            
             "Sugestion",
@@ -85,12 +113,15 @@ export const AppConstants = {
         ],
         SCREEN_WIDTH: wp(100),
         SCREEN_HEIGHT: hp(100),
-        PADDING_HORIZONTAL: wp(4),
-        PADDING_VERTICAL: hp(4),
+        SCREEN_PADDING_HORIZONTAL: wp(4),
+        SCREEN_PADDING_VERTICAL: hp(4),
         RANDOM_MANHWAS: {
             MAX_WIDTH: wp(87),
             MAX_HEIGHT: hp(80)
-        }
+        },
+        GAP: hp(1.2),
+        ITEM_PADDING_HORIZONTAL: hp(1),
+        ITEM_PADDING_VERTICAL: hp(1.4)
     },
     TOAST: {
         HEIGHT: 66,
@@ -98,10 +129,6 @@ export const AppConstants = {
         BOTTOM_OFFSET: 60,
         VISIBILITY_TIME: 2500,
         POSITION: "bottom"
-    },
-    DONATE_BANNER: {
-        WIDTH: 1024, 
-        HEIGHT: 943
     },
     URLS: {
         REDDIT: "https://www.reddit.com/r/pornhwa/"        
@@ -122,6 +149,16 @@ export const AppConstants = {
             LIGHT: Colors.white,
             DARK: Colors.backgroundColor,
             ERROR: Colors.neonRed
+        }
+    },
+    DONATION: {
+        BOTTOMSHEET: {
+            TITLE: 'Enjoying the app?',
+            MESSAGE: "Consider making a donation to help keep the servers running."
+        },
+        DONATE_BANNER: {
+            WIDTH: 1024, 
+            HEIGHT: 943
         }
     }
 }

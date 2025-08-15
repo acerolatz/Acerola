@@ -23,12 +23,13 @@ import { dbGetUserHistory } from '@/lib/database'
 import { useSQLiteContext } from 'expo-sqlite'
 import Row from '@/components/util/Row'
 import Footer from '@/components/util/Footer'
+import { Typography } from '@/constants/typography'
 
 
 const WIDTH = wp(92)
 const HEIGHT = getRelativeHeight(
-  AppConstants.DONATE_BANNER.WIDTH, 
-  AppConstants.DONATE_BANNER.HEIGHT, 
+  AppConstants.DONATION.DONATE_BANNER.WIDTH, 
+  AppConstants.DONATION.DONATE_BANNER.HEIGHT, 
   WIDTH
 )
 
@@ -38,15 +39,13 @@ const Donate = () => {
   const db = useSQLiteContext()
   const { donates, setDonates } = useDonateState()
   const [loading, setLoading] = useState(false)
-  const [userHistory, setUserHistory] = useState<UserHistory | null>(null)
   const [donateImageUrl, setDonateImageUrl] = useState<string | null | undefined>(null)
 
   useEffect(
     () => {
       let isCancelled = false      
       const init = async () => {
-        await dbGetUserHistory(db).then(u => setUserHistory(u))
-
+        
         if (donates.length != 0) { 
           setDonateImageUrl(donates.find(i => i.method === 'donation-banner')?.value)
           return 
@@ -78,18 +77,18 @@ const Donate = () => {
   if (loading) {
     return (
       <SafeAreaView style={AppStyle.safeArea} >
-        <TopBar title='Donate' titleColor={Colors.donateColor} >
-            <ReturnButton color={Colors.donateColor} />
+        <TopBar title='Donate'>
+            <ReturnButton/>
         </TopBar>
-        <PageActivityIndicator color={Colors.donateColor} />
+        <PageActivityIndicator/>
       </SafeAreaView>  
     )
   }
 
   return (
     <SafeAreaView style={AppStyle.safeArea} >
-        <TopBar title='Donate' titleColor={Colors.donateColor} >
-            <ReturnButton color={Colors.donateColor} />
+        <TopBar title='Donate'>
+            <ReturnButton />
         </TopBar>        
         <FlatList
             data={donates.filter(i => i.method !== 'donation-banner')}
@@ -98,31 +97,12 @@ const Donate = () => {
             ListHeaderComponent={
               <>
                 {
-                  userHistory &&
-                  <View style={{ marginBottom: AppConstants.COMMON.MARGIN, gap: AppConstants.COMMON.MARGIN}} >
-                      <Text style={[AppStyle.textHeader, {color: Colors.donateColor, fontSize: 20}]}>Activity history</Text>
-                      <ScrollView style={{width: '100%'}} showsHorizontalScrollIndicator={false} horizontal={true} >
-                        <Row style={{gap: AppConstants.COMMON.MARGIN}} >
-                            <View style={styles.item} >
-                              <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor, textAlign: "center"}]} >{formatNumberWithSuffix(userHistory.images)} images</Text>
-                            </View>
-                            <View style={styles.item} >
-                              <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor, textAlign: "center"}]} >{formatNumberWithSuffix(userHistory.chapters)} chapters</Text>
-                            </View>
-                            <View style={styles.item} >
-                              <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor, textAlign: "center"}]} >{formatNumberWithSuffix(userHistory.manhwas)} manhwas</Text>
-                            </View>
-                        </Row>
-                      </ScrollView>
-                  </View>
-                }
-                {
                   donateImageUrl && 
                   <Image 
                     source={donateImageUrl} 
                     style={styles.image} 
                     contentFit='cover' />
-                }
+                }                
               </>
             }
             ListFooterComponent={<Footer/>}
@@ -135,25 +115,11 @@ const Donate = () => {
 export default Donate
 
 const styles = StyleSheet.create({
-  donateButton: {
-    maxWidth: '100%', 
-    padding: 10, 
-    borderRadius: AppConstants.COMMON.BORDER_RADIUS, 
-    backgroundColor: Colors.donateColor, 
-    marginBottom: AppConstants.COMMON.MARGIN,
-  },
-  donateTitleContainer: {
-    width: "100%", 
-    flexDirection: 'row', 
-    alignItems: "center", 
-    gap: 10, 
-    justifyContent: "space-between"
-  },
   item: {
     paddingHorizontal: 20,
     height: 52,
     borderRadius: AppConstants.COMMON.BORDER_RADIUS,
-    backgroundColor: Colors.donateColor,
+    backgroundColor: Colors.yellow,
     alignItems: "center",
     justifyContent: "center"
   },

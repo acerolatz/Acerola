@@ -1,19 +1,25 @@
 import { Colors } from '@/constants/Colors'
 import { AppStyle } from '@/styles/AppStyle'
 import React from 'react'
-import { Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { AppConstants } from '../../constants/AppConstants'
+import { Typography } from '@/constants/typography'
 
 
 const AppLogo = ({name = AppConstants.COMMON.APP_NAME}: {name?: string}) => {
   return (
-    <View>
-      <Text style={[AppStyle.textHeader, {fontSize: 30, fontFamily: 'LeagueSpartan_600SemiBold', color: Colors.yellow, textAlignVertical: 'center'}]}>
-        {name}
-      </Text>
-    </View>
+    <Text style={styles.text}>{name}</Text>
   )
 }
 
 
 export default AppLogo
+
+
+const styles = StyleSheet.create({
+  text: {
+    ...Typography.semiboldXl, 
+    color: Colors.yellow, 
+    textAlignVertical: 'center'
+  }
+})

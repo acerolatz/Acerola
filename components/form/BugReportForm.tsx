@@ -30,6 +30,7 @@ import Footer from '../util/Footer';
 import { BugType } from '@/helpers/types';
 import BugTypePicker from '../picker/BugTypePicker';
 import BugImage from '../util/BugImage';
+import { Typography } from '@/constants/typography';
 
 
 
@@ -145,103 +146,93 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
     return (
         <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
             <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='always' >
-                
-                {/* Title */}
-                <Text style={AppStyle.inputHeaderText}>Title</Text>
-                {errors.title && (<Text style={AppStyle.error}>{errors.title.message}</Text>)}
-                <Controller
-                    control={control}
-                    name="title"
-                    render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                        style={AppStyle.input}
-                        autoCapitalize="sentences"
-                        onBlur={onBlur}
-                        onChangeText={onChange}
-                        value={value}/>
-                    )}
-                />
+                <View style={{gap: AppConstants.COMMON.GAP}} >
+                    {/* Title */}
+                    <Text style={Typography.semibold}>Title</Text>
+                    {errors.title && (<Text style={AppStyle.error}>{errors.title.message}</Text>)}
+                    <Controller
+                        control={control}
+                        name="title"
+                        render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInput
+                            style={AppStyle.input}
+                            autoCapitalize="sentences"
+                            onBlur={onBlur}
+                            onChangeText={onChange}
+                            value={value}/>
+                        )}
+                    />
 
-                {/* BugType */}
-                {errors.bugType && (<Text style={AppStyle.error}>{errors.bugType.message}</Text>)}
-                <Controller
-                    name="bugType"
-                    control={control}
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <BugTypePicker value={value} onChange={onChange} />
-                    )}
-                />
-                
-                {/* Description */}
-                <View style={{flexDirection: 'row', gap: 10, alignItems: "center", justifyContent: "center", alignSelf: 'flex-start'}} >
-                    <Text style={AppStyle.inputHeaderText}>Description</Text>
-                    <Text style={[AppStyle.textRegular, {fontSize: 12, color: Colors.neonRed}]}>optional</Text>
-                </View>
-                {errors.descr && (<Text style={AppStyle.error}>{errors.descr.message}</Text>)}            
-                <Controller
-                    name="descr"
-                    control={control}
-                    render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                        style={[AppStyle.input, {height: hp(20), paddingVertical: 10, textAlignVertical: 'top'}]}
-                        multiline={true}
-                        autoCapitalize="sentences"
-                        onBlur={onBlur}
-                        onChangeText={onChange}
-                        value={value}/>
-                    )}
-                />
-                
-                {/* Buttons */}
-                {
-                    isLoading ?
-                    <>
-                        <View style={[styles.button, {marginBottom: 10}]} >
-                            <ActivityIndicator size={32} color={Colors.backgroundColor} />
-                        </View>
-                        <View style={styles.button} >
-                            <Text style={AppStyle.formButtonText} >Images (optional)</Text>
-                        </View>
-                    </>
-                    :
-                    <>
-                        <Pressable onPress={handleSubmit(onSubmit)} style={[styles.button, {marginBottom: 10}]} >
-                            <Text style={AppStyle.formButtonText} >Send</Text>
-                        </Pressable>
-                        <Pressable onPress={handlePickPhoto} style={styles.button} >
-                            <Text style={AppStyle.formButtonText} >Images (optional)</Text>
-                        </Pressable>
-                    </>
-                }
-
-                {/* Photos */}
-                {
-                    photos.length > 0 &&
-                    <View style={{width: '100%', marginTop: 10}} >
-                        <FlatList
-                            data={photos}
-                            keyExtractor={(item) => item}
-                            horizontal={true}
-                            showsVerticalScrollIndicator={false}
-                            renderItem={({item}) => <BugImage uri={item} setPhotos={setPhotos} />}
-                        />
+                    {/* BugType */}
+                    {errors.bugType && (<Text style={AppStyle.error}>{errors.bugType.message}</Text>)}
+                    <Controller
+                        name="bugType"
+                        control={control}
+                        render={({ field: { onChange, onBlur, value } }) => (
+                            <BugTypePicker value={value} onChange={onChange} />
+                        )}
+                    />
+                    
+                    {/* Description */}
+                    <View style={{flexDirection: 'row', gap: AppConstants.COMMON.GAP, alignItems: "center", justifyContent: "center", alignSelf: 'flex-start'}} >
+                        <Text style={Typography.semibold}>Description</Text>
+                        <Text style={AppStyle.textOptional}>optional</Text>
                     </View>
-                }
-                <Footer/>
+                    {errors.descr && (<Text style={AppStyle.error}>{errors.descr.message}</Text>)}
+                    <Controller
+                        name="descr"
+                        control={control}
+                        render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInput
+                            style={AppStyle.inputLarge}
+                            multiline={true}
+                            autoCapitalize="sentences"
+                            onBlur={onBlur}
+                            onChangeText={onChange}
+                            value={value}/>
+                        )}
+                    />
+                    
+                    {/* Buttons */}
+                    {
+                        isLoading ?
+                        <>
+                            <View style={AppStyle.formButton} >
+                                <ActivityIndicator size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />
+                            </View>
+                            <View style={AppStyle.formButton} >
+                                <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Images (optional)</Text>
+                            </View>
+                        </>
+                        :
+                        <>
+                            <Pressable onPress={handleSubmit(onSubmit)} style={AppStyle.formButton} >
+                                <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Send</Text>
+                            </Pressable>
+                            <Pressable onPress={handlePickPhoto} style={AppStyle.formButton} >
+                                <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Images (optional)</Text>
+                            </Pressable>
+                        </>
+                    }
+
+                    {/* Photos */}
+                    {
+                        photos.length > 0 &&
+                        <View style={{width: '100%'}} >
+                            <FlatList
+                                data={photos}
+                                keyExtractor={(item) => item}
+                                horizontal={true}
+                                showsVerticalScrollIndicator={false}
+                                renderItem={({item}) => <BugImage uri={item} setPhotos={setPhotos} />}
+                            />
+                        </View>
+                    }
+                    <Footer/>
+                </View>
             </ScrollView>
         </KeyboardAvoidingView>
     )
 }
 
 export default BugReportForm
-
-const styles = StyleSheet.create({
-    button: {
-        flex: 1,
-        height: 52,
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
-        backgroundColor: Colors.BugReportColor,
-        alignItems: "center",
-        justifyContent: "center"
-    }
-})

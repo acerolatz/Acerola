@@ -1,57 +1,90 @@
 import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
 import { Manhwa } from '@/helpers/types'
-import { AppStyle } from '@/styles/AppStyle'
 import { Image } from 'expo-image'
 import { LinearGradient } from 'expo-linear-gradient'
 import { router } from 'expo-router'
-import React, { useCallback } from 'react'
+import React, { useCallback, useRef, } from 'react'
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 import Title from '../Title'
+import Row from '../util/Row'
+import BooleanRotatingButton from '../buttons/BooleanRotatingButton'
+import { FontSizes, Typography } from '@/constants/typography'
 
 
 const TOP_1O_ITEM_WIDTH = 160
 const TOP_1O_ITEM_HEIGHT = 240
 
 
-const Top10Item = ({manhwa, index}: {manhwa: Manhwa, index: number}) => {
+interface Top10ItemProps {
+    title: string
+    manhwa_id: number
+    image_url: string
+    index: number
+}
+
+const Top10Item = ({title, manhwa_id, image_url, index}: Top10ItemProps) => {
 
     const onPress = useCallback(() => {
         router.push({
             pathname: '/(pages)/ManhwaPage',
-            params: { manhwa_id: manhwa.manhwa_id }
+            params: { manhwa_id: manhwa_id }
         });
-    }, [manhwa.manhwa_id]);
+    }, [manhwa_id]);
 
     return (
         <Pressable onPress={onPress} style={{marginRight: AppConstants.COMMON.MARGIN}} >
             <View>
-                <Image source={manhwa.cover_image_url} style={styles.image} contentFit='cover' />
-                <LinearGradient colors={['transparent', Colors.backgroundColor]} style={styles.linearGradient} >
-                    <Text style={[AppStyle.textRegular, styles.text]} >{index + 1}</Text>
+                <Image source={image_url} style={styles.image} contentFit='cover' transition={AppConstants.COMMON.IMAGE_TRANSITION} />
+                <LinearGradient colors={['transparent', 'transparent', Colors.backgroundColor]} style={styles.linearGradient} >
+                    <Text style={styles.number} >{index + 1}</Text>
+                    <Text numberOfLines={1} style={styles.manhwaTitle} >{title}</Text>
                 </LinearGradient>
-                <Text numberOfLines={1} style={[AppStyle.textRegular, {maxWidth: TOP_1O_ITEM_WIDTH, position: 'absolute', left: 0, bottom: 0}]} >{manhwa.title}</Text>
             </View>
         </Pressable>
     )
 }
 
 
-const Top10Grid = ({manhwas}: {manhwas: Manhwa[]}) => {
+interface Top10GridProps {
+    manhwas: Manhwa[]
+    reloadTop10: () => any
+}
 
+const Top10Grid = ({manhwas, reloadTop10}: Top10GridProps) => {
+
+    const flatListRef = useRef<FlatList>(null)
+
+    const reload = async () => {
+        await reloadTop10()
+        flatListRef.current?.scrollToIndex({index: 0, animated: true})
+    }    
+    
     if (manhwas.length === 0) {
         return <></>
     }
-    
+
     return (
         <View style={styles.container} >
-            <Title title="Today's Top 10"/>
+            <Row style={{justifyContent: "space-between"}} >
+                <Title title="Today's Top 10"/>                
+                <BooleanRotatingButton onPress={reload} iconName='reload-outline' />
+            </Row>
             <FlatList
+                ref={flatListRef}
                 data={manhwas}
                 horizontal={true}
                 showsHorizontalScrollIndicator={false}
                 keyExtractor={(item: Manhwa) => item.manhwa_id.toString()}
-                renderItem={({item, index}) => <Top10Item manhwa={item} index={index} />}
+                renderItem={
+                    ({item, index}) => 
+                        <Top10Item 
+                            title={item.title} 
+                            manhwa_id={item.manhwa_id} 
+                            image_url={item.cover_image_url} 
+                            index={index}
+                    />
+                }
             />
         </View>
     )
@@ -77,11 +110,18 @@ const styles = StyleSheet.create({
         height: '100%', 
         justifyContent: 'flex-end'
     },
-    text: {
-        left: 2, 
-        bottom: 0, 
+    number: {
+        ...Typography.semiboldXl,
         color: Colors.yellow,
-        fontSize: 96, 
-        fontFamily: 'LeagueSpartan_600SemiBold'
+        fontSize: 96,
+        bottom: 8,
+        left: 4
+    },    
+    manhwaTitle: {
+        ...Typography.regular, 
+        maxWidth: TOP_1O_ITEM_WIDTH - 10,
+        position: 'absolute',
+        left: 6, 
+        bottom: 10
     }
 })

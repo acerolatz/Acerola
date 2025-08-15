@@ -25,6 +25,7 @@ import Toast from 'react-native-toast-message';
 import * as yup from 'yup';
 import Row from '../util/Row';
 import Footer from '../util/Footer';
+import { FontSizes, Typography } from '@/constants/typography';
 
 
 interface FormData {
@@ -122,86 +123,77 @@ const SettingsForm = ({currentMaxCacheSize, currentCacheSize, safeModePassword, 
     return (
         <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
             <ScrollView style={{flex: 1}} keyboardShouldPersistTaps='always' showsVerticalScrollIndicator={false} >
-                <View style={{gap: 20}} >
-                    <View>
-                        <Row style={{gap: 10, alignSelf: 'flex-start'}} >
-                            <Text style={AppStyle.inputHeaderText}>Safe Mode</Text>
-                            <Text style={[AppStyle.inputHeaderText, {color: Colors.neonRed}]}>{isSafeModeOn ? 'enabled' : 'disabled'}</Text>
-                        </Row>
-                        <Text style={AppStyle.textRegular}>When safe mode is enabled, {AppConstants.COMMON.APP_NAME} will function as a simple to-do list. To unlock the main content, you will need the numeric password you define below.</Text>
-                        <Text style={[AppStyle.textRegular, {color: Colors.neonRed}]}>If you forget the password, it cannot be reset or recovered. You must delete the app data via {Platform.OS} settings to regain access to the main content.</Text>
-                        <Text style={[AppStyle.textRegular, {color: Colors.neonRed}]}>Changes to Safe Mode settings will be applied when the app restarts.</Text>
-                        
-                        <Text style={AppStyle.inputHeaderText} >Safe Mode Password</Text>
+                <View style={{gap: AppConstants.COMMON.GAP}} >
+                    <Row style={{gap: AppConstants.COMMON.GAP, alignSelf: 'flex-start'}} >
+                        <Text style={Typography.semibold}>Safe Mode</Text>
+                        <Text style={{...AppStyle.error, top: 8}}>{isSafeModeOn ? 'enabled' : 'disabled'}</Text>
+                    </Row>
+                    <Text style={Typography.regular}>When safe mode is enabled, {AppConstants.COMMON.APP_NAME} will function as a simple to-do list. To unlock the main content, you will need the numeric password you define below.</Text>
+                    <Text style={{...Typography.regular, color: Colors.neonRed}}>If you forget the password, it cannot be reset or recovered. You must delete the app data via {Platform.OS} settings to regain access to the main content.</Text>
+                    <Text style={{...Typography.regular, color: Colors.neonRed}}>Changes to Safe Mode settings will be applied when the app restarts.</Text>
+                    
+                    <Text style={Typography.regular} >Password</Text>
+                    <TextInput
+                        style={AppStyle.input}
+                        keyboardType='numeric'
+                        onChangeText={setCurrentSafeModePassword}
+                        value={currentSafeModePassword.toString()}/>
+
+                    <Text style={Typography.regular} >Confirm Password</Text>
+                    <TextInput
+                        style={AppStyle.input}
+                        keyboardType='numeric'
+                        onChangeText={setConfirmPassword}
+                        value={confirmPassword.toString()}/>
+
+                    {
+                        loadingSafeModeConfig ?
+                        <View style={AppStyle.formButton} >
+                            <Text style={{...Typography.regular, color: Colors.backgroundColor}}>{safeModeOn ? 'Disable' : 'Enable'} Safe Mode</Text>
+                        </View>
+                        :
+                        <Pressable onPress={submitPassword} style={AppStyle.formButton} >
+                            <Text style={{...Typography.regular, color: Colors.backgroundColor}}>{isSafeModeOn ? 'Disable' : 'Enable'} Safe Mode</Text>
+                        </Pressable>
+
+                    }
+                                    
+                    <Text style={Typography.semibold}>Cache size: {formatBytes(currentCacheSize)}</Text>
+                    <Text style={AppStyle.error}>* Restart Required</Text>                    
+                    {/* Clear Cache */}
+                    <Pressable onPress={clearAppCache} style={AppStyle.formButton} >
+                        <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Clear Cache</Text>
+                    </Pressable>                
+                
+                    {/* Cache Size */}
+                    <Text style={Typography.semibold}>Max cache size (MB)</Text>
+                    {errors.maxCacheSize && (<Text style={AppStyle.error}>{errors.maxCacheSize.message}</Text>)}
+                    <Controller
+                        control={control}
+                        name="maxCacheSize"
+                        render={({ field: { onChange, onBlur, value } }) => (
                         <TextInput
                             style={AppStyle.input}
                             keyboardType='numeric'
-                            onChangeText={setCurrentSafeModePassword}
-                            value={currentSafeModePassword.toString()}/>
+                            maxLength={AppConstants.FORM.SETTINGS.MAX_CACHE_SIZE.toString().length}
+                            onBlur={onBlur}
+                            onChangeText={onChange}
+                            value={value.toString()}/>
+                        )}
+                    />
+                    {/* Save Button */}
+                    {
+                        isLoading ?
+                        <View style={AppStyle.formButton} >
+                            <ActivityIndicator size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />
+                        </View> 
+                        :
+                        <Pressable onPress={handleSubmit(onSubmit)} style={AppStyle.formButton} >
+                            <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Save</Text>
+                        </Pressable>
+                    }
 
-                        <Text style={AppStyle.inputHeaderText} >Confirm Safe Mode Password</Text>
-                        <TextInput
-                            style={AppStyle.input}
-                            keyboardType='numeric'
-                            onChangeText={setConfirmPassword}
-                            value={confirmPassword.toString()}/>
-
-                        {
-                            loadingSafeModeConfig ?
-                            <View style={[AppStyle.formButton, {backgroundColor: Colors.white}]} >
-                                <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor}]}>{safeModeOn ? 'Disable' : 'Enable'} Safe Mode</Text>
-                            </View>
-                            :
-                            <Pressable onPress={submitPassword} style={[AppStyle.formButton, {backgroundColor: Colors.white}]} >
-                                <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor}]}>{isSafeModeOn ? 'Disable' : 'Enable'} Safe Mode</Text>
-                            </Pressable>
-
-                        }                        
-                    </View>
-
-                    <View style={styles.line} />
-                    
-                    <View>
-                        <Text style={AppStyle.inputHeaderText}>Cache size: {formatBytes(currentCacheSize)}</Text>
-                        {/* Clear Cache */}
-                        <Pressable onPress={clearAppCache} style={[AppStyle.formButton, {backgroundColor: Colors.white, marginTop: 0}]} >
-                            <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor}]} >Clear Cache</Text>
-                        </Pressable>                
-                        <Text style={[AppStyle.textRegular, {color: Colors.neonRed, marginTop: 6}]}>* Restart Required</Text>
-                    </View>
-
-                    <View style={styles.line} />
-                    
-                    <View>
-                        {/* Cache Size */}
-                        <Text style={AppStyle.inputHeaderText}>Max cache size (MB)</Text>
-                        {errors.maxCacheSize && (<Text style={AppStyle.error}>{errors.maxCacheSize.message}</Text>)}
-                        <Controller
-                            control={control}
-                            name="maxCacheSize"
-                            render={({ field: { onChange, onBlur, value } }) => (
-                            <TextInput
-                                style={AppStyle.input}
-                                keyboardType='numeric'
-                                maxLength={AppConstants.FORM.SETTINGS.MAX_CACHE_SIZE.toString().length}
-                                onBlur={onBlur}
-                                onChangeText={onChange}
-                                value={value.toString()}/>
-                            )}
-                        />
-                        {/* Save Button */}
-                        {
-                            isLoading ?
-                            <View style={[AppStyle.formButton, {backgroundColor: Colors.white}]} >
-                                <ActivityIndicator size={32} color={Colors.backgroundColor} />
-                            </View> 
-                            :
-                            <Pressable onPress={handleSubmit(onSubmit)} style={[AppStyle.formButton, {backgroundColor: Colors.white}]} >
-                                <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor}]} >Save</Text>
-                            </Pressable>
-                        }
-                    </View>
-                    <Footer/>
+                    <Footer height={62}/>
                 </View>
             </ScrollView>
         </KeyboardAvoidingView>
@@ -209,13 +201,3 @@ const SettingsForm = ({currentMaxCacheSize, currentCacheSize, safeModePassword, 
 }
 
 export default SettingsForm
-
-
-const styles = StyleSheet.create({
-    line: {
-        width: '100%', 
-        height: 2, 
-        backgroundColor: Colors.white, 
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS
-    }
-})

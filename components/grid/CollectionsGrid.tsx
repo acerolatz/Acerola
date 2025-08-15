@@ -7,7 +7,7 @@ import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 import ViewAllButton from '../buttons/ViewAllButton'
 import Title from '../Title'
 import Row from '../util/Row'
-import { AppConstants } from '@/constants/AppConstants'
+import { Typography } from '@/constants/typography'
 
 
 
@@ -30,8 +30,8 @@ const CollectionGrid = ({collections}: {collections: Collection[]}) => {
 
     const renderItem = ({item}: {item: Collection}) => {
         return (
-            <Pressable onPress={() => onPress(item)} style={styles.button} >
-                <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor}]}>{item.name}</Text>
+            <Pressable onPress={() => onPress(item)} style={AppStyle.defaultGridItem} >
+                <Text style={[Typography.regular, {color: Colors.backgroundColor}]}>{item.name}</Text>
             </Pressable>
         )
     }    
@@ -49,7 +49,7 @@ const CollectionGrid = ({collections}: {collections: Collection[]}) => {
             <FlatList
                 data={collections}
                 horizontal={true}
-                initialNumToRender={30}
+                initialNumToRender={10}
                 showsHorizontalScrollIndicator={false}
                 keyExtractor={(item) => item.collection_id.toString()}
                 renderItem={renderItem}
@@ -65,14 +65,5 @@ const styles = StyleSheet.create({
         width: '100%',
         gap: 10,
         alignItems: "flex-start"
-    },
-    button: {
-        paddingHorizontal: 10,
-        paddingVertical: 12,
-        alignItems: "center",
-        justifyContent: "center",
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
-        backgroundColor: Colors.yellow,
-        marginRight: AppConstants.COMMON.MARGIN
-    }
+    }    
 })

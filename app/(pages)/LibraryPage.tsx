@@ -2,7 +2,7 @@ import ReturnButton from '@/components/buttons/ReturnButton'
 import ManhwaGrid from '@/components/grid/ManhwaGrid'
 import ReadingStatusPicker from '@/components/picker/ReadingStatusPicker'
 import TopBar from '@/components/TopBar'
-import { Colors } from '@/constants/Colors'
+import { AppConstants } from '@/constants/AppConstants'
 import { Manhwa } from '@/helpers/types'
 import { dbGetManhwasByReadingStatus } from '@/lib/database'
 import { AppStyle } from '@/styles/AppStyle'
@@ -66,18 +66,18 @@ const Library = () => {
 
   return (
     <SafeAreaView style={AppStyle.safeArea}>
-        <TopBar title='Library' titleColor={Colors.libraryColor} >
-          <ReturnButton color={Colors.libraryColor} />
+        <TopBar title='Library'>
+          <ReturnButton/>
         </TopBar>
-        <View style={{flex: 1, gap: 10}} >
+        <View style={{flex: 1, gap: AppConstants.COMMON.GAP}} >
           <ReadingStatusPicker onChangeValue={onChangeValue}/>
           <ManhwaGrid
             manhwas={manhwas}
             loading={loading}
+            showChaptersPreview={false}
             shouldShowChapterDate={false}
             showManhwaStatus={false}
             onEndReached={onEndReached}
-            color={Colors.libraryColor}
           />
         </View>
     </SafeAreaView>

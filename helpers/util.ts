@@ -192,6 +192,7 @@ export async function copyToClipboard(value: string) {
 
 export function getChapterGridNumColumns(): number {
   const w = wp(92)
+  if (w >= 500) { return 12 }
   if (w >= 440) { return 9 }
   if (w >= 400) { return 8 }
   if (w >= 360) { return 7 }

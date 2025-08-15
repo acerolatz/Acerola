@@ -1,8 +1,8 @@
 import { AppConstants } from '@/constants/AppConstants';
 import { Colors } from '@/constants/Colors';
+import { Typography } from '@/constants/typography';
 import { Manhwa } from '@/helpers/types';
 import { dbGetManhwaReadingStatus, dbUpdateManhwaReadingStatus } from '@/lib/database';
-import { AppStyle } from '@/styles/AppStyle';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useSQLiteContext } from 'expo-sqlite';
 import React, { useEffect, useRef, useState } from 'react';
@@ -12,15 +12,13 @@ import DropDownPicker from 'react-native-dropdown-picker';
 
 interface AddToLibrayProps {
     manhwa: Manhwa,
-    backgroundColor?: string
-    textColor?: string
+    backgroundColor?: string    
 }
 
 
 const AddToLibray = ({
     manhwa,
-    backgroundColor = Colors.libraryColor, 
-    textColor = Colors.backgroundColor
+    backgroundColor = Colors.libraryColor    
 }: AddToLibrayProps) => {
 
     const db = useSQLiteContext()
@@ -56,18 +54,18 @@ const AddToLibray = ({
     }
 
     return (
-        <View style={{flex: 1, height: 52}} >
+        <View style={{flex: 1, height: AppConstants.BUTTON.SIZE}} >
             <DropDownPicker
                 open={open}
                 style={[styles.dropDownContainer, {backgroundColor}]}
-                dropDownContainerStyle={{backgroundColor: Colors.backgroundColor, borderWidth: 2, borderColor: backgroundColor}}
-                labelStyle={{color: textColor}}
-                textStyle={AppStyle.textRegular}
+                dropDownContainerStyle={[styles.dropDownContainerStyle, {borderColor: backgroundColor}]}
+                labelStyle={{color: Colors.backgroundColor}}
+                textStyle={Typography.regular}
                 showArrowIcon={true}
                 ArrowUpIconComponent={() => {return <Ionicons name='chevron-up' size={20} color={Colors.backgroundColor} />}}
                 ArrowDownIconComponent={() => {return <Ionicons name='chevron-down' size={20} color={Colors.backgroundColor} />}}
                 placeholder='Add To Library'
-                placeholderStyle={[AppStyle.textRegular, {color: textColor}]}
+                placeholderStyle={{...Typography.regular, color: Colors.backgroundColor}}
                 value={value as any}
                 items={items}
                 setOpen={setOpen}
@@ -87,8 +85,17 @@ export default AddToLibray
 
 const styles = StyleSheet.create({
     dropDownContainer: {
-        height: 52,
+        height: AppConstants.BUTTON.SIZE,
         borderRadius: AppConstants.COMMON.BORDER_RADIUS,
         borderWidth: 0
-    }    
+    },
+    dropDownContainerStyle: {
+        backgroundColor: Colors.backgroundColor, 
+        borderWidth: 2        
+    },
+    text: {
+        ...Typography.regular,
+        color: Colors.backgroundColor
+    }
+
 })

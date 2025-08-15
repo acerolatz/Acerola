@@ -1,111 +1,81 @@
-import ReturnButton from '@/components/buttons/ReturnButton'
+import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
+import { AppStyle } from '@/styles/AppStyle'
 import TopBar from '@/components/TopBar'
-import Column from '@/components/util/Column'
+import ReturnButton from '@/components/buttons/ReturnButton'
+import { Feedback, Post } from '@/helpers/types'
+import { spFetchNews } from '@/lib/supabase'
+import { FlashList } from '@shopify/flash-list'
 import CustomActivityIndicator from '@/components/util/CustomActivityIndicator'
 import Footer from '@/components/util/Footer'
+import { formatTimestamp } from '@/helpers/util'
 import Row from '@/components/util/Row'
-import { AppConstants } from '@/constants/AppConstants'
-import { Colors } from '@/constants/Colors'
-import { Post } from '@/helpers/types'
-import { formatTimestamp, wp } from '@/helpers/util'
-import { spFetchNews } from '@/lib/supabase'
-import { AppStyle } from '@/styles/AppStyle'
 import Ionicons from '@expo/vector-icons/Ionicons'
-import { FlashList } from '@shopify/flash-list'
-import { Image } from 'expo-image'
-import React, { useEffect, useRef, useState } from 'react'
-import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native'
+import { Colors } from '@/constants/Colors'
+import { AppConstants } from '@/constants/AppConstants'
+import { Typography } from '@/constants/typography'
 
 
 const PAGE_LIMIT = 16
-const IMAGE_WIDTH = AppConstants.COMMON.SCREEN_WIDTH - AppConstants.COMMON.PADDING_HORIZONTAL * 2
-const TEXT_LENGHT_LIMIT = 128
+const TEXT_LENGHT_LIMIT = 256
 
 
-const News = ({news}: {news: Post}) => {
-    
+const Item = ({item}: {item: Post}) => {
+
     const [expandText, setExpandText] = useState(false)
-    const hasImage = news.image_url && news.image_width && news.image_height
-    const imageHeight = hasImage ? IMAGE_WIDTH * (news.image_height! / news.image_width!) : 0
-    const text = expandText ? news.descr : news.descr.length > TEXT_LENGHT_LIMIT ? `${news.descr.slice(0, TEXT_LENGHT_LIMIT)}...` : news.descr
-
+    const text = expandText ? item.message : item.message.length > TEXT_LENGHT_LIMIT ? `${item.message.slice(0, TEXT_LENGHT_LIMIT)}...` : item.message    
+    const iconName = expandText ? 'chevron-back' : 'chevron-forward'
+    
     const handleTextExpand = () => { setExpandText(prev => !prev) }
 
-    if (!hasImage) {
-        <Column style={styles.item} >
-            <Text style={AppStyle.textHeader}>{news.title}</Text>
-            <Text style={AppStyle.textRegular}>{text}</Text>
-            <Row style={{justifyContent: "space-between"}} >
-                <Text style={AppStyle.textRegular} >{formatTimestamp(news.created_at)}</Text>
-                {
-                    news.descr.length > TEXT_LENGHT_LIMIT &&
-                    <Pressable onPress={handleTextExpand} hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE} >
-                        <Row style={{gap: 4}} >
-                            <Text style={AppStyle.textRegular}>{expandText ? 'Collapse' : 'Expand'}</Text>
-                            <Ionicons 
-                                name={expandText ? 'chevron-back' : 'chevron-forward'} 
-                                color={Colors.newsColor} 
-                                style={{marginTop: 3}} 
-                                size={20} />
-                        </Row>
-                    </Pressable>
-                }
-            </Row>
-        </Column>
-    }
-
     return (
-        <Column style={styles.item} >
-            <Image 
-                style={{width: IMAGE_WIDTH, height: imageHeight , borderRadius: AppConstants.COMMON.BORDER_RADIUS}} 
-                source={news.image_url} 
-                contentFit='cover' />
-            <Text style={AppStyle.textHeader}>{news.title}</Text>
-            <Text style={AppStyle.textRegular}>{text}</Text>
-            <Row style={{justifyContent: "space-between"}} >
-                <Text style={AppStyle.textRegular} >{formatTimestamp(news.created_at)}</Text>
-                {
-                    news.descr.length > TEXT_LENGHT_LIMIT &&
-                    <Pressable onPress={handleTextExpand} hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE} >
-                        <Row style={{gap: 4}} >
-                            <Text style={AppStyle.textRegular}>{expandText ? 'Collapse' : 'Expand'}</Text>
-                            <Ionicons 
-                                name={expandText ? 'chevron-back' : 'chevron-forward'} 
-                                color={Colors.newsColor} 
-                                style={{marginTop: 3}} 
-                                size={20} />
-                        </Row>
-                    </Pressable>
-                }
-            </Row>
-        </Column>
+        <View style={styles.itemContainer} >
+            <View style={styles.itemTitleContainer} >
+                <Text style={[Typography.semibold, {color: Colors.backgroundColor}]}>{item.title}</Text>
+            </View>
+            <View style={styles.itemBodyContainer}>
+                <Text style={Typography.regular}>{text}</Text>
+                <Row style={{justifyContent: "space-between", marginTop: 10}} >
+                    <Text style={Typography.light}>{formatTimestamp(item.created_at)}</Text>
+                    {
+                        item.message.length > TEXT_LENGHT_LIMIT &&
+                        <Pressable style={{alignItems: "flex-end"}} onPress={handleTextExpand} hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE} >
+                            <Row style={{gap: 4}} >
+                                <Text style={Typography.light}>{expandText ? 'Collapse' : 'Expand'}</Text>
+                                <Ionicons 
+                                    name={iconName} 
+                                    color={Colors.white} 
+                                    style={{marginTop: 3}} 
+                                    size={AppConstants.ICON.SIZE} />
+                            </Row>
+                        </Pressable>
+                    }
+                </Row>
+            </View>
+        </View>
     )
 }
 
-
 const NewsPage = () => {
 
-    const [news, setNews] = useState<Post[]>([])
     const [loading, setLoading] = useState(false)
+    const [posts, setPosts] = useState<Post[]>([])
 
-    const hasResults = useRef(true)
     const isInitialized = useRef(false)
     const page = useRef(0)
+    const hasResults = useRef(true)
 
     useEffect(
         () => {
-            let isCancelled = false
             const init = async () => {
                 setLoading(true)
-                    const p = await spFetchNews(page.current, PAGE_LIMIT)
-                    if (isCancelled) { return }
-                    setNews(p)
-                    hasResults.current = p.length >= PAGE_LIMIT
+                    const f = await spFetchNews(0, PAGE_LIMIT)
+                    hasResults.current = f.length >= PAGE_LIMIT
                     isInitialized.current = true
-                setLoading(true)
+                    setPosts(f)
+                setLoading(false)
             }
             init()
-            return () => { isCancelled = true }
         },
         []
     )
@@ -114,31 +84,31 @@ const NewsPage = () => {
         if (!hasResults.current || !isInitialized.current) { return }
         page.current += 1
         setLoading(true)
-          const n= await spFetchNews(page.current, PAGE_LIMIT)
-          setNews(prev => [...prev, ...n])
-          hasResults.current = n.length >= PAGE_LIMIT
+            const f = await spFetchNews(page.current, PAGE_LIMIT)
+            hasResults.current = f.length >= PAGE_LIMIT
+            setPosts(prev => [...prev, ...f])
         setLoading(false)
     }
 
     const renderFooter = () => {
         if (loading && hasResults.current) {
-            return <CustomActivityIndicator color={Colors.newsColor} />
+            return <CustomActivityIndicator/>
         }
         return <Footer/>
-    }    
+    }
 
     return (
         <SafeAreaView style={AppStyle.safeArea} >
-            <TopBar title='News' titleColor={Colors.newsColor} >
-                <ReturnButton color={Colors.newsColor} />
+            <TopBar title='News' >
+                <ReturnButton/>
             </TopBar>
             <View style={{flex: 1}} >
                 <FlashList
-                    data={news}
+                    data={posts}
                     estimatedItemSize={300}
-                    keyExtractor={(item, index) => item.news_id.toString()}
+                    keyExtractor={(item, index) => index.toString()}
                     onEndReached={onEndReached}
-                    renderItem={({item}) => <News news={item} />}
+                    renderItem={({item}) => <Item item={item} />}
                     ListFooterComponent={renderFooter}
                 />
             </View>
@@ -149,9 +119,24 @@ const NewsPage = () => {
 export default NewsPage
 
 const styles = StyleSheet.create({
-    item: {
-        width: '100%',
-        gap: 20,
-        marginBottom: 32
+    itemContainer: {
+        width: '100%', 
+        marginBottom: 10
+    },
+    itemTitleContainer: {
+        padding: 10, 
+        backgroundColor: Colors.yellow, 
+        borderRadius: AppConstants.COMMON.BORDER_RADIUS, 
+        borderBottomLeftRadius: 0, 
+        borderBottomRightRadius: 0
+    },
+    itemBodyContainer: {
+        padding: 10, 
+        borderWidth: 1, 
+        borderTopWidth: 0, 
+        borderTopLeftRadius: 0, 
+        borderTopRightRadius: 0, 
+        borderColor: Colors.yellow, 
+        borderRadius: AppConstants.COMMON.BORDER_RADIUS
     }
 })

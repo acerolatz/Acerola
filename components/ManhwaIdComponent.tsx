@@ -12,7 +12,7 @@ interface ManhwaIdComponentProps {
 
 const ManhwaIdComponent = ({manhwa_id, position = 'l'}: ManhwaIdComponentProps) => {
 
-    if (AppConstants.COMMON.DEBUG_MODE) {
+    if (AppConstants.DEBUB.ENABLED) {
         return position === 'l' ?        
             <View style={[styles.container, {left: 6}]} >
                 <Text style={AppStyle.textRegular}>{manhwa_id}</Text>
@@ -33,10 +33,10 @@ const styles = StyleSheet.create({
     container: {
         position: 'absolute',
         top: 6, 
-        borderRadius: 4, 
+        borderRadius: 42, 
         width: 42, 
         height: 42, 
-        backgroundColor: Colors.backgroundColor, 
+        backgroundColor: Colors.backgroundSecondary, 
         alignItems: "center", 
         justifyContent: "center"
     }

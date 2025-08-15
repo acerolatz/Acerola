@@ -4,8 +4,10 @@ import { AppStyle } from "@/styles/AppStyle"
 import { useRouter } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
 import { useEffect, useRef, useState } from "react"
-import { FlatList, Pressable, Text } from "react-native"
+import { FlatList, Pressable, StyleSheet, Text } from "react-native"
 import Row from "./util/Row"
+import { Colors } from "@/constants/Colors"
+import { Typography } from "@/constants/typography"
 
 
 interface ManhwaAuthorInfoProps {
@@ -43,8 +45,8 @@ const ManhwaAuthorInfo = ({manhwa}: ManhwaAuthorInfoProps) => {
 
   const renderItem = ({item}: {item: ManhwaAuthor}) => {
     return (
-      <Pressable style={AppStyle.defaultGridItem} onPress={() => openAuthorPage(item)}>
-        <Text style={AppStyle.textRegular} >
+      <Pressable style={styles.container} onPress={() => openAuthorPage(item)}>
+        <Text style={Typography.regular} >
           {item.role == "Author" ? "Story" : "Art"}: {item.name}
         </Text>
       </Pressable>
@@ -67,3 +69,11 @@ const ManhwaAuthorInfo = ({manhwa}: ManhwaAuthorInfoProps) => {
 }
 
 export default ManhwaAuthorInfo;
+
+
+const styles = StyleSheet.create({
+  container: {
+    ...AppStyle.defaultGridItem,
+    backgroundColor: Colors.backgroundSecondary
+  }
+})

@@ -1,6 +1,5 @@
 import { AppConstants } from '@/constants/AppConstants';
 import { Manhwa } from '@/helpers/types';
-import { AppStyle } from '@/styles/AppStyle';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { memo, useCallback } from 'react';
@@ -13,6 +12,8 @@ import {
 import ChapterLink from './chapter/ChapterLink';
 import ManhwaIdComponent from './ManhwaIdComponent';
 import ManhwaStatusComponent from './ManhwaStatusComponent';
+import { Typography } from '@/constants/typography';
+import { LinearGradient } from 'expo-linear-gradient';
 
 
 interface ManhwaCardProps {
@@ -29,8 +30,8 @@ interface ManhwaCardProps {
 
 const ManhwaCard = ({
     manhwa,
-    width = AppConstants.COMMON.MANHWA_COVER_DIMENSION.WIDTH,
-    height = AppConstants.COMMON.MANHWA_COVER_DIMENSION.HEIGHT,
+    width = AppConstants.MANHWA_COVER.WIDTH,
+    height = AppConstants.MANHWA_COVER.HEIGHT,
     marginRight = AppConstants.COMMON.MARGIN,
     marginBottom = 0,
     showChaptersPreview = true,
@@ -46,41 +47,22 @@ const ManhwaCard = ({
     }, [manhwa.manhwa_id]);    
 
     return (
-        <View style={[{marginRight, marginBottom}]} >
-            <Pressable onPress={onPress}>
-                <Image
-                    source={manhwa.cover_image_url} 
-                    contentFit='cover'
-                    style={[{width, height, borderRadius: AppConstants.COMMON.BORDER_RADIUS}]}
-                />
-            </Pressable>
-            <View style={styles.container} >
-                <Text numberOfLines={1} style={[AppStyle.textRegular, {fontSize: 20, maxWidth: '98%'}]}>{manhwa.title}</Text>
-                {
-                    showChaptersPreview && 
-                    manhwa.chapters &&                    
-                    <View style={{gap: 10, marginTop: 2}} >
-                        {manhwa.chapters.map(
-                            (item, index) => 
-                                <ChapterLink 
-                                    shouldShowChapterDate={shouldShowChapterDate} 
-                                    key={item.chapter_id}
-                                    manhwa_title={manhwa.title}
-                                    manhwa_id={manhwa.manhwa_id}
-                                    index={index}
-                                    chapter_name={item.chapter_name}
-                                    chapter_created_at={item.created_at}
-                                    chapter_id={item.chapter_id} />
-                        )}
-                    </View>
-                }
-            </View>
-            {
-                showManhwaStatus &&
-                <ManhwaStatusComponent status={manhwa.status} />
-            }
+        <Pressable onPress={onPress} style={[{width, height, marginRight, marginBottom}]} >
+            <Image
+                source={manhwa.cover_image_url} 
+                contentFit='cover'
+                style={[{width, height, borderRadius: AppConstants.COMMON.BORDER_RADIUS}]}
+                transition={AppConstants.COMMON.IMAGE_TRANSITION}
+            />
+            { showManhwaStatus && <ManhwaStatusComponent status={manhwa.status} /> }
+            <LinearGradient 
+                colors={['transparent', 'transparent', 'rgba(0, 0, 0, 0.7)']} 
+                style={StyleSheet.absoluteFill} />
             <ManhwaIdComponent manhwa_id={manhwa.manhwa_id} position='r' />
-        </View>
+            <View style={styles.manhwaTitleContainer} >
+                <Text style={Typography.semibold}>{manhwa.title}</Text>
+            </View>
+        </Pressable>
     )
 }
 
@@ -88,8 +70,11 @@ const ManhwaCard = ({
 export default memo(ManhwaCard);
 
 
-const styles = StyleSheet.create({    
-    container: {
-        paddingTop: 4        
+const styles = StyleSheet.create({
+    manhwaTitleContainer: {
+        position: 'absolute',
+        bottom: 4,
+        left: 8,
+        paddingRight: 10
     }    
 })

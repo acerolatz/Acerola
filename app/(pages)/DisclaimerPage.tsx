@@ -2,7 +2,7 @@ import ReturnButton from '@/components/buttons/ReturnButton'
 import TopBar from '@/components/TopBar'
 import Footer from '@/components/util/Footer'
 import PageActivityIndicator from '@/components/util/PageActivityIndicator'
-import { Colors } from '@/constants/Colors'
+import { Typography } from '@/constants/typography'
 import { spFetchEulaAndDisclaimer } from '@/lib/supabase'
 import { useTextState } from '@/store/appTextState'
 import { AppStyle } from '@/styles/AppStyle'
@@ -40,10 +40,10 @@ const DisclaimerPage = () => {
     if (loading) {
         return (
             <SafeAreaView style={AppStyle.safeArea} >
-                <TopBar title='EULA' titleColor={Colors.disclaimerColor} >
-                    <ReturnButton color={Colors.disclaimerColor} />
+                <TopBar title='EULA & Disclaimer'>
+                    <ReturnButton/>
                 </TopBar>
-                <PageActivityIndicator color={Colors.disclaimerColor} />
+                <PageActivityIndicator/>
             </SafeAreaView>
         )
     }
@@ -51,14 +51,15 @@ const DisclaimerPage = () => {
     if (EULA && DISCLAIMER) {
         return (
             <SafeAreaView style={AppStyle.safeArea} >
-                <TopBar title='EULA' titleColor={Colors.disclaimerColor} >
-                    <ReturnButton color={Colors.disclaimerColor} />
+                <TopBar title='EULA & Disclaimer'>
+                    <ReturnButton/>
                 </TopBar>
                 <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} >
-                    <Text style={AppStyle.textRegular}>{EULA}</Text>
-                    <View style={{width: '100%', height: 4, borderRadius: 4, marginVertical: 20, backgroundColor: Colors.disclaimerColor}} />
-                    <Text style={[AppStyle.textHeader, {color: Colors.disclaimerColor}]}>Disclaimer</Text>
-                    <Text style={AppStyle.textRegular}>{DISCLAIMER}</Text>
+                    <View style={{gap: 10}} >
+                        <Text style={Typography.regular}>{EULA}</Text>
+                        <TopBar title='Disclaimer'/>
+                        <Text style={Typography.regular}>{DISCLAIMER}</Text>
+                    </View>
                     <Footer/>
                 </ScrollView>
             </SafeAreaView>
@@ -67,8 +68,8 @@ const DisclaimerPage = () => {
 
     return (
         <SafeAreaView style={AppStyle.safeArea} >
-            <TopBar title='EULA' titleColor={Colors.disclaimerColor} >
-                <ReturnButton color={Colors.disclaimerColor} />
+            <TopBar title='EULA & Disclaimer'>
+                <ReturnButton/>
             </TopBar>
         </SafeAreaView>
     )

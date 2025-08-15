@@ -18,7 +18,7 @@ interface UpdateDatabaseProps {
 
 
 const UpdateDatabaseButton = ({
-    iconSize = AppConstants.COMMON.BUTTON.SIZE, 
+    iconSize = AppConstants.ICON.SIZE, 
     iconColor = Colors.white,
     type
 }: UpdateDatabaseProps) => {
@@ -32,7 +32,7 @@ const UpdateDatabaseButton = ({
             return 
         }        
 
-        const shouldUpdate = await dbShouldUpdate(db, type) || AppConstants.COMMON.DEBUG_MODE
+        const shouldUpdate = await dbShouldUpdate(db, type) || AppConstants.DEBUB.ENABLED
         let hasMangas = true
 
         if (!shouldUpdate) {

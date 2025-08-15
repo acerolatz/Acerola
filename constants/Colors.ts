@@ -1,23 +1,19 @@
 
 export const Colors = {
-  
-  black: "#000000",
+    
   almostBlack: "#111419",
-  white: "#fff",
   
   gray: "#2C2C2C",
   gray1: "#3D414A",
 
-  red: "#F24E4E",
-  orange: "#FF6740",
+  red: "#F24E4E",  
   neonRed: "#ef4069",
   purple: "#8746A7",
   yellow: "#FFF7A6",
   silver: "#C3C3C3",
   paleGrey: "#E5E5E5",
   mediumGray: "#696969",
-  uglyBlue: "#4984A2",    
-  green: "#86A788",  
+  uglyBlue: "#4984A2",
   paleYellow: "#FFFDEC",
   clayDust: "#C4A79D",
   frostedBlue: "#D3E0F7",
@@ -46,6 +42,37 @@ export const Colors = {
   documentsColor: "#FF3366",
   backgroundSecondary: "#1f2226",
   sourceCodeColor: 'white',
+
+  white: "#FFFFFF",
+  black: "#000000",
+  gray100: "#F5F5F5",
+  gray200: "#E0E0E0",
+  gray300: "#C0C0C0",
+  gray500: "#808080",
+  gray700: "#4D4D4D",
+  gray900: "#1A1A1A",
+
+  // Primárias
+  primary: "#FFF7A6",
+  secondary: "#FF6F61",
+  accent: "#FFD700",
+
+  // Feedback / status
+  success: "#4CAF50",
+  error: "#F44336",
+  warning: "#FF9800",
+  info: "#2196F3",
+
+  // Transparências úteis
+  overlay50: "rgba(0,0,0,0.5)",
+  overlay80: "rgba(0,0,0,0.8)",
+
+  // text
+  textLightColor: "white",
+  textDarkColor: "#111419",
+
+  green: "rgba(33, 183, 116, 0.7)",
+  orange: "rgba(255, 103, 64, 0.7)",
 
   manhwaStatusTextColor: "#111419",
   manhwaStatusCompleted: "rgba(33, 183, 116, 0.7)",

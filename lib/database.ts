@@ -153,9 +153,9 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       INSERT INTO 
         update_history (name, refresh_cycle)
       VALUES
-        ('server', ${AppConstants.COMMON.SERVER_UPDATE_RATE}),
-        ('client', ${AppConstants.COMMON.CLIENT_UPDATE_RATE}),
-        ('collections', ${AppConstants.COMMON.COLLECTIONS_UPDATE_RATE})
+        ('server', ${AppConstants.DATABASE.UPDATE_INTERVAL.SERVER}),
+        ('client', ${AppConstants.DATABASE.UPDATE_INTERVAL.CLIENT}),
+        ('collections', ${AppConstants.DATABASE.UPDATE_INTERVAL.COLLECTIONS})
       ON CONFLICT 
         (name)
       DO UPDATE SET 
@@ -164,7 +164,7 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       INSERT INTO 
         update_history (name, refresh_cycle)
       VALUES
-        ('cache', ${AppConstants.COMMON.DEFAULT_CACHE_SIZE})
+        ('cache', ${AppConstants.DATABASE.SIZE.CACHE})
       ON CONFLICT  
         (name)
       DO NOTHING;
@@ -204,10 +204,10 @@ export async function dbGetCacheMaxSize(db: SQLite.SQLiteDatabase): Promise<numb
   ).catch(error => console.log("error dbGetCacheMaxSize", error))
 
   if (!r) {
-    await dbSetCacheSize(db, AppConstants.COMMON.DEFAULT_CACHE_SIZE)
+    await dbSetCacheSize(db, AppConstants.DATABASE.SIZE.CACHE)
   }
 
-  return r ? r.refresh_cycle : AppConstants.COMMON.DEFAULT_CACHE_SIZE;
+  return r ? r.refresh_cycle : AppConstants.DATABASE.SIZE.CACHE;
 }
 
 
@@ -1515,4 +1515,51 @@ export async function dbCreateSafeModePassword(db: SQLite.SQLiteDatabase, passwo
 export async function dbCheckPassword(db: SQLite.SQLiteDatabase, password: string): Promise<boolean> {
   const p = await dbReadSafeModePassword(db)
   return p === password
+}
+
+
+export async function dbResetApp(db: SQLite.SQLiteDatabase) {
+  await db.execAsync(
+    `
+    INSERT OR REPLACE INTO 
+      app_info (name, value)
+    VALUES 
+      ('version', '${AppConstants.COMMON.APP_VERSION}');
+
+    INSERT INTO app_info 
+      (name, value)
+    VALUES
+      ('device', 'null'),
+      ('last_sync_time', ''),
+      ('should_ask_for_donation', '1'),
+      ('password', ''),
+      ('is_safe_mode_on', '0')
+    ON CONFLICT 
+      (name)
+    DO UPDATE SET
+      value = EXCLUDED.value;
+
+    INSERT INTO app_numeric_info
+      (name, value)        
+    VALUES
+      ('images', 0),
+      ('current_chapter_milestone', ${AppConstants.COMMON.CHAPTER_START_MILESTONE})
+    ON CONFLICT 
+      (name)
+    DO UPDATE SET
+      value = EXCLUDED.value;
+
+    INSERT INTO 
+      update_history (name, refresh_cycle)
+    VALUES
+      ('cache', ${AppConstants.DATABASE.SIZE.CACHE})
+    ON CONFLICT  
+      (name)
+    DO NOTHING;
+    `
+  ).catch(error => console.log("error dbResetApp", error))
+  await dbCleanTable(db, 'chapters')
+  await dbCleanTable(db, 'reading_status')
+  await dbCleanTable(db, 'reading_history')
+  await dbCleanTable(db, 'todos')
 }

@@ -18,26 +18,24 @@ import {
 import CloseBtn from './buttons/CloseButton'
 import TopBar from './TopBar'
 import Footer from './util/Footer'
+import { Typography } from '@/constants/typography'
 
 
 interface OptionProps {
     onPress: () => void
-    backgroundColor: string
     title: string
     iconName: string
 }
 
 
-const Option = ({onPress, title, iconName, backgroundColor}: OptionProps) => {    
+const Option = ({onPress, title, iconName}: OptionProps) => {    
     return (
         <Pressable 
             onPress={onPress}
             style={styles.optionButton} 
-            hitSlop={AppConstants.COMMON.HIT_SLOP.NORMAL} >
-            <View style={{padding: 8, backgroundColor, borderRadius: AppConstants.COMMON.BORDER_RADIUS}} >
-                <Ionicons name={iconName as any} size={26} color={Colors.backgroundColor} />
-            </View>
-            <Text style={[[AppStyle.textRegular, {fontSize: 16}]]}>{title}</Text>
+            hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE} >
+            <Ionicons name={iconName as any} size={AppConstants.ICON.SIZE} color={Colors.primary} />
+            <Text style={Typography.regular}>{title}</Text>
         </Pressable>
     )
 }
@@ -74,16 +72,13 @@ const openReddit = async () => {
     await openUrl(AppConstants.URLS.REDDIT)
 }
 
-const openNews = () => {
-    router.navigate("/(pages)/NewsPage")
-}
-
-const openSourceCode = async () => {
-    router.navigate("/(pages)/SourceCodePage")
-}
 
 const openReleases = () => {
     router.navigate("/(pages)/ReleasesPage")
+}
+
+const openNewsPage = () => {
+    router.navigate("/(pages)/NewsPage")
 }
 
 
@@ -100,102 +95,86 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
             pathname: "/(pages)/Settings",
             params: { cache_size }
         })
-    }
+    }    
         
     return (
         <SafeAreaView style={AppStyle.safeArea} >
-            <TopBar title='Menu' titleColor={Colors.yellow} >
-                <CloseBtn onPress={closeMenu} color={Colors.yellow} />
+            <TopBar title='Menu'>
+                <CloseBtn onPress={closeMenu} />
             </TopBar>
             <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} >
                 <View style={styles.container} >
-                    <Option 
-                        onPress={libraryPage} 
-                        title='Library' 
-                        iconName='library-outline'                        
-                        backgroundColor={Colors.libraryColor}
-                    />                
+                    <View style={{gap: AppConstants.COMMON.GAP * 2}} > 
                     
-                    <Option 
-                        onPress={readingHistoryPage} 
-                        title='Reading History' 
-                        iconName='book-outline'                        
-                        backgroundColor={Colors.readingHistoryColor}
-                    />
+                        <Option 
+                            onPress={libraryPage} 
+                            title='Library'
+                            iconName='library-outline'
+                        />                
+                        
+                        <Option 
+                            onPress={readingHistoryPage} 
+                            title='Reading History' 
+                            iconName='book-outline'
+                        />
 
-                    <Option 
-                        onPress={openDonate} 
-                        title='Donate' 
-                        iconName='cash-outline'                        
-                        backgroundColor={Colors.donateColor}
-                    />
+                        <Option 
+                            onPress={openDonate} 
+                            title='Donate' 
+                            iconName='cash-outline'
+                        />
 
-                    <Option 
-                        onPress={openNews} 
-                        title='News' 
-                        iconName='newspaper-outline'                        
-                        backgroundColor={Colors.newsColor}
-                    />
+                        <Option 
+                            onPress={openNewsPage} 
+                            title='News' 
+                            iconName='newspaper-outline'
+                        />
 
-                    <Option 
-                        onPress={openManhwaRequest} 
-                        title='Request Manhwa'
-                        iconName='megaphone-outline'
-                        backgroundColor={Colors.requestMangaColor}
-                    />
+                        <Option 
+                            onPress={openManhwaRequest} 
+                            title='Request Manhwa'
+                            iconName='megaphone-outline'
+                        />
 
-                    <Option 
-                        onPress={openReleases} 
-                        title='Releases' 
-                        iconName='git-branch-outline'                        
-                        backgroundColor={Colors.releasesColor}
-                    />
+                        <Option 
+                            onPress={openReleases} 
+                            title='Releases' 
+                            iconName='git-branch-outline'
+                        />
 
-                    <Option 
-                        onPress={openBugReport} 
-                        title='Bug Report' 
-                        iconName='bug-outline'                        
-                        backgroundColor={Colors.BugReportColor}
-                    />
+                        <Option 
+                            onPress={openBugReport} 
+                            title='Bug Report' 
+                            iconName='bug-outline'
+                        />
 
-                    <Option 
-                        onPress={scansPage} 
-                        title='Scans' 
-                        iconName='earth-outline'                        
-                        backgroundColor={Colors.scansColor}
-                    />
+                        <Option 
+                            onPress={scansPage} 
+                            title='Scans' 
+                            iconName='earth-outline'
+                        />
 
-                    <Option 
-                        onPress={openReddit} 
-                        title='Reddit' 
-                        iconName='logo-reddit'                        
-                        backgroundColor={Colors.redditColor}
-                    />
+                        <Option 
+                            onPress={openReddit} 
+                            title='Reddit'
+                            iconName='logo-reddit'
+                        />
 
-                    <Option 
-                        onPress={openSourceCode} 
-                        title='Source Code' 
-                        iconName='code-slash-outline'                        
-                        backgroundColor={Colors.sourceCodeColor}
-                    />
+                        <Option 
+                            onPress={openSettings} 
+                            title='Settings' 
+                            iconName='settings-outline'
+                        />                              
 
-                    <Option 
-                        onPress={openDisclaimer} 
-                        title='EULA / Disclaimer' 
-                        iconName='reader-outline'                        
-                        backgroundColor={Colors.disclaimerColor}
-                    />
-
-                    <Option 
-                        onPress={openSettings} 
-                        title='Settings' 
-                        iconName='settings-outline'                        
-                        backgroundColor={'white'}
-                    />
-                    
-                    <Footer/>
-                </View>            
+                        <Footer height={30} />
+                    </View>
+                </View>
             </ScrollView>
+            <Pressable 
+                onPress={openDisclaimer} style={{paddingBottom: 62, alignItems: "center"}} 
+                hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE} >
+                <Text style={{...Typography.light, textDecorationLine: 'underline'}} >eula & disclaimer</Text>
+            </Pressable>
         </SafeAreaView>
     )
 }
@@ -205,11 +184,11 @@ export default LateralMenu
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        gap: 12
+        justifyContent: "space-between"
     },
     optionButton: {
         width: '100%',
-        gap: 12,
+        gap: AppConstants.COMMON.GAP,
         flexDirection: 'row',
         alignItems: "center",
         justifyContent: "flex-start"

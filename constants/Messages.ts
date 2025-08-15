@@ -7,6 +7,17 @@ export const ToastMessages = {
             text2: "You have no internet!", 
             type: "info"
         },
+        UNABLE_TO_LOAD_IMAGES_INTERNET: {
+            text1: "Unable to load images", 
+            text2: "Please check your internet connection", 
+            type: "error",
+            visibilityTime: 3500
+        },
+        UNABLE_TO_LOAD_IMAGES: {
+            text1: "Unable to load images", 
+            type: "error",
+            visibilityTime: 3500
+        },        
         SYNC_LOCAL_DATABASE: {
             text1: "Synchronizing local database...", 
             type: "info"

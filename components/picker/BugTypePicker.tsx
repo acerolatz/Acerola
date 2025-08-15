@@ -4,20 +4,21 @@ import { AppConstants } from '@/constants/AppConstants'
 import { AppStyle } from '@/styles/AppStyle'
 import { BugType } from '@/helpers/types'
 import { Colors } from '@/constants/Colors'
+import { Typography } from '@/constants/typography'
 
 
 const BugItem = ({item, isSelected, onChange}: {item: BugType, isSelected: boolean, onChange: (b: BugType) => any}) => {
     
     const onPress = () => { onChange(item) }
 
-    const backgroundColor = isSelected ? Colors.BugReportColor : Colors.backgroundSecondary
+    const backgroundColor = isSelected ? Colors.yellow : Colors.backgroundSecondary
     const color = isSelected ? Colors.backgroundColor : Colors.white
 
     return (
         <Pressable
-        onPress={onPress}
-        style={[ styles.bugItem, {backgroundColor}]} >
-            <Text style={[AppStyle.textRegular, {color}]} >{item}</Text>
+            onPress={onPress}
+            style={{...AppStyle.defaultGridItem, backgroundColor}} >
+            <Text style={{...Typography.regular, color}} >{item}</Text>
         </Pressable>
     )
 }
@@ -40,15 +41,6 @@ export default BugTypePicker
 
 const styles = StyleSheet.create({
     container: {
-        width: '100%', 
-        height: 52
-    },
-    bugItem: {
-        height: 42,
-        alignItems: "center", 
-        justifyContent: "center", 
-        paddingHorizontal: 12, 
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
-        marginRight: AppConstants.COMMON.MARGIN,
+        width: '100%'        
     }
 })

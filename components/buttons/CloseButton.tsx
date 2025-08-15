@@ -6,35 +6,20 @@ import { Pressable, StyleProp, StyleSheet, ViewStyle } from 'react-native'
 
 
 interface CloseBtnProps {
-    onPress: () => void
-    style?: StyleProp<ViewStyle>
+    onPress: () => void   
     size?: number
     color?: string
 }
 
 
-const CloseBtn = ({
-  onPress, 
-  style,
-  size = 28, 
-  color = Colors.white
-}: CloseBtnProps) => {
+const CloseBtn = ({onPress, size = 24, color = Colors.yellow}: CloseBtnProps) => {
   return (
     <Pressable
         onPress={onPress}
-        hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE}
-        style={[styles.container, style]}>
-        <Ionicons name='close' size={size} color={color} />
+        hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE}>
+        <Ionicons name='close-outline' size={size} color={color} />
     </Pressable>
   )
 }
 
 export default CloseBtn
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 8, 
-    borderRadius: 32, 
-    backgroundColor: Colors.backgroundColor
-  }
-})

@@ -19,6 +19,8 @@ import { AppConstants } from '@/constants/AppConstants'
 import CustomActivityIndicator from '../util/CustomActivityIndicator'
 import { FlashList } from '@shopify/flash-list'
 import { wp } from '@/helpers/util'
+import { Typography } from '@/constants/typography'
+import { LinearGradient } from 'expo-linear-gradient'
 
 
 
@@ -71,12 +73,14 @@ const ManhwaRandomCard = ({card}: {card: ManhwaCard}) => {
                 source={card.image_url} 
                 style={{
                     width: card.normalizedWidth,
-                    height: card.normalizedHeight, 
+                    height: card.normalizedHeight,
                     borderRadius: AppConstants.COMMON.BORDER_RADIUS
                 }} 
+                transition={AppConstants.COMMON.IMAGE_TRANSITION}
                 contentFit='cover' />
+            <LinearGradient colors={['transparent', 'transparent', 'rgba(0, 0, 0, 0.6)']} style={StyleSheet.absoluteFill} />
             <View style={styles.manhwaTitleContainer} >
-                <Text numberOfLines={1} style={[AppStyle.textRegular, {color: Colors.backgroundColor}]}>{card.title}</Text>
+                <Text style={Typography.semibold}>{card.title}</Text>
             </View>
         </Pressable>
     )
@@ -111,12 +115,12 @@ const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
                 <Title title='Random'/>
                 <RotatingButton onPress={debounceReload} />
             </Row>
-            <View style={{flex: 1, height: AppConstants.COMMON.RANDOM_MANHWAS.MAX_HEIGHT}} >
+            <View style={styles.gridContainer} >
                 <FlashList
                     ref={flatListRef}
                     data={cards}
                     ItemSeparatorComponent={() => <View style={{ width: AppConstants.COMMON.MARGIN }} />}
-                    drawDistance={wp(150)}
+                    drawDistance={wp(120)}
                     onEndReachedThreshold={3}
                     estimatedItemSize={AppConstants.COMMON.RANDOM_MANHWAS.MAX_WIDTH}
                     showsHorizontalScrollIndicator={false}
@@ -134,18 +138,16 @@ export default RandomCardsGrid
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        gap: 10
+        gap: AppConstants.COMMON.GAP
+    },    
+    gridContainer: {
+        flex: 1, 
+        height: AppConstants.COMMON.RANDOM_MANHWAS.MAX_HEIGHT
     },
     manhwaTitleContainer: {
-        maxWidth: '90%', 
-        position: 'absolute', 
-        top: 6, 
-        left: 6, 
-        paddingHorizontal: 12, 
-        paddingVertical: 8, 
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS, 
-        backgroundColor: Colors.yellow, 
-        borderWidth: 1, 
-        borderColor: Colors.backgroundColor
+        position: 'absolute',
+        bottom: 30,
+        left: 8,
+        paddingRight: 10
     }
 })

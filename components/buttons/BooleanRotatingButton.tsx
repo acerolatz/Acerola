@@ -15,7 +15,7 @@ interface BooleanRotatingButtonProps {
 
 const BooleanRotatingButton = ({
     onPress, 
-    iconSize = AppConstants.COMMON.BUTTON.SIZE, 
+    iconSize = AppConstants.ICON.SIZE, 
     iconColor = Colors.white, 
     iconName = 'sync'
 }: BooleanRotatingButtonProps) => {
@@ -51,8 +51,8 @@ const BooleanRotatingButton = ({
         if (rotateIsActive.current) { return }
         rotateIsActive.current = true
         setIsRotating(true)
-        await onPress()
-        rotateIsActive.current = false
+            await onPress()
+            rotateIsActive.current = false
         setIsRotating(false)
     }
 

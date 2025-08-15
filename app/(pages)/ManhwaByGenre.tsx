@@ -63,8 +63,8 @@ const MangaByGenre = () => {
 
     return (
         <SafeAreaView style={AppStyle.safeArea}>
-            <TopBar title={genre} titleColor={Colors.yellow} >
-                <ReturnButton color={Colors.yellow} />
+            <TopBar title={genre} >
+                <ReturnButton/>
             </TopBar>
             <ManhwaGrid
                 manhwas={manhwas}

@@ -1,13 +1,8 @@
-// ChapterImageItem.tsx
 import { AppConstants } from '@/constants/AppConstants';
 import { ChapterImage } from '@/helpers/types';
-import { wp } from '@/helpers/util';
 import { Image } from 'expo-image';
 import React from 'react';
 import { PixelRatio, View } from 'react-native';
-
-
-const MAX_WIDTH = wp(100);
 
 
 type ChapterImageItemProps = {
@@ -25,16 +20,20 @@ const ChapterImageItem = React.memo(({ item }: ChapterImageItemProps) => {
     return <View style={{ width: '100%', height: AppConstants.PAGES.CHAPTER.FOOTER_HEIGHT }} />;
   }
 
-  const width = Math.min(item.width, MAX_WIDTH);
+  const width = Math.min(item.width, AppConstants.COMMON.SCREEN_WIDTH);
   const height = PixelRatio.roundToNearestPixel((width * item.height) / item.width);
   
   return (
     <Image
-      style={{ width, height }}
+      style={{ width, height, alignSelf: "center" }}
       source={item.image_url}
       contentFit="cover"
+      placeholder={require("@/assets/images/chapter-image-placeholder.png")}
+      placeholderContentFit='cover'
+      transition={200}
     />
   );
 });
+
 
 export default ChapterImageItem;

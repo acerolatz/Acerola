@@ -7,23 +7,31 @@ import Title from '../Title'
 import ViewAllButton from '../buttons/ViewAllButton'
 import Row from '../util/Row'
 import { AppConstants } from '@/constants/AppConstants'
+import { hp, wp } from '@/helpers/util'
 
 
-const Item = ({item} : {item: Manhwa}) => {
+interface ItemProps {
+    manhwa_id: number
+    image_url: string
+}
+
+
+const Item = ({manhwa_id, image_url} : ItemProps) => {
 
     const onPress = useCallback(() => {
         router.push({
             pathname: '/(pages)/ManhwaPage',
-            params: { manhwa_id: item.manhwa_id }
+            params: { manhwa_id: manhwa_id }
         });
-    }, [item.manhwa_id]);
+    }, [manhwa_id]);
 
     return (
         <Pressable onPress={onPress} style={{marginRight: AppConstants.COMMON.MARGIN}} >
             <Image 
                 style={styles.image} 
+                source={image_url} 
                 contentFit='cover' 
-                source={item.cover_image_url} />
+                transition={AppConstants.COMMON.IMAGE_TRANSITION} />
         </Pressable>
     )   
 }
@@ -51,7 +59,7 @@ const ContinueReadingGrid = ({manhwas}: {manhwas: Manhwa[]}) => {
                 horizontal={true}
                 showsHorizontalScrollIndicator={false}
                 keyExtractor={(item: Manhwa) => item.manhwa_id.toString()}
-                renderItem={({item}) => <Item item={item} />}
+                renderItem={({item}) => <Item manhwa_id={item.manhwa_id} image_url={item.cover_image_url} />}
             />
         </View>
     )
@@ -62,11 +70,13 @@ export default ContinueReadingGrid
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        gap: 10
+        gap: AppConstants.COMMON.GAP
     },
     image: {
-        width: 80, 
-        height: 120, 
+        width: wp(20),
+        height: hp(14),
+        maxWidth: AppConstants.MANHWA_COVER.WIDTH,
+        maxHeight: AppConstants.MANHWA_COVER.HEIGHT,
         borderRadius: AppConstants.COMMON.BORDER_RADIUS
     }
 })

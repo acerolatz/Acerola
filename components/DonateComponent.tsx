@@ -7,6 +7,7 @@ import Ionicons from '@expo/vector-icons/Ionicons'
 import { Colors } from '@/constants/Colors'
 import { copyToClipboard, openUrl } from '@/helpers/util'
 import { AppConstants } from '@/constants/AppConstants'
+import { Typography } from '@/constants/typography'
 
 
 const DonateComponent = ({item}: {item: DonateMethod}) => {  
@@ -28,10 +29,10 @@ const DonateComponent = ({item}: {item: DonateMethod}) => {
     return (
       <Pressable onPress={() => onPress(item)} style={styles.donateButton} >
         <Column style={styles.donateTitleContainer} >
-          <Text style={[AppStyle.textHeader, {color: Colors.backgroundColor}]}>{item.method}</Text>
+          <Text style={[Typography.semibold, {color: Colors.backgroundColor}]}>{item.method}</Text>
           <Ionicons name={iconName as any} size={28} color={Colors.backgroundColor} />
         </Column>
-        <Text adjustsFontSizeToFit={true} style={[AppStyle.textRegular, {color: Colors.backgroundColor}]}>{item.value}</Text>
+        <Text style={[Typography.regular, {color: Colors.backgroundColor}]}>{item.value}</Text>
       </Pressable>
     )
 }
@@ -45,14 +46,13 @@ const styles = StyleSheet.create({
     maxWidth: '100%', 
     padding: 10,
     borderRadius: AppConstants.COMMON.BORDER_RADIUS, 
-    backgroundColor: Colors.donateColor, 
+    backgroundColor: Colors.yellow, 
     marginBottom: AppConstants.COMMON.MARGIN      
   },
   donateTitleContainer: {
     width: "100%", 
     flexDirection: 'row', 
-    alignItems: "center", 
-    gap: 10, 
+    alignItems: "center",
     justifyContent: "space-between"
   }
 })

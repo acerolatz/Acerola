@@ -1,24 +1,42 @@
-import { AppRelease } from '@/helpers/types'
+import { ReleaseWrapper } from '@/helpers/types'
 import { create } from 'zustand'
 
 
 type AppReleaseState = {
     localVersion: string | null
     setLocalVersion: (version: string | null) => void
-    allReleases: AppRelease[]
-    setAllReleases: (allReleases: AppRelease[]) => void
+    
+    liveVersion: string | null
+    setLiveVersion: (liveVersion: string | null) => any
+    
+    releasesInfo: ReleaseWrapper
+    setReleasesInfo: (releasesInfo: ReleaseWrapper) => void
+
+    shouldShowNewAppVersionWarning: boolean,
+    setShouldShowNewAppVersionWarning: (shouldShowNewAppVersionWarning: boolean) => any
 }
 
 
 export const useAppVersionState = create<AppReleaseState>(
     (set) => ({
+        liveVersion: null,
+        setLiveVersion: (liveVersion: string | null) => {
+            (set((state) => {return {...state, liveVersion}}))
+        },
+        
         localVersion: null,
         setLocalVersion: (localVersion: string | null) => {
             (set((state) => {return {...state, localVersion}}))
         },
-        allReleases: [],
-        setAllReleases: (allReleases: AppRelease[]) => {
-            (set((state) => {return {...state, allReleases}}))
-        }
+        
+        releasesInfo: {releases: [], source: []},
+        setReleasesInfo: (releasesInfo: ReleaseWrapper) => {
+            (set((state) => {return {...state, releasesInfo}}))
+        },
+
+        shouldShowNewAppVersionWarning: true,
+        setShouldShowNewAppVersionWarning: (shouldShowNewAppVersionWarning: boolean) => {
+            (set((state) => {return {...state, shouldShowNewAppVersionWarning}}))
+        },
     })
 )

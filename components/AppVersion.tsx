@@ -1,10 +1,9 @@
-import { Colors } from '@/constants/Colors'
+import { Typography } from '@/constants/typography'
 import { dbGetAppVersion } from '@/lib/database'
 import { useAppVersionState } from '@/store/appVersionState'
-import { AppStyle } from '@/styles/AppStyle'
 import { useSQLiteContext } from 'expo-sqlite'
 import React, { useEffect } from 'react'
-import { Text, View } from 'react-native'
+import { Text } from 'react-native'
 
 const AppVersion = () => {
     
@@ -27,11 +26,9 @@ const AppVersion = () => {
     }
 
     return (
-        <View>
-            <Text style={[AppStyle.textRegular, {marginBottom: 10, color: Colors.releasesColor}]} >
-                Your app version is {localVersion}
-            </Text>
-        </View>        
+        <Text style={Typography.light} >
+            Your app version is {localVersion}
+        </Text>
     )
 }
 

@@ -88,9 +88,8 @@ const RootLayout = () => {
           <Stack.Screen name='(pages)/DonatePage' options={{headerShown: false}} />              
           <Stack.Screen name='(pages)/RequestManhwaPage' options={{headerShown: false}} />
           <Stack.Screen name='(pages)/ReleasesPage' options={{headerShown: false}} />
-          <Stack.Screen name='(pages)/SourceCodePage' options={{headerShown: false}} />
-          <Stack.Screen name='(pages)/NewsPage' options={{headerShown: false}} />
           <Stack.Screen name='(pages)/DisclaimerPage' options={{headerShown: false}} />
+          <Stack.Screen name='(pages)/NewsPage' options={{headerShown: false}} />
           <Stack.Screen name='(pages)/Settings' options={{headerShown: false}} />              
         </Stack>
         <Toast
@@ -112,6 +111,7 @@ const styles = StyleSheet.create({
   toast: {
     width: AppConstants.TOAST.WIDTH,
     height: AppConstants.TOAST.HEIGHT,
+    maxWidth: 500,
     alignItems: "flex-start",
     justifyContent: "center",
     paddingLeft: 12,
@@ -129,3 +129,4 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: AppConstants.COMMON.BORDER_RADIUS
   }
 })
+

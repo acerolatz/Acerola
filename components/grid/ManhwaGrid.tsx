@@ -15,7 +15,6 @@ interface MangaGridProps {
     onEndReached?: () => void
     loading?: boolean
     hasResults?: boolean
-    paddingHorizontal?: number
     numColumns?: number
     shouldShowChapterDate?: boolean
     showChaptersPreview?: boolean
@@ -33,7 +32,6 @@ const ManhwaGrid = ({
     listHeader,
     loading = false, 
     hasResults = true,
-    paddingHorizontal = wp(4),
     numColumns = 2,
     shouldShowChapterDate = true,
     showsVerticalScrollIndicator = true,
@@ -43,10 +41,10 @@ const ManhwaGrid = ({
     showManhwaStatus = true
 }: MangaGridProps) => {
 
-    const width = (wp(46) - 4)
+    const width = (wp(46) - AppConstants.COMMON.GAP / 2)
     const height = getRelativeHeight(
-        AppConstants.COMMON.MANHWA_COVER_DIMENSION.WIDTH,
-        AppConstants.COMMON.MANHWA_COVER_DIMENSION.HEIGHT,
+        AppConstants.MANHWA_COVER.WIDTH,
+        AppConstants.MANHWA_COVER.HEIGHT,
         width
     )
 
@@ -60,8 +58,7 @@ const ManhwaGrid = ({
                 showManhwaStatus={showManhwaStatus}
                 width={width} 
                 height={height}
-                marginRight={AppConstants.COMMON.MARGIN}
-                marginBottom={10}
+                marginBottom={AppConstants.COMMON.GAP / 2}
                 manhwa={item}
             />
         )
@@ -90,7 +87,7 @@ const ManhwaGrid = ({
                     estimatedItemSize={estimatedItemSize}
                     drawDistance={hp(150)}
                     onEndReached={onEndReached}
-                    scrollEventThrottle={4}
+                    scrollEventThrottle={4}                    
                     onEndReachedThreshold={2}
                     renderItem={renderItem}
                     ListHeaderComponent={listHeader}

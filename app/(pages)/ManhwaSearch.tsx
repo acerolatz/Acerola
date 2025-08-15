@@ -20,11 +20,11 @@ import { SafeAreaView, View } from 'react-native'
 const PAGE_LIMIT = 32
 
 const {width, height} = getItemGridDimensions(
-  AppConstants.COMMON.PADDING_HORIZONTAL,
+  AppConstants.COMMON.SCREEN_PADDING_HORIZONTAL,
   10,
   2,
-  AppConstants.COMMON.MANHWA_COVER_DIMENSION.WIDTH,
-  AppConstants.COMMON.MANHWA_COVER_DIMENSION.HEIGHT
+  AppConstants.MANHWA_COVER.WIDTH,
+  AppConstants.MANHWA_COVER.HEIGHT
 )
 
 const estimatedItemSize = height + 20

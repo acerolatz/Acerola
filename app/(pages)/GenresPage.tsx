@@ -3,8 +3,9 @@ import ReturnButton from '@/components/buttons/ReturnButton'
 import Footer from '@/components/util/Footer'
 import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
+import { Typography } from '@/constants/typography'
 import { Genre } from '@/helpers/types'
-import { wp } from '@/helpers/util'
+import { hp, wp } from '@/helpers/util'
 import { dbReadGenres } from '@/lib/database'
 import { AppStyle } from '@/styles/AppStyle'
 import { router } from 'expo-router'
@@ -22,7 +23,7 @@ import {
 
 const NUM_COLUMNS = 2
 const ITEM_WIDTH = (wp(92) - AppConstants.COMMON.MARGIN * (NUM_COLUMNS - 1)) / NUM_COLUMNS
-const ITEM_HEIGHT = 52
+const ITEM_HEIGHT = hp(8)
 
 
 const GenresPage = () => {
@@ -56,7 +57,7 @@ const GenresPage = () => {
             <Pressable
                 onPress={() => onPress(item)}
                 style={[styles.item, {marginRight: index % 2 == 0 ? AppConstants.COMMON.MARGIN : 0}]} >
-                <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor, textAlign: "center", alignSelf: "center"}]} >{item.genre}</Text>
+                <Text style={styles.itemText} >{item.genre}</Text>
             </Pressable>
         )
     }    
@@ -74,7 +75,7 @@ const GenresPage = () => {
                     showsVerticalScrollIndicator={false}
                     initialNumToRender={30}
                     renderItem={renderItem}
-                    ListFooterComponent={<Footer/>}
+                    ListFooterComponent={<Footer height={hp(12)}/>}
                 />
             </View>
         </SafeAreaView>
@@ -88,10 +89,17 @@ const styles = StyleSheet.create({
     item: {
         width: ITEM_WIDTH,
         height: ITEM_HEIGHT,
+        paddingHorizontal: 10,
         alignItems: "center", 
         justifyContent: "center",         
         backgroundColor: Colors.yellow, 
         borderRadius: AppConstants.COMMON.BORDER_RADIUS,
         marginBottom: AppConstants.COMMON.MARGIN
+    },
+    itemText: {
+        ...Typography.regular, 
+        color: Colors.backgroundColor, 
+        textAlign: "center", 
+        alignSelf: "center"
     }
 })

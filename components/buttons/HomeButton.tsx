@@ -15,7 +15,7 @@ interface HomeButtonProps {
 }
 
 const HomeButton = ({
-  size = AppConstants.COMMON.BUTTON.SIZE, 
+  size = AppConstants.ICON.SIZE, 
   color = Colors.white, 
   iconName = 'home', 
   backgroundColor = 'transparent'

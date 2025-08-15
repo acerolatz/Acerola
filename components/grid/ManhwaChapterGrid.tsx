@@ -8,88 +8,15 @@ import { router, useFocusEffect } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
 import { useCallback, useEffect, useState } from "react"
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native"
-import CButton from "../buttons/CButton"
 import Row from "../util/Row"
 import { AppConstants } from "@/constants/AppConstants"
-import { getChapterGridNumColumns, wp } from "@/helpers/util"
+import { wp } from "@/helpers/util"
+import { Typography } from "@/constants/typography"
+import ChapterPageSelector from "../chapter/ChapterPageSelector"
+import ChapterGridItem from "../chapter/ChapterGridItem"
 
 
 const PAGE_LIMIT = 96
-const NUM_COLUMNS = getChapterGridNumColumns()
-const ITEM_SIZE = (wp(92) - AppConstants.COMMON.MARGIN * (NUM_COLUMNS - 1)) / NUM_COLUMNS
-
-
-interface ChapterItemProps {
-  isReaded: boolean
-  chapterName: string
-  index: number
-  manhwaColor: string
-  onPress: (index: number) => void
-}
-
-
-const ChapterItem = ({
-  isReaded,    
-  chapterName,
-  index,
-  manhwaColor,
-  onPress  
-}: ChapterItemProps) => {
-  const backgroundColor = isReaded ? manhwaColor : Colors.backgroundSecondary
-  const color = isReaded ? Colors.backgroundSecondary : Colors.white
-
-  return (
-    <Pressable
-      onPress={() => onPress(index)}
-      style={[styles.chapterItem, {backgroundColor}]} >
-        <Text style={[AppStyle.textRegular, {color, fontSize: 14}]}>{chapterName}</Text>
-    </Pressable>
-  )
-}
-
-
-interface ChapterPageSelectorProps {
-  textColor: string
-  manhwaColor: string
-  currentPage: number
-  numChapters: number
-  moveToPreviousChapterPage: () => any
-  moveToNextChapterPage: () => any
-}
-
-const ChapterPageSelector = ({
-  textColor,
-  manhwaColor,  
-  currentPage,
-  moveToPreviousChapterPage,
-  moveToNextChapterPage,
-  numChapters
-}: ChapterPageSelectorProps) => {
-  return (
-    <View style={{width: '100%', gap: AppConstants.COMMON.MARGIN, flexDirection: 'row'}} >
-      <View style={{flex: 1, alignItems: "center", justifyContent: "center", height: 52, borderRadius: AppConstants.COMMON.BORDER_RADIUS, backgroundColor: manhwaColor}} >
-          <Text style={[AppStyle.textRegular, {color: Colors.backgroundColor}]} >Chapters: {numChapters}</Text>
-      </View>
-      <View style={{flex: 1, gap: AppConstants.COMMON.MARGIN, flexDirection: 'row'}} >
-        <CButton 
-          style={{flex: 1, height: 52, borderRadius: AppConstants.COMMON.BORDER_RADIUS, backgroundColor: manhwaColor}} 
-          iconColor={textColor}
-          iconName="chevron-back-outline"
-          onPress={moveToPreviousChapterPage}
-        />
-        <View style={{flex: 1, alignItems: "center", justifyContent: "center", height: 52, borderRadius: AppConstants.COMMON.BORDER_RADIUS, borderWidth: 1, borderColor: manhwaColor}}>
-          <Text style={[AppStyle.textRegular, {color: manhwaColor}]}>{currentPage + 1}</Text>
-        </View>
-        <CButton 
-          style={{flex: 1, height: 52, borderRadius: AppConstants.COMMON.BORDER_RADIUS, backgroundColor: manhwaColor}} 
-          iconColor={textColor}
-          iconName="chevron-forward-outline"
-          onPress={moveToNextChapterPage}
-          />
-      </View>
-    </View>
-  )
-}
 
 
 interface ManhwaChapterGridProps {
@@ -187,7 +114,7 @@ const ManhwaChapterGrid = ({
   if (loading) {
     return (
       <View style={{width: '100%', alignItems: "center", justifyContent: "center"}} >
-        <ActivityIndicator size={'large'} color={manhwa.color} />
+        <ActivityIndicator size={AppConstants.ICON.SIZE} color={manhwa.color} />
       </View>
     )
   }  
@@ -198,28 +125,27 @@ const ManhwaChapterGrid = ({
 
   return (    
     <View style={styles.container} >
-      <Row style={{gap: 6}} >
-        <Pressable onPress={readFirst} style={[styles.button, {backgroundColor: manhwa.color}]}>
-          <Text style={[AppStyle.textRegular, {color: textColor}]}>Read First</Text>
+      <Row style={{gap: AppConstants.COMMON.MARGIN}} >
+        <Pressable onPress={readFirst} style={{...AppStyle.button, backgroundColor: manhwa.color}}>
+          <Text style={{...Typography.regular, color: textColor}}>Read First</Text>
         </Pressable>
-        <Pressable onPress={readLast} style={[styles.button, {backgroundColor: manhwa.color}]}>
-          <Text style={[AppStyle.textRegular, {color: textColor}]}>Read Last</Text>
+        <Pressable onPress={readLast} style={{...AppStyle.button, backgroundColor: manhwa.color}}>
+          <Text style={{...Typography.regular, color: textColor}}>Read Last</Text>
         </Pressable>
       </Row>
       
       <ChapterPageSelector
         currentPage={currentPage}
         numChapters={chapters.length}
-        manhwaColor={manhwa.color}
-        textColor={textColor}              
+        backgroundColor={manhwa.color}
         moveToNextChapterPage={moveToNextChapterPage}
         moveToPreviousChapterPage={moveToPreviousChapterPage}
       />
-
+      
       <View style={styles.chapterGrid}>
         {
           chapters.slice(currentPage * PAGE_LIMIT, (currentPage + 1) * PAGE_LIMIT).map(( item, index ) => 
-            <ChapterItem
+            <ChapterGridItem
               manhwaColor={manhwa.color}
               index={currentPage * PAGE_LIMIT + index}
               onPress={readChapter}
@@ -239,28 +165,20 @@ export default ManhwaChapterGrid;
 const styles = StyleSheet.create({
   container: {
     width: '100%', 
-    gap: 6, 
+    gap: AppConstants.COMMON.MARGIN, 
     flexWrap: 'wrap', 
     flexDirection: 'row', 
     alignItems: "center", 
     justifyContent: "center"
   },
-  chapterItem: {    
-    width: ITEM_SIZE, 
-    height: ITEM_SIZE, 
-    borderRadius: AppConstants.COMMON.BORDER_RADIUS, 
-    alignItems: "center", 
-    justifyContent: "center"    
-  },
   chapterGrid: {
-    width: wp(94),
-    left: wp(1),
+    flex: 1,
     alignItems: "center", 
-    justifyContent: "flex-start",
-    gap: 6,
+    justifyContent: "center",
+    gap: AppConstants.COMMON.MARGIN,
     flexDirection: 'row', 
     flexWrap: 'wrap'
-  },
+  },  
   button: {
     flex: 1,     
     height: 52, 

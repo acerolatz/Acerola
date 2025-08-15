@@ -10,8 +10,8 @@ import { SafeAreaView } from 'react-native'
 const RequestManhwa = () => {
   return (
     <SafeAreaView style={AppStyle.safeArea} >
-        <TopBar title='Request Manhwa' titleColor={Colors.requestMangaColor} >
-            <ReturnButton color={Colors.requestMangaColor} />
+        <TopBar title='Request Manhwa'>
+            <ReturnButton/>
         </TopBar>
         <RequestManhwaForm/>
     </SafeAreaView>

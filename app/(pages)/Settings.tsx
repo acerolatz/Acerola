@@ -41,18 +41,18 @@ const Settings = () => {
     if (loading || safeModePassword === null || safeModeOn === null) {
         return (
             <SafeAreaView style={AppStyle.safeArea} >
-                <TopBar title='Settings' titleColor={Colors.white} >
-                    <ReturnButton color={Colors.white} />
+                <TopBar title='Settings'>
+                    <ReturnButton/>
                 </TopBar>      
-                <PageActivityIndicator color={Colors.white}/>      
+                <PageActivityIndicator/>
             </SafeAreaView>    
         )
     }
 
     return (
         <SafeAreaView style={AppStyle.safeArea} >
-            <TopBar title='Settings' titleColor={Colors.white} >
-                <ReturnButton color={Colors.white} />
+            <TopBar title='Settings'>
+                <ReturnButton/>
             </TopBar>
             <SettingsForm 
                 currentMaxCacheSize={cache_size} 

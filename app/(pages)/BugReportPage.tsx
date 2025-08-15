@@ -1,11 +1,10 @@
 import ReturnButton from '@/components/buttons/ReturnButton'
 import BugReportForm from '@/components/form/BugReportForm'
 import TopBar from '@/components/TopBar'
-import { Colors } from '@/constants/Colors'
 import { AppStyle } from '@/styles/AppStyle'
 import { useLocalSearchParams } from 'expo-router'
-import React from 'react'
 import { SafeAreaView } from 'react-native'
+import React from 'react'
 
 
 const BugReport = () => {
@@ -15,8 +14,8 @@ const BugReport = () => {
 
     return (
         <SafeAreaView style={AppStyle.safeArea} >            
-            <TopBar title='Bug Report' titleColor={Colors.BugReportColor} >
-                <ReturnButton color={Colors.BugReportColor} />
+            <TopBar title='Bug Report'>
+                <ReturnButton/>
             </TopBar>
             <BugReportForm title={title}/>
         </SafeAreaView>

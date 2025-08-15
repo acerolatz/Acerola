@@ -12,10 +12,13 @@ import { Colors } from '@/constants/Colors';
 import { ToastMessages } from '@/constants/Messages';
 import { Manhwa } from '@/helpers/types';
 import { formatTimestamp, hp } from '@/helpers/util';
-import { dbGetManhwaAltNames, dbReadManhwaById, dbUpdateManhwaViews } from '@/lib/database';
+import { 
+  dbGetManhwaAltNames, 
+  dbReadManhwaById, 
+  dbUpdateManhwaViews 
+} from '@/lib/database';
 import { spUpdateManhwaViews } from '@/lib/supabase';
 import { AppStyle } from '@/styles/AppStyle';
-import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -36,18 +39,20 @@ import Row from '@/components/util/Row';
 import ManhwaIdComponent from '@/components/ManhwaIdComponent';
 import Footer from '@/components/util/Footer';
 import { AppConstants } from '@/constants/AppConstants';
+import ManhwaImageCover from '@/components/ManhwaImageCover';
+import { Typography } from '@/constants/typography';
+import ManhwaSummary from '@/components/util/ManhwaSummary';
 
 
 interface ItemProps {
   text: string
-  backgroundColor: string
-  textColor?: string
+  backgroundColor: string  
 }
 
-const Item = ({text, backgroundColor, textColor = Colors.backgroundColor}: ItemProps) => {
+const Item = ({text, backgroundColor}: ItemProps) => {
   return (
     <View style={[styles.item, {backgroundColor}]} >
-      <Text style={[AppStyle.textRegular, {color: textColor}]}>{text}</Text>
+      <Text style={{...Typography.regular, color: Colors.backgroundColor}}>{text}</Text>
     </View>
   )
 }
@@ -111,30 +116,31 @@ const ManhwaPage = () => {
 
         <LinearGradient colors={[manhwa.color, Colors.backgroundColor]} style={styles.linearBackground} />
 
-        {/* Top */}
+        {/* Top */}        
         <Row style={styles.topBar} >
-            <HomeButton color={Colors.backgroundColor} iconName='home-outline'/>
-            <Row style={{gap: 20}} >
-              <BugReportButton color={Colors.backgroundColor} title={manhwa.title}/> 
-              <RandomManhwaButton color={Colors.backgroundColor}/>
-              <ReturnButton color={Colors.backgroundColor}/>
-            </Row>
+          <HomeButton color={Colors.white} iconName='home-outline'/>
+          <Row style={{gap: AppConstants.ICON.SIZE}} >
+            <BugReportButton title={manhwa.title}/> 
+            <RandomManhwaButton />
+            <ReturnButton color={Colors.white}/>
+          </Row>
         </Row>
-        
+
         {/* Main Content */}
         <View style={styles.manhwaContainer}>
+          
           {/* Manhwa Image */}
-          <View style={{width: '100%'}} >
-            <Image source={manhwa.cover_image_url} contentFit='cover' style={styles.image} />
+          <View>
+            <ManhwaImageCover url={manhwa.cover_image_url} />
             <ManhwaIdComponent manhwa_id={manhwa.manhwa_id} />
           </View>
 
           {/* Title, Summary and Last Update */}
-          <View style={{alignSelf: "flex-start"}} >
-            <Text style={AppStyle.textMangaTitle}>{manhwa!.title}</Text>
+          <View style={{alignSelf: "flex-start", gap: AppConstants.COMMON.GAP, marginBottom: AppConstants.COMMON.GAP}} >
+            <Text style={Typography.semiboldXl}>{manhwa!.title}</Text>
             <ManhwaAlternativeNames names={altNames} />
-            <Text style={AppStyle.textRegular}>{manhwa.descr}</Text>
-            <Text style={[AppStyle.textRegular, {alignSelf: "flex-start", marginTop: 6}]}>
+            <ManhwaSummary summary={manhwa.descr} />
+            <Text style={Typography.regular}>
               last update: {formatTimestamp(manhwa.updated_at)}
             </Text>
           </View>
@@ -144,10 +150,7 @@ const ManhwaPage = () => {
           <ManhwaGenreInfo manhwa={manhwa} />
 
           {/* Libray */}
-          <AddToLibray 
-            manhwa={manhwa} 
-            textColor={Colors.backgroundColor} 
-            backgroundColor={manhwa.color} />
+          <AddToLibray manhwa={manhwa} backgroundColor={manhwa.color} />
 
           {/* Status (OnGoing or Completed) and Num Views */}
           <Row style={{gap: AppConstants.COMMON.MARGIN}} >
@@ -181,7 +184,7 @@ const styles = StyleSheet.create({
     height: hp(98)
   },
   item: {
-    height: 52,
+    height: AppConstants.BUTTON.SIZE,
     borderRadius: AppConstants.COMMON.BORDER_RADIUS,
     alignItems: "center",
     justifyContent: "center",
@@ -189,23 +192,16 @@ const styles = StyleSheet.create({
   },
   topBar: {
     width: '100%',
-    justifyContent: "space-between", 
-    marginTop: 10,
-    paddingHorizontal: AppConstants.COMMON.PADDING_HORIZONTAL,
-    paddingVertical: AppConstants.COMMON.PADDING_VERTICAL,
-    paddingBottom: 10
+    justifyContent: "space-between",
+    paddingHorizontal: AppConstants.COMMON.SCREEN_PADDING_HORIZONTAL,
+    paddingTop: AppConstants.COMMON.SCREEN_PADDING_VERTICAL,
+    paddingBottom: 20
   },
   manhwaContainer: {
-    width: '100%', 
+    width: '100%',
     gap: AppConstants.COMMON.MARGIN, 
     alignItems: "center", 
-    paddingHorizontal: AppConstants.COMMON.PADDING_HORIZONTAL
-  },
-  image: {
-    width: '100%',
-    maxWidth: AppConstants.COMMON.SCREEN_WIDTH - AppConstants.COMMON.PADDING_HORIZONTAL * 2,
-    height: 520, 
-    borderRadius: AppConstants.COMMON.BORDER_RADIUS
+    paddingHorizontal: AppConstants.COMMON.SCREEN_PADDING_HORIZONTAL
   },
   bottomSheetContainer: {
     flex: 1,

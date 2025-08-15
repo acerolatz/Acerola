@@ -1,6 +1,6 @@
 import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
-import { AppStyle } from '@/styles/AppStyle'
+import { Typography } from '@/constants/typography'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import React, { useState } from 'react'
 import { StyleSheet } from 'react-native'
@@ -9,19 +9,13 @@ import DropDownPicker from 'react-native-dropdown-picker'
 
 interface ReadingStatusPickerProps {
     onChangeValue: (v: any) => void
-    defaultValue?: string
-    backgroundColor?: string
 }
 
 
-const ReadingStatusPicker = ({
-    onChangeValue,
-    defaultValue = 'Reading',
-    backgroundColor = Colors.libraryColor
-}: ReadingStatusPickerProps) => {
+const ReadingStatusPicker = ({onChangeValue}: ReadingStatusPickerProps) => {
 
     const [open, setOpen] = useState(false)
-    const [value, setValue] = useState(defaultValue)
+    const [value, setValue] = useState('Reading')
     const [items, setItems] = useState(
         AppConstants.COMMON.READING_STATUS.map(i => {return {label: i, value: i}})
     )
@@ -29,14 +23,13 @@ const ReadingStatusPicker = ({
     return (
         <DropDownPicker
             open={open}
-            style={[styles.dropDownContainer, {backgroundColor}]}
-            dropDownContainerStyle={{backgroundColor: Colors.backgroundColor, borderWidth: 2, borderColor: backgroundColor}}
-            labelStyle={{color: Colors.backgroundColor}}                
-            textStyle={AppStyle.textRegular}
-            placeholder='Reading Status'
-            placeholderStyle={AppStyle.textRegular}
-            ArrowUpIconComponent={() => {return <Ionicons name='chevron-up' size={20} color={Colors.backgroundColor} />}}
-            ArrowDownIconComponent={() => {return <Ionicons name='chevron-down' size={20} color={Colors.backgroundColor} />}}
+            style={styles.dropDownContainer}
+            dropDownContainerStyle={styles.dropDownContainerStyle}
+            labelStyle={{color: Colors.backgroundColor}}
+            textStyle={Typography.regular}
+            placeholderStyle={Typography.regular}
+            ArrowUpIconComponent={() => {return <Ionicons name='chevron-up' size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />}}
+            ArrowDownIconComponent={() => {return <Ionicons name='chevron-down' size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />}}
             value={value as any}
             showArrowIcon={true}
             items={items}
@@ -57,8 +50,14 @@ export default ReadingStatusPicker
 
 const styles = StyleSheet.create({    
     dropDownContainer: {
-        height: 52, 
+        height: AppConstants.BUTTON.SIZE,
         borderRadius: AppConstants.COMMON.BORDER_RADIUS,
+        backgroundColor: Colors.primary,
         borderWidth: 0
+    },
+    dropDownContainerStyle: {
+        backgroundColor: Colors.backgroundColor, 
+        borderWidth: 2, 
+        borderColor: Colors.primary
     }
 })

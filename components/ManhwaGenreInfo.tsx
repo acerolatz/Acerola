@@ -1,4 +1,5 @@
 import { Colors } from "@/constants/Colors"
+import { Typography } from "@/constants/typography"
 import { Genre, Manhwa } from "@/helpers/types"
 import { dbReadManhwaGenres } from "@/lib/database"
 import { AppStyle } from "@/styles/AppStyle"
@@ -42,8 +43,8 @@ const ManhwaGenreInfo = ({manhwa}: ManhwaGenreInfoProps) => {
 
   const renderItem = ({item}: {item: Genre}) => {
     return (
-      <Pressable style={AppStyle.defaultGridItem} onPress={() => openGenrePage(item)}>
-        <Text style={AppStyle.textRegular} >{item.genre}</Text>
+      <Pressable style={styles.container} onPress={() => openGenrePage(item)}>
+        <Text style={Typography.regular} >{item.genre}</Text>
       </Pressable>
     )
   }
@@ -63,3 +64,10 @@ const ManhwaGenreInfo = ({manhwa}: ManhwaGenreInfoProps) => {
 }
 
 export default ManhwaGenreInfo;
+
+const styles = StyleSheet.create({
+  container: {
+    ...AppStyle.defaultGridItem,
+    backgroundColor: Colors.backgroundSecondary
+  }
+})

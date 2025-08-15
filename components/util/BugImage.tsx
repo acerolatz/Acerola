@@ -20,7 +20,7 @@ const BugImage = ({uri, setPhotos}: BubImageProps) => {
         <View style={{marginRight: AppConstants.COMMON.MARGIN}} >
             <Image source={{uri}} style={styles.image} contentFit='cover' />
             <Pressable onPress={onPress} style={styles.removeImageButton} hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE} >
-                <Ionicons name='trash-outline' size={18} color={Colors.backgroundColor} />
+                <Ionicons name='trash-outline' size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />
             </Pressable>
         </View>
     )
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
         left: 8, 
         top: 8, 
         padding: 6, 
-        backgroundColor: Colors.BugReportColor, 
+        backgroundColor: Colors.primary, 
         borderRadius: AppConstants.COMMON.BORDER_RADIUS
     } 
 })

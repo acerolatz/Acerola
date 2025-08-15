@@ -54,8 +54,8 @@ const ReadingHistory = () => {
 
   return (
     <SafeAreaView style={AppStyle.safeArea} >
-      <TopBar title='Reading History' titleColor={Colors.readingHistoryColor} >
-        <ReturnButton color={Colors.readingHistoryColor} />
+      <TopBar title='Reading History'>
+        <ReturnButton/>
       </TopBar>
       <ManhwaGrid
         manhwas={manhwas}
@@ -63,7 +63,6 @@ const ReadingHistory = () => {
         showManhwaStatus={false}
         loading={loading}
         showChaptersPreview={false}
-        color={Colors.readingHistoryColor}
         onEndReached={onEndReached}
       />
     </SafeAreaView>

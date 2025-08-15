@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/Colors'
+import { FontSizes, Typography } from '@/constants/typography'
 import { Chapter } from '@/helpers/types'
 import { formatTimestamp } from '@/helpers/util'
 import { spFetchChapterList } from '@/lib/supabase'
@@ -56,17 +57,21 @@ const ChapterLink = ({
     if (loading) {
         return (
             <View style={styles.chapterLink} >
-                <ActivityIndicator size={24} color={Colors.white} />
+                <ActivityIndicator size={FontSizes.xl} color={Colors.white} />
+                {
+                    shouldShowChapterDate &&
+                    <Text style={Typography.regular}>{formatTimestamp(chapter_created_at)}</Text>
+                }
             </View>
         )
     }
 
     return (
         <Pressable onPress={onPress} style={styles.chapterLink} >
-            <Text style={AppStyle.textRegular}>{name}</Text>
+            <Text style={Typography.regular}>{name}</Text>
             {
                 shouldShowChapterDate &&
-                <Text style={styles.text}>{formatTimestamp(chapter_created_at)}</Text>
+                <Text style={Typography.regular}>{formatTimestamp(chapter_created_at)}</Text>
             }
         </Pressable>
     )
@@ -79,10 +84,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: "center",
         justifyContent: "space-between",
-        height: 24
-    },
-    text: {
-        ...AppStyle.textRegular,
+        height: FontSizes.xl,
         paddingRight: 6
-    }
+    }    
 })

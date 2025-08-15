@@ -1,5 +1,18 @@
 import { AppConstants } from "@/constants/AppConstants";
-import { AppRelease, Chapter, ChapterImage, Collection, DonateMethod, Manhwa, ManhwaCard, Post, Scan, SourceCodeLink } from "@/helpers/types";
+import { 
+    AppRelease, 
+    Chapter, 
+    ChapterImage, 
+    Collection, 
+    DonateMethod, 
+    Feedback, 
+    Manhwa, 
+    ManhwaCard, 
+    Post, 
+    ReleaseWrapper, 
+    Scan, 
+    SourceCodeLink 
+} from "@/helpers/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createClient } from '@supabase/supabase-js';
 import * as RNLocalize from 'react-native-localize';
@@ -7,7 +20,9 @@ import * as mime from 'react-native-mime-types';
 import { Image as CompressorImage } from 'react-native-compressor';
 import { supabaseKey, supabaseUrl } from "./supabaseKey";
 import RNFS from 'react-native-fs';
-import { decode } from "@/helpers/util";
+import { decode, hasInternetAvailable } from "@/helpers/util";
+import Toast from "react-native-toast-message";
+import { ToastMessages } from "@/constants/Messages";
 
 
 export const supabase = createClient(supabaseUrl, supabaseKey as any, {
@@ -61,20 +76,6 @@ export async function spFetchManhwaById(manhwa_id: number): Promise<Manhwa | nul
     }
 
     return data
-}
-
-export async function spFetchNews(page: number = 0, limit: number = 10): Promise<Post[]> {
-    const { data, error } = await supabase
-        .from("news")
-        .select('*')
-        .order("created_at", {ascending: false})
-        .range(page * limit, (page + 1) * limit)
-
-    if (error) {
-        console.log("error spFetchNews", error)
-    }
-
-    return data ? data as Post[] : []
 }
 
 
@@ -146,6 +147,11 @@ export async function spFetchChapterImages(chapter_id: number): Promise<ChapterI
 
     if (error) {
         console.log("error spFetchChapterImages", error)
+        const hasInternet = await hasInternetAvailable()
+        Toast.show(!hasInternet ? 
+            ToastMessages.EN.UNABLE_TO_LOAD_IMAGES_INTERNET : 
+            ToastMessages.EN.UNABLE_TO_LOAD_IMAGES
+        )
         return []
     }
 
@@ -203,7 +209,7 @@ export async function spGetDonationMethods(): Promise<DonateMethod[]> {
 
 
 export async function spFetchRandomManhwaCards(p_limit: number = 30): Promise<ManhwaCard[]> {
-    if (AppConstants.COMMON.DEBUG_MODE) {
+    if (AppConstants.DEBUB.ENABLED) {
         const { data, error } = await supabase
             .from("cards")
             .select("manhwas (title, manhwa_id), width, height, image_url, created_at")
@@ -344,11 +350,34 @@ export const uploadBugScreenshot = async (uri: string, bug_id: string, index: nu
 };
 
 
+export async function spFetchReleasesAndSourceCode(): Promise<ReleaseWrapper> {
+    const { data, error } = await supabase
+        .from("app_infos")
+        .select('name, value, action, type')
+        .or("type.eq.source, type.eq.release")
+
+    if (error) {
+        console.log("error spFetchReleasesAndSourceCode", error)
+        return {releases: [], source: []}
+    }
+
+    const releases: AppRelease[] = data
+        .filter(i => i.type === "release")
+        .map(i => {return {version: i.name, url: i.value, action: i.action}})
+
+    const source: SourceCodeLink[] = data
+        .filter(i => i.type === "source")
+        .map(i => {return {name: i.name, url: i.value}})
+
+    return {releases, source}
+}
+
 export async function spFetchSourceCodeLinks(): Promise<SourceCodeLink[]> {
     const { data, error } = await supabase
         .from("app_infos")
         .select('name, value')
         .eq("type", "source")
+        .eq("type", "release")
 
     if (error) {
         console.log("error spFetchSourceCodeLinks", error)
@@ -361,4 +390,42 @@ export async function spFetchSourceCodeLinks(): Promise<SourceCodeLink[]> {
             url: s.value
         }}
     )
+}
+
+
+export async function spFetchNews(p_offset: number = 0, p_limit: number = 30): Promise<Post[]> {
+    const { data, error } = await supabase
+        .from("app_infos")
+        .select("name, value, created_at")
+        .eq("type", "post")
+        .order("created_at", {ascending: false})
+        .range(p_offset * p_limit, (p_offset + 1) * p_limit - 1)
+
+    if (error) {
+        console.log("error spFetchFeedbacks", error)
+        return []
+    }
+
+    return data.map(i => {return {
+        title: i.name, 
+        message: i.value,
+        created_at: i.created_at
+    }})
+}
+
+
+export async function spFetchLiveVersion(): Promise<string | null> {
+    const { data, error } = await supabase
+        .from("app_infos")
+        .select("value")
+        .eq("type", "live_version")
+        .single()
+
+    if (error) {
+        console.log("error spFetchLiveVersion", error)
+        return null
+    
+    }
+
+    return data.value
 }
