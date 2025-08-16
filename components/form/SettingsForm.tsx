@@ -4,6 +4,8 @@ import {
   Animated,  
   Text,
   StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import UiForm from './UiForm';
 import PerformanceUIForm from './PerformanceUIForm';
@@ -30,7 +32,7 @@ const SettingsForm = ({
 }: SettingsFormProps) => {
 
     const [title, setTitle] = useState('Safe Mode')
-    const titles = ['Safe Mode', 'UI', 'Performance', 'Cache']
+    const titles = ['Safe Mode', 'UI', 'Optimization', 'Cache']
 
     const forms = [
         <SafeModeForm key="safe" safeModeOn={safeModeOn} safeModePassword={safeModePassword} />,
@@ -49,6 +51,7 @@ const SettingsForm = ({
     };
 
     return (
+      <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
         <View style={styles.container}>
             <View style={{width: '100%', alignItems: "center", justifyContent: "center"}} >
                 <Text style={{...Typography.semibold, color: Colors.primary}} >{title}</Text>
@@ -89,8 +92,8 @@ const SettingsForm = ({
                 )}
                 scrollEventThrottle={16}
             />
-        
         </View>
+      </KeyboardAvoidingView>
     );
 };
 

@@ -1,6 +1,5 @@
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
-import TopBar from '../TopBar'
 import { Typography } from '@/constants/typography'
 import Checkmark from '../util/Checkmark'
 import { formatTimestamp, getYesterday, hp, wp } from '@/helpers/util'
@@ -11,6 +10,7 @@ import { useSettingsState } from '@/store/settingsState'
 import { Image } from 'expo-image'
 import { LinearGradient } from 'expo-linear-gradient'
 import Row from '../util/Row'
+import Footer from '../util/Footer'
 
 
 interface DummyChapterLinkProps {
@@ -77,20 +77,19 @@ const UiForm = () => {
     }
 
     return (
-        <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
-            <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='always' >
-                <View style={{flex: 1, gap: AppConstants.COMMON.GAP, paddingHorizontal: wp(1)}} >
-                    <Checkmark 
-                        title='Last3Chapters' 
-                        value={settings.showLast3Chapters}
-                        check={setLast3} />
-                    <Row style={{alignItems: "flex-start"}} >
-                        <DummyLast3Chapters />
-                        <DummyLast3Chapters showLast3Chapters={false} />
-                    </Row>
-                </View>
-            </ScrollView>
-        </KeyboardAvoidingView>
+        <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='always' >
+            <View style={{flex: 1, gap: AppConstants.COMMON.GAP, paddingHorizontal: wp(1)}} >
+                <Checkmark 
+                    title='Last3Chapters' 
+                    value={settings.showLast3Chapters}
+                    check={setLast3} />
+                <Row style={{alignItems: "flex-start"}} >
+                    <DummyLast3Chapters />
+                    <DummyLast3Chapters showLast3Chapters={false} />
+                </Row>
+            </View>
+            <Footer/>
+        </ScrollView>
     )
 }
 

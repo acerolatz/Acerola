@@ -1,7 +1,13 @@
-import { Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { 
+    Keyboard, 
+    Pressable, 
+    ScrollView, 
+    StyleSheet, 
+    Text, 
+    TextInput, 
+    View 
+} from 'react-native'
 import React, { useState } from 'react'
-import TopBar from '../TopBar'
-import Checkmark from '../util/Checkmark'
 import { useSettingsState } from '@/store/settingsState'
 import { Typography } from '@/constants/typography'
 import { AppStyle } from '@/styles/AppStyle'
@@ -11,9 +17,13 @@ import * as yup from 'yup';
 import { AppConstants } from '@/constants/AppConstants'
 import { useSQLiteContext } from 'expo-sqlite'
 import { dbSetNumericInfo } from '@/lib/database'
-import Row from '../util/Row'
-import Footer from '../util/Footer'
 import { wp } from '@/helpers/util'
+import { Colors } from '@/constants/Colors'
+import CustomActivityIndicator from '../util/CustomActivityIndicator'
+import Toast from 'react-native-toast-message'
+import { ToastMessages } from '@/constants/Messages'
+import Footer from '../util/Footer'
+
 
 interface FormData {
     drawDistance: number
@@ -26,6 +36,7 @@ const schema = yup.object().shape({
         .min(AppConstants.COMMON.SCREEN_WIDTH, `Min ${AppConstants.COMMON.SCREEN_WIDTH} pixels`)
         .max(AppConstants.COMMON.SCREEN_WIDTH * 20, `Max ${AppConstants.COMMON.SCREEN_WIDTH * 20} pixels`)
         .required('DrawDistance is required'),
+
     onEndReachedThreshold: yup
         .number()
         .min(0.5, 'Min 0.5')
@@ -61,57 +72,70 @@ const PerformanceUIForm = () => {
             })
             await dbSetNumericInfo(db, 'drawDistance', form_data.drawDistance)
             await dbSetNumericInfo(db, 'onEndReachedThreshold', form_data.onEndReachedThreshold)
+            Toast.show(ToastMessages.EN.GENERIC_SUCCESS)
         setLoading(false)
     };
     
-    return (
-        <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
-            <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='always' >
-                <View style={{flex: 1, gap: AppConstants.COMMON.GAP, paddingHorizontal: wp(1)}} >
-                    {/* Draw Distance */}
-                    <View>
-                        <Text style={Typography.semibold}>DrawDistance</Text>
-                        <Text style={AppStyle.textOptional} >chapter reader</Text>
-                    </View>
-                    {errors.drawDistance && (<Text style={AppStyle.error}>{errors.drawDistance.message}</Text>)}
-                    <Text style={Typography.regular}>Draw distance for advanced rendering (in px)</Text>
-                    <Controller
-                        name="drawDistance"
-                        control={control}
-                        render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                            style={AppStyle.input}
-                            keyboardType='numeric'
-                            onBlur={onBlur}
-                            onChangeText={onChange}
-                            value={value.toString()}/>
-                        )}
-                    />
-
-                    {/* On End Reached Threshold */}
-                    <View>
-                        <Text style={Typography.semibold}>EndReachedThreshold</Text>
-                        <Text style={AppStyle.textOptional} >chapter reader</Text>
-                    </View>
-                    {errors.onEndReachedThreshold && (<Text style={AppStyle.error}>{errors.onEndReachedThreshold.message}</Text>)}
-                    <Text style={Typography.regular}>
-                        How far from the end (in units of visible length of the list) the bottom edge of the list must be from the end of the content to trigger the onEndReached callback. Thus a value of 0.5 will trigger onEndReached when the end of the content is within half the visible length of the list.
-                    </Text>
-                    <Controller
-                        name="onEndReachedThreshold"
-                        control={control}
-                        render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                            style={AppStyle.input}
-                            keyboardType='numeric'
-                            onBlur={onBlur}
-                            onChangeText={onChange}
-                            value={value.toString()}/>
-                        )}
-                    />
+    return (        
+        <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='always' >
+            <View style={{flex: 1, gap: AppConstants.COMMON.GAP, paddingHorizontal: wp(1)}} >
+                {/* Draw Distance */}
+                <View>
+                    <Text style={Typography.semibold}>DrawDistance</Text>
+                    <Text style={AppStyle.textOptional} >chapter reader</Text>
                 </View>
-            </ScrollView>
-        </KeyboardAvoidingView>
+                <Text style={Typography.regular}>Draw distance for advanced rendering (in px)</Text>
+                {errors.drawDistance && (<Text style={AppStyle.error}>{errors.drawDistance.message}</Text>)}
+                <Controller
+                    name="drawDistance"
+                    control={control}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                        style={AppStyle.input}
+                        keyboardType='numeric'
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value.toString()}/>
+                    )}
+                />
+
+                {/* On End Reached Threshold */}
+                <View>
+                    <Text style={Typography.semibold}>EndReachedThreshold</Text>
+                    <Text style={AppStyle.textOptional} >chapter reader</Text>
+                </View>
+                <Text style={Typography.regular}>
+                    How far from the end (in units of visible length of the list) the bottom edge of the list must be from the end of the content to trigger the onEndReached callback. Thus a value of 0.5 will trigger onEndReached when the end of the content is within half the visible length of the list.
+                </Text>
+                {errors.onEndReachedThreshold && (<Text style={AppStyle.error}>{errors.onEndReachedThreshold.message}</Text>)}
+                <Controller
+                    name="onEndReachedThreshold"
+                    control={control}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                        style={AppStyle.input}
+                        keyboardType='numeric'
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value.toString()}/>
+                    )}
+                />
+
+                {
+                    loading ?
+
+                    <View style={AppStyle.formButton} >
+                        <CustomActivityIndicator color={Colors.backgroundColor} />
+                    </View>
+                    :
+                    <Pressable onPress={handleSubmit(onSubmit)} style={AppStyle.formButton} >
+                        <Text style={{...Typography.regular, color: Colors.backgroundColor}} >OK</Text>
+                    </Pressable>
+                }
+
+            </View>
+            <Footer/>
+        </ScrollView>
     )
 }
 

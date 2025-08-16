@@ -17,9 +17,8 @@ import AppLogo from '@/components/util/Logo'
 import Row from '@/components/util/Row'
 import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
-import { Typography } from '@/constants/typography'
 import { Genre, Manhwa } from '@/helpers/types'
-import { hp } from '@/helpers/util'
+import { normalizeRandomManhwaCardHeight } from '@/helpers/util'
 import {     
     dbGetReadingHistory,         
     dbReadGenres, 
@@ -43,7 +42,8 @@ import {
     Pressable, 
     SafeAreaView, 
     ScrollView, 
-    StyleSheet    
+    StyleSheet,
+    View
 } from 'react-native'
 
 
@@ -52,14 +52,8 @@ const PAGE_LIMIT = 32
 const HomePage = () => {
 
     const db = useSQLiteContext()
-
-    // Lateral Menu
-    const menuAnim = useRef(new Animated.Value(-AppConstants.PAGES.HOME.MENU_WIDTH)).current 
-    const backgroundAnim = useRef(new Animated.Value(-AppConstants.COMMON.SCREEN_WIDTH)).current
-    const menuVisible = useRef(false)    
-    
     const { cards, setCards } = useManhwaCardsState()    
-    
+
     const { top10manhwas, setTop10manhwas } = useTop10ManhwasState()
     const { collections, setCollections } = useCollectionState()
     const [loading, setLoading] = useState(true)
@@ -68,17 +62,18 @@ const HomePage = () => {
     const [mostView, setMostView] = useState<Manhwa[]>([])    
     const [readingHistoryManhwas, setReadingHistoryManhwas] = useState<Manhwa[]>([])
 
+    // Lateral Menu
+    const menuAnim = useRef(new Animated.Value(-AppConstants.PAGES.HOME.MENU_WIDTH)).current 
+    const backgroundAnim = useRef(new Animated.Value(-AppConstants.COMMON.SCREEN_WIDTH)).current
+    const menuVisible = useRef(false)    
+
     const reloadCards = async () => {
         const r = await spFetchRandomManhwaCards(PAGE_LIMIT)
         setCards(r.map(c => {
-            const normalizedHeight = c.height > AppConstants.COMMON.RANDOM_MANHWAS.MAX_HEIGHT ? 
-                AppConstants.COMMON.RANDOM_MANHWAS.MAX_HEIGHT : c.height
-            
-            let normalizedWidth = (normalizedHeight * c.width) / c.height
-
-            normalizedWidth = normalizedWidth > AppConstants.COMMON.RANDOM_MANHWAS.MAX_WIDTH ? 
-                AppConstants.COMMON.RANDOM_MANHWAS.MAX_WIDTH : normalizedWidth
-                
+            const {
+                normalizedWidth, 
+                normalizedHeight
+            } = normalizeRandomManhwaCardHeight(c.width, c.height)
             return {...c, normalizedWidth, normalizedHeight}
         }))
     }
@@ -106,6 +101,14 @@ const HomePage = () => {
         if (cards.length == 0) {
             await reloadCards()
         }
+    }
+
+    const openManhwaSearch = () => {
+        router.navigate("/(pages)/ManhwaSearch")
+    }
+
+    const toggleMenu = () => {
+        menuVisible.current ? closeMenu() : openMenu()
     }
     
     useEffect(
@@ -174,35 +177,23 @@ const HomePage = () => {
         }).start()
     }
 
-    const openManhwaSearch = () => {
-        router.navigate("/(pages)/ManhwaSearch")
-    }
-
-    const toggleMenu = () => {
-        menuVisible.current ? closeMenu() : openMenu()
-    }
-
     return (
-        <SafeAreaView style={[AppStyle.safeArea, {paddingTop: 0}]} >            
-            {/* Main content */}
-            <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} >
-                {/* Header */}
-                <Footer height={AppConstants.COMMON.SCREEN_PADDING_VERTICAL + 4} />
-                <Row style={styles.header} >
-                    <AppLogo/>
-                    <Row style={{gap: AppConstants.ICON.SIZE}} >
-                        {
-                            !loading &&
+        <SafeAreaView style={{...AppStyle.safeArea, paddingTop: 0}} >
+            <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false}>
+                <View style={{height: AppConstants.COMMON.SCREEN_PADDING_VERTICAL}} />
+                <Row style={styles.header}>
+                    <AppLogo />
+                    <Row style={{ gap: AppConstants.ICON.SIZE }}>
+                        {!loading && (
                             <>
-                                <UpdateDatabaseButton type='client' />
-                                <Button iconName='search-outline' onPress={openManhwaSearch} />
-                                <RandomManhwaButton />
+                            <UpdateDatabaseButton type="client" />
+                            <Button iconName="search-outline" onPress={openManhwaSearch} />
+                            <RandomManhwaButton />
                             </>
-                        }
-                        <Button iconName='options-outline' onPress={toggleMenu} />
-                    </Row>                
+                        )}
+                        <Button iconName="options-outline" onPress={toggleMenu} />
+                    </Row>
                 </Row>
-
                 <Column style={{gap: AppConstants.COMMON.GAP}} >
                     <GenreGrid genres={genres} />
                     <CollectionGrid collections={collections} />
@@ -240,9 +231,9 @@ const styles = StyleSheet.create({
         height: '100%'
     },
     header: {
-        width: '100%',
-        marginBottom: 10, 
-        justifyContent: "space-between"
+        width: '100%', 
+        justifyContent: "space-between",
+        paddingBottom: AppConstants.COMMON.GAP * 2
     },
     sideMenu: {
         position: 'absolute',
@@ -263,34 +254,5 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
         elevation: 4,        
         zIndex: 90
-    },
-    button: {
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
-        backgroundColor: Colors.yellow,
-        alignItems: "center",
-        justifyContent: "center",
-        flex: 1,
-        height: 52
-    },
-    bottomSheetContainer: {
-        paddingHorizontal: AppConstants.COMMON.SCREEN_PADDING_HORIZONTAL, 
-        paddingTop: 10,
-        gap: AppConstants.COMMON.GAP
-    },
-    handleStyle: {
-        backgroundColor: Colors.backgroundSecondary, 
-        borderTopLeftRadius: 12, 
-        borderTopEndRadius: 12
-    },
-    handleIndicatorStyle: {
-        backgroundColor: Colors.yellow
-    },
-    bottomSheetBackgroundStyle: {
-        backgroundColor: Colors.backgroundSecondary
-    },
-    textLink: {
-        ...Typography.light,
-        marginTop: 10,
-        textDecorationLine: 'underline'
-    }
+    }    
 })

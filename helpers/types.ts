@@ -133,3 +133,9 @@ export type Settings = {
     drawDistance: number
     onEndReachedThreshold: number
 }
+
+export type DownloadProgress = {
+  current: number
+  total: number
+  percentage: number
+}

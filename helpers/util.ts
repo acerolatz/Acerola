@@ -6,6 +6,8 @@ import { Linking } from 'react-native';
 import { ToastMessages } from '@/constants/Messages';
 import Toast from 'react-native-toast-message';
 import { Platform } from 'react-native';
+import { DownloadProgress } from './types';
+import { AppConstants } from '@/constants/AppConstants';
 
 
 const {
@@ -233,4 +235,94 @@ export function getYesterday(delta: number = 1): Date {
   const d = new Date();
   d.setDate(d.getDate() - delta);
   return d;
+}
+
+
+const prepareFolder = async (folderPath: string) => {
+  const exists = await RNFS.exists(folderPath);
+  if (exists) {
+    await RNFS.unlink(folderPath);
+  }
+  await RNFS.mkdir(folderPath, { NSURLIsExcludedFromBackupKey: true });
+};
+
+
+export const downloadManhwaChapter = async (
+  urls: string[],
+  chapter_id: number,
+  maxParallel: number = 8,
+  onProgress?: (progress: DownloadProgress) => void
+): Promise<string[]> => {
+
+  const basePath = `${RNFS.CachesDirectoryPath}/${chapter_id}`;
+  await prepareFolder(basePath);
+
+  let completed = 0;
+  const total = urls.length;
+  const downloadedPaths: string[] = new Array(total);
+
+  const downloadImage = async (url: string, index: number) => {
+    const fileExt = url.split('.').pop()?.split('?')[0] || 'jpg';
+    const filePath = `${basePath}/image_${index + 1}.${fileExt}`;
+
+    await RNFS.downloadFile({
+      fromUrl: url,
+      toFile: filePath,
+      progress: (res) => {
+        if (onProgress) {
+          const percentage = Math.floor(
+            ((completed + res.bytesWritten / res.contentLength) / total) * 100
+          );
+          onProgress({
+            current: completed + 1,
+            total,
+            percentage,
+          });
+        }
+      },
+      progressDivider: 5,
+    }).promise;
+
+    downloadedPaths[index] = filePath;
+    completed++;
+    if (onProgress) {
+      onProgress({
+        current: completed,
+        total,
+        percentage: Math.floor((completed / total) * 100),
+      });
+    }
+  };
+
+  // Download pool
+  const pool: Promise<void>[] = [];
+  for (let i = 0; i < urls.length; i++) {
+    const promise = downloadImage(urls[i], i);
+    pool.push(promise);    
+    if (pool.length >= maxParallel) {
+      await Promise.race(pool);
+      for (let j = pool.length - 1; j >= 0; j--) {
+        if ((pool[j] as any).resolved) pool.splice(j, 1);
+      }
+    }
+  }
+
+  await Promise.all(pool);  
+  return downloadedPaths.sort();
+};
+
+
+export function normalizeRandomManhwaCardHeight(width: number, height: number): {
+  normalizedWidth: number, 
+  normalizedHeight: number
+} {
+  const normalizedHeight = height > AppConstants.COMMON.RANDOM_MANHWAS.MAX_HEIGHT ? 
+  AppConstants.COMMON.RANDOM_MANHWAS.MAX_HEIGHT : height
+
+  let normalizedWidth = (normalizedHeight * width) / height
+
+  normalizedWidth = normalizedWidth > AppConstants.COMMON.RANDOM_MANHWAS.MAX_WIDTH ? 
+  AppConstants.COMMON.RANDOM_MANHWAS.MAX_WIDTH : normalizedWidth
+  
+  return { normalizedWidth, normalizedHeight}
 }

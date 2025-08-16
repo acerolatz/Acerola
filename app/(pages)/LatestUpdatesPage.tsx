@@ -58,7 +58,8 @@ const LatestUpdatesPage = () => {
       </TopBar>
       <ManhwaGrid
         manhwas={manhwas}
-        loading={loading}      
+        loading={loading}
+        showChaptersPreview={false}
         shouldShowChapterDate={false}
         onEndReached={onEndReached}
       />

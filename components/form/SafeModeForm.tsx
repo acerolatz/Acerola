@@ -1,6 +1,13 @@
-import { Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { 
+    Keyboard, 
+    Platform, 
+    Pressable, 
+    ScrollView,
+    Text, 
+    TextInput, 
+    View 
+} from 'react-native'
 import React, { useState } from 'react'
-import TopBar from '../TopBar'
 import { AppStyle } from '@/styles/AppStyle'
 import { Colors } from '@/constants/Colors'
 import { Typography } from '@/constants/typography'
@@ -9,6 +16,7 @@ import { hasOnlyDigits, wp } from '@/helpers/util'
 import Toast from 'react-native-toast-message'
 import { useSQLiteContext } from 'expo-sqlite'
 import { dbCreateSafeModePassword, dbSetSafeModeState } from '@/lib/database'
+import Footer from '../util/Footer'
 
 interface SafeModeFormProps {
     safeModePassword: string 
@@ -56,45 +64,42 @@ const SafeModeForm = ({safeModePassword, safeModeOn}: SafeModeFormProps) => {
         setLoadingSafeModeConfig(false)
     }
 
-    return (
-        <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >        
-            <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='always' >
-                <View style={{flex: 1, gap: AppConstants.COMMON.GAP, paddingHorizontal: wp(1)}} >
-                    <Text style={AppStyle.error}>{isSafeModeOn ? 'enabled' : 'disabled'}</Text>
-                    <Text style={Typography.regular}>When safe mode is enabled, {AppConstants.COMMON.APP_NAME} will function as a simple to-do list. To unlock the main content, you will need the numeric password you define below.</Text>
-                    <Text style={{...Typography.regular, color: Colors.neonRed}}>If you forget the password, it cannot be reset or recovered. You must delete the app data via {Platform.OS} settings to regain access to the main content.</Text>
-                    <Text style={{...Typography.regular, color: Colors.neonRed}}>Changes to Safe Mode settings will be applied when the app restarts.</Text>
-                    
-                    <Text style={Typography.regular} >Password</Text>
-                    <TextInput
-                        style={AppStyle.input}
-                        keyboardType='numeric'
-                        onChangeText={setCurrentSafeModePassword}
-                        value={currentSafeModePassword.toString()}/>
+    return (        
+        <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled' >
+            <View style={{flex: 1, gap: AppConstants.COMMON.GAP, paddingHorizontal: wp(1)}} >
+                <Text style={AppStyle.error}>{isSafeModeOn ? 'enabled' : 'disabled'}</Text>
+                <Text style={Typography.regular}>When safe mode is enabled, {AppConstants.COMMON.APP_NAME} will function as a simple to-do list. To unlock the main content, you will need the numeric password you define below.</Text>
+                <Text style={{...Typography.regular, color: Colors.neonRed}}>If you forget the password, it cannot be reset or recovered. You must delete the app data via {Platform.OS} settings to regain access to the main content.</Text>
+                <Text style={{...Typography.regular, color: Colors.neonRed}}>Changes to Safe Mode settings will be applied when the app restarts.</Text>
+                
+                <Text style={Typography.regular} >Password</Text>
+                <TextInput
+                    style={AppStyle.input}
+                    keyboardType='numeric'
+                    onChangeText={setCurrentSafeModePassword}
+                    value={currentSafeModePassword.toString()}/>
 
-                    <Text style={Typography.regular} >Confirm Password</Text>
-                    <TextInput
-                        style={AppStyle.input}
-                        keyboardType='numeric'
-                        onChangeText={setConfirmPassword}
-                        value={confirmPassword.toString()}/>
+                <Text style={Typography.regular} >Confirm Password</Text>
+                <TextInput
+                    style={AppStyle.input}
+                    keyboardType='numeric'
+                    onChangeText={setConfirmPassword}
+                    value={confirmPassword.toString()}/>
 
-                    {
-                        loadingSafeModeConfig ?
-                        <View style={AppStyle.formButton} >
-                            <Text style={{...Typography.regular, color: Colors.backgroundColor}}>{safeModeOn ? 'Disable' : 'Enable'} Safe Mode</Text>
-                        </View>
-                        :
-                        <Pressable onPress={submitPassword} style={AppStyle.formButton} >
-                            <Text style={{...Typography.regular, color: Colors.backgroundColor}}>{isSafeModeOn ? 'Disable' : 'Enable'} Safe Mode</Text>
-                        </Pressable>
-                    }
-                </View>
-            </ScrollView>
-        </KeyboardAvoidingView>
+                {
+                    loadingSafeModeConfig ?
+                    <View style={AppStyle.formButton} >
+                        <Text style={{...Typography.regular, color: Colors.backgroundColor}}>{safeModeOn ? 'Disable' : 'Enable'} Safe Mode</Text>
+                    </View>
+                    :
+                    <Pressable onPress={submitPassword} style={AppStyle.formButton} >
+                        <Text style={{...Typography.regular, color: Colors.backgroundColor}}>{isSafeModeOn ? 'Disable' : 'Enable'} Safe Mode</Text>
+                    </Pressable>
+                }
+            </View>
+            <Footer/>
+        </ScrollView>        
     )
 }
 
 export default SafeModeForm
-
-const styles = StyleSheet.create({})

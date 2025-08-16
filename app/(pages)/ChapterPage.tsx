@@ -43,7 +43,7 @@ const ChapterPage = () => {
     const [listTotalHeight, setListTotalHeight] = useState(hp(40))
   
     const drawDistance = useSettingsState(s => s.settings.drawDistance)
-    const onEndReachedThreshold = useSettingsState(s => s.settings.onEndReachedThreshold)
+    const onEndReachedThreshold = useSettingsState(s => s.settings.onEndReachedThreshold)    
 
     const currentChapter: Chapter = chapters[currentChapterIndex] 
     const headerVisible = useSharedValue(true)

@@ -1,88 +1,21 @@
-import { Manhwa, ManhwaCard } from '@/helpers/types'
-import { spFetchManhwaById, spUpdateManhwaCardView } from '@/lib/supabase'
+import { ManhwaCard } from '@/helpers/types'
 import { useManhwaCardsState } from '@/store/randomManhwaState'
-import { Image } from 'expo-image'
-import { router } from 'expo-router'
 import { debounce } from 'lodash'
-import React, { useRef, useState } from 'react'
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import React, { useRef } from 'react'
+import { StyleSheet, View } from 'react-native'
 import Title from '../Title'
 import RotatingButton from '../buttons/RotatingButton'
 import Row from '../util/Row'
-import { useSQLiteContext } from 'expo-sqlite'
-import { dbHasManhwa, dbUpsertManhwa } from '@/lib/database'
-import Toast from 'react-native-toast-message'
-import { ToastMessages } from '@/constants/Messages'
 import { AppConstants } from '@/constants/AppConstants'
-import CustomActivityIndicator from '../util/CustomActivityIndicator'
 import { FlashList } from '@shopify/flash-list'
-import { hp, wp } from '@/helpers/util'
-import { Typography } from '@/constants/typography'
-import { LinearGradient } from 'expo-linear-gradient'
-
+import { wp } from '@/helpers/util'
+import RandomManhwaCard from '../RandomManhwaCard'
 
 
 interface RandomCardsGridProps {
     reloadCards: () => any
 }
 
-const ManhwaRandomCard = ({card}: {card: ManhwaCard}) => {
-
-    const db = useSQLiteContext()
-
-    const [loading, setLoading] = useState(false)    
-
-    const onPress = async () => {
-        const hasManhwa = await dbHasManhwa(db, card.manhwa_id)
-        if (!hasManhwa) {
-            setLoading(true)
-                const m: Manhwa | null = await spFetchManhwaById(card.manhwa_id)
-                if (!m) {
-                    Toast.show(ToastMessages.EN.INVALID_MANHWA)
-                    return
-                }
-                await dbUpsertManhwa(db, m)
-            setLoading(false)
-        }
-        spUpdateManhwaCardView(card.manhwa_id)
-        router.navigate({
-            pathname: '/ManhwaPage', 
-            params: {
-                manhwa_id: card.manhwa_id
-        }})
-    }
-
-    if (loading) {
-        return (
-            <View style={{
-                width: card.normalizedWidth, 
-                height: card.normalizedHeight, 
-                alignItems: 'center',
-                justifyContent: "center"
-            }} >
-                <CustomActivityIndicator/>
-            </View>
-        )
-    }
-
-    return (
-        <Pressable onPress={() => onPress()} >
-            <Image 
-                source={card.image_url} 
-                style={{
-                    width: card.normalizedWidth,
-                    height: card.normalizedHeight,
-                    borderRadius: AppConstants.COMMON.BORDER_RADIUS
-                }} 
-                transition={AppConstants.COMMON.IMAGE_TRANSITION}
-                contentFit='cover' />
-            <LinearGradient colors={['transparent', 'transparent', 'rgba(0, 0, 0, 0.6)']} style={StyleSheet.absoluteFill} />
-            <View style={styles.manhwaTitleContainer} >
-                <Text style={Typography.semibold}>{card.title}</Text>
-            </View>
-        </Pressable>
-    )
-}
 
 const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
     
@@ -124,7 +57,7 @@ const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
                     showsHorizontalScrollIndicator={false}
                     horizontal={true}
                     keyExtractor={(item: ManhwaCard) => item.manhwa_id.toString()}
-                    renderItem={({item}) => <ManhwaRandomCard card={item} />}
+                    renderItem={({item}) => <RandomManhwaCard card={item} />}
                 />
             </View>
         </View>
@@ -141,11 +74,5 @@ const styles = StyleSheet.create({
     gridContainer: {
         flex: 1, 
         height: AppConstants.COMMON.RANDOM_MANHWAS.MAX_HEIGHT
-    },
-    manhwaTitleContainer: {
-        position: 'absolute',
-        left: wp(2),
-        paddingRight: wp(2),
-        bottom: 24
-    }
+    }    
 })
