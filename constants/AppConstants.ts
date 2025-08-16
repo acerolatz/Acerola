@@ -34,7 +34,7 @@ export const AppConstants = {
         }
     },
     DEBUB: {
-        ENABLED: true
+        ENABLED: false
     },
     MANHWA_COVER: {
         WIDTH: 300,
@@ -117,7 +117,7 @@ export const AppConstants = {
         SCREEN_PADDING_VERTICAL: hp(4),
         RANDOM_MANHWAS: {
             MAX_WIDTH: wp(87),
-            MAX_HEIGHT: hp(82)
+            MAX_HEIGHT: hp(90)
         },
         GAP: hp(1.2),
         ITEM_PADDING_HORIZONTAL: hp(1),

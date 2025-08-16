@@ -18,16 +18,13 @@ import Row from '@/components/util/Row'
 import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
 import { Typography } from '@/constants/typography'
-import { Collection, Genre, Manhwa } from '@/helpers/types'
-import { 
-    dbCleanTable, 
-    dbGetReadingHistory,     
-    dbReadCollections, 
+import { Genre, Manhwa } from '@/helpers/types'
+import { hp } from '@/helpers/util'
+import {     
+    dbGetReadingHistory,         
     dbReadGenres, 
     dbReadManhwasOrderedByUpdateAt, 
-    dbReadManhwasOrderedByViews,     
-    dbShouldUpdate, 
-    dbUpsertCollections 
+    dbReadManhwasOrderedByViews
 } from '@/lib/database'
 import { 
     spFetchCollections,  
@@ -38,6 +35,7 @@ import { useCollectionState } from '@/store/collectionsState'
 import { useManhwaCardsState } from '@/store/randomManhwaState'
 import { useTop10ManhwasState } from '@/store/top10State'
 import { AppStyle } from '@/styles/AppStyle'
+import { LinearGradient } from 'expo-linear-gradient'
 import { router, useFocusEffect } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
@@ -186,25 +184,26 @@ const HomePage = () => {
     }
 
     return (
-        <SafeAreaView style={AppStyle.safeArea} >
-            {/* Header */}
-            <Row style={styles.header} >
-                <AppLogo/>
-                <Row style={{gap: AppConstants.ICON.SIZE}} >
-                    {
-                        !loading &&
-                        <>
-                            <UpdateDatabaseButton type='client' />
-                            <Button iconName='search-outline' onPress={openManhwaSearch} />
-                            <RandomManhwaButton />
-                        </>
-                    }
-                    <Button iconName='options-outline' onPress={toggleMenu} />
-                </Row>
-            </Row>
-
+        <SafeAreaView style={[AppStyle.safeArea, {paddingTop: 0}]} >            
             {/* Main content */}
             <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} >
+                {/* Header */}
+                <Footer height={AppConstants.COMMON.SCREEN_PADDING_VERTICAL + 4} />
+                <Row style={styles.header} >
+                    <AppLogo/>
+                    <Row style={{gap: AppConstants.ICON.SIZE}} >
+                        {
+                            !loading &&
+                            <>
+                                <UpdateDatabaseButton type='client' />
+                                <Button iconName='search-outline' onPress={openManhwaSearch} />
+                                <RandomManhwaButton />
+                            </>
+                        }
+                        <Button iconName='options-outline' onPress={toggleMenu} />
+                    </Row>                
+                </Row>
+
                 <Column style={{gap: AppConstants.COMMON.GAP}} >
                     <GenreGrid genres={genres} />
                     <CollectionGrid collections={collections} />
@@ -243,8 +242,6 @@ const styles = StyleSheet.create({
     },
     header: {
         width: '100%',
-        paddingRight: 2, 
-        marginTop: 4, 
         marginBottom: 10, 
         justifyContent: "space-between"
     },

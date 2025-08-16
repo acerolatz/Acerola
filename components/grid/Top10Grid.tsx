@@ -9,11 +9,11 @@ import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 import Title from '../Title'
 import Row from '../util/Row'
 import BooleanRotatingButton from '../buttons/BooleanRotatingButton'
-import { FontSizes, Typography } from '@/constants/typography'
+import { Typography } from '@/constants/typography'
 import { hp, wp } from '@/helpers/util'
 
 
-const TOP_1O_ITEM_WIDTH = wp(24)
+const TOP_1O_ITEM_WIDTH = wp(30)
 const TOP_1O_ITEM_HEIGHT = hp(24)
 
 

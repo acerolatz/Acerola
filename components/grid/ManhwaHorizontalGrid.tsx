@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     },
     gridContainer: {
         width: '100%', 
-        height: hp(46)
+        height: hp(44)
         // height: AppConstants.MANHWA_COVER.HEIGHT + AppConstants.COMMON.GAP * 3 + FontSizes.xl * 3        
     }
 })

@@ -16,7 +16,7 @@ import { ToastMessages } from '@/constants/Messages'
 import { AppConstants } from '@/constants/AppConstants'
 import CustomActivityIndicator from '../util/CustomActivityIndicator'
 import { FlashList } from '@shopify/flash-list'
-import { wp } from '@/helpers/util'
+import { hp, wp } from '@/helpers/util'
 import { Typography } from '@/constants/typography'
 import { LinearGradient } from 'expo-linear-gradient'
 
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     manhwaTitleContainer: {
         position: 'absolute',
         left: wp(2),
-        bottom: wp(2),
-        paddingRight: wp(2)
+        paddingRight: wp(2),
+        bottom: 24
     }
 })

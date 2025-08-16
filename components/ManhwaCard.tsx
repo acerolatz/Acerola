@@ -31,8 +31,8 @@ interface ManhwaCardProps {
 
 const ManhwaCard = ({
     manhwa,
-    width = wp(46),
-    height = hp(46),
+    width = wp(56),
+    height = hp(44),
     marginRight = AppConstants.COMMON.MARGIN,
     marginBottom = 0,
     showChaptersPreview = true,
@@ -76,6 +76,6 @@ const styles = StyleSheet.create({
         position: 'absolute',
         left: wp(1),
         bottom: wp(1),
-        paddingRight: wp(1)
+        paddingRight: wp(1.2)
     }    
 })

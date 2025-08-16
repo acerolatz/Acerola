@@ -33,7 +33,7 @@ const DummyChapterLink = ({index}: DummyChapterLinkProps) => {
 const DummyLast3Chapters = () => {
     return (
         <>
-            <Text style={Typography.regular}>Last 3 Chapter Component look like this: </Text>
+            <Text style={Typography.regular}>This is what the Last 3 Chapters Component looks like: </Text>
             <View style={{width: wp(46), gap: AppConstants.COMMON.MARGIN}} >
                 <DummyChapterLink index={2} />
                 <DummyChapterLink index={1} />

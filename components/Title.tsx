@@ -6,12 +6,11 @@ import { Text } from 'react-native'
 
 interface TitleProps {
   title: string
-  textColor?: string
 }
 
-const Title = ({title, textColor = Colors.white}: TitleProps) => {
+const Title = ({title}: TitleProps) => {
   return (    
-    <Text style={[Typography.semiboldLg, {color: textColor}]}>{title}</Text>
+    <Text style={{...Typography.semiboldLg, color: Colors.white}}>{title}</Text>
   )
 }
 

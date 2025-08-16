@@ -1,14 +1,16 @@
-import { Colors } from '@/constants/Colors'
-import { AppStyle } from '@/styles/AppStyle'
 import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet } from 'react-native'
 import { AppConstants } from '../../constants/AppConstants'
-import { Typography } from '@/constants/typography'
+import { Image } from 'expo-image'
 
 
-const AppLogo = ({name = AppConstants.COMMON.APP_NAME}: {name?: string}) => {
+const AppLogo = () => {
   return (
-    <Text style={styles.text}>{name}</Text>
+    <Image 
+      source={require("@/assets/images/kisshot.png")} 
+      style={styles.image} 
+      contentFit='fill'
+      transition={1000} />
   )
 }
 
@@ -17,9 +19,9 @@ export default AppLogo
 
 
 const styles = StyleSheet.create({
-  text: {
-    ...Typography.semiboldXl, 
-    color: Colors.yellow, 
-    textAlignVertical: 'center'
+  image: {
+    width: AppConstants.BUTTON.SIZE * 0.9,
+    height: AppConstants.BUTTON.SIZE * 0.9,
+    borderRadius: AppConstants.BUTTON.SIZE
   }
 })
