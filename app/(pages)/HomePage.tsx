@@ -35,7 +35,6 @@ import { useCollectionState } from '@/store/collectionsState'
 import { useManhwaCardsState } from '@/store/randomManhwaState'
 import { useTop10ManhwasState } from '@/store/top10State'
 import { AppStyle } from '@/styles/AppStyle'
-import { LinearGradient } from 'expo-linear-gradient'
 import { router, useFocusEffect } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
@@ -83,7 +82,7 @@ const HomePage = () => {
             return {...c, normalizedWidth, normalizedHeight}
         }))
     }
-
+    
     const updateCollections = async () => {
         if (collections.length === 0) {
             const c = await spFetchCollections()

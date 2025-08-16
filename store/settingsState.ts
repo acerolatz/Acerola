@@ -10,7 +10,11 @@ type SettingsState = {
 
 export const useSettingsState = create<SettingsState>(
     (set) => ({
-        settings: {showLast3Chapters: false},
+        settings: {
+            showLast3Chapters: false,
+            drawDistance: 0, 
+            onEndReachedThreshold: 0
+        },
         setSettings: (settings: Settings) => {
             (set((state) => {return {...state, settings}}))
         }

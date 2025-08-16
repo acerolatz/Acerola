@@ -14,6 +14,7 @@ import {
   dbFirstRun,
   dbGetAppVersion,
   dbIsSafeModeEnabled,
+  dbLoadSettings,
   dbSetLastRefresh,
   dbShouldClearCache,
   dbShouldUpdate,
@@ -24,6 +25,7 @@ import Toast from 'react-native-toast-message';
 import { router } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useAppVersionState } from '@/store/appVersionState';
+import { useSettingsState } from '@/store/settingsState';
 
 
 const App = () => {
@@ -32,6 +34,7 @@ const App = () => {
     const isInitialized = useRef(false);
 
     const { setLocalVersion } = useAppVersionState()
+    const { setSettings } = useSettingsState()
 
     let [fontsLoaded] = useFonts({
         LeagueSpartan_200ExtraLight,
@@ -50,6 +53,11 @@ const App = () => {
         }
     }
 
+    const loadSettings = async () => {
+        const s = await dbLoadSettings(db)   
+        setSettings(s)
+    }
+
     useEffect(
         () => {
             if (isInitialized.current) return;
@@ -59,7 +67,8 @@ const App = () => {
                 await Promise.all([
                     handleCache(),
                     updateLocalVersion(),
-                    dbFirstRun(db)
+                    dbFirstRun(db),
+                    loadSettings()
                 ])
                 
                 const state = await NetInfo.fetch();

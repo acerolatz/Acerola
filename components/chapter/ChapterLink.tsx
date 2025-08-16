@@ -1,20 +1,17 @@
 import { Colors } from '@/constants/Colors'
-import { FontSizes, Typography } from '@/constants/typography'
+import { Typography } from '@/constants/typography'
 import { Chapter } from '@/helpers/types'
-import { formatTimestamp } from '@/helpers/util'
+import { formatTimestamp, hp } from '@/helpers/util'
 import { spFetchChapterList } from '@/lib/supabase'
 import { useChapterState } from '@/store/chapterState'
-import { AppStyle } from '@/styles/AppStyle'
 import { router } from 'expo-router'
 import React, { useCallback, useState } from 'react'
 import {
     ActivityIndicator,
-    Pressable,
-    StyleProp,
+    Pressable,    
     StyleSheet,
     Text,
-    View,
-    ViewStyle
+    View    
 } from 'react-native'
 
 
@@ -55,15 +52,15 @@ const ChapterLink = ({
             pathname: "/(pages)/ChapterPage",
             params: {manhwaTitle: manhwa_title}
         })
-    }, [chapter_id])
+    }, [chapter_id])    
 
     if (loading) {
         return (
             <View style={styles.chapterLink} >
-                <ActivityIndicator size={FontSizes.xl} color={Colors.white} />
+                <ActivityIndicator size={hp(2)} color={Colors.white} />
                 {
                     shouldShowChapterDate &&
-                    <Text style={Typography.regular}>{formatTimestamp(chapter_created_at)}</Text>
+                    <Text style={styles.text}>{formatTimestamp(chapter_created_at)}</Text>
                 }
             </View>
         )
@@ -71,10 +68,10 @@ const ChapterLink = ({
 
     return (
         <Pressable onPress={onPress} style={styles.chapterLink} >
-            <Text style={Typography.regular}>{name}</Text>
+            <Text style={styles.text}>{name}</Text>
             {
                 shouldShowChapterDate &&
-                <Text style={Typography.regular}>{formatTimestamp(chapter_created_at)}</Text>
+                <Text style={styles.text}>{formatTimestamp(chapter_created_at)}</Text>
             }
         </Pressable>
     )
@@ -86,8 +83,10 @@ const styles = StyleSheet.create({
     chapterLink: {        
         flexDirection: 'row',
         alignItems: "center",
-        justifyContent: "space-between",
-        height: FontSizes.xl,
-        paddingRight: 6
-    }    
+        justifyContent: "space-between"        
+    },
+    text: {
+        ...Typography.regular,
+        fontSize: hp(2)
+    }
 })

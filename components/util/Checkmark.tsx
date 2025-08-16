@@ -1,10 +1,11 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
 import { AppConstants } from '@/constants/AppConstants'
 import Row from './Row'
 import { Typography } from '@/constants/typography'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { Colors } from '@/constants/Colors'
+import CustomActivityIndicator from './CustomActivityIndicator'
 
 
 interface CheckmarkProps {
@@ -15,12 +16,34 @@ interface CheckmarkProps {
 
 const Checkmark = ({title, value, check}: CheckmarkProps) => {
 
+    const [loading, setLoading] = useState(false)
+
+    const onPress = async () => {
+        setLoading(true)
+        await check()
+        setLoading(false)
+    }
+
+    if (loading) {
+        return (
+            <Row style={styles.container} >
+                <Text style={{...Typography.regular, flexShrink: 1}} >{title}</Text>
+                <View style={{alignItems: "center", justifyContent: "center"}} >
+                    <CustomActivityIndicator size={AppConstants.ICON.SIZE * 0.8} />
+                </View>
+            </Row>
+        )
+    }
+
     if (value) {
         return (
             <Row style={styles.container} >
                 <Text style={{...Typography.regular, flexShrink: 1}} >{title}</Text>
-                <Pressable style={styles.buttonMarked} onPress={check} >
-                    <Ionicons name='checkmark-outline' size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />
+                <Pressable onPress={onPress} style={styles.buttonMarked} hitSlop={AppConstants.COMMON.HIT_SLOP.NORMAL}>
+                    <Ionicons 
+                        name='checkmark-outline' 
+                        size={AppConstants.ICON.SIZE} 
+                        color={Colors.backgroundColor} />
                 </Pressable>
             </Row>
         )
@@ -29,9 +52,10 @@ const Checkmark = ({title, value, check}: CheckmarkProps) => {
     return (
         <Row style={styles.container} >
             <Text style={{...Typography.regular, flexShrink: 1}} >{title}</Text>
-            <Pressable style={styles.button}  onPress={check} >
-                
-            </Pressable>
+            <Pressable 
+                style={styles.button} 
+                onPress={onPress}
+                hitSlop={AppConstants.COMMON.HIT_SLOP.NORMAL} />
         </Row>
     )
 }
@@ -40,16 +64,16 @@ export default Checkmark
 
 const styles = StyleSheet.create({
     container: {
-        gap: AppConstants.COMMON.GAP
+        gap: AppConstants.COMMON.GAP,
+        justifyContent: "space-between"
     },
     button: {
         alignItems: "center",
         justifyContent: "center",
         width: AppConstants.ICON.SIZE,
         height: AppConstants.ICON.SIZE,
-        padding: 2,
         borderWidth: 2,
-        borderColor: Colors.white,
+        borderColor: Colors.primary,
         borderRadius: AppConstants.COMMON.BORDER_RADIUS
     },
     buttonMarked: {
@@ -57,10 +81,9 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         width: AppConstants.ICON.SIZE,
         height: AppConstants.ICON.SIZE,
-        padding: 2,
         borderWidth: 2,
-        borderColor: Colors.white,
+        borderColor: Colors.primary,
         borderRadius: AppConstants.COMMON.BORDER_RADIUS,
-        backgroundColor: Colors.white
+        backgroundColor: Colors.primary
     }
 })

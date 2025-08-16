@@ -1,14 +1,16 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
 import TopBar from '../TopBar'
 import { Typography } from '@/constants/typography'
 import Checkmark from '../util/Checkmark'
-import { getYesterday, wp } from '@/helpers/util'
+import { formatTimestamp, getYesterday, hp, wp } from '@/helpers/util'
 import { AppConstants } from '@/constants/AppConstants'
-import ChapterLink from '../chapter/ChapterLink'
 import { useSQLiteContext } from 'expo-sqlite'
 import { dbSetInfo } from '@/lib/database'
 import { useSettingsState } from '@/store/settingsState'
+import { Image } from 'expo-image'
+import { LinearGradient } from 'expo-linear-gradient'
+import Row from '../util/Row'
 
 
 interface DummyChapterLinkProps {
@@ -18,36 +20,54 @@ interface DummyChapterLinkProps {
 const DummyChapterLink = ({index}: DummyChapterLinkProps) => {
     
     return (
-        <ChapterLink 
-            chapter_name={(index + 1).toString()}
-            chapter_id={3}
-            manhwa_id={42}
-            manhwa_title=''
-            index={1}
-            shouldShowChapterDate={true}
-            enabled={false}
-            chapter_created_at={getYesterday(index).toISOString()} />
+        <Row style={{justifyContent: "space-between", paddingRight: 6}} >
+            <Text style={[Typography.regular, {fontSize: hp(1.4)}]}>Chapter {index}</Text>
+            <Text numberOfLines={1} style={[Typography.regular, {fontSize: hp(1.4)}]}>{formatTimestamp(getYesterday(3 - index).toISOString())}</Text>
+        </Row>        
     )
 }
 
-const DummyLast3Chapters = () => {
+
+const DummyManhwaCard = () => {
     return (
-        <>
-            <Text style={Typography.regular}>This is what the Last 3 Chapters Component looks like: </Text>
-            <View style={{width: wp(46), gap: AppConstants.COMMON.MARGIN}} >
-                <DummyChapterLink index={2} />
-                <DummyChapterLink index={1} />
-                <DummyChapterLink index={0} />
+        <View style={{width: wp(45), height: hp(36)}} >
+            <Image
+                source={require("@/assets/images/Addicted to My Mom.webp")} 
+                style={{width: '100%', height: hp(36), borderRadius: AppConstants.COMMON.BORDER_RADIUS}}
+                contentFit='cover'
+                transition={AppConstants.COMMON.IMAGE_TRANSITION}
+                />
+            <LinearGradient 
+                colors={['transparent', 'transparent', 'rgba(0, 0, 0, 0.7)']} 
+                style={StyleSheet.absoluteFill} />
+            <View style={styles.manhwaTitleContainer} >
+                <Text style={Typography.semibold}>Addicted to My Mom</Text>
             </View>
-        </>
+        </View>
+    )
+}
+
+const DummyLast3Chapters = ({showLast3Chapters = true}: {showLast3Chapters?: boolean}) => {
+    return (
+        <View style={{gap: AppConstants.COMMON.GAP, marginRight: wp(1)}} >            
+            <DummyManhwaCard/>
+            {
+            showLast3Chapters &&
+                <View style={{width: wp(45), gap: AppConstants.COMMON.MARGIN}} >
+                    <DummyChapterLink index={3} />
+                    <DummyChapterLink index={2} />
+                    <DummyChapterLink index={1} />
+                </View>
+            }
+        </View>
     )
 }
 
 const UiForm = () => {
 
     const db = useSQLiteContext()
-    const [enable3LastChapter, setEnable3LastChapter] = useState(false)
     const { settings, setSettings } = useSettingsState()
+    const [enable3LastChapter, setEnable3LastChapter] = useState(settings.showLast3Chapters)
 
     const setLast3 = async () => {
         const newState = !enable3LastChapter
@@ -57,18 +77,30 @@ const UiForm = () => {
     }
 
     return (
-        <>
-            <TopBar title='UI'/>
-            <Text style={Typography.semibold} >Home Page</Text>
-            <Checkmark 
-                title='Enable Last 3 Chapters Component in Latest Updates e Most Popular grid' 
-                value={enable3LastChapter}
-                check={setLast3} />
-            <DummyLast3Chapters/>
-        </>
+        <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
+            <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='always' >
+                <View style={{flex: 1, gap: AppConstants.COMMON.GAP, paddingHorizontal: wp(1)}} >
+                    <Checkmark 
+                        title='Last3Chapters' 
+                        value={settings.showLast3Chapters}
+                        check={setLast3} />
+                    <Row style={{alignItems: "flex-start"}} >
+                        <DummyLast3Chapters />
+                        <DummyLast3Chapters showLast3Chapters={false} />
+                    </Row>
+                </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
     )
 }
 
 export default UiForm
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+    manhwaTitleContainer: {
+        position: 'absolute',
+        left: wp(1),
+        bottom: wp(1),
+        paddingRight: wp(1.2)
+    }
+})

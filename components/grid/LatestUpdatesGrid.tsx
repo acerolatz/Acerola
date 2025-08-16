@@ -12,9 +12,9 @@ const LatestUpdatesGrid = ({manhwas}: LatestUpdatesGridProps) => {
     
   return (
     <ManhwaHorizontalGrid
-        title='Latest Updates'
-        onViewAll={() => router.navigate("/(pages)/LatestUpdatesPage")}
-        manhwas={manhwas}
+      title='Latest Updates'
+      onViewAll={() => router.navigate("/(pages)/LatestUpdatesPage")}
+      manhwas={manhwas}      
     />
   )
 

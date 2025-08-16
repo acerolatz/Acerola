@@ -1,7 +1,6 @@
 import { AppConstants } from '@/constants/AppConstants';
 import { Colors } from '@/constants/Colors';
 import { ToastMessages } from '@/constants/Messages';
-import { hp } from '@/helpers/util';
 import { spRequestManhwa } from '@/lib/supabase';
 import { AppStyle } from '@/styles/AppStyle';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -26,6 +25,11 @@ import Footer from '../util/Footer';
 import { Typography } from '@/constants/typography';
 
 
+interface FormData {
+    manga_title: string
+    descr: string
+}
+
 const schema = yup.object().shape({  
     manga_title: yup
         .string()
@@ -36,12 +40,6 @@ const schema = yup.object().shape({
         .string()
         .max(AppConstants.FORM.MANHWA_REQUEST.DESCR_MAX_LENGTH, `Max ${AppConstants.FORM.MANHWA_REQUEST.DESCR_MAX_LENGTH} characters`)
 });
-
-
-interface FormData {
-    manga_title: string
-    descr: string
-}
 
 
 const RequestManhwaForm = () => {
@@ -95,7 +93,7 @@ const RequestManhwaForm = () => {
                     <Text style={Typography.semibold}>Message</Text>
                     <Text style={AppStyle.textOptional}>optional</Text>
                 </View>
-                {errors.descr && (<Text style={AppStyle.error}>{errors.descr.message}</Text>)}            
+                {errors.descr && (<Text style={AppStyle.error}>{errors.descr.message}</Text>)}
                 <Controller
                     name="descr"
                     control={control}

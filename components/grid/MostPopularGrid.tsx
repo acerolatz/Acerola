@@ -10,11 +10,11 @@ interface MostPopularGridProps {
 
 const MostPopularGrid = ({manhwas}: MostPopularGridProps) => {
   return (
-        <ManhwaHorizontalGrid
-            title='Most Popular'
-            onViewAll={() => router.navigate("/(pages)/MostViewPage")}
-            manhwas={manhwas}
-        />
+    <ManhwaHorizontalGrid
+      title='Most Popular'
+      onViewAll={() => router.navigate("/(pages)/MostViewPage")}
+      manhwas={manhwas}
+    />
   )
 }
 

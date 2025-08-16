@@ -20,6 +20,7 @@ const Library = () => {
   const db = useSQLiteContext()
   const [manhwas, setManhwas] = useState<Manhwa[]>([])
   const [loading, setLoading] = useState(false)
+  
   const status = useRef('Reading')
   const page = useRef(0)
   const hasResults = useRef(true)
@@ -75,7 +76,6 @@ const Library = () => {
             manhwas={manhwas}
             loading={loading}
             showChaptersPreview={false}
-            shouldShowChapterDate={false}
             showManhwaStatus={false}
             onEndReached={onEndReached}
           />

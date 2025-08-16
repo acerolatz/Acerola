@@ -1,6 +1,6 @@
 import { AppConstants } from '@/constants/AppConstants';
-import { Author, Chapter, Collection, Genre, Manhwa, ManhwaAuthor, ManhwaGenre, Todo, UserHistory } from '@/helpers/types';
-import { formatBytes, getCacheSizeBytes, secondsSince } from '@/helpers/util';
+import { Author, Chapter, Collection, Genre, Manhwa, ManhwaAuthor, ManhwaGenre, Settings, Todo, UserHistory } from '@/helpers/types';
+import { formatBytes, getCacheSizeBytes, hp, secondsSince } from '@/helpers/util';
 import * as SQLite from 'expo-sqlite';
 import DeviceInfo from 'react-native-device-info';
 import uuid from 'react-native-uuid';
@@ -146,7 +146,9 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
         (name, value)        
       VALUES
         ('images', 0),
-        ('current_chapter_milestone', ${AppConstants.COMMON.CHAPTER_START_MILESTONE})
+        ('current_chapter_milestone', ${AppConstants.COMMON.CHAPTER_START_MILESTONE}),
+        ('drawDistance', ${Math.floor(AppConstants.COMMON.IS_TABLET ? hp(200) : hp(330))}),
+        ('onEndReachedThreshold', ${AppConstants.COMMON.IS_TABLET ? 2 : 3})
       ON CONFLICT 
         (name)
       DO NOTHING;
@@ -1290,7 +1292,7 @@ export async function dbGetNumImagesFetchedCount(db: SQLite.SQLiteDatabase): Pro
   return r ? r.value : 0
 }
 
-export async function dbGetNumericInfo(db: SQLite.SQLiteDatabase, name: string): Promise<number | null> {
+export async function dbReadNumericInfo(db: SQLite.SQLiteDatabase, name: string): Promise<number | null> {
   const r = await db.getFirstAsync<{value: number}>(
     'SELECT value FROM app_numeric_info WHERE name = ?;',
     [name]
@@ -1359,7 +1361,7 @@ export async function dbIsChapterMilestoneReached(db: SQLite.SQLiteDatabase): Pr
 
   const readChaptersCount = await dbGetReadChaptersCount(db)
   
-  let currentMilestone = await dbGetNumericInfo(db, 'current_chapter_milestone')
+  let currentMilestone = await dbReadNumericInfo(db, 'current_chapter_milestone')
   if (!currentMilestone) {
     await dbCreateNumericInfo(db, 'current_chapter_milestone', AppConstants.COMMON.CHAPTER_START_MILESTONE)
     currentMilestone = AppConstants.COMMON.CHAPTER_START_MILESTONE
@@ -1563,4 +1565,32 @@ export async function dbResetApp(db: SQLite.SQLiteDatabase) {
   await dbCleanTable(db, 'reading_status')
   await dbCleanTable(db, 'reading_history')
   await dbCleanTable(db, 'todos')
+}
+
+
+export async function dbLoadSettings(db: SQLite.SQLiteDatabase): Promise<Settings> {
+  const r: Settings | null = await Promise.all([
+      dbReadInfo(db, 'show_last_3_chapters'),
+      dbReadNumericInfo(db, 'drawDistance'),
+      dbReadNumericInfo(db, 'onEndReachedThreshold')
+  ]).then(([
+    showLast3Chapters,
+    drawDistance,
+    onEndReachedThreshold
+  ]) => {
+      return {
+        showLast3Chapters: showLast3Chapters === '1',
+        drawDistance: drawDistance !== null ? drawDistance : Math.floor(AppConstants.COMMON.IS_TABLET ? hp(200) : hp(330)),
+        onEndReachedThreshold: onEndReachedThreshold !== null ? onEndReachedThreshold : AppConstants.COMMON.IS_TABLET ? 2 : 3
+      }
+  }).catch(error => {
+    console.log("error dbLoadSettings", error); 
+    return null
+  })
+
+  return r ? r : {
+    showLast3Chapters: false,
+    drawDistance: Math.floor(AppConstants.COMMON.IS_TABLET ? hp(200) : hp(330)),
+    onEndReachedThreshold: AppConstants.COMMON.IS_TABLET ? 2 : 3
+  }
 }

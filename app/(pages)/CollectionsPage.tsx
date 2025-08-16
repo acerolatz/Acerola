@@ -7,6 +7,7 @@ import { Typography } from '@/constants/typography'
 import { Collection } from '@/helpers/types'
 import { hp, wp } from '@/helpers/util'
 import { dbReadCollections } from '@/lib/database'
+import { useCollectionState } from '@/store/collectionsState'
 import { AppStyle } from '@/styles/AppStyle'
 import { router } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
@@ -26,20 +27,8 @@ const ITEM_HEIGHT = hp(8)
 
 
 const CollectionsPage = () => {
-    
-    const db = useSQLiteContext()
-    const [collections, setCollections] = useState<Collection[]>([])
-
-    useEffect(
-        () => {
-            const init = async () => {
-                const c = await dbReadCollections(db)
-                setCollections(c)
-            }
-            init()
-        },
-        [db]
-    )    
+        
+    const { collections } = useCollectionState()
 
     const onCollectionPress = async (collection: Collection) => {
         router.navigate({

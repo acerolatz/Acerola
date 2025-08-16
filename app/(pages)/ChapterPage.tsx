@@ -9,6 +9,7 @@ import { hp } from '@/helpers/util'
 import { dbAddNumericInfo, dbUpsertReadingHistory } from '@/lib/database'
 import { spFetchChapterImages, spUpdateChapterView } from '@/lib/supabase'
 import { useChapterState } from '@/store/chapterState'
+import { useSettingsState } from '@/store/settingsState'
 import { FlashList } from '@shopify/flash-list'
 import { Image } from 'expo-image'
 import { useLocalSearchParams } from 'expo-router'
@@ -25,8 +26,6 @@ import Toast from 'react-native-toast-message'
 
 
 const AnimatedFlashList = Animated.createAnimatedComponent(FlashList<ChapterImage>)
-const DRAW_DISTANCE = AppConstants.COMMON.IS_TABLET ? hp(200) : hp(330)
-const ON_END_REACHED_THRESHOLD = AppConstants.COMMON.IS_TABLET ? 2 : 3
 
 
 const ChapterPage = () => {
@@ -42,6 +41,9 @@ const ChapterPage = () => {
     const flashListRef = useRef<FlashList<ChapterImage>>(null)
     
     const [listTotalHeight, setListTotalHeight] = useState(hp(40))
+  
+    const drawDistance = useSettingsState(s => s.settings.drawDistance)
+    const onEndReachedThreshold = useSettingsState(s => s.settings.onEndReachedThreshold)
 
     const currentChapter: Chapter = chapters[currentChapterIndex] 
     const headerVisible = useSharedValue(true)
@@ -194,10 +196,10 @@ const ChapterPage = () => {
             keyExtractor={keyExtractor}
             estimatedItemSize={listTotalHeight}
             renderItem={renderItem}
-            drawDistance={DRAW_DISTANCE}
+            drawDistance={drawDistance}
             scrollEventThrottle={4}
             onScroll={scrollHandler}
-            onEndReachedThreshold={ON_END_REACHED_THRESHOLD}
+            onEndReachedThreshold={onEndReachedThreshold}
           />
           <Animated.View style={animatedFooterStyle} >
             <ChapterFooter

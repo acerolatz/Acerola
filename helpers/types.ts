@@ -130,4 +130,6 @@ export type Feedback = {
 
 export type Settings = {
     showLast3Chapters: boolean
+    drawDistance: number
+    onEndReachedThreshold: number
 }

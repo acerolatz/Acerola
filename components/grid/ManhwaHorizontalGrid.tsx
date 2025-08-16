@@ -3,43 +3,48 @@ import { Manhwa } from '@/helpers/types'
 import { hp, wp } from '@/helpers/util'
 import { FlashList } from '@shopify/flash-list'
 import React from 'react'
-import { StyleSheet, View } from 'react-native'
+import { FlatList, StyleSheet, View } from 'react-native'
 import ManhwaCard from '../ManhwaCard'
 import Title from '../Title'
 import ViewAllButton from '../buttons/ViewAllButton'
 import Row from '../util/Row'
-import { FontSizes } from '@/constants/typography'
+import { useSettingsState } from '@/store/settingsState'
 
 
 interface ManhwaHorizontalGridProps {    
     title: string
     manhwas: Manhwa[]
-    onViewAll: () => void
+    onViewAll: () => void    
 }
 
 
 const ManhwaHorizontalGrid = ({
     title,
     manhwas,
-    onViewAll
+    onViewAll    
 }: ManhwaHorizontalGridProps) => {
-    if (manhwas.length === 0)  { return <></> }
+    
+    const { settings } = useSettingsState()
 
+    if (manhwas.length === 0)  { return <></> }
+    
     return (
         <View style={styles.container} >
-            <Row style={{width: '100%', justifyContent: "space-between"}} >
+            <Row style={styles.header} >
                 <Title title={title}/>
                 <ViewAllButton onPress={onViewAll} />
             </Row>
-            <View style={styles.gridContainer} >
-                <FlashList
+            <View style={{width: '100%'}} >
+                <FlatList
                     data={manhwas}
                     horizontal={true}
-                    estimatedItemSize={AppConstants.MANHWA_COVER.WIDTH}
-                    drawDistance={wp(120)}
+                    initialNumToRender={10}
                     showsHorizontalScrollIndicator={false}
                     keyExtractor={(item: Manhwa) => item.manhwa_id.toString()}
-                    renderItem={({item}) => <ManhwaCard manhwa={item} showChaptersPreview={false} />}
+                    extraData={settings.showLast3Chapters}
+                    renderItem={
+                        ({item}) => <ManhwaCard manhwa={item} showChaptersPreview={settings.showLast3Chapters} />
+                    }
                 />
             </View>
         </View>
@@ -53,9 +58,8 @@ const styles = StyleSheet.create({
         width: '100%',
         gap: AppConstants.COMMON.GAP
     },
-    gridContainer: {
+    header: {
         width: '100%', 
-        height: hp(44)
-        // height: AppConstants.MANHWA_COVER.HEIGHT + AppConstants.COMMON.GAP * 3 + FontSizes.xl * 3        
+        justifyContent: "space-between"
     }
 })
