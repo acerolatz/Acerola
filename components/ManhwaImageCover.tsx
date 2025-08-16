@@ -1,17 +1,24 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet, useWindowDimensions } from 'react-native'
 import React from 'react'
 import { AppConstants } from '@/constants/AppConstants'
-import { hp } from '@/helpers/util'
+import { getRelativeHeight, wp } from '@/helpers/util'
 import { Image } from 'expo-image'
 
 
-const ManhwaImageCover = ({url}: {url: string}) => {
+const MAX_WIDTH = AppConstants.COMMON.SCREEN_WIDTH - AppConstants.COMMON.SCREEN_PADDING_HORIZONTAL * 2
+
+
+const ManhwaImageCover = ({url}: {url: string}) => {  
+
+  const { width, height } = useWindowDimensions();
+  const w = width * 0.92
+  const h = getRelativeHeight(720, 980, w)
 
   return (
     <Image 
       source={url} 
       contentFit='cover' 
-      style={styles.image}
+      style={{...styles.image, width: w, height: h}}
       transition={AppConstants.COMMON.IMAGE_TRANSITION} />
   )
 }
@@ -19,11 +26,7 @@ const ManhwaImageCover = ({url}: {url: string}) => {
 export default ManhwaImageCover
 
 const styles = StyleSheet.create({
-  image: {    
-    width: 720,
-    height: 980,
-    maxWidth: AppConstants.COMMON.SCREEN_WIDTH - AppConstants.COMMON.SCREEN_PADDING_HORIZONTAL * 2,
-    maxHeight: hp(70),
+  image: {
     borderRadius: AppConstants.COMMON.BORDER_RADIUS
   }
 })

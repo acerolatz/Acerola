@@ -1,6 +1,6 @@
 import { AppConstants } from '@/constants/AppConstants'
 import { Manhwa } from '@/helpers/types'
-import { wp } from '@/helpers/util'
+import { hp, wp } from '@/helpers/util'
 import { FlashList } from '@shopify/flash-list'
 import React from 'react'
 import { StyleSheet, View } from 'react-native'
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     },
     gridContainer: {
         width: '100%', 
-        height: AppConstants.MANHWA_COVER.HEIGHT
+        height: hp(46)
         // height: AppConstants.MANHWA_COVER.HEIGHT + AppConstants.COMMON.GAP * 3 + FontSizes.xl * 3        
     }
 })

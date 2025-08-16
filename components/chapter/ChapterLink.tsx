@@ -26,6 +26,7 @@ interface ChapterLinkProps {
     chapter_created_at: string
     index: number
     shouldShowChapterDate?: boolean
+    enabled?: boolean
 }
 
 const ChapterLink = ({
@@ -35,7 +36,8 @@ const ChapterLink = ({
     chapter_id,
     chapter_created_at,
     chapter_name,
-    shouldShowChapterDate = true
+    shouldShowChapterDate = true,
+    enabled = true
 }: ChapterLinkProps) => {
 
     const { setChapterState } = useChapterState()
@@ -44,6 +46,7 @@ const ChapterLink = ({
     const name = 'Chapter ' + chapter_name
 
     const onPress = useCallback(async () => {
+        if (!enabled) { return }
         setLoading(true)
             const chapters: Chapter[] = await spFetchChapterList(manhwa_id)
             setChapterState(chapters, chapters.length - 1 - index)

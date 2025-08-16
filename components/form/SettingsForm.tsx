@@ -1,7 +1,7 @@
 import { AppConstants } from '@/constants/AppConstants';
 import { Colors } from '@/constants/Colors';
 import { ToastMessages } from '@/constants/Messages';
-import { clearCache, formatBytes, hasOnlyDigits } from '@/helpers/util';
+import { clearCache, formatBytes, getYesterday, hasOnlyDigits, wp } from '@/helpers/util';
 import { dbCreateSafeModePassword, dbSetCacheSize, dbSetSafeModeState } from '@/lib/database';
 import { AppStyle } from '@/styles/AppStyle';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -26,6 +26,10 @@ import * as yup from 'yup';
 import Row from '../util/Row';
 import Footer from '../util/Footer';
 import { FontSizes, Typography } from '@/constants/typography';
+import TopBar from '../TopBar';
+import ChapterLink from '../chapter/ChapterLink';
+import Checkmark from '../util/Checkmark';
+import UiForm from './UiForm';
 
 
 interface FormData {
@@ -124,8 +128,9 @@ const SettingsForm = ({currentMaxCacheSize, currentCacheSize, safeModePassword, 
         <>
             <Row style={{gap: AppConstants.COMMON.GAP, alignSelf: 'flex-start'}} >
                 <Text style={Typography.semibold}>Safe Mode</Text>
-                <Text style={{...AppStyle.error, top: 8}}>{isSafeModeOn ? 'enabled' : 'disabled'}</Text>
+                <Text style={{...AppStyle.error, alignSelf: "center"}}>{isSafeModeOn ? 'enabled' : 'disabled'}</Text>
             </Row>
+
             <Text style={Typography.regular}>When safe mode is enabled, {AppConstants.COMMON.APP_NAME} will function as a simple to-do list. To unlock the main content, you will need the numeric password you define below.</Text>
             <Text style={{...Typography.regular, color: Colors.neonRed}}>If you forget the password, it cannot be reset or recovered. You must delete the app data via {Platform.OS} settings to regain access to the main content.</Text>
             <Text style={{...Typography.regular, color: Colors.neonRed}}>Changes to Safe Mode settings will be applied when the app restarts.</Text>
@@ -190,6 +195,9 @@ const SettingsForm = ({currentMaxCacheSize, currentCacheSize, safeModePassword, 
                     <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Save</Text>
                 </Pressable>
             }
+
+            <UiForm/>
+
             <Footer height={62}/>
         </>
     )

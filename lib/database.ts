@@ -136,7 +136,8 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
         ('last_sync_time', ''),
         ('should_ask_for_donation', '1'),
         ('password', ''),
-        ('is_safe_mode_on', '0')
+        ('is_safe_mode_on', '0'),
+        ('show_last_3_chapters', '0')
       ON CONFLICT 
         (name)
       DO NOTHING;

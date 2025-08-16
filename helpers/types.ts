@@ -81,7 +81,7 @@ export type Scan = {
 
 export type Collection = {
     collection_id: number
-    name: string    
+    name: string
 }
 
 export type Post = {
@@ -125,4 +125,9 @@ export type Feedback = {
     title: string
     descr: string
     created_at: string
+}
+
+
+export type Settings = {
+    showLast3Chapters: boolean
 }

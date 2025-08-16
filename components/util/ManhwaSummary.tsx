@@ -38,7 +38,7 @@ const ManhwaSummary = ({summary}: ManhwaSummaryProps) => {
 
     if (isTextExpanded) {
         return (
-            <View>
+            <View style={{width: '100%'}} >
                 <Text style={Typography.regular}>{t}</Text>                
                 <Pressable 
                     onPress={onPress}
@@ -51,7 +51,7 @@ const ManhwaSummary = ({summary}: ManhwaSummaryProps) => {
     }
 
     return (
-        <View>
+        <View style={{width: '100%'}} >
             <Text style={Typography.regular}>{t}</Text>
             <Pressable 
                 onPress={onPress}
@@ -66,9 +66,12 @@ const ManhwaSummary = ({summary}: ManhwaSummaryProps) => {
 export default ManhwaSummary
 
 const styles = StyleSheet.create({
+    container: {
+        width: '100%'
+    },
     button: {
         width: '100%', 
         alignItems: "center", 
         justifyContent: "center"
-    }    
+    }
 })

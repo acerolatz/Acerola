@@ -14,6 +14,7 @@ import ManhwaIdComponent from './ManhwaIdComponent';
 import ManhwaStatusComponent from './ManhwaStatusComponent';
 import { Typography } from '@/constants/typography';
 import { LinearGradient } from 'expo-linear-gradient';
+import { hp, wp } from '@/helpers/util';
 
 
 interface ManhwaCardProps {
@@ -30,8 +31,8 @@ interface ManhwaCardProps {
 
 const ManhwaCard = ({
     manhwa,
-    width = AppConstants.MANHWA_COVER.WIDTH,
-    height = AppConstants.MANHWA_COVER.HEIGHT,
+    width = wp(46),
+    height = hp(46),
     marginRight = AppConstants.COMMON.MARGIN,
     marginBottom = 0,
     showChaptersPreview = true,
@@ -73,8 +74,8 @@ export default memo(ManhwaCard);
 const styles = StyleSheet.create({
     manhwaTitleContainer: {
         position: 'absolute',
-        bottom: 4,
-        left: 8,
-        paddingRight: 10
+        left: wp(1),
+        bottom: wp(1),
+        paddingRight: wp(1)
     }    
 })

@@ -72,7 +72,7 @@ const ChapterFooter = ({
           <Text style={{...Typography.regular, flexShrink: 1, textAlign: "center"}}>
             If you encounter broken or missing images, please use the bug-report option.
           </Text>
-          <Ionicons name='bug-outline' color={Colors.yellow} size={32}/>
+          <Ionicons name='bug-outline' color={Colors.yellow} size={AppConstants.ICON.SIZE}/>
         </Pressable>
 
       </Column>

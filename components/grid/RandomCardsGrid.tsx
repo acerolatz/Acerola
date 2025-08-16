@@ -144,8 +144,8 @@ const styles = StyleSheet.create({
     },
     manhwaTitleContainer: {
         position: 'absolute',
-        bottom: 30,
-        left: 8,
-        paddingRight: 10
+        left: wp(2),
+        bottom: wp(2),
+        paddingRight: wp(2)
     }
 })

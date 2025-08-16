@@ -25,8 +25,8 @@ import Toast from 'react-native-toast-message'
 
 
 const AnimatedFlashList = Animated.createAnimatedComponent(FlashList<ChapterImage>)
-const DRAW_DISTANCE = AppConstants.COMMON.IS_TABLET ? hp(100) : hp(330)
-const ON_END_REACHED_THRESHOLD = AppConstants.COMMON.IS_TABLET ? 1 : 3
+const DRAW_DISTANCE = AppConstants.COMMON.IS_TABLET ? hp(200) : hp(330)
+const ON_END_REACHED_THRESHOLD = AppConstants.COMMON.IS_TABLET ? 2 : 3
 
 
 const ChapterPage = () => {

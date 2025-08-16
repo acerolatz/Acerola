@@ -1,7 +1,8 @@
 import { AppConstants } from '@/constants/AppConstants';
 import { Colors } from '@/constants/Colors';
-import { Typography } from '@/constants/typography';
+import { FontSizes, Typography } from '@/constants/typography';
 import { Manhwa } from '@/helpers/types';
+import { hp } from '@/helpers/util';
 import { dbGetManhwaReadingStatus, dbUpdateManhwaReadingStatus } from '@/lib/database';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -16,10 +17,7 @@ interface AddToLibrayProps {
 }
 
 
-const AddToLibray = ({
-    manhwa,
-    backgroundColor = Colors.libraryColor    
-}: AddToLibrayProps) => {
+const AddToLibray = ({manhwa, backgroundColor = Colors.primary}: AddToLibrayProps) => {
 
     const db = useSQLiteContext()
 
@@ -54,27 +52,30 @@ const AddToLibray = ({
     }
 
     return (
-        <View style={{flex: 1, height: AppConstants.BUTTON.SIZE}} >
+        <View style={{flex: 1}} >
             <DropDownPicker
                 open={open}
-                style={[styles.dropDownContainer, {backgroundColor}]}
-                dropDownContainerStyle={[styles.dropDownContainerStyle, {borderColor: backgroundColor}]}
+                style={{...styles.dropDownContainer, backgroundColor}}
+                dropDownContainerStyle={{...styles.dropDownContainerStyle, borderColor: backgroundColor}}
                 labelStyle={{color: Colors.backgroundColor}}
                 textStyle={Typography.regular}
                 showArrowIcon={true}
-                ArrowUpIconComponent={() => {return <Ionicons name='chevron-up' size={20} color={Colors.backgroundColor} />}}
-                ArrowDownIconComponent={() => {return <Ionicons name='chevron-down' size={20} color={Colors.backgroundColor} />}}
+                ArrowUpIconComponent={() => {return <Ionicons name='chevron-up' size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />}}
+                ArrowDownIconComponent={() => {return <Ionicons name='chevron-down' size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />}}
                 placeholder='Add To Library'
                 placeholderStyle={{...Typography.regular, color: Colors.backgroundColor}}
                 value={value as any}
                 items={items}
+                listItemContainerStyle={{height: FontSizes.sm * 2}}
+                TickIconComponent={() => <Ionicons name='checkmark' size={FontSizes.sm} color={backgroundColor} />}
                 setOpen={setOpen}
                 setValue={setValue}
                 setItems={setItems}
-                listMode='SCROLLVIEW'
+                listMode='SCROLLVIEW'            
                 theme="DARK"                
                 onChangeValue={onChangeValue}
                 multiple={false}
+                maxHeight={hp(40)}
                 mode="SIMPLE"
             />
         </View>
@@ -87,15 +88,11 @@ const styles = StyleSheet.create({
     dropDownContainer: {
         height: AppConstants.BUTTON.SIZE,
         borderRadius: AppConstants.COMMON.BORDER_RADIUS,
+        gap: AppConstants.COMMON.GAP,
         borderWidth: 0
     },
     dropDownContainerStyle: {
-        backgroundColor: Colors.backgroundColor, 
+        backgroundColor: Colors.backgroundColor,
         borderWidth: 2        
-    },
-    text: {
-        ...Typography.regular,
-        color: Colors.backgroundColor
     }
-
 })

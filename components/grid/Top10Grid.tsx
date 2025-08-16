@@ -10,10 +10,11 @@ import Title from '../Title'
 import Row from '../util/Row'
 import BooleanRotatingButton from '../buttons/BooleanRotatingButton'
 import { FontSizes, Typography } from '@/constants/typography'
+import { hp, wp } from '@/helpers/util'
 
 
-const TOP_1O_ITEM_WIDTH = 160
-const TOP_1O_ITEM_HEIGHT = 240
+const TOP_1O_ITEM_WIDTH = wp(24)
+const TOP_1O_ITEM_HEIGHT = hp(24)
 
 
 interface Top10ItemProps {
@@ -35,7 +36,11 @@ const Top10Item = ({title, manhwa_id, image_url, index}: Top10ItemProps) => {
     return (
         <Pressable onPress={onPress} style={{marginRight: AppConstants.COMMON.MARGIN}} >
             <View>
-                <Image source={image_url} style={styles.image} contentFit='cover' transition={AppConstants.COMMON.IMAGE_TRANSITION} />
+                <Image 
+                    source={image_url} 
+                    style={styles.image} 
+                    contentFit='cover'
+                    transition={AppConstants.COMMON.IMAGE_TRANSITION} />
                 <LinearGradient colors={['transparent', 'transparent', Colors.backgroundColor]} style={styles.linearGradient} >
                     <Text style={styles.number} >{index + 1}</Text>
                     <Text numberOfLines={1} style={styles.manhwaTitle} >{title}</Text>
@@ -113,15 +118,15 @@ const styles = StyleSheet.create({
     number: {
         ...Typography.semiboldXl,
         color: Colors.yellow,
-        fontSize: 96,
-        bottom: 8,
-        left: 4
+        fontSize: hp(8),
+        bottom: hp(2),
+        left: wp(1)
     },    
     manhwaTitle: {
         ...Typography.regular, 
         maxWidth: TOP_1O_ITEM_WIDTH - 10,
         position: 'absolute',
-        left: 6, 
-        bottom: 10
+        left: wp(1), 
+        bottom: hp(1)
     }
 })

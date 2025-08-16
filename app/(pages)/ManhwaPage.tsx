@@ -11,7 +11,7 @@ import PageActivityIndicator from '@/components/util/PageActivityIndicator';
 import { Colors } from '@/constants/Colors';
 import { ToastMessages } from '@/constants/Messages';
 import { Manhwa } from '@/helpers/types';
-import { formatTimestamp, hp } from '@/helpers/util';
+import { formatTimestamp } from '@/helpers/util';
 import { 
   dbGetManhwaAltNames, 
   dbReadManhwaById, 
@@ -31,7 +31,8 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  View
+  View,
+  ViewStyle
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { formatNumberWithSuffix } from '../../helpers/util';
@@ -42,6 +43,7 @@ import { AppConstants } from '@/constants/AppConstants';
 import ManhwaImageCover from '@/components/ManhwaImageCover';
 import { Typography } from '@/constants/typography';
 import ManhwaSummary from '@/components/util/ManhwaSummary';
+import { useResponsive } from '@/helpers/useResponsive';
 
 
 interface ItemProps {
@@ -51,7 +53,7 @@ interface ItemProps {
 
 const Item = ({text, backgroundColor}: ItemProps) => {
   return (
-    <View style={[styles.item, {backgroundColor}]} >
+    <View style={{...styles.item, backgroundColor}} >
       <Text style={{...Typography.regular, color: Colors.backgroundColor}}>{text}</Text>
     </View>
   )
@@ -64,7 +66,9 @@ const ManhwaPage = () => {
   const params = useLocalSearchParams()
   const manhwa_id: number = params.manhwa_id as any
   const [manhwa, setManhwa] = useState<Manhwa | null>(null)
-  const [altNames, setAltNames] = useState<string[]>([])  
+  const [altNames, setAltNames] = useState<string[]>([])
+
+  const { hp } = useResponsive()  
 
   useEffect(
     () => {
@@ -114,7 +118,9 @@ const ManhwaPage = () => {
     <SafeAreaView style={[AppStyle.safeArea, styles.container]} >
       <ScrollView style={{flex: 1}} keyboardShouldPersistTaps={'always'} showsVerticalScrollIndicator={false} >
 
-        <LinearGradient colors={[manhwa.color, Colors.backgroundColor]} style={styles.linearBackground} />
+        <LinearGradient 
+          colors={[manhwa.color, Colors.backgroundColor]} 
+          style={{...styles.linearBackground, height: hp(100)}} />
 
         {/* Top */}        
         <Row style={styles.topBar} >
@@ -135,15 +141,11 @@ const ManhwaPage = () => {
             <ManhwaIdComponent manhwa_id={manhwa.manhwa_id} />
           </View>
 
-          {/* Title, Summary and Last Update */}
-          <View style={{alignSelf: "flex-start", gap: AppConstants.COMMON.GAP, marginBottom: AppConstants.COMMON.GAP}} >
-            <Text style={Typography.semiboldXl}>{manhwa!.title}</Text>
-            <ManhwaAlternativeNames names={altNames} />
-            <ManhwaSummary summary={manhwa.descr} />
-            <Text style={Typography.regular}>
-              last update: {formatTimestamp(manhwa.updated_at)}
-            </Text>
-          </View>
+          {/* Title, Summary and Last Update */}          
+          <Text style={Typography.semiboldXl}>{manhwa!.title}</Text>
+          <ManhwaAlternativeNames names={altNames} />
+          <ManhwaSummary summary={manhwa.descr} />
+          <Text style={Typography.regular}>last update: {formatTimestamp(manhwa.updated_at)}</Text>
           
           {/* Genre and Authors Info */}
           <ManhwaAuthorInfo manhwa={manhwa} />
@@ -157,9 +159,10 @@ const ManhwaPage = () => {
             <Item text={manhwa.status} backgroundColor={manhwa.color} />
             <Item text={`Views: ${formatNumberWithSuffix(manhwa.views + 1)}`} backgroundColor={manhwa.color} />
           </Row>
-
+          
           {/* Chapter Grid */}
           <ManhwaChapterGrid manhwa={manhwa} />
+
           <Footer/>
         </View>
 
@@ -178,10 +181,9 @@ const styles = StyleSheet.create({
   },
   linearBackground: {
     position: 'absolute',
-    width: AppConstants.COMMON.SCREEN_WIDTH,
-    left: 0,    
-    top: 0,
-    height: hp(98)
+    width: '100%',    
+    left: 0,
+    top: 0    
   },
   item: {
     height: AppConstants.BUTTON.SIZE,
@@ -194,13 +196,13 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: "space-between",
     paddingHorizontal: AppConstants.COMMON.SCREEN_PADDING_HORIZONTAL,
-    paddingTop: AppConstants.COMMON.SCREEN_PADDING_VERTICAL,
+    paddingVertical: AppConstants.COMMON.SCREEN_PADDING_VERTICAL,
     paddingBottom: 20
   },
   manhwaContainer: {
     width: '100%',
-    gap: AppConstants.COMMON.MARGIN, 
-    alignItems: "center", 
+    gap: AppConstants.COMMON.MARGIN,
+    alignItems: "flex-start",
     paddingHorizontal: AppConstants.COMMON.SCREEN_PADDING_HORIZONTAL
   },
   bottomSheetContainer: {

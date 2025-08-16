@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
     },
     checkBox: {
         backgroundColor: Colors.backgroundColor, 
-        borderRadius: 20, 
+        borderRadius: AppConstants.ICON.SIZE, 
         alignItems: "center", 
         justifyContent: "center", 
         padding: 4
@@ -329,8 +329,8 @@ const styles = StyleSheet.create({
     },
     showPasswordIcon: {
         position: "absolute",
-        right: 8,
+        right: AppConstants.ICON.SIZE / 2,
         top: "50%",
-        transform: [{ translateY: -11 }]
+        transform: [{ translateY: -AppConstants.ICON.SIZE / 2 }]
     }
 })

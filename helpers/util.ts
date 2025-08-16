@@ -191,8 +191,7 @@ export async function copyToClipboard(value: string) {
 
 
 export function getChapterGridNumColumns(): number {
-  const w = wp(92)
-  if (w >= 500) { return 12 }
+  const w = wp(92)  
   if (w >= 440) { return 9 }
   if (w >= 400) { return 8 }
   if (w >= 360) { return 7 }
@@ -228,3 +227,10 @@ export const requestPermissions = async (): Promise<boolean> => {
     return false;
   }
 };
+
+
+export function getYesterday(delta: number = 1): Date {
+  const d = new Date();
+  d.setDate(d.getDate() - delta);
+  return d;
+}

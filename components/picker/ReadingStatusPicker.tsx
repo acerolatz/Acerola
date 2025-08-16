@@ -1,6 +1,7 @@
 import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
-import { Typography } from '@/constants/typography'
+import { FontSizes, Typography } from '@/constants/typography'
+import { hp } from '@/helpers/util'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import React, { useState } from 'react'
 import { StyleSheet } from 'react-native'
@@ -32,6 +33,9 @@ const ReadingStatusPicker = ({onChangeValue}: ReadingStatusPickerProps) => {
             ArrowDownIconComponent={() => {return <Ionicons name='chevron-down' size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />}}
             value={value as any}
             showArrowIcon={true}
+            listItemContainerStyle={{height: FontSizes.sm * 2}}
+            TickIconComponent={() => <Ionicons name='checkmark' size={FontSizes.sm} color={Colors.primary} />}
+            maxHeight={hp(40)}
             items={items}
             setOpen={setOpen}
             setValue={setValue}

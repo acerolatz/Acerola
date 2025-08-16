@@ -73,8 +73,8 @@ const styles = StyleSheet.create({
         gap: AppConstants.COMMON.GAP
     },
     image: {
-        width: wp(20),
-        height: hp(14),
+        width: wp(13),
+        height: hp(13),
         maxWidth: AppConstants.MANHWA_COVER.WIDTH,
         maxHeight: AppConstants.MANHWA_COVER.HEIGHT,
         borderRadius: AppConstants.COMMON.BORDER_RADIUS

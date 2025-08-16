@@ -13,7 +13,7 @@ const ChapterArrowUpButton = ({onPress}: ChapterArrowUpButtonProps) => {
         onPress={onPress}
         hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE}
         style={styles.arrowUp}>
-        <Ionicons name="arrow-up-outline" size={20} color="rgba(0,0,0,0.3)" />
+        <Ionicons name="arrow-up-outline" size={AppConstants.ICON.SIZE * 0.7} color="rgba(0,0,0,0.3)" />
     </Pressable>
   )
 }
@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     bottom: 62,
     right: 12,
     padding: 6,
-    borderRadius: 32,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)'
+    borderRadius: AppConstants.ICON.SIZE,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)'
   }
 })

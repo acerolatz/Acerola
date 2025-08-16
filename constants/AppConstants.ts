@@ -9,8 +9,8 @@ export const AppConstants = {
             MENU_ANIMATION_TIME: 300
         },
         CHAPTER: {
-            HEADER_HEIGHT: 160,
-            FOOTER_HEIGHT: 500
+            HEADER_HEIGHT: hp(20),
+            FOOTER_HEIGHT: hp(45)
         }
     },
     FORM: {
@@ -117,7 +117,7 @@ export const AppConstants = {
         SCREEN_PADDING_VERTICAL: hp(4),
         RANDOM_MANHWAS: {
             MAX_WIDTH: wp(87),
-            MAX_HEIGHT: hp(85)
+            MAX_HEIGHT: hp(82)
         },
         GAP: hp(1.2),
         ITEM_PADDING_HORIZONTAL: hp(1),

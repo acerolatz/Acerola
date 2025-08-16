@@ -29,8 +29,8 @@ const DonateComponent = ({item}: {item: DonateMethod}) => {
     return (
       <Pressable onPress={() => onPress(item)} style={styles.donateButton} >
         <Column style={styles.donateTitleContainer} >
-          <Text style={[Typography.semibold, {color: Colors.backgroundColor}]}>{item.method}</Text>
-          <Ionicons name={iconName as any} size={28} color={Colors.backgroundColor} />
+          <Text style={[Typography.regular, {color: Colors.backgroundColor}]}>{item.method}</Text>
+          <Ionicons name={iconName as any} size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />
         </Column>
         <Text style={[Typography.regular, {color: Colors.backgroundColor}]}>{item.value}</Text>
       </Pressable>
@@ -44,10 +44,11 @@ export default DonateComponent
 const styles = StyleSheet.create({
   donateButton: {
     maxWidth: '100%', 
-    padding: 10,
+    paddingHorizontal: AppConstants.COMMON.ITEM_PADDING_HORIZONTAL,
+    paddingVertical: AppConstants.COMMON.ITEM_PADDING_VERTICAL,
     borderRadius: AppConstants.COMMON.BORDER_RADIUS, 
     backgroundColor: Colors.yellow, 
-    marginBottom: AppConstants.COMMON.MARGIN      
+    marginBottom: AppConstants.COMMON.MARGIN
   },
   donateTitleContainer: {
     width: "100%", 
