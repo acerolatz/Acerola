@@ -139,3 +139,6 @@ export type DownloadProgress = {
   total: number
   percentage: number
 }
+
+
+export type WriteTask = () => Promise<void>

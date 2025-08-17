@@ -14,11 +14,11 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/splash-icon.png",
-        "backgroundColor": "#111419"
+        "backgroundColor": "#000000"
       },
       "icon": {
         "foregroundImage": "./assets/images/icon.png",
-        "backgroundColor": "#FA5454"
+        "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.ougi.acerola"
@@ -36,7 +36,7 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 256,
           "resizeMode": "cover",
-          "backgroundColor": "#111419"
+          "backgroundColor": "#000000"
         }
       ],
       "expo-font"

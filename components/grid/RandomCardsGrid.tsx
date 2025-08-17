@@ -1,12 +1,10 @@
 import { useManhwaCardsState } from '@/store/randomManhwaState'
-import RotatingButton from '../buttons/RotatingButton'
+import { FlatList, StyleSheet, View } from 'react-native'
 import { AppConstants } from '@/constants/AppConstants'
+import RotatingButton from '../buttons/RotatingButton'
 import RandomManhwaCard from '../RandomManhwaCard'
-import { StyleSheet, View } from 'react-native'
-import { FlashList } from '@shopify/flash-list'
 import { ManhwaCard } from '@/helpers/types'
 import React, { useRef } from 'react'
-import { wp } from '@/helpers/util'
 import { debounce } from 'lodash'
 import Row from '../util/Row'
 import Title from '../Title'
@@ -20,7 +18,7 @@ interface RandomCardsGridProps {
 const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
     
     const { cards } = useManhwaCardsState()
-    const flatListRef = useRef<FlashList<ManhwaCard>>(null)
+    const flatListRef = useRef<FlatList<ManhwaCard>>(null)
 
     const reload = async () => {
         await reloadCards()
@@ -47,13 +45,12 @@ const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
                 <RotatingButton onPress={debounceReload} />
             </Row>
             <View style={styles.gridContainer} >
-                <FlashList
+                <FlatList
                     ref={flatListRef}
                     data={cards}
+                    initialNumToRender={4}
                     ItemSeparatorComponent={() => <View style={{ width: AppConstants.MARGIN }} />}
-                    drawDistance={wp(100)}
                     onEndReachedThreshold={1}
-                    estimatedItemSize={AppConstants.RANDOM_MANHWAS.MAX_WIDTH}
                     showsHorizontalScrollIndicator={false}
                     horizontal={true}
                     keyExtractor={(item: ManhwaCard) => item.manhwa_id.toString()}

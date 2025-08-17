@@ -1,23 +1,23 @@
-import DonationBottomSheet from '@/components/bottomsheet/DonationBottomSheet'
 import NewAppReleaseBottomSheet from '@/components/bottomsheet/NewAppReleaseBottomSheet'
-import Button from '@/components/buttons/Button'
+import DonationBottomSheet from '@/components/bottomsheet/DonationBottomSheet'
 import RandomManhwaButton from '@/components/buttons/OpenRandomManhwaButton'
 import UpdateDatabaseButton from '@/components/buttons/UpdateDatabaseButton'
-import CollectionGrid from '@/components/grid/CollectionsGrid'
 import ContinueReadingGrid from '@/components/grid/ContinueReadingGrid'
-import GenreGrid from '@/components/grid/GenreGrid'
 import LatestUpdatesGrid from '@/components/grid/LatestUpdatesGrid'
 import MostPopularGrid from '@/components/grid/MostPopularGrid'
 import RandomCardsGrid from '@/components/grid/RandomCardsGrid'
+import CollectionGrid from '@/components/grid/CollectionsGrid'
+import { AppConstants } from '@/constants/AppConstants'
+import GenreGrid from '@/components/grid/GenreGrid'
 import Top10Grid from '@/components/grid/Top10Grid'
 import LateralMenu from '@/components/LateralMenu'
+import Button from '@/components/buttons/Button'
+import { Genre, Manhwa } from '@/helpers/types'
 import Column from '@/components/util/Column'
 import Footer from '@/components/util/Footer'
 import AppLogo from '@/components/util/Logo'
-import Row from '@/components/util/Row'
-import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
-import { Genre, Manhwa } from '@/helpers/types'
+import Row from '@/components/util/Row'
 import {     
     dbGetReadingHistory,         
     dbReadGenres, 
@@ -32,10 +32,15 @@ import {
 import { useCollectionState } from '@/store/collectionsState'
 import { useManhwaCardsState } from '@/store/randomManhwaState'
 import { useTop10ManhwasState } from '@/store/top10State'
-import { AppStyle } from '@/styles/AppStyle'
 import { router, useFocusEffect } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { AppStyle } from '@/styles/AppStyle'
+import React, { 
+    useCallback, 
+    useEffect, 
+    useRef, 
+    useState 
+} from 'react'
 import { 
     Animated, 
     Pressable, 

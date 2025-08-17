@@ -1,7 +1,7 @@
 import { Colors } from '@/constants/Colors'
 import { ToastMessages } from '@/constants/Messages'
 import { hasInternetAvailable } from '@/helpers/util'
-import { dbCheckSecondsSinceLastRefresh, dbHasManhwas, dbShouldUpdate, dbUpdateDatabase } from '@/lib/database'
+import { dbCheckSecondsSinceLastRefresh, dbHasNoManhwas, dbShouldUpdate, dbUpdateDatabase } from '@/lib/database'
 import { router } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
 import React from 'react'
@@ -25,24 +25,22 @@ const UpdateDatabaseButton = ({
 
     const db = useSQLiteContext()    
 
-    const update = async () => {        
+    const update = async () => {
         const hasInternet = await hasInternetAvailable()
         if (!hasInternet) { 
             Toast.show(ToastMessages.EN.NO_INTERNET)
             return 
         }        
 
-        const shouldUpdate = await dbShouldUpdate(db, type) || AppConstants.DEBUB.ENABLED
-        let hasMangas = true
+        const shouldUpdate = await dbShouldUpdate(db, type)
+        let hasNoMangas = true
 
-        if (!shouldUpdate) {
-            hasMangas = await dbHasManhwas(db)
-        }
+        if (!shouldUpdate) { hasNoMangas = await dbHasNoManhwas(db) }
         
-        if (!shouldUpdate && hasMangas) {
+        if (!shouldUpdate && !hasNoMangas) {
             const secondsUntilRefresh = await dbCheckSecondsSinceLastRefresh(db, type)
             Toast.show({
-                text1: "Warning", 
+                text1: "Wait",
                 text2: `You can try again in ${secondsUntilRefresh} seconds.`,
                 type: 'info',
                 visibilityTime: 3000

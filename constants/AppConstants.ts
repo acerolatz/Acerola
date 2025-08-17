@@ -6,6 +6,7 @@ const IS_TABLET_AUX = Math.min(wp(100), hp(100)) >= 600
 export const AppConstants = {
     APP_NAME: "Acerola",
     APP_VERSION: "v1.1.0",
+    DEBUB: { ENABLED: true },
     PAGES: {
         HOME: {
             MENU_WIDTH: wp(65),
@@ -35,8 +36,7 @@ export const AppConstants = {
             MIN_CACHE_SIZE: 64, // MiB
             MAX_CACHE_SIZE: 256000 // MiB
         }
-    },
-    DEBUB: { ENABLED: false },    
+    },    
     DATABASE: {
         UPDATE_INTERVAL: {
             SERVER: 60 * 60 * 3, // 3 HOURS,
