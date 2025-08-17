@@ -31,7 +31,7 @@ const ChangeChapter = ({
       <Text style={Typography.regular}>Chapter</Text>
       {
         !isFirstChapter &&
-        <Pressable onPress={goToPreviousChapter} style={{marginTop: 2}} hitSlop={AppConstants.COMMON.HIT_SLOP.NORMAL} >
+        <Pressable onPress={goToPreviousChapter} style={{marginTop: 2}} hitSlop={AppConstants.HIT_SLOP.NORMAL} >
           <Ionicons name='chevron-back' size={AppConstants.ICON.SIZE} color={Colors.white} />
         </Pressable>
       }
@@ -44,7 +44,7 @@ const ChangeChapter = ({
       </View>
       {
         !isLastChapter &&
-        <Pressable onPress={goToNextChapter} style={{marginTop: 2}}  hitSlop={AppConstants.COMMON.HIT_SLOP.NORMAL}>
+        <Pressable onPress={goToNextChapter} style={{marginTop: 2}}  hitSlop={AppConstants.HIT_SLOP.NORMAL}>
           <Ionicons name='chevron-forward' size={AppConstants.ICON.SIZE} color={Colors.white} />
         </Pressable>
       }

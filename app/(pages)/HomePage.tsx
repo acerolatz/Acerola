@@ -18,7 +18,6 @@ import Row from '@/components/util/Row'
 import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
 import { Genre, Manhwa } from '@/helpers/types'
-import { normalizeRandomManhwaCardHeight } from '@/helpers/util'
 import {     
     dbGetReadingHistory,         
     dbReadGenres, 
@@ -49,6 +48,29 @@ import {
 
 const PAGE_LIMIT = 32
 
+
+function normalizeRandomManhwaCardHeight(width: number, height: number): {
+  normalizedWidth: number, 
+  normalizedHeight: number
+} {
+  const normalizedHeight = height > AppConstants.RANDOM_MANHWAS.MAX_HEIGHT ? 
+    AppConstants.RANDOM_MANHWAS.MAX_HEIGHT :
+    height
+  
+  let normalizedWidth = (normalizedHeight * width) / height
+
+  normalizedWidth = normalizedWidth > AppConstants.RANDOM_MANHWAS.MAX_WIDTH ?
+    AppConstants.RANDOM_MANHWAS.MAX_WIDTH : 
+    normalizedWidth
+  return { normalizedWidth, normalizedHeight}
+}
+
+
+const openManhwaSearch = () => {
+    router.navigate("/(pages)/ManhwaSearch")
+}
+
+
 const HomePage = () => {
 
     const db = useSQLiteContext()
@@ -64,7 +86,7 @@ const HomePage = () => {
 
     // Lateral Menu
     const menuAnim = useRef(new Animated.Value(-AppConstants.PAGES.HOME.MENU_WIDTH)).current 
-    const backgroundAnim = useRef(new Animated.Value(-AppConstants.COMMON.SCREEN_WIDTH)).current
+    const backgroundAnim = useRef(new Animated.Value(-AppConstants.SCREEN.WIDTH)).current
     const menuVisible = useRef(false)    
 
     const reloadCards = async () => {
@@ -101,11 +123,7 @@ const HomePage = () => {
         if (cards.length == 0) {
             await reloadCards()
         }
-    }
-
-    const openManhwaSearch = () => {
-        router.navigate("/(pages)/ManhwaSearch")
-    }
+    }    
 
     const toggleMenu = () => {
         menuVisible.current ? closeMenu() : openMenu()
@@ -171,7 +189,7 @@ const HomePage = () => {
             menuVisible.current = false
         })
         Animated.timing(backgroundAnim, {
-            toValue: -AppConstants.COMMON.SCREEN_WIDTH,
+            toValue: -AppConstants.SCREEN.WIDTH,
             duration: AppConstants.PAGES.HOME.MENU_ANIMATION_TIME,
             useNativeDriver: true
         }).start()
@@ -180,7 +198,7 @@ const HomePage = () => {
     return (
         <SafeAreaView style={{...AppStyle.safeArea, paddingTop: 0}} >
             <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false}>
-                <View style={{height: AppConstants.COMMON.SCREEN_PADDING_VERTICAL}} />
+                <View style={{height: AppConstants.SCREEN.PADDING_VERTICAL}} />
                 <Row style={styles.header}>
                     <AppLogo />
                     <Row style={{ gap: AppConstants.ICON.SIZE }}>
@@ -194,7 +212,7 @@ const HomePage = () => {
                         <Button iconName="options-outline" onPress={toggleMenu} />
                     </Row>
                 </Row>
-                <Column style={{gap: AppConstants.COMMON.GAP}} >
+                <Column style={{gap: AppConstants.GAP}} >
                     <GenreGrid genres={genres} />
                     <CollectionGrid collections={collections} />
                     <ContinueReadingGrid manhwas={readingHistoryManhwas} />
@@ -233,7 +251,7 @@ const styles = StyleSheet.create({
     header: {
         width: '100%', 
         justifyContent: "space-between",
-        paddingBottom: AppConstants.COMMON.GAP * 2
+        paddingBottom: AppConstants.GAP * 2
     },
     sideMenu: {
         position: 'absolute',
@@ -246,9 +264,9 @@ const styles = StyleSheet.create({
         zIndex: 100
     },
     menuBackground: {
-        width: AppConstants.COMMON.SCREEN_WIDTH,
+        width: AppConstants.SCREEN.WIDTH,
         position: 'absolute',
-        height: AppConstants.COMMON.SCREEN_HEIGHT * 1.2,
+        height: AppConstants.SCREEN.HEIGHT * 1.2,
         top: 0,
         left: 0,        
         backgroundColor: 'rgba(0, 0, 0, 0.8)',

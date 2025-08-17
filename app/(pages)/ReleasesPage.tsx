@@ -83,6 +83,6 @@ export default Releases
 const styles = StyleSheet.create({
     flatListContainer: {
         width: '100%',
-        gap: AppConstants.COMMON.GAP
+        gap: AppConstants.GAP
     }    
 })

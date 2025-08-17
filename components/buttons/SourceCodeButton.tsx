@@ -49,7 +49,7 @@ export default SourceCodeButton
 const styles = StyleSheet.create({
     container: {
         ...AppStyle.defaultGridItem,
-        gap: AppConstants.COMMON.GAP,
+        gap: AppConstants.GAP,
         flexDirection: 'row'
     }    
 })

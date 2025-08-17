@@ -53,8 +53,8 @@ const LatestUpdatesPage = () => {
 
   return (
     <SafeAreaView style={AppStyle.safeArea}>
-      <TopBar title='Latest Updates' titleColor={Colors.yellow} >
-        <ReturnButton color={Colors.yellow} />
+      <TopBar title='Latest Updates' >
+        <ReturnButton />
       </TopBar>
       <ManhwaGrid
         manhwas={manhwas}

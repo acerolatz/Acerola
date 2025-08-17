@@ -34,9 +34,9 @@ const styles = StyleSheet.create({
     container: {
         position: 'absolute',
         top: hp(1),
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
-        paddingHorizontal: AppConstants.COMMON.ITEM_PADDING_HORIZONTAL,
-        paddingVertical: AppConstants.COMMON.ITEM_PADDING_VERTICAL,
+        borderRadius: AppConstants.BORDER_RADIUS,
+        paddingHorizontal: AppConstants.ITEM_PADDING_HORIZONTAL,
+        paddingVertical: AppConstants.ITEM_PADDING_VERTICAL,
         backgroundColor: Colors.backgroundSecondary, 
         alignItems: "center", 
         justifyContent: "center"

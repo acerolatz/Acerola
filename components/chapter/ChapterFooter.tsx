@@ -43,10 +43,10 @@ const ChapterFooter = ({
         {/* Chapter Controller Button */}
         <Row style={styles.chapterSelector} >
           <Text style={Typography.regular}>Chapter</Text>
-          <Row style={{gap: AppConstants.COMMON.GAP}} >
+          <Row style={{gap: AppConstants.GAP}} >
             {
               !isFirstChapter &&
-              <Pressable onPress={goToPreviousChapter} hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE} >
+              <Pressable onPress={goToPreviousChapter} hitSlop={AppConstants.HIT_SLOP.LARGE} >
                 <Ionicons name='chevron-back' size={AppConstants.ICON.SIZE} color={Colors.white} />
               </Pressable>
             }
@@ -59,7 +59,7 @@ const ChapterFooter = ({
             </View>
             {
               !isLastChapter &&
-              <Pressable onPress={goToNextChapter} hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE}>
+              <Pressable onPress={goToNextChapter} hitSlop={AppConstants.HIT_SLOP.LARGE}>
                 <Ionicons name='chevron-forward' size={AppConstants.ICON.SIZE} color={Colors.white} />
               </Pressable>
             }
@@ -72,7 +72,7 @@ const ChapterFooter = ({
           <Text style={{...Typography.regular, flexShrink: 1, textAlign: "center"}}>
             If you encounter broken or missing images, please use the bug-report option.
           </Text>
-          <Ionicons name='bug-outline' color={Colors.yellow} size={AppConstants.ICON.SIZE}/>
+          <Ionicons name='bug-outline' color={Colors.primary} size={AppConstants.ICON.SIZE}/>
         </Pressable>
 
       </Column>
@@ -84,20 +84,20 @@ export default ChapterFooter
 const styles = StyleSheet.create({
   container: {
     width: '100%', 
-    paddingHorizontal: AppConstants.COMMON.SCREEN_PADDING_HORIZONTAL,
-    gap: AppConstants.COMMON.GAP * 2
+    paddingHorizontal: AppConstants.SCREEN.PADDING_HORIZONTAL,
+    gap: AppConstants.GAP * 2
   },
   chapterSelector: {
-    gap: AppConstants.COMMON.GAP
+    gap: AppConstants.GAP
   },  
   button: {
     width: '100%',    
-    paddingVertical: AppConstants.COMMON.ITEM_PADDING_VERTICAL,
-    paddingHorizontal: AppConstants.COMMON.ITEM_PADDING_HORIZONTAL,
-    gap: AppConstants.COMMON.GAP * 2,
+    paddingVertical: AppConstants.ITEM_PADDING_VERTICAL,
+    paddingHorizontal: AppConstants.ITEM_PADDING_HORIZONTAL,
+    gap: AppConstants.GAP * 2,
     alignItems: "center",    
     justifyContent: "center",
-    borderRadius: AppConstants.COMMON.BORDER_RADIUS, 
+    borderRadius: AppConstants.BORDER_RADIUS, 
     backgroundColor: Colors.backgroundSecondary
   }
 })

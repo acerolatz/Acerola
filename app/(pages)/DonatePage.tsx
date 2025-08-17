@@ -118,16 +118,16 @@ const styles = StyleSheet.create({
   item: {
     paddingHorizontal: 20,
     height: 52,
-    borderRadius: AppConstants.COMMON.BORDER_RADIUS,
-    backgroundColor: Colors.yellow,
+    borderRadius: AppConstants.BORDER_RADIUS,
+    backgroundColor: Colors.primary,
     alignItems: "center",
     justifyContent: "center"
   },
   image: {
     width: WIDTH, 
     height: HEIGHT, 
-    marginBottom: AppConstants.COMMON.MARGIN, 
+    marginBottom: AppConstants.MARGIN, 
     alignSelf: "center", 
-    borderRadius: AppConstants.COMMON.BORDER_RADIUS
+    borderRadius: AppConstants.BORDER_RADIUS
   }
 })

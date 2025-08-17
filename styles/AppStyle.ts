@@ -9,19 +9,14 @@ export const AppStyle = StyleSheet.create({
     safeArea: {
         width: '100%', 
         flex: 1, 
-        paddingHorizontal: AppConstants.COMMON.SCREEN_PADDING_HORIZONTAL,
-        paddingTop: AppConstants.COMMON.SCREEN_PADDING_VERTICAL,
+        paddingHorizontal: AppConstants.SCREEN.PADDING_HORIZONTAL,
+        paddingTop: AppConstants.SCREEN.PADDING_VERTICAL,
         backgroundColor: Colors.backgroundColor
-    },    
-    buttonBackground: {
-        padding: 6, 
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS, 
-        backgroundColor: Colors.almostBlack  
     },
     input: {
         ...Typography.regular,
         backgroundColor: Colors.backgroundSecondary,
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
+        borderRadius: AppConstants.BORDER_RADIUS,
         height: AppConstants.BUTTON.SIZE,
         paddingHorizontal: 10,
         color: Colors.white
@@ -30,7 +25,7 @@ export const AppStyle = StyleSheet.create({
         ...Typography.regular,
         backgroundColor: Colors.backgroundSecondary,
         textAlignVertical: 'top',
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
+        borderRadius: AppConstants.BORDER_RADIUS,
         height: hp(12),
         paddingHorizontal: 10,
         color: Colors.white
@@ -38,7 +33,7 @@ export const AppStyle = StyleSheet.create({
     inputLarge: {
         ...Typography.regular,
         backgroundColor: Colors.backgroundSecondary,
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
+        borderRadius: AppConstants.BORDER_RADIUS,
         textAlignVertical: 'top',
         height: hp(20),
         paddingHorizontal: 10,
@@ -58,22 +53,22 @@ export const AppStyle = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         height: AppConstants.BUTTON.SIZE,
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
-        backgroundColor: Colors.yellow
+        borderRadius: AppConstants.BORDER_RADIUS,
+        backgroundColor: Colors.primary
     },    
     defaultGridItem: {
-        paddingHorizontal: AppConstants.COMMON.ITEM_PADDING_HORIZONTAL,
-        paddingVertical: AppConstants.COMMON.ITEM_PADDING_VERTICAL,
+        paddingHorizontal: AppConstants.ITEM_PADDING_HORIZONTAL,
+        paddingVertical: AppConstants.ITEM_PADDING_VERTICAL,
         alignItems: "center",
         justifyContent: "center",
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
-        backgroundColor: Colors.yellow,
-        marginRight: AppConstants.COMMON.MARGIN
+        borderRadius: AppConstants.BORDER_RADIUS,
+        backgroundColor: Colors.primary,
+        marginRight: AppConstants.MARGIN
     },            
     buttonCancel: {
         flex: 1,
         height: AppConstants.BUTTON.SIZE,
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
+        borderRadius: AppConstants.BORDER_RADIUS,
         backgroundColor: Colors.backgroundSecondary,
         alignItems: "center",
         justifyContent: "center",
@@ -83,7 +78,7 @@ export const AppStyle = StyleSheet.create({
     button: {
         flex: 1,
         height: AppConstants.BUTTON.SIZE,
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
+        borderRadius: AppConstants.BORDER_RADIUS,
         backgroundColor: Colors.primary,
         alignItems: "center",
         justifyContent: "center"

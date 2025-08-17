@@ -66,11 +66,11 @@ const SafeModeForm = ({safeModePassword, safeModeOn}: SafeModeFormProps) => {
 
     return (        
         <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled' >
-            <View style={{flex: 1, gap: AppConstants.COMMON.GAP, paddingHorizontal: wp(1)}} >
+            <View style={{flex: 1, gap: AppConstants.GAP, paddingHorizontal: wp(1)}} >
                 <Text style={AppStyle.error}>{isSafeModeOn ? 'enabled' : 'disabled'}</Text>
-                <Text style={Typography.regular}>When safe mode is enabled, {AppConstants.COMMON.APP_NAME} will function as a simple to-do list. To unlock the main content, you will need the numeric password you define below.</Text>
-                <Text style={{...Typography.regular, color: Colors.neonRed}}>If you forget the password, it cannot be reset or recovered. You must delete the app data via {Platform.OS} settings to regain access to the main content.</Text>
-                <Text style={{...Typography.regular, color: Colors.neonRed}}>Changes to Safe Mode settings will be applied when the app restarts.</Text>
+                <Text style={Typography.regular}>When safe mode is enabled, {AppConstants.APP_NAME} will function as a simple to-do list. To unlock the main content, you will need the numeric password you define below.</Text>
+                <Text style={{...Typography.regular, color: Colors.red}}>If you forget the password, it cannot be reset or recovered. You must delete the app data via {Platform.OS} settings to regain access to the main content.</Text>
+                <Text style={{...Typography.regular, color: Colors.red}}>Changes to Safe Mode settings will be applied when the app restarts.</Text>
                 
                 <Text style={Typography.regular} >Password</Text>
                 <TextInput

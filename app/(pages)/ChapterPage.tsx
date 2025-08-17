@@ -55,7 +55,7 @@ const ChapterPage = () => {
     const calculateTotalHeight = (imgs: ChapterImage[]) => {
         let newHeight = 0
         imgs.forEach(img => {
-          const w = Math.min(img.width, AppConstants.COMMON.SCREEN_WIDTH)
+          const w = Math.min(img.width, AppConstants.SCREEN.WIDTH)
           const h = (w * img.height) / img.width
           newHeight += h              
         })
@@ -130,7 +130,7 @@ const ChapterPage = () => {
     const scrollHandler = useAnimatedScrollHandler({
       onScroll: (event) => {
         headerVisible.value = event.contentOffset.y <= 50
-        footerVisible.value = event.contentOffset.y + AppConstants.COMMON.SCREEN_HEIGHT >= listTotalHeightRef.value - 100
+        footerVisible.value = event.contentOffset.y + AppConstants.SCREEN.HEIGHT >= listTotalHeightRef.value - 100
       }
     })
 

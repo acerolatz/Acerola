@@ -24,7 +24,7 @@ const AddToLibray = ({manhwa, backgroundColor = Colors.primary}: AddToLibrayProp
     const [open, setOpen] = useState(false)
     const [value, setValue] = useState<string>()
     const [items, setItems] = useState(
-        AppConstants.COMMON.READING_STATUS.map(i => {return {label: i, value: i}})
+        AppConstants.READING_STATUS.map(i => {return {label: i, value: i}})
     )
 
     const dbValue = useRef('')
@@ -87,8 +87,8 @@ export default AddToLibray
 const styles = StyleSheet.create({
     dropDownContainer: {
         height: AppConstants.BUTTON.SIZE,
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
-        gap: AppConstants.COMMON.GAP,
+        borderRadius: AppConstants.BORDER_RADIUS,
+        gap: AppConstants.GAP,
         borderWidth: 0
     },
     dropDownContainerStyle: {

@@ -145,8 +145,8 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
 
     return (
         <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
-            <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='always' >
-                <View style={{gap: AppConstants.COMMON.GAP}} >
+            <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled' >
+                <View style={{gap: AppConstants.GAP}} >
                     {/* Title */}
                     <Text style={Typography.semibold}>Title</Text>
                     {errors.title && (<Text style={AppStyle.error}>{errors.title.message}</Text>)}
@@ -174,7 +174,7 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
                     />
                     
                     {/* Description */}
-                    <View style={{flexDirection: 'row', gap: AppConstants.COMMON.GAP, alignItems: "center", justifyContent: "center", alignSelf: 'flex-start'}} >
+                    <View style={{flexDirection: 'row', gap: AppConstants.GAP, alignItems: "center", justifyContent: "center", alignSelf: 'flex-start'}} >
                         <Text style={Typography.semibold}>Description</Text>
                         <Text style={AppStyle.textOptional}>optional</Text>
                     </View>

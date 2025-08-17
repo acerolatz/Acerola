@@ -11,7 +11,7 @@ const BugItem = ({item, isSelected, onChange}: {item: BugType, isSelected: boole
     
     const onPress = () => { onChange(item) }
 
-    const backgroundColor = isSelected ? Colors.yellow : Colors.backgroundSecondary
+    const backgroundColor = isSelected ? Colors.primary : Colors.backgroundSecondary
     const color = isSelected ? Colors.backgroundColor : Colors.white
 
     return (
@@ -27,7 +27,7 @@ const BugTypePicker = ({value, onChange}: {value: BugType, onChange: (b: BugType
     return (
         <View style={styles.container} >
             <FlatList
-                data={AppConstants.COMMON.BUT_TYPE_LIST as BugType[]}
+                data={AppConstants.BUG_TYPE_LIST as BugType[]}
                 horizontal={true}
                 keyExtractor={(item) => item}
                 showsHorizontalScrollIndicator={false}

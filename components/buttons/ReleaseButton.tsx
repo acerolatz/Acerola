@@ -56,6 +56,6 @@ const styles = StyleSheet.create({
     container: {
         ...AppStyle.defaultGridItem,
         width: '100%',
-        marginBottom: AppConstants.COMMON.MARGIN
+        marginBottom: AppConstants.MARGIN
     }
 })

@@ -65,13 +65,13 @@ const DonationBottomSheet = () => {
                 <Text style={Typography.regular}>{AppConstants.DONATION.BOTTOMSHEET.MESSAGE}</Text>
                 <Row style={{gap: 10}} >
                     <Pressable onPress={handleCloseDonationBottomSheet} style={AppStyle.buttonCancel} >
-                        <Text style={[Typography.regular, {color: Colors.yellow}]} >Close</Text>
+                        <Text style={[Typography.regular, {color: Colors.primary}]} >Close</Text>
                     </Pressable>
                     <Pressable onPress={openDonatePage} style={AppStyle.button} >
                         <Text style={[Typography.regular, {color: Colors.backgroundSecondary}]} >Donate</Text>
                     </Pressable>
                 </Row>
-                <Pressable onPress={neverShowDonationMessageAgain} hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE} >
+                <Pressable onPress={neverShowDonationMessageAgain} hitSlop={AppConstants.HIT_SLOP.LARGE} >
                     <Text style={styles.textLink}>Never show again.</Text>
                 </Pressable>
                 <Footer height={80}/>
@@ -84,9 +84,9 @@ export default DonationBottomSheet
 
 const styles = StyleSheet.create({
     bottomSheetContainer: {
-        paddingHorizontal: AppConstants.COMMON.SCREEN_PADDING_HORIZONTAL, 
+        paddingHorizontal: AppConstants.SCREEN.PADDING_HORIZONTAL, 
         paddingTop: 10,
-        gap: AppConstants.COMMON.GAP
+        gap: AppConstants.GAP
     },
     handleStyle: {
         backgroundColor: Colors.backgroundSecondary, 
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
         borderTopEndRadius: 12
     },
     handleIndicatorStyle: {
-        backgroundColor: Colors.yellow
+        backgroundColor: Colors.primary
     },
     bottomSheetBackgroundStyle: {
         backgroundColor: Colors.backgroundSecondary

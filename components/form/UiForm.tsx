@@ -33,9 +33,9 @@ const DummyManhwaCard = () => {
         <View style={{width: wp(45), height: hp(36)}} >
             <Image
                 source={require("@/assets/images/Addicted to My Mom.webp")} 
-                style={{width: '100%', height: hp(36), borderRadius: AppConstants.COMMON.BORDER_RADIUS}}
+                style={{width: '100%', height: hp(36), borderRadius: AppConstants.BORDER_RADIUS}}
                 contentFit='cover'
-                transition={AppConstants.COMMON.IMAGE_TRANSITION}
+                transition={AppConstants.IMAGE_TRANSITION}
                 />
             <LinearGradient 
                 colors={['transparent', 'transparent', 'rgba(0, 0, 0, 0.7)']} 
@@ -49,11 +49,11 @@ const DummyManhwaCard = () => {
 
 const DummyLast3Chapters = ({showLast3Chapters = true}: {showLast3Chapters?: boolean}) => {
     return (
-        <View style={{gap: AppConstants.COMMON.GAP, marginRight: wp(1)}} >            
+        <View style={{gap: AppConstants.GAP, marginRight: wp(1)}} >            
             <DummyManhwaCard/>
             {
             showLast3Chapters &&
-                <View style={{width: wp(45), gap: AppConstants.COMMON.MARGIN}} >
+                <View style={{width: wp(45), gap: AppConstants.MARGIN}} >
                     <DummyChapterLink index={3} />
                     <DummyChapterLink index={2} />
                     <DummyChapterLink index={1} />
@@ -77,8 +77,8 @@ const UiForm = () => {
     }
 
     return (
-        <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='always' >
-            <View style={{flex: 1, gap: AppConstants.COMMON.GAP, paddingHorizontal: wp(1)}} >
+        <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled' >
+            <View style={{flex: 1, gap: AppConstants.GAP, paddingHorizontal: wp(1)}} >
                 <Checkmark 
                     title='Last3Chapters' 
                     value={settings.showLast3Chapters}

@@ -22,7 +22,7 @@ import {
 
 
 const NUM_COLUMNS = 2
-const ITEM_WIDTH = (wp(92) - AppConstants.COMMON.MARGIN * (NUM_COLUMNS - 1)) / NUM_COLUMNS
+const ITEM_WIDTH = (wp(92) - AppConstants.MARGIN * (NUM_COLUMNS - 1)) / NUM_COLUMNS
 const ITEM_HEIGHT = hp(8)
 
 
@@ -44,7 +44,7 @@ const CollectionsPage = () => {
         return (
             <Pressable
                 onPress={() => onCollectionPress(item)}
-                style={[styles.item, {marginRight: index % 2 == 0 ? AppConstants.COMMON.MARGIN : 0}]} >
+                style={[styles.item, {marginRight: index % 2 == 0 ? AppConstants.MARGIN : 0}]} >
                 <Text style={styles.itemText} >{item.name}</Text>
             </Pressable>
         )
@@ -77,9 +77,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         alignItems: "center", 
         justifyContent: "center",         
-        backgroundColor: Colors.yellow, 
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
-        marginBottom: AppConstants.COMMON.MARGIN
+        backgroundColor: Colors.primary, 
+        borderRadius: AppConstants.BORDER_RADIUS,
+        marginBottom: AppConstants.MARGIN
     },
     itemText: {
         ...Typography.regular, 

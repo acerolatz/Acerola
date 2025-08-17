@@ -14,7 +14,7 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       PRAGMA synchronous = NORMAL;
       PRAGMA foreign_keys = ON;
       PRAGMA temp_store = MEMORY;
-      PRAGMA cache_size = -10000;
+      PRAGMA cache_size = -20000;
 
       CREATE TABLE IF NOT EXISTS app_info (
         name TEXT NOT NULL PRIMARY KEY,
@@ -126,7 +126,7 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       INSERT OR REPLACE INTO 
         app_info (name, value)
       VALUES 
-        ('version', '${AppConstants.COMMON.APP_VERSION}');
+        ('version', '${AppConstants.APP_VERSION}');
       
       INSERT INTO app_info 
         (name, value)
@@ -146,9 +146,9 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
         (name, value)        
       VALUES
         ('images', 0),
-        ('current_chapter_milestone', ${AppConstants.COMMON.CHAPTER_START_MILESTONE}),
-        ('drawDistance', ${Math.floor(AppConstants.COMMON.IS_TABLET ? hp(200) : hp(330))}),
-        ('onEndReachedThreshold', ${AppConstants.COMMON.IS_TABLET ? 2 : 3})
+        ('current_chapter_milestone', ${AppConstants.CHAPTER_GOAL_START}),
+        ('drawDistance', ${Math.floor(AppConstants.IS_TABLET ? hp(200) : hp(330))}),
+        ('onEndReachedThreshold', ${AppConstants.IS_TABLET ? 2 : 3})
       ON CONFLICT 
         (name)
       DO NOTHING;
@@ -1354,7 +1354,6 @@ export async function dbGetUserHistory(db: SQLite.SQLiteDatabase): Promise<UserH
 }
 
 
-
 export async function dbIsChapterMilestoneReached(db: SQLite.SQLiteDatabase): Promise<boolean> {
   const shouldAsk = await dbShouldAskForDonation(db)
   if (!shouldAsk) { return false }
@@ -1363,12 +1362,16 @@ export async function dbIsChapterMilestoneReached(db: SQLite.SQLiteDatabase): Pr
   
   let currentMilestone = await dbReadNumericInfo(db, 'current_chapter_milestone')
   if (!currentMilestone) {
-    await dbCreateNumericInfo(db, 'current_chapter_milestone', AppConstants.COMMON.CHAPTER_START_MILESTONE)
-    currentMilestone = AppConstants.COMMON.CHAPTER_START_MILESTONE
+    await dbCreateNumericInfo(db, 'current_chapter_milestone', AppConstants.CHAPTER_GOAL_START)
+    currentMilestone = AppConstants.CHAPTER_GOAL_START
   }  
   
   if (readChaptersCount >= currentMilestone) {
-    await dbSetNumericInfo(db, 'current_chapter_milestone', readChaptersCount + AppConstants.COMMON.CHAPTER_MILESTONE_INCREMENT)    
+    await dbSetNumericInfo(
+      db, 
+      'current_chapter_milestone', 
+      readChaptersCount + AppConstants.CHAPTER_GOAL_INCREMENT
+    )
     return true
   }  
   return false
@@ -1527,7 +1530,7 @@ export async function dbResetApp(db: SQLite.SQLiteDatabase) {
     INSERT OR REPLACE INTO 
       app_info (name, value)
     VALUES 
-      ('version', '${AppConstants.COMMON.APP_VERSION}');
+      ('version', '${AppConstants.APP_VERSION}');
 
     INSERT INTO app_info 
       (name, value)
@@ -1546,7 +1549,7 @@ export async function dbResetApp(db: SQLite.SQLiteDatabase) {
       (name, value)        
     VALUES
       ('images', 0),
-      ('current_chapter_milestone', ${AppConstants.COMMON.CHAPTER_START_MILESTONE})
+      ('current_chapter_milestone', ${AppConstants.CHAPTER_GOAL_START})
     ON CONFLICT 
       (name)
     DO UPDATE SET
@@ -1580,8 +1583,8 @@ export async function dbLoadSettings(db: SQLite.SQLiteDatabase): Promise<Setting
   ]) => {
       return {
         showLast3Chapters: showLast3Chapters === '1',
-        drawDistance: drawDistance !== null ? drawDistance : Math.floor(AppConstants.COMMON.IS_TABLET ? hp(200) : hp(330)),
-        onEndReachedThreshold: onEndReachedThreshold !== null ? onEndReachedThreshold : AppConstants.COMMON.IS_TABLET ? 2 : 3
+        drawDistance: drawDistance !== null ? drawDistance : Math.floor(AppConstants.IS_TABLET ? hp(200) : hp(330)),
+        onEndReachedThreshold: onEndReachedThreshold !== null ? onEndReachedThreshold : AppConstants.IS_TABLET ? 2 : 3
       }
   }).catch(error => {
     console.log("error dbLoadSettings", error); 
@@ -1590,7 +1593,7 @@ export async function dbLoadSettings(db: SQLite.SQLiteDatabase): Promise<Setting
 
   return r ? r : {
     showLast3Chapters: false,
-    drawDistance: Math.floor(AppConstants.COMMON.IS_TABLET ? hp(200) : hp(330)),
-    onEndReachedThreshold: AppConstants.COMMON.IS_TABLET ? 2 : 3
+    drawDistance: Math.floor(AppConstants.IS_TABLET ? hp(200) : hp(330)),
+    onEndReachedThreshold: AppConstants.IS_TABLET ? 2 : 3
   }
 }

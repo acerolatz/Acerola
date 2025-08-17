@@ -13,7 +13,7 @@ interface ViewAllButtonProps {
 
 const ViewAllButton = ({onPress}: ViewAllButtonProps) => {
   return (
-    <Pressable onPress={onPress} hitSlop={AppConstants.COMMON.HIT_SLOP.NORMAL} >
+    <Pressable onPress={onPress} hitSlop={AppConstants.HIT_SLOP.NORMAL} >
       <Row>
         <Text style={[Typography.regular, {textAlignVertical: "center"}]}>more</Text>
         <Ionicons name='chevron-forward' size={AppConstants.ICON.SIZE} color={'white'} style={{top: FontSizes.sm / 4}} />

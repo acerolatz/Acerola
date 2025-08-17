@@ -44,11 +44,11 @@ export default DonateComponent
 const styles = StyleSheet.create({
   donateButton: {
     maxWidth: '100%', 
-    paddingHorizontal: AppConstants.COMMON.ITEM_PADDING_HORIZONTAL,
-    paddingVertical: AppConstants.COMMON.ITEM_PADDING_VERTICAL,
-    borderRadius: AppConstants.COMMON.BORDER_RADIUS, 
-    backgroundColor: Colors.yellow, 
-    marginBottom: AppConstants.COMMON.MARGIN
+    paddingHorizontal: AppConstants.ITEM_PADDING_HORIZONTAL,
+    paddingVertical: AppConstants.ITEM_PADDING_VERTICAL,
+    borderRadius: AppConstants.BORDER_RADIUS, 
+    backgroundColor: Colors.primary, 
+    marginBottom: AppConstants.MARGIN
   },
   donateTitleContainer: {
     width: "100%", 

@@ -7,8 +7,6 @@ import { ToastMessages } from '@/constants/Messages';
 import Toast from 'react-native-toast-message';
 import { Platform } from 'react-native';
 import { DownloadProgress } from './types';
-import { AppConstants } from '@/constants/AppConstants';
-
 
 const {
     width: deviceWidth, 
@@ -50,10 +48,10 @@ export function getRelativeWidth(originalWidth: number, originalHeight: number, 
 }
 
 
-export function formatTimestamp(timestamp: string): string {    
-    const date = new Date(timestamp);
-    const options = { month: 'long', day: 'numeric', year: 'numeric' };    
-    return date.toLocaleDateString('en-US', options as any);
+export function formatTimestamp(timestamp: string): string {      
+  const date = new Date(timestamp)
+  const options = { month: 'long', day: 'numeric', year: 'numeric' };
+  return date.toLocaleDateString('en-US', options as any);
 }
 
 
@@ -310,19 +308,3 @@ export const downloadManhwaChapter = async (
   await Promise.all(pool);  
   return downloadedPaths.sort();
 };
-
-
-export function normalizeRandomManhwaCardHeight(width: number, height: number): {
-  normalizedWidth: number, 
-  normalizedHeight: number
-} {
-  const normalizedHeight = height > AppConstants.COMMON.RANDOM_MANHWAS.MAX_HEIGHT ? 
-  AppConstants.COMMON.RANDOM_MANHWAS.MAX_HEIGHT : height
-
-  let normalizedWidth = (normalizedHeight * width) / height
-
-  normalizedWidth = normalizedWidth > AppConstants.COMMON.RANDOM_MANHWAS.MAX_WIDTH ? 
-  AppConstants.COMMON.RANDOM_MANHWAS.MAX_WIDTH : normalizedWidth
-  
-  return { normalizedWidth, normalizedHeight}
-}

@@ -15,7 +15,7 @@ const TOAST_CONFIG = {
     <View style={styles.toast}>
       <Text numberOfLines={1} style={[Typography.regular, {fontSize: 18}]}>{text1}</Text>
       {text2 && <Text numberOfLines={1} style={[Typography.regular, {fontSize: 16}]}>{text2}</Text>}
-      <View style={[styles.leftBar, {backgroundColor: Colors.ononokiGreen}]} />
+      <View style={[styles.leftBar, {backgroundColor: Colors.success}]} />
     </View>
   ),
 
@@ -23,7 +23,7 @@ const TOAST_CONFIG = {
     <View style={[styles.toast, {backgroundColor: Colors.backgroundColor}]}>
       <Text numberOfLines={1} style={[Typography.regular, {fontSize: 18}]}>{text1}</Text>
       {text2 && <Text numberOfLines={1} style={[Typography.regular, {fontSize: 16}]}>{text2}</Text>}
-      <View style={[styles.leftBar, {backgroundColor: Colors.ononokiGreen}]} />
+      <View style={[styles.leftBar, {backgroundColor: Colors.success}]} />
     </View>
   ),
   
@@ -31,7 +31,7 @@ const TOAST_CONFIG = {
     <View style={styles.toast}>
       <Text numberOfLines={1} style={[Typography.regular, {fontSize: 18}]}>{text1}</Text>
       {text2 && <Text numberOfLines={1} style={[Typography.regular, {fontSize: 16}]}>{text2}</Text>}
-      <View style={[styles.leftBar, {backgroundColor: Colors.neonRed}]} />
+      <View style={[styles.leftBar, {backgroundColor: Colors.error}]} />
     </View>
   ),
 
@@ -39,7 +39,7 @@ const TOAST_CONFIG = {
     <View style={[styles.toast, {backgroundColor: Colors.backgroundColor}]}>
       <Text numberOfLines={1} style={[Typography.regular, {fontSize: 18}]}>{text1}</Text>
       {text2 && <Text numberOfLines={1} style={[Typography.regular, {fontSize: 16}]}>{text2}</Text>}
-      <View style={[styles.leftBar, {backgroundColor: Colors.neonRed}]} />
+      <View style={[styles.leftBar, {backgroundColor: Colors.error}]} />
     </View>
   ),
   
@@ -47,7 +47,7 @@ const TOAST_CONFIG = {
     <View style={styles.toast}>
       <Text numberOfLines={1} style={[Typography.regular, {fontSize: 18}]}>{text1}</Text>
       {text2 && <Text numberOfLines={1} style={[Typography.regular, {fontSize: 16}]}>{text2}</Text>}
-      <View style={[styles.leftBar, {backgroundColor: Colors.yellow}]} />
+      <View style={[styles.leftBar, {backgroundColor: Colors.info}]} />
     </View>
   ),
 
@@ -55,7 +55,7 @@ const TOAST_CONFIG = {
     <View style={[styles.toast, {backgroundColor: Colors.backgroundColor}]}>
       <Text numberOfLines={1} style={[Typography.regular, {fontSize: 18}]}>{text1}</Text>
       {text2 && <Text numberOfLines={1} style={[Typography.regular, {fontSize: 16}]}>{text2}</Text>}
-      <View style={[styles.leftBar, {backgroundColor: Colors.yellow}]} />
+      <View style={[styles.leftBar, {backgroundColor: Colors.info}]} />
     </View>
   )
 };
@@ -88,7 +88,7 @@ const RootLayout = () => {
           <Stack.Screen name='(pages)/DonatePage' options={{headerShown: false}} />              
           <Stack.Screen name='(pages)/RequestManhwaPage' options={{headerShown: false}} />
           <Stack.Screen name='(pages)/ReleasesPage' options={{headerShown: false}} />
-          <Stack.Screen name='(pages)/DisclaimerPage' options={{headerShown: false}} />
+          <Stack.Screen name='(pages)/EulaDisclaimerPage' options={{headerShown: false}} />
           <Stack.Screen name='(pages)/NewsPage' options={{headerShown: false}} />
           <Stack.Screen name='(pages)/Settings' options={{headerShown: false}} />              
         </Stack>
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingLeft: 12,
     paddingRight: 4,
-    borderRadius: AppConstants.COMMON.BORDER_RADIUS,
+    borderRadius: AppConstants.BORDER_RADIUS,
     backgroundColor: Colors.backgroundSecondary
   },
   leftBar: {
@@ -125,8 +125,8 @@ const styles = StyleSheet.create({
     top: 0, 
     width: 6,
     height: '100%', 
-    borderTopLeftRadius: AppConstants.COMMON.BORDER_RADIUS, 
-    borderBottomLeftRadius: AppConstants.COMMON.BORDER_RADIUS
+    borderTopLeftRadius: AppConstants.BORDER_RADIUS, 
+    borderBottomLeftRadius: AppConstants.BORDER_RADIUS
   }
 })
 

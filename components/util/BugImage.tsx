@@ -18,13 +18,13 @@ const BugImage = ({uri, setPhotos}: BubImageProps) => {
     }
 
     return (
-        <View style={{marginRight: AppConstants.COMMON.MARGIN}} >
+        <View style={{marginRight: AppConstants.MARGIN}} >
             <Image 
                 source={{uri}} 
                 style={styles.image} 
                 contentFit='cover'
-                transition={AppConstants.COMMON.IMAGE_TRANSITION} />
-            <Pressable onPress={onPress} style={styles.removeImageButton} hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE} >
+                transition={AppConstants.IMAGE_TRANSITION} />
+            <Pressable onPress={onPress} style={styles.removeImageButton} hitSlop={AppConstants.HIT_SLOP.LARGE} >
                 <Ionicons name='trash-outline' size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />
             </Pressable>
         </View>
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     image: {
         width: wp(25),
         height: hp(25), 
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS
+        borderRadius: AppConstants.BORDER_RADIUS
     },
     removeImageButton: {
         position: "absolute", 
@@ -44,6 +44,6 @@ const styles = StyleSheet.create({
         top: wp(1),
         padding: wp(1),
         backgroundColor: Colors.primary, 
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS
+        borderRadius: AppConstants.BORDER_RADIUS
     } 
 })

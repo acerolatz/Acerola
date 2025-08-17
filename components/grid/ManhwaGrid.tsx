@@ -37,11 +37,11 @@ const ManhwaGrid = ({
     showsVerticalScrollIndicator = true,
     showChaptersPreview = true,
     listMode = 'FlashList',
-    color = Colors.yellow,
+    color = Colors.primary,
     showManhwaStatus = true
 }: MangaGridProps) => {
 
-    const width = (wp(46) - AppConstants.COMMON.GAP / 2)
+    const width = (wp(46) - AppConstants.GAP / 2)
     const height = getRelativeHeight(
         AppConstants.MANHWA_COVER.WIDTH,
         AppConstants.MANHWA_COVER.HEIGHT,
@@ -58,7 +58,7 @@ const ManhwaGrid = ({
                 showManhwaStatus={showManhwaStatus}
                 width={width} 
                 height={height}
-                marginBottom={AppConstants.COMMON.GAP / 2}
+                marginBottom={AppConstants.GAP / 2}
                 manhwa={item}
             />
         )

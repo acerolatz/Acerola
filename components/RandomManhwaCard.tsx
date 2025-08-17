@@ -65,9 +65,9 @@ const RandomManhwaCard = ({card}: RandomManhwaCardProps) => {
                 style={{
                     width: card.normalizedWidth,
                     height: card.normalizedHeight,
-                    borderRadius: AppConstants.COMMON.BORDER_RADIUS
+                    borderRadius: AppConstants.BORDER_RADIUS * 2
                 }} 
-                transition={AppConstants.COMMON.IMAGE_TRANSITION}
+                transition={AppConstants.IMAGE_TRANSITION}
                 contentFit='cover' />
             <LinearGradient colors={['transparent', 'transparent', 'rgba(0, 0, 0, 0.6)']} style={StyleSheet.absoluteFill} />
             <View style={styles.manhwaTitleContainer} >

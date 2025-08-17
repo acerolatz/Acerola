@@ -50,10 +50,10 @@ const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
                 <FlashList
                     ref={flatListRef}
                     data={cards}
-                    ItemSeparatorComponent={() => <View style={{ width: AppConstants.COMMON.MARGIN }} />}
+                    ItemSeparatorComponent={() => <View style={{ width: AppConstants.MARGIN }} />}
                     drawDistance={wp(120)}
                     onEndReachedThreshold={3}
-                    estimatedItemSize={AppConstants.COMMON.RANDOM_MANHWAS.MAX_WIDTH}
+                    estimatedItemSize={AppConstants.RANDOM_MANHWAS.MAX_WIDTH}
                     showsHorizontalScrollIndicator={false}
                     horizontal={true}
                     keyExtractor={(item: ManhwaCard) => item.manhwa_id.toString()}
@@ -69,10 +69,10 @@ export default RandomCardsGrid
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        gap: AppConstants.COMMON.GAP
+        gap: AppConstants.GAP
     },    
     gridContainer: {
         flex: 1, 
-        height: AppConstants.COMMON.RANDOM_MANHWAS.MAX_HEIGHT
+        height: AppConstants.RANDOM_MANHWAS.MAX_HEIGHT
     }    
 })

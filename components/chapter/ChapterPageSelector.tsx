@@ -25,12 +25,12 @@ const ChapterPageSelector = ({
   numChapters
 }: ChapterPageSelectorProps) => {
   return (
-    <Row style={{width: '100%', gap: AppConstants.COMMON.MARGIN}} >
+    <Row style={{width: '100%', gap: AppConstants.MARGIN}} >
       <View style={{...AppStyle.button, backgroundColor, flex: 1}} >
           <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Chapters: {numChapters}</Text>
       </View>
 
-      <Row style={{gap: AppConstants.COMMON.MARGIN, flex: 1}} >
+      <Row style={{gap: AppConstants.MARGIN, flex: 1}} >
         <CButton 
           style={{...AppStyle.button, backgroundColor}}
           iconColor={Colors.backgroundColor}

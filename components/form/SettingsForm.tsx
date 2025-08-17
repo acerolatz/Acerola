@@ -14,6 +14,8 @@ import CacheForm from './CacheForm';
 import { Colors } from '@/constants/Colors';
 import { wp } from '@/helpers/util';
 import { Typography } from '@/constants/typography';
+import UserActivityHistory from '../UserActivityHistory';
+import { AppConstants } from '@/constants/AppConstants';
 
 interface SettingsFormProps {
   currentMaxCacheSize: number;
@@ -32,22 +34,21 @@ const SettingsForm = ({
 }: SettingsFormProps) => {
 
     const [title, setTitle] = useState('Safe Mode')
-    const titles = ['Safe Mode', 'UI', 'Optimization', 'Cache']
+    const titles = ['Safe Mode', 'UI', 'Optimization', 'Cache', 'History']
 
     const forms = [
-        <SafeModeForm key="safe" safeModeOn={safeModeOn} safeModePassword={safeModePassword} />,
-        <UiForm key="ui" />,
-        <PerformanceUIForm key="perf" />,
-        <CacheForm key="cache" currentCacheSize={currentCacheSize} currentMaxCacheSize={currentMaxCacheSize} />,
+      <SafeModeForm key="safe" safeModeOn={safeModeOn} safeModePassword={safeModePassword} />,
+      <UiForm key="ui" />,
+      <PerformanceUIForm key="perf" />,
+      <CacheForm key="cache" currentCacheSize={currentCacheSize} currentMaxCacheSize={currentMaxCacheSize} />,
+      <UserActivityHistory/>
     ];
 
     const scrollX = useRef(new Animated.Value(0)).current;
-
-
     const handleMomentumScrollEnd = (e: any) => {
-        const offsetX = e.nativeEvent.contentOffset.x;
-        const index = Math.round(offsetX / width);
-        setTitle(titles[index])
+      const offsetX = e.nativeEvent.contentOffset.x;
+      const index = Math.round(offsetX / width);
+      setTitle(titles[index])
     };
 
     return (
@@ -77,6 +78,7 @@ const SettingsForm = ({
             </View>            
             <Animated.FlatList
                 data={forms}
+                keyboardShouldPersistTaps='handled'
                 renderItem={({ item }) => <View style={{ width }}>{item}</View>}
                 keyExtractor={(_, index) => index.toString()}
                 horizontal
@@ -106,13 +108,14 @@ const styles = StyleSheet.create({
   dotsContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginVertical: 12,
+    marginTop: AppConstants.MARGIN,
+    marginBottom: AppConstants.MARGIN * 2
   },
   dot: {
-    height: 8,
-    width: 8,
-    borderRadius: 4,
-    backgroundColor: Colors.primary,
-    marginHorizontal: 4,
-  },
+      height: AppConstants.ICON.SIZE * 0.5,
+      width: AppConstants.ICON.SIZE * 0.5,
+      borderRadius: AppConstants.ICON.SIZE,
+      backgroundColor: Colors.primary,
+      marginHorizontal: 4,
+  }
 });

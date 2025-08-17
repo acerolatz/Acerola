@@ -47,7 +47,7 @@ const RandomManhwaButton = ({
     }
 
     return (        
-        <Pressable onPress={openRandomManhwa} hitSlop={AppConstants.COMMON.HIT_SLOP.NORMAL}>
+        <Pressable onPress={openRandomManhwa} hitSlop={AppConstants.HIT_SLOP.NORMAL}>
             <Ionicons name='dice-outline' size={size} color={color}/>
         </Pressable>        
     )

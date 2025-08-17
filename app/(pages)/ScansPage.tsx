@@ -103,6 +103,6 @@ export default ScansPage
 const styles = StyleSheet.create({
     scanButton: {
         ...AppStyle.defaultGridItem,
-        marginBottom: AppConstants.COMMON.MARGIN
+        marginBottom: AppConstants.MARGIN
     }    
 })

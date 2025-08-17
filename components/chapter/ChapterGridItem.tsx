@@ -7,7 +7,7 @@ import { AppStyle } from '@/styles/AppStyle'
 import { Typography } from '@/constants/typography'
 
 const NUM_COLUMNS = getChapterGridNumColumns()
-const ITEM_SIZE = Math.floor((wp(92) - AppConstants.COMMON.MARGIN * (NUM_COLUMNS - 1)) / NUM_COLUMNS)
+const ITEM_SIZE = Math.floor((wp(92) - AppConstants.MARGIN * (NUM_COLUMNS - 1)) / NUM_COLUMNS)
 
 
 interface ChapterGridItemProps {
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     chapterItem: {    
         width: ITEM_SIZE, 
         height: ITEM_SIZE, 
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS, 
+        borderRadius: AppConstants.BORDER_RADIUS, 
         alignItems: "center", 
         justifyContent: "center"    
     }

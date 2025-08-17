@@ -14,13 +14,13 @@ import { FlashList } from '@shopify/flash-list'
 import { useSQLiteContext } from 'expo-sqlite'
 import { debounce } from 'lodash'
 import React, { useEffect, useRef, useState } from 'react'
-import { SafeAreaView, View } from 'react-native'
+import { SafeAreaView, StyleSheet, View } from 'react-native'
 
 
 const PAGE_LIMIT = 32
 
 const {width, height} = getItemGridDimensions(
-  AppConstants.COMMON.SCREEN_PADDING_HORIZONTAL,
+  AppConstants.SCREEN.PADDING_HORIZONTAL,
   10,
   2,
   AppConstants.MANHWA_COVER.WIDTH,
@@ -88,9 +88,7 @@ const ManhwaSearch = () => {
   const renderFooter = () => {
       if (loading && hasResults) {
           return (
-              <View style={{width: '100%', paddingVertical: 22, alignItems: "center", justifyContent: "center"}} >
-                  <CustomActivityIndicator color={Colors.yellow}/>
-              </View> 
+              <CustomActivityIndicator/>
           )
       }
       return <Footer/>
@@ -98,33 +96,33 @@ const ManhwaSearch = () => {
 
   return (
     <SafeAreaView style={AppStyle.safeArea} >
-      <TopBar title='Search' titleColor={Colors.yellow} > 
-        <ReturnButton color={Colors.yellow} />
+      <TopBar title='Search' > 
+        <ReturnButton />
       </TopBar>
-      <View style={{flex: 1, gap: 10}} >
-        <SearchBar onChangeText={debounceSearch} color={Colors.yellow} placeholder='pornhwa' />
+      <View style={styles.container} >
+        <SearchBar onChangeText={debounceSearch} placeholder='pornhwa' />
         <View style={{flex: 1}} >
           <FlashList
-              ref={flashListRef}
-              keyboardShouldPersistTaps={'always'}
-              data={manhwas}
-              numColumns={2}
-              keyExtractor={(item) => item.manhwa_id.toString()}
-              estimatedItemSize={estimatedItemSize}
-              drawDistance={hp(150)}
-              onEndReached={onEndReached}
-              scrollEventThrottle={4}
-              onEndReachedThreshold={2}
-              renderItem={({item}) => <ManhwaCard 
-                showChaptersPreview={false}
-                showManhwaStatus={true}
-                width={width} 
-                height={height} 
-                marginBottom={AppConstants.COMMON.MARGIN} 
-                manhwa={item}
-              />}
-              ListFooterComponent={renderFooter}
-              />
+            ref={flashListRef}
+            keyboardShouldPersistTaps={'always'}
+            data={manhwas}
+            numColumns={2}
+            keyExtractor={(item) => item.manhwa_id.toString()}
+            estimatedItemSize={estimatedItemSize}
+            drawDistance={hp(150)}
+            onEndReached={onEndReached}
+            scrollEventThrottle={4}
+            onEndReachedThreshold={2}
+            renderItem={({item}) => <ManhwaCard 
+              showChaptersPreview={false}
+              showManhwaStatus={true}
+              width={width} 
+              height={height} 
+              marginBottom={AppConstants.MARGIN} 
+              manhwa={item}
+            />}
+            ListFooterComponent={renderFooter}
+            />
         </View>      
       </View>
     </SafeAreaView>
@@ -132,3 +130,10 @@ const ManhwaSearch = () => {
 }
 
 export default ManhwaSearch
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1, 
+    gap: 10
+  }
+})

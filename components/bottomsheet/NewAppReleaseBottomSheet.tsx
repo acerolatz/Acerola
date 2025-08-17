@@ -65,7 +65,7 @@ const NewAppReleaseBottomSheet = () => {
                 </TopBar>
                 <Row style={{gap: 10}} >
                     <Pressable onPress={handleCloseBottomSheet} style={AppStyle.buttonCancel} >
-                        <Text style={[Typography.regular, {color: Colors.yellow}]} >Close</Text>
+                        <Text style={[Typography.regular, {color: Colors.primary}]} >Close</Text>
                     </Pressable>
                     <Pressable onPress={openReleasesPage} style={AppStyle.button} >
                         <Text style={[Typography.regular, {color: Colors.backgroundColor}]} >Update!</Text>
@@ -84,9 +84,9 @@ export default NewAppReleaseBottomSheet
 
 const styles = StyleSheet.create({
     bottomSheetContainer: {
-        paddingHorizontal: AppConstants.COMMON.SCREEN_PADDING_HORIZONTAL, 
+        paddingHorizontal: AppConstants.SCREEN.PADDING_HORIZONTAL, 
         paddingTop: 10,
-        gap: AppConstants.COMMON.GAP
+        gap: AppConstants.GAP
     },
     handleStyle: {
         backgroundColor: Colors.backgroundSecondary, 
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
         borderTopEndRadius: 12
     },
     handleIndicatorStyle: {
-        backgroundColor: Colors.yellow
+        backgroundColor: Colors.primary
     },
     bottomSheetBackgroundStyle: {
         backgroundColor: Colors.backgroundSecondary

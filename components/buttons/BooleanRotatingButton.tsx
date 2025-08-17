@@ -69,7 +69,7 @@ const BooleanRotatingButton = ({
     }
 
     return (
-        <Pressable onPress={handlePress} hitSlop={AppConstants.COMMON.HIT_SLOP.NORMAL}>
+        <Pressable onPress={handlePress} hitSlop={AppConstants.HIT_SLOP.NORMAL}>
             <Animated.View
             style={[
                 styles.box,

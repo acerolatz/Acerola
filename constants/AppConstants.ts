@@ -1,8 +1,9 @@
 import { hp, wp } from "@/helpers/util";
-import { Colors } from "./Colors";
 
 
 export const AppConstants = {
+    APP_NAME: "Acerola",
+    APP_VERSION: "v1.1.0",
     PAGES: {
         HOME: {
             MENU_WIDTH: wp(65),
@@ -33,9 +34,7 @@ export const AppConstants = {
             MAX_CACHE_SIZE: 256000 // MiB
         }
     },
-    DEBUB: {
-        ENABLED: false
-    },
+    DEBUB: { ENABLED: false },
     MANHWA_COVER: {
         WIDTH: 300,
         HEIGHT: 440
@@ -51,78 +50,48 @@ export const AppConstants = {
         }
     },
     HIT_SLOP: {
-        NORMAL: { 
-            left: 10,
-            right: 10,
-            top: 10,
-            bottom: 10
-        },
-        LARGE: {
-            left: 20,
-            right: 20,
-            top: 20,
-            bottom: 20
-        }
+        NORMAL: { left: 10, right: 10, top: 10, bottom: 10 },
+        LARGE: { left: 20, right: 20, top: 20, bottom: 20 }
     },
-    ICON: {
-        SIZE: wp(5)
+    MARGIN: wp(1.2),
+    GAP: hp(1.2),
+    ICON: { SIZE: wp(5) },
+    BUTTON: { SIZE: hp(6.4) },
+    BORDER_RADIUS: wp(1),
+    SCREEN: {
+        WIDTH: wp(100),
+        HEIGHT: hp(100),
+        PADDING_HORIZONTAL: wp(4),
+        PADDING_VERTICAL: hp(4)
     },
-    BUTTON: {
-        SIZE: hp(6.4)
+    BOTTOMSHEET_HANDLE_RADIUS: wp(4),    
+    IMAGE_TRANSITION: 200,
+    IS_TABLET: Math.min(wp(100), hp(100)) >= 600,
+    READING_STATUS: [
+        'Completed',
+        'Reading',
+        'On Hold',
+        'Dropped',
+        'Plan to Read',
+        'Re-Reading',
+        'None'
+    ],  
+    ITEM_PADDING_HORIZONTAL: hp(1),
+    ITEM_PADDING_VERTICAL: hp(1.4),
+    CHAPTER_GOAL_START: 32,
+    CHAPTER_GOAL_INCREMENT: 92,
+    RANDOM_MANHWAS: {
+        MAX_WIDTH: wp(87),
+        MAX_HEIGHT: hp(88)
     },
-    BOTTOMSHEET_HANDLE_RADIUS: wp(4),
-    COMMON: {
-        IMAGE_TRANSITION: 200,
-        IS_TABLET: Math.min(wp(100), hp(100)) >= 600,
-        APP_NAME: "Acerola",
-        APP_VERSION: 'v1.0.0',
-        BORDER_RADIUS: wp(1),
-        MARGIN: wp(1.2),
-        READING_STATUS: [
-            'Completed',
-            'Reading',
-            'On Hold',
-            'Dropped',
-            'Plan to Read',
-            'Re-Reading',
-            'None'
-        ],
-        HIT_SLOP: {
-            NORMAL: { 
-                left: 10,
-                right: 10,
-                top: 10,
-                bottom: 10
-            },
-            LARGE: {
-                left: 20,
-                right: 20,
-                top: 20,
-                bottom: 20
-            }
-        },
-        CHAPTER_START_MILESTONE: 32,
-        CHAPTER_MILESTONE_INCREMENT: 92,
-        BUT_TYPE_LIST: [
-            "Bug",            
-            "Sugestion",
-            "Broken",
-            "ImagesOutOfOrder",
-            "MissingImages",
-            "Other"
-        ],
-        SCREEN_WIDTH: wp(100),
-        SCREEN_HEIGHT: hp(100),
-        SCREEN_PADDING_HORIZONTAL: wp(4),
-        SCREEN_PADDING_VERTICAL: hp(4),
-        RANDOM_MANHWAS: {
-            MAX_WIDTH: wp(87),
-            MAX_HEIGHT: hp(90)
-        },
-        GAP: hp(1.2),
-        ITEM_PADDING_HORIZONTAL: hp(1),
-        ITEM_PADDING_VERTICAL: hp(1.4)
-    },
+    BUG_TYPE_LIST: [
+        "Bug",            
+        "Sugestion",
+        "Broken",
+        "ImagesOutOfOrder",
+        "MissingImages",
+        "Other"
+    ],    
     TOAST: {
         HEIGHT: 66,
         WIDTH: wp(92),
@@ -130,35 +99,12 @@ export const AppConstants = {
         VISIBILITY_TIME: 2500,
         POSITION: "bottom"
     },
-    URLS: {
-        REDDIT: "https://www.reddit.com/r/pornhwa/"        
-    },
-    TEXT: {
-        SIZE: {
-            LIGTH: 14,
-            REGULAR: 18,
-            SEMIBOLD: 24,
-            BOLD: 26
-        },        
-        FONT: {
-            LIGHT: "LeagueSpartan_200ExtraLight",
-            REGULAR: "LeagueSpartan_400Regular",
-            SEMIBOLD: "LeagueSpartan_600SemiBold"
-        },
-        COLOR: {
-            LIGHT: Colors.white,
-            DARK: Colors.backgroundColor,
-            ERROR: Colors.neonRed
-        }
-    },
+    URLS: { REDDIT: "https://www.reddit.com/r/pornhwa/" },
     DONATION: {
         BOTTOMSHEET: {
             TITLE: 'Enjoying the app?',
             MESSAGE: "Consider making a donation to help keep the servers running."
         },
-        DONATE_BANNER: {
-            WIDTH: 1024, 
-            HEIGHT: 943
-        }
+        DONATE_BANNER: { WIDTH: 1024, HEIGHT: 943 }
     }
 }

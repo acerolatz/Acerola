@@ -12,9 +12,7 @@ interface ManhwaStatusComponentProps {
 
 const ManhwaStatusComponent = ({ status }: ManhwaStatusComponentProps) => {
 
-    const backgroundColor = status === "Completed" ? 
-        Colors.manhwaStatusCompleted : 
-        Colors.manhwaStatusOnGoing
+    const backgroundColor = status === "Completed" ? Colors.green : Colors.orange
 
     return (
         <View style={[styles.container, {backgroundColor}]} >
@@ -32,6 +30,6 @@ const styles = StyleSheet.create({
         top: 6,
         paddingHorizontal: 4,
         paddingVertical: 4,
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS
+        borderRadius: AppConstants.BORDER_RADIUS
     }
 })

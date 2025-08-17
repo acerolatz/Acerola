@@ -70,8 +70,8 @@ const RequestManhwaForm = () => {
 
   return (
     <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
-        <ScrollView style={{flex: 1}} keyboardShouldPersistTaps='always' >
-            <View style={{gap: AppConstants.COMMON.GAP}} >
+        <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled' >
+            <View style={{gap: AppConstants.GAP}} >
                 {/* Manga Name */}
                 <Text style={Typography.semibold}>Manhwa</Text>
                 {errors.manga_title && (<Text style={AppStyle.error}>{errors.manga_title.message}</Text>)}
@@ -89,7 +89,7 @@ const RequestManhwaForm = () => {
                 />
 
                 {/* Description */}
-                <View style={{flexDirection: 'row', gap: AppConstants.COMMON.GAP, alignItems: "center", justifyContent: "center", alignSelf: 'flex-start'}} >
+                <View style={{flexDirection: 'row', gap: AppConstants.GAP, alignItems: "center", justifyContent: "center", alignSelf: 'flex-start'}} >
                     <Text style={Typography.semibold}>Message</Text>
                     <Text style={AppStyle.textOptional}>optional</Text>
                 </View>

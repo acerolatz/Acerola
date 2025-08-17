@@ -39,7 +39,7 @@ const Checkmark = ({title, value, check}: CheckmarkProps) => {
         return (
             <Row style={styles.container} >
                 <Text style={{...Typography.regular, flexShrink: 1}} >{title}</Text>
-                <Pressable onPress={onPress} style={styles.buttonMarked} hitSlop={AppConstants.COMMON.HIT_SLOP.NORMAL}>
+                <Pressable onPress={onPress} style={styles.buttonMarked} hitSlop={AppConstants.HIT_SLOP.LARGE}>
                     <Ionicons 
                         name='checkmark-outline' 
                         size={AppConstants.ICON.SIZE} 
@@ -53,9 +53,9 @@ const Checkmark = ({title, value, check}: CheckmarkProps) => {
         <Row style={styles.container} >
             <Text style={{...Typography.regular, flexShrink: 1}} >{title}</Text>
             <Pressable 
-                style={styles.button} 
+                style={styles.button}
                 onPress={onPress}
-                hitSlop={AppConstants.COMMON.HIT_SLOP.NORMAL} />
+                hitSlop={AppConstants.HIT_SLOP.LARGE} />
         </Row>
     )
 }
@@ -64,7 +64,7 @@ export default Checkmark
 
 const styles = StyleSheet.create({
     container: {
-        gap: AppConstants.COMMON.GAP,
+        gap: AppConstants.GAP,
         justifyContent: "space-between"
     },
     button: {
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
         height: AppConstants.ICON.SIZE,
         borderWidth: 2,
         borderColor: Colors.primary,
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS
+        borderRadius: AppConstants.BORDER_RADIUS
     },
     buttonMarked: {
         alignItems: "center",
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
         height: AppConstants.ICON.SIZE,
         borderWidth: 2,
         borderColor: Colors.primary,
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
+        borderRadius: AppConstants.BORDER_RADIUS,
         backgroundColor: Colors.primary
     }
 })

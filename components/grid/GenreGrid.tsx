@@ -68,7 +68,7 @@ export default GenreGrid
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        gap: AppConstants.COMMON.GAP,
+        gap: AppConstants.GAP,
         alignItems: "flex-start"
     }
 })

@@ -7,7 +7,7 @@ interface CustomActivityIndicatorProps {
   color?: string
 }
 
-const CustomActivityIndicator = ({size = 32, color = Colors.yellow}: CustomActivityIndicatorProps) => {
+const CustomActivityIndicator = ({size = 32, color = Colors.primary}: CustomActivityIndicatorProps) => {
   return (
     <ActivityIndicator size={size} color={color} />
   )

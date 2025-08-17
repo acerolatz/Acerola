@@ -55,8 +55,8 @@ const CollectionPage = () => {
 
     return (
         <SafeAreaView style={AppStyle.safeArea} >
-            <TopBar title={collection_name} titleColor={Colors.yellow} >
-                <ReturnButton color={Colors.yellow} />
+            <TopBar title={collection_name} >
+                <ReturnButton />
             </TopBar>
             <ManhwaGrid
                 manhwas={manhwas}

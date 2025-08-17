@@ -20,7 +20,7 @@ const ChapterImageItem = React.memo(({ item }: ChapterImageItemProps) => {
     return <View style={{ width: '100%', height: AppConstants.PAGES.CHAPTER.FOOTER_HEIGHT }} />;
   }
 
-  const width = Math.min(item.width, AppConstants.COMMON.SCREEN_WIDTH);
+  const width = Math.min(item.width, AppConstants.SCREEN.WIDTH);
   const height = PixelRatio.roundToNearestPixel((width * item.height) / item.width);
   
   return (

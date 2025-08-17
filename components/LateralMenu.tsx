@@ -33,7 +33,7 @@ const Option = ({onPress, title, iconName}: OptionProps) => {
         <Pressable 
             onPress={onPress}
             style={styles.optionButton} 
-            hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE} >
+            hitSlop={AppConstants.HIT_SLOP.LARGE} >
             <Ionicons name={iconName as any} size={AppConstants.ICON.SIZE} color={Colors.primary} />
             <Text style={Typography.regular}>{title}</Text>
         </Pressable>
@@ -61,7 +61,7 @@ const openBugReport = () => {
 }
 
 const openDisclaimer = () => {
-    router.navigate("/(pages)/DisclaimerPage")
+    router.navigate("/(pages)/EulaDisclaimerPage")
 }
 
 const openManhwaRequest = () => {
@@ -104,7 +104,7 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
             </TopBar>
             <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} >
                 <View style={styles.container} >
-                    <View style={{gap: AppConstants.COMMON.GAP * 2.5, marginTop: AppConstants.COMMON.GAP}} > 
+                    <View style={{gap: AppConstants.GAP * 2.5, marginTop: AppConstants.GAP}} > 
                     
                         <Option 
                             onPress={libraryPage} 
@@ -122,18 +122,18 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
                             onPress={openDonate} 
                             title='Donate' 
                             iconName='cash-outline'
-                        />
-
-                        <Option 
-                            onPress={openNewsPage} 
-                            title='News' 
-                            iconName='newspaper-outline'
-                        />
+                        />                        
 
                         <Option 
                             onPress={openManhwaRequest} 
                             title='Request Manhwa'
                             iconName='megaphone-outline'
+                        />
+
+                        <Option 
+                            onPress={openBugReport} 
+                            title='Bug Report' 
+                            iconName='bug-outline'
                         />
 
                         <Option 
@@ -143,9 +143,9 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
                         />
 
                         <Option 
-                            onPress={openBugReport} 
-                            title='Bug Report' 
-                            iconName='bug-outline'
+                            onPress={openNewsPage} 
+                            title='News' 
+                            iconName='newspaper-outline'
                         />
 
                         <Option 
@@ -172,7 +172,7 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
             </ScrollView>
             <Pressable 
                 onPress={openDisclaimer} style={{paddingBottom: 62, alignItems: "center"}} 
-                hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE} >
+                hitSlop={AppConstants.HIT_SLOP.LARGE} >
                 <Text style={{...Typography.light, textDecorationLine: 'underline'}} >eula & disclaimer</Text>
             </Pressable>
         </SafeAreaView>
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     },
     optionButton: {
         width: '100%',
-        gap: AppConstants.COMMON.GAP,
+        gap: AppConstants.GAP,
         flexDirection: 'row',
         alignItems: "center",
         justifyContent: "flex-start"

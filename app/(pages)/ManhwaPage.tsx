@@ -155,7 +155,7 @@ const ManhwaPage = () => {
           <AddToLibray manhwa={manhwa} backgroundColor={manhwa.color} />
 
           {/* Status (OnGoing or Completed) and Num Views */}
-          <Row style={{gap: AppConstants.COMMON.MARGIN}} >
+          <Row style={{gap: AppConstants.MARGIN}} >
             <Item text={manhwa.status} backgroundColor={manhwa.color} />
             <Item text={`Views: ${formatNumberWithSuffix(manhwa.views + 1)}`} backgroundColor={manhwa.color} />
           </Row>
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
   },
   item: {
     height: AppConstants.BUTTON.SIZE,
-    borderRadius: AppConstants.COMMON.BORDER_RADIUS,
+    borderRadius: AppConstants.BORDER_RADIUS,
     alignItems: "center",
     justifyContent: "center",
     flex: 1
@@ -195,19 +195,14 @@ const styles = StyleSheet.create({
   topBar: {
     width: '100%',
     justifyContent: "space-between",
-    paddingHorizontal: AppConstants.COMMON.SCREEN_PADDING_HORIZONTAL,
-    paddingVertical: AppConstants.COMMON.SCREEN_PADDING_VERTICAL,
+    paddingHorizontal: AppConstants.SCREEN.PADDING_HORIZONTAL,
+    paddingVertical: AppConstants.SCREEN.PADDING_VERTICAL,
     paddingBottom: 20
   },
   manhwaContainer: {
     width: '100%',
-    gap: AppConstants.COMMON.MARGIN,
+    gap: AppConstants.MARGIN,
     alignItems: "flex-start",
-    paddingHorizontal: AppConstants.COMMON.SCREEN_PADDING_HORIZONTAL
-  },
-  bottomSheetContainer: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: Colors.gray
+    paddingHorizontal: AppConstants.SCREEN.PADDING_HORIZONTAL
   }
 })

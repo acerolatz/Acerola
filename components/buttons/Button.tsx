@@ -50,7 +50,7 @@ const Button = ({
   }
 
   return (
-    <Pressable onPress={p} hitSlop={AppConstants.COMMON.HIT_SLOP.NORMAL} style={style} >
+    <Pressable onPress={p} hitSlop={AppConstants.HIT_SLOP.NORMAL} style={style} >
         <Ionicons name={iconName as any} size={iconSize} color={iconColor} />
     </Pressable>
   )

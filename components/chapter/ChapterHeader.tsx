@@ -72,8 +72,8 @@ export default ChapterHeader
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    gap: AppConstants.COMMON.GAP,
-    paddingHorizontal: AppConstants.COMMON.SCREEN_PADDING_HORIZONTAL, 
-    paddingTop: AppConstants.COMMON.SCREEN_PADDING_VERTICAL
+    gap: AppConstants.GAP,
+    paddingHorizontal: AppConstants.SCREEN.PADDING_HORIZONTAL, 
+    paddingTop: AppConstants.SCREEN.PADDING_VERTICAL
   }  
 })

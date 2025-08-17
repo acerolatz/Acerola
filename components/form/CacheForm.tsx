@@ -77,9 +77,9 @@ const CacheForm = ({currentCacheSize, currentMaxCacheSize}: CacheFormProps) => {
         RNRestart.Restart();
     }
 
-    return (        
-        <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='always' >
-            <View style={{flex: 1, gap: AppConstants.COMMON.GAP, paddingHorizontal: wp(1)}} >
+    return (
+        <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled' >
+            <View style={{flex: 1, gap: AppConstants.GAP, paddingHorizontal: wp(1)}} >
                 <Text style={Typography.semibold}>Cache size: {formatBytes(currentCacheSize)}</Text>
                 <Text style={AppStyle.error}>* Restart Required</Text>                    
                 {/* Clear Cache */}

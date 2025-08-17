@@ -125,7 +125,7 @@ const ManhwaChapterGrid = ({
 
   return (    
     <View style={styles.container} >
-      <Row style={{gap: AppConstants.COMMON.MARGIN}} >
+      <Row style={{gap: AppConstants.MARGIN}} >
         <Pressable onPress={readFirst} style={{...AppStyle.button, backgroundColor: manhwa.color}}>
           <Text style={{...Typography.regular, color: textColor}}>Read First</Text>
         </Pressable>
@@ -165,7 +165,7 @@ export default ManhwaChapterGrid;
 const styles = StyleSheet.create({
   container: {
     width: '100%', 
-    gap: AppConstants.COMMON.MARGIN, 
+    gap: AppConstants.MARGIN, 
     flexWrap: 'wrap', 
     flexDirection: 'row', 
     alignItems: "center", 
@@ -175,14 +175,14 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center", 
     justifyContent: "center",
-    gap: AppConstants.COMMON.MARGIN,
+    gap: AppConstants.MARGIN,
     flexDirection: 'row', 
     flexWrap: 'wrap'
   },  
   button: {
     flex: 1,     
     height: 52, 
-    borderRadius: AppConstants.COMMON.BORDER_RADIUS, 
+    borderRadius: AppConstants.BORDER_RADIUS, 
     alignItems: "center", 
     justifyContent: "center"
   }

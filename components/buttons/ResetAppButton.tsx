@@ -18,7 +18,7 @@ const ResetAppButton = () => {
     }
 
     return (
-        <Pressable onPress={onPress} hitSlop={AppConstants.COMMON.HIT_SLOP.NORMAL} >
+        <Pressable onPress={onPress} hitSlop={AppConstants.HIT_SLOP.NORMAL} >
             <Ionicons name='refresh-outline' size={AppConstants.ICON.SIZE} color={'white'} />
         </Pressable>
     )

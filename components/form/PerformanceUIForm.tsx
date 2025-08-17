@@ -33,8 +33,8 @@ interface FormData {
 const schema = yup.object().shape({  
     drawDistance: yup
         .number()
-        .min(AppConstants.COMMON.SCREEN_WIDTH, `Min ${AppConstants.COMMON.SCREEN_WIDTH} pixels`)
-        .max(AppConstants.COMMON.SCREEN_WIDTH * 20, `Max ${AppConstants.COMMON.SCREEN_WIDTH * 20} pixels`)
+        .min(AppConstants.SCREEN.WIDTH, `Min ${AppConstants.SCREEN.WIDTH} pixels`)
+        .max(AppConstants.SCREEN.WIDTH * 20, `Max ${AppConstants.SCREEN.WIDTH * 20} pixels`)
         .required('DrawDistance is required'),
 
     onEndReachedThreshold: yup
@@ -70,15 +70,17 @@ const PerformanceUIForm = () => {
                 drawDistance: form_data.drawDistance, 
                 onEndReachedThreshold: form_data.onEndReachedThreshold
             })
-            await dbSetNumericInfo(db, 'drawDistance', form_data.drawDistance)
-            await dbSetNumericInfo(db, 'onEndReachedThreshold', form_data.onEndReachedThreshold)
+            await Promise.all([
+                dbSetNumericInfo(db, 'drawDistance', form_data.drawDistance),
+                dbSetNumericInfo(db, 'onEndReachedThreshold', form_data.onEndReachedThreshold)
+            ])
             Toast.show(ToastMessages.EN.GENERIC_SUCCESS)
         setLoading(false)
     };
     
     return (        
-        <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='always' >
-            <View style={{flex: 1, gap: AppConstants.COMMON.GAP, paddingHorizontal: wp(1)}} >
+        <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled' >
+            <View style={{flex: 1, gap: AppConstants.GAP, paddingHorizontal: wp(1)}} >
                 {/* Draw Distance */}
                 <View>
                     <Text style={Typography.semibold}>DrawDistance</Text>

@@ -1,8 +1,8 @@
 import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
 import Ionicons from '@expo/vector-icons/Ionicons'
-import React from 'react'
 import { Pressable } from 'react-native'
+import React from 'react'
 
 
 interface CloseBtnProps {
@@ -12,9 +12,7 @@ interface CloseBtnProps {
 
 const CloseBtn = ({ onPress }: CloseBtnProps) => {
   return (
-    <Pressable
-        onPress={onPress}
-        hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE}>
+    <Pressable onPress={onPress} hitSlop={AppConstants.HIT_SLOP.LARGE}>
         <Ionicons name='close-outline' size={AppConstants.ICON.SIZE} color={Colors.primary} />
     </Pressable>
   )

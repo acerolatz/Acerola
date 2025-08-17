@@ -13,7 +13,12 @@ interface SearchBarProps {
 }
 
 
-const SearchBar = ({ onChangeText, style, placeholder = 'search', color = 'white' }: SearchBarProps) => {    
+const SearchBar = ({ 
+    onChangeText, 
+    style, 
+    placeholder = 'search', 
+    color = Colors.primary 
+}: SearchBarProps) => {    
 
     const inputRef = useRef<TextInput>(null)
 
@@ -34,7 +39,7 @@ const SearchBar = ({ onChangeText, style, placeholder = 'search', color = 'white
             <Pressable 
                 style={styles.icon}
                 onPress={clearText} 
-                hitSlop={AppConstants.COMMON.HIT_SLOP.LARGE} >
+                hitSlop={AppConstants.HIT_SLOP.LARGE} >
                 <Ionicons name='close-circle-outline' size={24} color={color} />
             </Pressable>
         </View>
@@ -47,7 +52,7 @@ const styles = StyleSheet.create({
     input: {
         paddingHorizontal: 10,
         height: 52,
-        borderRadius: AppConstants.COMMON.BORDER_RADIUS,
+        borderRadius: AppConstants.BORDER_RADIUS,
         backgroundColor: Colors.backgroundSecondary,
         fontSize: 18,
         color: Colors.white,
