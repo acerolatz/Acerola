@@ -1,23 +1,23 @@
 import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
-import { AppStyle } from '@/styles/AppStyle'
-import TopBar from '@/components/TopBar'
-import ReturnButton from '@/components/buttons/ReturnButton'
-import { Feedback, Post } from '@/helpers/types'
-import { spFetchNews } from '@/lib/supabase'
-import { FlashList } from '@shopify/flash-list'
 import CustomActivityIndicator from '@/components/util/CustomActivityIndicator'
-import Footer from '@/components/util/Footer'
-import { formatTimestamp } from '@/helpers/util'
-import Row from '@/components/util/Row'
-import Ionicons from '@expo/vector-icons/Ionicons'
-import { Colors } from '@/constants/Colors'
+import ReturnButton from '@/components/buttons/ReturnButton'
+import React, { useEffect, useRef, useState } from 'react'
 import { AppConstants } from '@/constants/AppConstants'
 import { Typography } from '@/constants/typography'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import { formatTimestamp } from '@/helpers/util'
+import { Feedback, Post } from '@/helpers/types'
+import { FlashList } from '@shopify/flash-list'
+import { AppStyle } from '@/styles/AppStyle'
+import { spFetchNews } from '@/lib/supabase'
+import Footer from '@/components/util/Footer'
+import { Colors } from '@/constants/Colors'
+import TopBar from '@/components/TopBar'
+import Row from '@/components/util/Row'
 
 
 const PAGE_LIMIT = 16
-const TEXT_LENGHT_LIMIT = 256
+const TEXT_LENGHT_LIMIT = 128
 
 
 const Item = ({item}: {item: Post}) => {

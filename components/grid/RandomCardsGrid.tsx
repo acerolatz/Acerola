@@ -1,15 +1,15 @@
-import { ManhwaCard } from '@/helpers/types'
 import { useManhwaCardsState } from '@/store/randomManhwaState'
-import { debounce } from 'lodash'
-import React, { useRef } from 'react'
-import { StyleSheet, View } from 'react-native'
-import Title from '../Title'
 import RotatingButton from '../buttons/RotatingButton'
-import Row from '../util/Row'
 import { AppConstants } from '@/constants/AppConstants'
-import { FlashList } from '@shopify/flash-list'
-import { wp } from '@/helpers/util'
 import RandomManhwaCard from '../RandomManhwaCard'
+import { StyleSheet, View } from 'react-native'
+import { FlashList } from '@shopify/flash-list'
+import { ManhwaCard } from '@/helpers/types'
+import React, { useRef } from 'react'
+import { wp } from '@/helpers/util'
+import { debounce } from 'lodash'
+import Row from '../util/Row'
+import Title from '../Title'
 
 
 interface RandomCardsGridProps {
@@ -32,7 +32,7 @@ const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
     if (cards.length === 0) {
         return (
             <View style={styles.container} >
-                <Row style={{width: '100%', justifyContent: "space-between"}} >
+                <Row style={styles.header} >
                     <Title title='Random'/>
                     <RotatingButton onPress={debounceReload} />
                 </Row>
@@ -42,7 +42,7 @@ const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
     
     return (
         <View style={styles.container} >
-            <Row style={{width: '100%', justifyContent: "space-between"}} >
+            <Row style={styles.header} >
                 <Title title='Random'/>
                 <RotatingButton onPress={debounceReload} />
             </Row>
@@ -51,8 +51,8 @@ const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
                     ref={flatListRef}
                     data={cards}
                     ItemSeparatorComponent={() => <View style={{ width: AppConstants.MARGIN }} />}
-                    drawDistance={wp(120)}
-                    onEndReachedThreshold={3}
+                    drawDistance={wp(100)}
+                    onEndReachedThreshold={1}
                     estimatedItemSize={AppConstants.RANDOM_MANHWAS.MAX_WIDTH}
                     showsHorizontalScrollIndicator={false}
                     horizontal={true}
@@ -67,6 +67,10 @@ const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
 export default RandomCardsGrid
 
 const styles = StyleSheet.create({
+    header: {
+        width: '100%', 
+        justifyContent: "space-between"
+    },
     container: {
         flex: 1,
         gap: AppConstants.GAP

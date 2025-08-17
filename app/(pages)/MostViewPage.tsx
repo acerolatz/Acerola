@@ -1,16 +1,14 @@
 import ReturnButton from '@/components/buttons/ReturnButton'
-import ManhwaGrid from '@/components/grid/ManhwaGrid'
-import TopBar from '@/components/TopBar'
-import { Colors } from '@/constants/Colors'
-import { Manhwa } from '@/helpers/types'
 import { dbReadManhwasOrderedByViews } from '@/lib/database'
-import { AppStyle } from '@/styles/AppStyle'
-import { useSQLiteContext } from 'expo-sqlite'
 import React, { useEffect, useRef, useState } from 'react'
+import ManhwaGrid from '@/components/grid/ManhwaGrid'
+import { useSQLiteContext } from 'expo-sqlite'
+import { AppStyle } from '@/styles/AppStyle'
 import { SafeAreaView } from 'react-native'
+import TopBar from '@/components/TopBar'
+import { Manhwa } from '@/helpers/types'
+import { AppConstants } from '@/constants/AppConstants'
 
-
-const PAGE_LIMIT = 32
 
 
 const MostView = () => {
@@ -28,7 +26,7 @@ const MostView = () => {
       let isCancelled = false
       async function init() {
         setLoading(true)
-          const m: Manhwa[] = await dbReadManhwasOrderedByViews(db, 0, PAGE_LIMIT)
+          const m: Manhwa[] = await dbReadManhwasOrderedByViews(db, 0, AppConstants.PAGE_LIMIT)
           if (isCancelled) { return }
           setManhwas(m)
           isInitialized.current = true
@@ -47,7 +45,11 @@ const MostView = () => {
     }
     page.current += 1
     setLoading(true)
-      const m: Manhwa[] = await dbReadManhwasOrderedByViews(db, page.current * PAGE_LIMIT, PAGE_LIMIT)
+      const m: Manhwa[] = await dbReadManhwasOrderedByViews(
+        db, 
+        page.current * AppConstants.PAGE_LIMIT, 
+        AppConstants.PAGE_LIMIT
+      )
       hasResults.current = m.length > 0
       setManhwas(prev => [...prev, ...m])
     setLoading(false)
@@ -55,7 +57,7 @@ const MostView = () => {
 
   return (
     <SafeAreaView style={AppStyle.safeArea}>
-      <TopBar title='Most Views'>
+      <TopBar title='Most Popular'>
         <ReturnButton/>
       </TopBar>
       <ManhwaGrid

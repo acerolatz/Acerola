@@ -1,16 +1,13 @@
 import ReturnButton from '@/components/buttons/ReturnButton'
-import ManhwaGrid from '@/components/grid/ManhwaGrid'
-import TopBar from '@/components/TopBar'
-import { Colors } from '@/constants/Colors'
-import { Manhwa } from '@/helpers/types'
-import { dbGetReadingHistory } from '@/lib/database'
-import { AppStyle } from '@/styles/AppStyle'
-import { useSQLiteContext } from 'expo-sqlite'
 import React, { useEffect, useRef, useState } from 'react'
+import { AppConstants } from '@/constants/AppConstants'
+import ManhwaGrid from '@/components/grid/ManhwaGrid'
+import { dbGetReadingHistory } from '@/lib/database'
+import { useSQLiteContext } from 'expo-sqlite'
+import { AppStyle } from '@/styles/AppStyle'
 import { SafeAreaView } from 'react-native'
-
-
-const PAGE_LIMIT = 32
+import TopBar from '@/components/TopBar'
+import { Manhwa } from '@/helpers/types'
 
 
 const ReadingHistory = () => {
@@ -29,7 +26,7 @@ const ReadingHistory = () => {
       const init = async () => {
         if (isInitialized.current) { return }
         isInitialized.current = true
-        const m = await dbGetReadingHistory(db, 0, PAGE_LIMIT)
+        const m = await dbGetReadingHistory(db, 0, AppConstants.PAGE_LIMIT)
         if (isCancelled) { return }
         setManhwas(m)
         hasResults.current = m.length > 0
@@ -45,7 +42,11 @@ const ReadingHistory = () => {
     if (!hasResults.current || !isInitialized.current) { return }
     setLoading(true)
       page.current += 1    
-      const m = await dbGetReadingHistory(db, page.current * PAGE_LIMIT, PAGE_LIMIT)
+      const m = await dbGetReadingHistory(
+        db, 
+        page.current * AppConstants.PAGE_LIMIT, 
+        AppConstants.PAGE_LIMIT
+      )
       setManhwas(prev => [...prev, ...m])
       hasResults.current = m.length > 0
     setLoading(false)

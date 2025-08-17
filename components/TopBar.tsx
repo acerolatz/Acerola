@@ -1,7 +1,8 @@
-import { Colors } from '@/constants/Colors'
-import { Typography } from '@/constants/typography'
-import React from 'react'
+import { AppConstants } from '@/constants/AppConstants'
 import { StyleSheet, Text, View } from 'react-native'
+import { Typography } from '@/constants/typography'
+import { Colors } from '@/constants/Colors'
+import React from 'react'
 
 
 interface TopBarProps {
@@ -30,13 +31,14 @@ export default TopBar
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    marginBottom: 10,
+    marginBottom: AppConstants.GAP,
+    gap: AppConstants.GAP,
     flexDirection: 'row',
     alignItems: "center", 
     justifyContent: "space-between"
   },
   title: {
     ...Typography.semiboldXl,
-    maxWidth: '80%',
+    flexShrink: 1
   }
 })

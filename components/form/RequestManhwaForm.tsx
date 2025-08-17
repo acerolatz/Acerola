@@ -1,12 +1,16 @@
 import { AppConstants } from '@/constants/AppConstants';
-import { Colors } from '@/constants/Colors';
-import { ToastMessages } from '@/constants/Messages';
-import { spRequestManhwa } from '@/lib/supabase';
-import { AppStyle } from '@/styles/AppStyle';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { router } from 'expo-router';
-import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { ToastMessages } from '@/constants/Messages';
+import { Typography } from '@/constants/typography';
+import { spRequestManhwa } from '@/lib/supabase';
+import Toast from 'react-native-toast-message';
+import { AppStyle } from '@/styles/AppStyle';
+import { Colors } from '@/constants/Colors';
+import React, { useState } from 'react';
+import { router } from 'expo-router';
+import Footer from '../util/Footer';
+import * as yup from 'yup';
 import {
     ActivityIndicator,
     Keyboard,
@@ -14,29 +18,24 @@ import {
     Platform,
     Pressable,
     ScrollView,
-    StyleSheet,
     Text,
     TextInput,
     View
 } from 'react-native';
-import Toast from 'react-native-toast-message';
-import * as yup from 'yup';
-import Footer from '../util/Footer';
-import { Typography } from '@/constants/typography';
 
 
 interface FormData {
-    manga_title: string
-    descr: string
+    pornhwaTitle: string
+    message: string
 }
 
 const schema = yup.object().shape({  
-    manga_title: yup
+    pornhwaTitle: yup
         .string()
         .min(AppConstants.FORM.MANHWA_REQUEST.TITLE_MIN_LENGTH, `Min ${AppConstants.FORM.MANHWA_REQUEST.TITLE_MIN_LENGTH} characters`)
         .max(AppConstants.FORM.MANHWA_REQUEST.TITLE_MAX_LENGTH, `Max ${AppConstants.FORM.MANHWA_REQUEST.TITLE_MAX_LENGTH} characters`)
         .required('Manga name is required'),
-    descr: yup
+    message: yup
         .string()
         .max(AppConstants.FORM.MANHWA_REQUEST.DESCR_MAX_LENGTH, `Max ${AppConstants.FORM.MANHWA_REQUEST.DESCR_MAX_LENGTH} characters`)
 });
@@ -53,16 +52,16 @@ const RequestManhwaForm = () => {
     } = useForm<FormData>({
         resolver: yupResolver(schema as any),
         defaultValues: {            
-            manga_title: '',
-            descr: ''
+            pornhwaTitle: '',
+            message: ''
         },
     });
     
     const onSubmit = async (form_data: FormData) => {
+        Keyboard.dismiss()
         setLoading(true)
-            const m = form_data.descr.trim() == '' ? null : form_data.descr.trim()
-            await spRequestManhwa(form_data.manga_title, m)
-            Keyboard.dismiss()
+            const m = form_data.message.trim() == '' ? null : form_data.message.trim()
+            await spRequestManhwa(form_data.pornhwaTitle, m)
             Toast.show(ToastMessages.EN.THANKS)
             router.back()
         setLoading(false)
@@ -73,11 +72,11 @@ const RequestManhwaForm = () => {
         <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled' >
             <View style={{gap: AppConstants.GAP}} >
                 {/* Manga Name */}
-                <Text style={Typography.semibold}>Manhwa</Text>
-                {errors.manga_title && (<Text style={AppStyle.error}>{errors.manga_title.message}</Text>)}
+                <Text style={Typography.semibold}>Pornhwa</Text>
+                {errors.pornhwaTitle && (<Text style={AppStyle.error}>{errors.pornhwaTitle.message}</Text>)}
                 <Controller
                     control={control}
-                    name="manga_title"
+                    name="pornhwaTitle"
                     render={({ field: { onChange, onBlur, value } }) => (
                     <TextInput
                         style={AppStyle.input}
@@ -93,9 +92,9 @@ const RequestManhwaForm = () => {
                     <Text style={Typography.semibold}>Message</Text>
                     <Text style={AppStyle.textOptional}>optional</Text>
                 </View>
-                {errors.descr && (<Text style={AppStyle.error}>{errors.descr.message}</Text>)}
+                {errors.message && (<Text style={AppStyle.error}>{errors.message.message}</Text>)}
                 <Controller
-                    name="descr"
+                    name="message"
                     control={control}
                     render={({ field: { onChange, onBlur, value } }) => (
                     <TextInput

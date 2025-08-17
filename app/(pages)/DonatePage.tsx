@@ -1,29 +1,23 @@
-import ReturnButton from '@/components/buttons/ReturnButton'
-import TopBar from '@/components/TopBar'
 import PageActivityIndicator from '@/components/util/PageActivityIndicator'
-import { Colors } from '@/constants/Colors'
-import { DonateMethod, UserHistory } from '@/helpers/types'
-import { formatNumberWithSuffix, getRelativeHeight, wp } from '@/helpers/util'
+import ReturnButton from '@/components/buttons/ReturnButton'
+import DonateComponent from '@/components/DonateComponent'
+import { getRelativeHeight, wp } from '@/helpers/util'
 import { spGetDonationMethods } from '@/lib/supabase'
 import { useDonateState } from '@/store/donateState'
-import { AppStyle } from '@/styles/AppStyle'
-import { Image } from 'expo-image'
 import React, { useEffect, useState } from 'react'
-import DonateComponent from '@/components/DonateComponent'
+import { DonateMethod } from '@/helpers/types'
+import { AppStyle } from '@/styles/AppStyle'
+import { Colors } from '@/constants/Colors'
+import TopBar from '@/components/TopBar'
+import { Image } from 'expo-image'
 import {
   FlatList,
   SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View
+  StyleSheet
 } from 'react-native'
 import { AppConstants } from '@/constants/AppConstants'
-import { dbGetUserHistory } from '@/lib/database'
 import { useSQLiteContext } from 'expo-sqlite'
-import Row from '@/components/util/Row'
 import Footer from '@/components/util/Footer'
-import { Typography } from '@/constants/typography'
 
 
 const WIDTH = wp(92)

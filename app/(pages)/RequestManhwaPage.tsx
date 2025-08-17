@@ -1,16 +1,15 @@
-import ReturnButton from '@/components/buttons/ReturnButton'
 import RequestManhwaForm from '@/components/form/RequestManhwaForm'
-import TopBar from '@/components/TopBar'
-import { Colors } from '@/constants/Colors'
+import ReturnButton from '@/components/buttons/ReturnButton'
 import { AppStyle } from '@/styles/AppStyle'
-import React from 'react'
 import { SafeAreaView } from 'react-native'
+import TopBar from '@/components/TopBar'
+import React from 'react'
 
 
-const RequestManhwa = () => {
+const RequestPornhwaPage = () => {
   return (
     <SafeAreaView style={AppStyle.safeArea} >
-        <TopBar title='Request Manhwa'>
+        <TopBar title='Request Pornhwa'>
             <ReturnButton/>
         </TopBar>
         <RequestManhwaForm/>
@@ -19,4 +18,4 @@ const RequestManhwa = () => {
 }
 
 
-export default RequestManhwa
+export default RequestPornhwaPage

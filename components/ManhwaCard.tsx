@@ -31,8 +31,8 @@ interface ManhwaCardProps {
 
 const ManhwaCard = ({
     manhwa,
-    width = wp(56),
-    height = hp(44),
+    width = wp(70),
+    height = hp(50),
     marginRight = AppConstants.MARGIN,
     marginBottom = 0,
     showChaptersPreview = true,

@@ -1,19 +1,26 @@
-import ReturnButton from '@/components/buttons/ReturnButton'
-import TopBar from '@/components/TopBar'
-import Footer from '@/components/util/Footer'
 import PageActivityIndicator from '@/components/util/PageActivityIndicator'
-import { AppConstants } from '@/constants/AppConstants'
-import { Colors } from '@/constants/Colors'
-import { Typography } from '@/constants/typography'
-import { wp } from '@/helpers/util'
-import { spFetchEulaAndDisclaimer } from '@/lib/supabase'
-import { useTextState } from '@/store/appTextState'
-import { AppStyle } from '@/styles/AppStyle'
+import ReturnButton from '@/components/buttons/ReturnButton'
 import React, { useEffect, useRef, useState } from 'react'
-import { Animated, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { spFetchEulaAndDisclaimer } from '@/lib/supabase'
+import { AppConstants } from '@/constants/AppConstants'
+import { Typography } from '@/constants/typography'
+import { useTextState } from '@/store/appTextState'
+import Footer from '@/components/util/Footer'
+import { AppStyle } from '@/styles/AppStyle'
+import { Colors } from '@/constants/Colors'
+import TopBar from '@/components/TopBar'
+import { wp } from '@/helpers/util'
+import { 
+    Animated, 
+    SafeAreaView, 
+    ScrollView, 
+    StyleSheet, 
+    Text, 
+    View 
+} from 'react-native'
 
 
-const width = wp(92)
+const width = AppConstants.SCREEN.WIDTH - AppConstants.SCREEN.PADDING_HORIZONTAL * 2
 
 
 const EulaAndDisclaimerPage = () => {
@@ -89,15 +96,10 @@ const EulaAndDisclaimerPage = () => {
                         {
                             texts.map((_, i) => {
                                 const opacity = scrollX.interpolate({
-                                    inputRange: [
-                                    (i - 1) * width,
-                                    i * width,
-                                    (i + 1) * width,
-                                    ],
+                                    inputRange: [(i - 1) * width, i * width, (i + 1) * width, ],
                                     outputRange: [0.3, 1, 0.3],
                                     extrapolate: 'clamp',
-                                });
-        
+                                });        
                                 return (
                                     <Animated.View key={i} style={[styles.dot, { opacity }]}/>
                                 );

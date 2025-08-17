@@ -20,8 +20,8 @@ export default AppLogo
 
 const styles = StyleSheet.create({
   image: {
-    width: AppConstants.BUTTON.SIZE * 0.9,
-    height: AppConstants.BUTTON.SIZE * 0.9,
+    width: AppConstants.ICON.SIZE * 2,
+    height: AppConstants.ICON.SIZE * 2,
     borderRadius: AppConstants.BUTTON.SIZE
   }
 })

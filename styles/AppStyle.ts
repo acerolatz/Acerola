@@ -82,5 +82,12 @@ export const AppStyle = StyleSheet.create({
         backgroundColor: Colors.primary,
         alignItems: "center",
         justifyContent: "center"
+    },
+    iconCenter: {
+        position: 'absolute', 
+        height: '100%', 
+        right: AppConstants.ICON.SIZE / 2,
+        top: "50%",
+        transform: [{ translateY: -AppConstants.ICON.SIZE / 2 }]
     }
 })

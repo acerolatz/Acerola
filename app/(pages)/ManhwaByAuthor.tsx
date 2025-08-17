@@ -1,14 +1,13 @@
 import ReturnButton from '@/components/buttons/ReturnButton'
-import ManhwaGrid from '@/components/grid/ManhwaGrid'
-import TopBar from '@/components/TopBar'
-import { Colors } from '@/constants/Colors'
-import { Manhwa } from '@/helpers/types'
+import React, { useEffect, useRef, useState } from 'react'
 import { dbReadManhwasByAuthorId } from '@/lib/database'
-import { AppStyle } from '@/styles/AppStyle'
+import ManhwaGrid from '@/components/grid/ManhwaGrid'
 import { useLocalSearchParams } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
-import React, { useEffect, useRef, useState } from 'react'
+import { AppStyle } from '@/styles/AppStyle'
 import { SafeAreaView } from 'react-native'
+import TopBar from '@/components/TopBar'
+import { Manhwa } from '@/helpers/types'
 
 
 const ManhwaByAuthor = () => {
@@ -41,7 +40,7 @@ const ManhwaByAuthor = () => {
             return () => { isCancelled = true }
         },
         [db]
-    )    
+    )
 
     return (
         <SafeAreaView style={AppStyle.safeArea}>

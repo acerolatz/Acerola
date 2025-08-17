@@ -1,11 +1,9 @@
 import { AppConstants } from '@/constants/AppConstants'
-import { Colors } from '@/constants/Colors'
-import { openUrl } from '@/helpers/util'
 import { dbGetCacheMaxSize } from '@/lib/database'
-import { AppStyle } from '@/styles/AppStyle'
-import Ionicons from '@expo/vector-icons/Ionicons'
-import { router } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
+import { AppStyle } from '@/styles/AppStyle'
+import { openUrl } from '@/helpers/util'
+import { router } from 'expo-router'
 import React from 'react'
 import {
     Pressable,
@@ -19,26 +17,8 @@ import CloseBtn from './buttons/CloseButton'
 import TopBar from './TopBar'
 import Footer from './util/Footer'
 import { Typography } from '@/constants/typography'
+import MenuButton from './buttons/MenuButton'
 
-
-interface OptionProps {
-    onPress: () => void
-    title: string
-    iconName: string
-}
-
-
-const Option = ({onPress, title, iconName}: OptionProps) => {    
-    return (
-        <Pressable 
-            onPress={onPress}
-            style={styles.optionButton} 
-            hitSlop={AppConstants.HIT_SLOP.LARGE} >
-            <Ionicons name={iconName as any} size={AppConstants.ICON.SIZE} color={Colors.primary} />
-            <Text style={Typography.regular}>{title}</Text>
-        </Pressable>
-    )
-}
 
 const readingHistoryPage = () => {
     router.navigate("/(pages)/ReadingHistoryPage")
@@ -64,14 +44,13 @@ const openDisclaimer = () => {
     router.navigate("/(pages)/EulaDisclaimerPage")
 }
 
-const openManhwaRequest = () => {
+const openPornhwaRequest = () => {
     router.navigate("/(pages)/RequestManhwaPage")
 }
 
 const openReddit = async () => {
-    await openUrl(AppConstants.URLS.REDDIT)
+    await openUrl(AppConstants.URLS.PORNHWA_REDDIT)
 }
-
 
 const openReleases = () => {
     router.navigate("/(pages)/ReleasesPage")
@@ -86,6 +65,7 @@ interface LateralMenuProps {
     closeMenu: () => any
 }
 
+
 const LateralMenu = ({closeMenu}: LateralMenuProps) => {
         
     const db = useSQLiteContext()    
@@ -95,8 +75,8 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
             pathname: "/(pages)/Settings",
             params: { cache_size }
         })
-    }    
-        
+    }
+
     return (
         <SafeAreaView style={AppStyle.safeArea} >
             <TopBar title='Menu'>
@@ -106,61 +86,61 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
                 <View style={styles.container} >
                     <View style={{gap: AppConstants.GAP * 2.5, marginTop: AppConstants.GAP}} > 
                     
-                        <Option 
+                        <MenuButton 
                             onPress={libraryPage} 
                             title='Library'
                             iconName='library-outline'
                         />                
                         
-                        <Option 
+                        <MenuButton 
                             onPress={readingHistoryPage} 
                             title='Reading History' 
                             iconName='book-outline'
                         />
 
-                        <Option 
+                        <MenuButton 
                             onPress={openDonate} 
                             title='Donate' 
                             iconName='cash-outline'
                         />                        
 
-                        <Option 
-                            onPress={openManhwaRequest} 
-                            title='Request Manhwa'
+                        <MenuButton 
+                            onPress={openPornhwaRequest} 
+                            title='Request Pornhwa'
                             iconName='megaphone-outline'
                         />
 
-                        <Option 
+                        <MenuButton 
                             onPress={openBugReport} 
                             title='Bug Report' 
                             iconName='bug-outline'
                         />
 
-                        <Option 
+                        <MenuButton 
                             onPress={openReleases} 
                             title='Releases' 
                             iconName='git-branch-outline'
                         />
 
-                        <Option 
+                        <MenuButton 
                             onPress={openNewsPage} 
                             title='News' 
                             iconName='newspaper-outline'
                         />
 
-                        <Option 
+                        <MenuButton 
                             onPress={scansPage} 
                             title='Scans' 
                             iconName='earth-outline'
                         />
 
-                        <Option 
+                        <MenuButton 
                             onPress={openReddit} 
-                            title='Reddit'
+                            title='Pornhwa'
                             iconName='logo-reddit'
                         />
 
-                        <Option 
+                        <MenuButton 
                             onPress={openSettings} 
                             title='Settings' 
                             iconName='settings-outline'
@@ -186,12 +166,5 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "space-between",
         paddingTop: 10
-    },
-    optionButton: {
-        width: '100%',
-        gap: AppConstants.GAP,
-        flexDirection: 'row',
-        alignItems: "center",
-        justifyContent: "flex-start"
     }
 })

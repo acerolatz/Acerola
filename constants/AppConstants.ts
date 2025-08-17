@@ -1,6 +1,8 @@
 import { hp, wp } from "@/helpers/util";
 
 
+const IS_TABLET_AUX = Math.min(wp(100), hp(100)) >= 600
+
 export const AppConstants = {
     APP_NAME: "Acerola",
     APP_VERSION: "v1.1.0",
@@ -34,11 +36,7 @@ export const AppConstants = {
             MAX_CACHE_SIZE: 256000 // MiB
         }
     },
-    DEBUB: { ENABLED: false },
-    MANHWA_COVER: {
-        WIDTH: 300,
-        HEIGHT: 440
-    },
+    DEBUB: { ENABLED: false },    
     DATABASE: {
         UPDATE_INTERVAL: {
             SERVER: 60 * 60 * 3, // 3 HOURS,
@@ -53,6 +51,10 @@ export const AppConstants = {
         NORMAL: { left: 10, right: 10, top: 10, bottom: 10 },
         LARGE: { left: 20, right: 20, top: 20, bottom: 20 }
     },
+    MANHWA_COVER: {
+        WIDTH: wp(46) - hp(1.2) / 2,
+        HEIGHT: hp(35)
+    },
     MARGIN: wp(1.2),
     GAP: hp(1.2),
     ICON: { SIZE: wp(5) },
@@ -66,7 +68,9 @@ export const AppConstants = {
     },
     BOTTOMSHEET_HANDLE_RADIUS: wp(4),    
     IMAGE_TRANSITION: 200,
-    IS_TABLET: Math.min(wp(100), hp(100)) >= 600,
+    IS_TABLET: IS_TABLET_AUX,
+    DEFAULT_DRAW_DISTANCE: Math.floor(IS_TABLET_AUX ? hp(150) : hp(200)),
+    DEFAULT_ON_END_REACHED_THRESHOLD: IS_TABLET_AUX ? 1 : 1.5,
     READING_STATUS: [
         'Completed',
         'Reading',
@@ -99,12 +103,13 @@ export const AppConstants = {
         VISIBILITY_TIME: 2500,
         POSITION: "bottom"
     },
-    URLS: { REDDIT: "https://www.reddit.com/r/pornhwa/" },
+    URLS: { PORNHWA_REDDIT: "https://www.reddit.com/r/pornhwa/" },
     DONATION: {
         BOTTOMSHEET: {
             TITLE: 'Enjoying the app?',
             MESSAGE: "Consider making a donation to help keep the servers running."
         },
         DONATE_BANNER: { WIDTH: 1024, HEIGHT: 943 }
-    }
+    },
+    PAGE_LIMIT: 24
 }

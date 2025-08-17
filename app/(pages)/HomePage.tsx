@@ -46,9 +46,6 @@ import {
 } from 'react-native'
 
 
-const PAGE_LIMIT = 32
-
-
 function normalizeRandomManhwaCardHeight(width: number, height: number): {
   normalizedWidth: number, 
   normalizedHeight: number
@@ -90,7 +87,7 @@ const HomePage = () => {
     const menuVisible = useRef(false)    
 
     const reloadCards = async () => {
-        const r = await spFetchRandomManhwaCards(PAGE_LIMIT)
+        const r = await spFetchRandomManhwaCards(AppConstants.PAGE_LIMIT)
         setCards(r.map(c => {
             const {
                 normalizedWidth, 
@@ -135,8 +132,8 @@ const HomePage = () => {
                 setLoading(true)
                     await Promise.all([
                         dbReadGenres(db),
-                        dbReadManhwasOrderedByUpdateAt(db, 0, PAGE_LIMIT),
-                        dbReadManhwasOrderedByViews(db, 0, PAGE_LIMIT)
+                        dbReadManhwasOrderedByUpdateAt(db, 0, AppConstants.PAGE_LIMIT),
+                        dbReadManhwasOrderedByViews(db, 0, AppConstants.PAGE_LIMIT)
                     ]).then(([g, l, m]) => {
                         setGenres(g)
                         setLatestUpdates(l)
@@ -159,7 +156,7 @@ const HomePage = () => {
         useCallback(
             () => {
                 const reload = async () => {
-                    await dbGetReadingHistory(db, 0, PAGE_LIMIT)
+                    await dbGetReadingHistory(db, 0, AppConstants.PAGE_LIMIT)
                         .then(v => setReadingHistoryManhwas(v))
                 }
                 reload()

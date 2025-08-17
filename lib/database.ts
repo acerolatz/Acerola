@@ -147,8 +147,8 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       VALUES
         ('images', 0),
         ('current_chapter_milestone', ${AppConstants.CHAPTER_GOAL_START}),
-        ('drawDistance', ${Math.floor(AppConstants.IS_TABLET ? hp(200) : hp(330))}),
-        ('onEndReachedThreshold', ${AppConstants.IS_TABLET ? 2 : 3})
+        ('drawDistance', ${AppConstants.DEFAULT_DRAW_DISTANCE}),
+        ('onEndReachedThreshold', ${AppConstants.DEFAULT_ON_END_REACHED_THRESHOLD})
       ON CONFLICT 
         (name)
       DO NOTHING;
@@ -1583,8 +1583,8 @@ export async function dbLoadSettings(db: SQLite.SQLiteDatabase): Promise<Setting
   ]) => {
       return {
         showLast3Chapters: showLast3Chapters === '1',
-        drawDistance: drawDistance !== null ? drawDistance : Math.floor(AppConstants.IS_TABLET ? hp(200) : hp(330)),
-        onEndReachedThreshold: onEndReachedThreshold !== null ? onEndReachedThreshold : AppConstants.IS_TABLET ? 2 : 3
+        drawDistance: drawDistance !== null ? drawDistance : AppConstants.DEFAULT_DRAW_DISTANCE,
+        onEndReachedThreshold: onEndReachedThreshold !== null ? onEndReachedThreshold : AppConstants.DEFAULT_ON_END_REACHED_THRESHOLD
       }
   }).catch(error => {
     console.log("error dbLoadSettings", error); 
@@ -1593,7 +1593,7 @@ export async function dbLoadSettings(db: SQLite.SQLiteDatabase): Promise<Setting
 
   return r ? r : {
     showLast3Chapters: false,
-    drawDistance: Math.floor(AppConstants.IS_TABLET ? hp(200) : hp(330)),
-    onEndReachedThreshold: AppConstants.IS_TABLET ? 2 : 3
+    drawDistance: AppConstants.DEFAULT_DRAW_DISTANCE,
+    onEndReachedThreshold: AppConstants.DEFAULT_ON_END_REACHED_THRESHOLD
   }
 }

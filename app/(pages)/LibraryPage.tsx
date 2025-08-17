@@ -12,9 +12,6 @@ import React, { useCallback, useRef, useState } from 'react'
 import { SafeAreaView, View } from 'react-native'
 
 
-const PAGE_LIMIT = 32
-
-
 const Library = () => {
 
   const db = useSQLiteContext()
@@ -27,7 +24,7 @@ const Library = () => {
 
   const init = async () => {
     setLoading(true)
-      const m = await dbGetManhwasByReadingStatus(db, status.current, 0, PAGE_LIMIT)
+      const m = await dbGetManhwasByReadingStatus(db, status.current, 0, AppConstants.PAGE_LIMIT)
       hasResults.current = m.length > 0
       setManhwas(m)
     setLoading(false)
@@ -38,8 +35,8 @@ const Library = () => {
       const m = await dbGetManhwasByReadingStatus(
         db,
         status.current,
-        page.current * PAGE_LIMIT,
-        PAGE_LIMIT
+        page.current * AppConstants.PAGE_LIMIT,
+        AppConstants.PAGE_LIMIT
       )
       hasResults.current = m.length > 0
       setManhwas(prev => append ? [...prev, ...m] : m)

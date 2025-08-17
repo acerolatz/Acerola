@@ -31,8 +31,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  View,
-  ViewStyle
+  View  
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { formatNumberWithSuffix } from '../../helpers/util';
@@ -50,6 +49,7 @@ interface ItemProps {
   text: string
   backgroundColor: string  
 }
+
 
 const Item = ({text, backgroundColor}: ItemProps) => {
   return (
@@ -117,10 +117,9 @@ const ManhwaPage = () => {
   return (
     <SafeAreaView style={[AppStyle.safeArea, styles.container]} >
       <ScrollView style={{flex: 1}} keyboardShouldPersistTaps={'always'} showsVerticalScrollIndicator={false} >
-
         <LinearGradient 
-          colors={[manhwa.color, Colors.backgroundColor]} 
-          style={{...styles.linearBackground, height: hp(100)}} />
+          colors={[manhwa.color, Colors.backgroundColor]}
+          style={{...styles.linearBackground, height: hp(92)}} />
 
         {/* Top */}        
         <Row style={styles.topBar} >
@@ -165,7 +164,6 @@ const ManhwaPage = () => {
 
           <Footer/>
         </View>
-
       </ScrollView>
     </SafeAreaView>
   )
@@ -183,7 +181,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',    
     left: 0,
-    top: 0    
+    top: 0
   },
   item: {
     height: AppConstants.BUTTON.SIZE,

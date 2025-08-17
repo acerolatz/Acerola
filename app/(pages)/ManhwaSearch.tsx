@@ -1,33 +1,19 @@
-import ReturnButton from '@/components/buttons/ReturnButton'
-import ManhwaCard from '@/components/ManhwaCard'
-import SearchBar from '@/components/SearchBar'
-import TopBar from '@/components/TopBar'
 import CustomActivityIndicator from '@/components/util/CustomActivityIndicator'
-import Footer from '@/components/util/Footer'
-import { AppConstants } from '@/constants/AppConstants'
-import { Colors } from '@/constants/Colors'
-import { Manhwa } from '@/helpers/types'
-import { getItemGridDimensions, hp, wp } from '@/helpers/util'
-import { dbSearchMangas } from '@/lib/database'
-import { AppStyle } from '@/styles/AppStyle'
-import { FlashList } from '@shopify/flash-list'
-import { useSQLiteContext } from 'expo-sqlite'
-import { debounce } from 'lodash'
-import React, { useEffect, useRef, useState } from 'react'
 import { SafeAreaView, StyleSheet, View } from 'react-native'
-
-
-const PAGE_LIMIT = 32
-
-const {width, height} = getItemGridDimensions(
-  AppConstants.SCREEN.PADDING_HORIZONTAL,
-  10,
-  2,
-  AppConstants.MANHWA_COVER.WIDTH,
-  AppConstants.MANHWA_COVER.HEIGHT
-)
-
-const estimatedItemSize = height + 20
+import ReturnButton from '@/components/buttons/ReturnButton'
+import React, { useEffect, useRef, useState } from 'react'
+import { AppConstants } from '@/constants/AppConstants'
+import ManhwaCard from '@/components/ManhwaCard'
+import { dbSearchMangas } from '@/lib/database'
+import { useSQLiteContext } from 'expo-sqlite'
+import { FlashList } from '@shopify/flash-list'
+import SearchBar from '@/components/SearchBar'
+import Footer from '@/components/util/Footer'
+import { AppStyle } from '@/styles/AppStyle'
+import TopBar from '@/components/TopBar'
+import { Manhwa } from '@/helpers/types'
+import { hp } from '@/helpers/util'
+import { debounce } from 'lodash'
 
 
 const ManhwaSearch = () => {
@@ -48,7 +34,7 @@ const ManhwaSearch = () => {
       const init = async () => {
         if (manhwas.length == 0) {
           setLoading(true)
-            const m = await dbSearchMangas(db, searchTerm.current, 0, PAGE_LIMIT)
+            const m = await dbSearchMangas(db, searchTerm.current, 0, AppConstants.PAGE_LIMIT)
             if (isCancelled) { return }
             hasResults.current = m.length > 0
             setManhwas(m)
@@ -66,7 +52,12 @@ const ManhwaSearch = () => {
     searchTerm.current = value.trim()
     page.current = 0
     setLoading(true)
-      const m = await dbSearchMangas(db, searchTerm.current, page.current * PAGE_LIMIT, PAGE_LIMIT)
+      const m = await dbSearchMangas(
+        db, 
+        searchTerm.current, 
+        page.current * AppConstants.PAGE_LIMIT, 
+        AppConstants.PAGE_LIMIT
+      )
       hasResults.current = m.length > 0
       flashListRef.current?.scrollToIndex({animated: false, index: 0})
       setManhwas(m)
@@ -79,7 +70,12 @@ const ManhwaSearch = () => {
     if (!hasResults.current || !isInitialized.current) { return }
     page.current += 1
     setLoading(true)
-      const m: Manhwa[] = await dbSearchMangas(db, searchTerm.current, page.current * PAGE_LIMIT, PAGE_LIMIT)
+      const m: Manhwa[] = await dbSearchMangas(
+        db, 
+        searchTerm.current, 
+        page.current * AppConstants.PAGE_LIMIT, 
+        AppConstants.PAGE_LIMIT
+      )
       hasResults.current = m.length > 0
       setManhwas(prev => [...prev, ...m])
     setLoading(false)
@@ -101,23 +97,23 @@ const ManhwaSearch = () => {
       </TopBar>
       <View style={styles.container} >
         <SearchBar onChangeText={debounceSearch} placeholder='pornhwa' />
-        <View style={{flex: 1}} >
+        <View style={styles.listContainer} >
           <FlashList
             ref={flashListRef}
             keyboardShouldPersistTaps={'always'}
             data={manhwas}
             numColumns={2}
             keyExtractor={(item) => item.manhwa_id.toString()}
-            estimatedItemSize={estimatedItemSize}
-            drawDistance={hp(150)}
+            estimatedItemSize={AppConstants.MANHWA_COVER.HEIGHT}
+            drawDistance={hp(100)}
             onEndReached={onEndReached}
             scrollEventThrottle={4}
-            onEndReachedThreshold={2}
+            onEndReachedThreshold={0.8}
             renderItem={({item}) => <ManhwaCard 
               showChaptersPreview={false}
               showManhwaStatus={true}
-              width={width} 
-              height={height} 
+              width={AppConstants.MANHWA_COVER.WIDTH}
+              height={AppConstants.MANHWA_COVER.HEIGHT}
               marginBottom={AppConstants.MARGIN} 
               manhwa={item}
             />}
@@ -135,5 +131,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1, 
     gap: 10
+  },
+  listContainer: {
+    flex: 1
   }
 })

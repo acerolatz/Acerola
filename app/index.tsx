@@ -1,31 +1,31 @@
 import PageActivityIndicator from '@/components/util/PageActivityIndicator';
+import { useAppVersionState } from '@/store/appVersionState';
+import { useSettingsState } from '@/store/settingsState';
+import NetInfo from '@react-native-community/netinfo';
+import { ToastMessages } from '@/constants/Messages';
+import React, { useEffect, useRef } from 'react';
+import { useSQLiteContext } from 'expo-sqlite';
+import Toast from 'react-native-toast-message';
 import { AppStyle } from '@/styles/AppStyle';
+import { SafeAreaView } from 'react-native';
+import { clearCache } from '@/helpers/util';
+import { router } from 'expo-router';
+import {
+    dbFirstRun,
+    dbGetAppVersion,
+    dbIsSafeModeEnabled,
+    dbLoadSettings,
+    dbSetLastRefresh,
+    dbShouldClearCache,
+    dbShouldUpdate,
+    dbUpdateDatabase
+} from '@/lib/database';
 import {
     LeagueSpartan_200ExtraLight,
     LeagueSpartan_400Regular,
     LeagueSpartan_600SemiBold,
     useFonts
 } from '@expo-google-fonts/league-spartan';
-import React, { useEffect, useRef } from 'react';
-import { SafeAreaView } from 'react-native';
-import { clearCache } from '@/helpers/util';
-import { ToastMessages } from '@/constants/Messages';
-import {
-  dbFirstRun,
-  dbGetAppVersion,
-  dbIsSafeModeEnabled,
-  dbLoadSettings,
-  dbSetLastRefresh,
-  dbShouldClearCache,
-  dbShouldUpdate,
-  dbUpdateDatabase
-} from '@/lib/database';
-import NetInfo from '@react-native-community/netinfo';
-import Toast from 'react-native-toast-message';
-import { router } from 'expo-router';
-import { useSQLiteContext } from 'expo-sqlite';
-import { useAppVersionState } from '@/store/appVersionState';
-import { useSettingsState } from '@/store/settingsState';
 
 
 const App = () => {

@@ -128,7 +128,7 @@ const SafeModeHomePage = () => {
                             <Pressable
                                 onPress={handleShowPassword}
                                 hitSlop={AppConstants.HIT_SLOP.NORMAL}
-                                style={styles.showPasswordIcon}>
+                                style={AppStyle.iconCenter}>
                                 <Ionicons name={passwordIcon} size={AppConstants.ICON.SIZE} color={Colors.primary} />
                             </Pressable>
                         </View>
@@ -171,11 +171,5 @@ const styles = StyleSheet.create({
         ...AppStyle.input, 
         backgroundColor: Colors.backgroundColor, 
         paddingRight: AppConstants.ICON.SIZE * 2
-    },
-    showPasswordIcon: {
-        position: "absolute",
-        right: AppConstants.ICON.SIZE / 2,
-        top: "50%",
-        transform: [{ translateY: -AppConstants.ICON.SIZE / 2 }]
-    }
+    }    
 })

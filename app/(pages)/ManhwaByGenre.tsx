@@ -1,7 +1,7 @@
 import ReturnButton from '@/components/buttons/ReturnButton'
 import ManhwaGrid from '@/components/grid/ManhwaGrid'
 import TopBar from '@/components/TopBar'
-import { Colors } from '@/constants/Colors'
+import { AppConstants } from '@/constants/AppConstants'
 import { Manhwa } from '@/helpers/types'
 import { dbReadManhwasByGenreId } from '@/lib/database'
 import { AppStyle } from '@/styles/AppStyle'
@@ -9,9 +9,6 @@ import { useLocalSearchParams } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
 import React, { useEffect, useRef, useState } from 'react'
 import { SafeAreaView } from 'react-native'
-
-
-const PAGE_LIMIT = 32
 
 
 const MangaByGenre = () => {
@@ -35,7 +32,7 @@ const MangaByGenre = () => {
             isInitialized.current = true
             async function init() {
                 setLoading(true)
-                    const m = await dbReadManhwasByGenreId(db, genre_id, 0, PAGE_LIMIT)
+                    const m = await dbReadManhwasByGenreId(db, genre_id, 0, AppConstants.PAGE_LIMIT)
                     if (isCancelled) { return }
                     setManhwas(m)
                     hasResults.current = m.length > 0
@@ -54,7 +51,12 @@ const MangaByGenre = () => {
         }
         page.current += 1
         setLoading(true)
-            const m = await dbReadManhwasByGenreId(db, genre_id, page.current * PAGE_LIMIT, PAGE_LIMIT)
+            const m = await dbReadManhwasByGenreId(
+                db, 
+                genre_id, 
+                page.current * AppConstants.PAGE_LIMIT, 
+                AppConstants.PAGE_LIMIT
+            )
             hasResults.current = m.length > 0
             setManhwas(prev => [...prev, ...m])
         setLoading(false)

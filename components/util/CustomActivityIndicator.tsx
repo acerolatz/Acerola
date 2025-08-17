@@ -1,3 +1,4 @@
+import { AppConstants } from '@/constants/AppConstants'
 import { Colors } from '@/constants/Colors'
 import React from 'react'
 import { ActivityIndicator, StyleSheet } from 'react-native'
@@ -7,7 +8,7 @@ interface CustomActivityIndicatorProps {
   color?: string
 }
 
-const CustomActivityIndicator = ({size = 32, color = Colors.primary}: CustomActivityIndicatorProps) => {
+const CustomActivityIndicator = ({size = AppConstants.ICON.SIZE, color = Colors.primary}: CustomActivityIndicatorProps) => {
   return (
     <ActivityIndicator size={size} color={color} />
   )

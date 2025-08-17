@@ -1,16 +1,13 @@
 import ReturnButton from '@/components/buttons/ReturnButton'
 import ManhwaGrid from '@/components/grid/ManhwaGrid'
 import TopBar from '@/components/TopBar'
-import { Colors } from '@/constants/Colors'
+import { AppConstants } from '@/constants/AppConstants'
 import { Manhwa } from '@/helpers/types'
 import { spFetchCollectionItems } from '@/lib/supabase'
 import { AppStyle } from '@/styles/AppStyle'
 import { useLocalSearchParams } from 'expo-router/build/hooks'
 import React, { useEffect, useRef, useState } from 'react'
 import { SafeAreaView } from 'react-native'
-
-
-const PAGE_LIMIT = 32
 
 
 const CollectionPage = () => {
@@ -31,7 +28,7 @@ const CollectionPage = () => {
             let isCancelled = false
             const init = async () => {
                 setLoading(true)
-                    const m = await spFetchCollectionItems(collection_id, 0, PAGE_LIMIT)
+                    const m = await spFetchCollectionItems(collection_id, 0, AppConstants.PAGE_LIMIT)
                     if (isCancelled) { return }
                     setManhwas(m)
                     isInitialized.current = true
@@ -47,7 +44,11 @@ const CollectionPage = () => {
         if (!hasResults.current || !isInitialized.current) { return }
         page.current += 1
         setLoading(true)
-          const m = await spFetchCollectionItems(collection_id, PAGE_LIMIT * page.current, PAGE_LIMIT)
+            const m = await spFetchCollectionItems(
+                collection_id, 
+                AppConstants.PAGE_LIMIT * page.current, 
+                AppConstants.PAGE_LIMIT
+            )
           hasResults.current = m.length > 0
           setManhwas(prev => [...prev, ...m])
         setLoading(false)

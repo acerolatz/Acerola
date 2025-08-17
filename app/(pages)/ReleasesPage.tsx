@@ -1,20 +1,17 @@
-import AppVersion from '@/components/AppVersion'
-import ReturnButton from '@/components/buttons/ReturnButton'
-import TopBar from '@/components/TopBar'
 import PageActivityIndicator from '@/components/util/PageActivityIndicator'
-import { Colors } from '@/constants/Colors'
-import { AppStyle } from '@/styles/AppStyle'
-import React, { useEffect, useState } from 'react'
-import { FlatList, SafeAreaView, View, Text, ScrollView } from 'react-native'
+import SourceCodeButton from '@/components/buttons/SourceCodeButton'
+import { FlatList, SafeAreaView, View, Text } from 'react-native'
 import { spFetchReleasesAndSourceCode } from '../../lib/supabase'
 import ReleaseButton from '@/components/buttons/ReleaseButton'
-import { ReleaseWrapper } from '@/helpers/types'
-import SourceCodeButton from '@/components/buttons/SourceCodeButton'
-import { StyleSheet } from 'react-native'
+import ReturnButton from '@/components/buttons/ReturnButton'
 import { useAppVersionState } from '@/store/appVersionState'
-import Row from '@/components/util/Row'
 import { AppConstants } from '@/constants/AppConstants'
 import { Typography } from '@/constants/typography'
+import React, { useEffect, useState } from 'react'
+import AppVersion from '@/components/AppVersion'
+import { AppStyle } from '@/styles/AppStyle'
+import TopBar from '@/components/TopBar'
+import { StyleSheet } from 'react-native'
 
 
 const Releases = () => {
@@ -57,6 +54,7 @@ const Releases = () => {
                 <ReturnButton/>
             </TopBar>
             <View style={styles.flatListContainer} >
+                
                 <Text style={Typography.semibold} >Source Code</Text>
                 <FlatList
                     data={releasesInfo.source}
@@ -65,6 +63,7 @@ const Releases = () => {
                     horizontal={true}
                     renderItem={({item}) => <SourceCodeButton item={item} />}
                 />
+
                 <Text style={Typography.semibold} >Packages</Text>
                 <AppVersion/>
                 <FlatList
