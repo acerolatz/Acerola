@@ -1,56 +1,142 @@
-import { Keyboard, KeyboardAvoidingView, Platform, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { AppStyle } from '@/styles/AppStyle'
-import TopBar from '@/components/TopBar'
-import ReturnButton from '@/components/buttons/ReturnButton'
-import { DebugInfo } from '@/helpers/types'
-import { useSQLiteContext } from 'expo-sqlite'
-import { dbDebugSetNumChapterRead, dbFetchDebugInfo, dbSetDebugInfo } from '@/lib/database'
-import PageActivityIndicator from '@/components/util/PageActivityIndicator'
-import Row from '@/components/util/Row'
-import Ionicons from '@expo/vector-icons/Ionicons'
-import { AppConstants } from '@/constants/AppConstants'
-import { Colors } from '@/constants/Colors'
+import { 
+    Keyboard, 
+    KeyboardAvoidingView, 
+    Platform, 
+    Pressable, 
+    SafeAreaView, 
+    ScrollView, 
+    StyleSheet, 
+    Text, 
+    View 
+} from 'react-native'
+import { dbDebugSetNumChapterRead, dbFetchDebugInfo, dbSetDebugInfo, dbSetNumericInfo } from '@/lib/database'
 import BooleanRotatingButton from '@/components/buttons/BooleanRotatingButton'
-import { Typography } from '@/constants/typography'
+import PageActivityIndicator from '@/components/util/PageActivityIndicator'
+import { spFetchCardAndCover, spFetchCardAndCoverLatest, spFetchCardAndCoverSearch, spFetchCardImage, spFetchCoverImage } from '@/lib/supabase'
+import RandomManhwaCard from '@/components/RandomManhwaCard'
+import ManhwaImageCover from '@/components/ManhwaImageCover'
+import ReturnButton from '@/components/buttons/ReturnButton'
 import { TextInput } from 'react-native-gesture-handler'
+import { DebugInfo, DebugManhwaImages, ManhwaCard } from '@/helpers/types'
+import { AppConstants } from '@/constants/AppConstants'
+import { Typography } from '@/constants/typography'
+import React, { useEffect, useState } from 'react'
+import { useSQLiteContext } from 'expo-sqlite'
 import Footer from '@/components/util/Footer'
+import { AppStyle } from '@/styles/AppStyle'
+import { Colors } from '@/constants/Colors'
+import TopBar from '@/components/TopBar'
+import Row from '@/components/util/Row'
+import { Image } from 'expo-image'
+import { hasOnlyDigits, hp, sleep, wp } from '@/helpers/util'
 import Toast from 'react-native-toast-message'
-import { ToastMessages } from '@/constants/Messages'
+import { LinearGradient } from 'expo-linear-gradient'
+
+
+interface ManhwaImagesComponentProps {
+    image: DebugManhwaImages
+    setCardToShow: React.Dispatch<React.SetStateAction<string | null>>    
+}
+
+
+const ManhwaImagesComponent = ({image, setCardToShow}: ManhwaImagesComponentProps) => {
+
+    const onPress = () => {
+        if (image.card) {
+            Keyboard.dismiss()
+            setCardToShow(image.card)
+        }
+    }
+
+    return (
+        <Pressable onPress={onPress} >
+            <View style={styles.debugManhwaImage}>
+                { image.cover &&  <Image source={image.cover} style={styles.image} contentFit='cover' /> }
+                { image.card && <Image source={image.card} style={styles.image} contentFit='contain' /> }
+                <Text style={styles.debugManhwaImageManhwaId} >{image.manhwa_id}</Text>
+                <LinearGradient colors={['rgba(0, 0, 0, 0.7)', 'transparent', 'transparent']} style={StyleSheet.absoluteFill} />
+                <Text style={styles.debugManhwaImageManhwaTitle} >{image.title}</Text>
+            </View>
+        </Pressable>
+    )
+}
+
 
 const DebugPage = () => {
 
     const db = useSQLiteContext()
     const [info, setInfo] = useState<DebugInfo | null>(null)
     const [loading, setLoading] = useState(false)
-    const [firstRun, setFirstRun] = useState<string>(info ? info.first_run! : '0')
-    const [shouldAskForDonation, setShouldAskForDonation] = useState<string>(info ? info.should_ask_for_donation! : '0')
-    const [readChapters, setReadChapters] = useState<string>(info ? info.read_chapters!.toString() : '0')
-
-    const reload = async () => {
-        setLoading(true)
-            const d = await dbFetchDebugInfo(db)
-            setInfo(d)
-        setLoading(false)
-    }
-
-    const saveReadChapters = async () => {
-        Keyboard.dismiss()
-        await dbDebugSetNumChapterRead(db, parseInt(readChapters))
-        await reload()
-    }
-
+    const [firstRun, setFirstRun] = useState<string>('')
+    const [shouldAskForDonation, setShouldAskForDonation] = useState<string>('')
+    const [readChapters, setReadChapters] = useState<string>('')
+    const [manhwaImage, setManhwaImage] = useState<DebugManhwaImages[]>([])
+    const [manhwaId, setManhwaId] = useState<string>('')
+    const [cardToShow, setCardToShow] = useState<string | null>(null)
+    const [chapterMilestone, setChapterMilestone] = useState('')
+    
     useEffect(
         () => {
-            reload()
+            const init = async () => {            
+                if (manhwaImage.length == 0) {
+                    setLoading(true)
+                        const m = await spFetchCardAndCoverLatest()
+                        setManhwaImage(m)
+                        const d = await dbFetchDebugInfo(db)
+                        setInfo(d)
+                    setLoading(false)
+                }
+            }
+            init()
         },
         []
     )
+
+    const reload = async () => {
+        await sleep(150)
+        const d = await dbFetchDebugInfo(db)
+        setInfo(d)
+    }
+
+    const loadManhwaImage = async () => {
+        Keyboard.dismiss()
+        if (hasOnlyDigits(manhwaId)) {
+            const d = await spFetchCardAndCover(parseInt(manhwaId))
+            if (d.cover === null) {
+                Toast.show({text1: "Not found", type: "error"})
+                setManhwaImage([])
+            } else {
+                setManhwaImage([d])
+            }
+        } else {
+         const d = await spFetchCardAndCoverSearch(manhwaId)
+            if (d.length === 0) {
+                Toast.show({text1: "No Manhwas found", type: "error"})
+            }
+            setManhwaImage(d)
+        }
+    }
 
     const save = async (debug: DebugInfo) => {
         Keyboard.dismiss()
         await dbSetDebugInfo(db, debug)
         await reload()
+    }
+
+    const saveAskForDonation = async () => {
+        await save({...info, should_ask_for_donation: shouldAskForDonation === '1' ? '1' : '0'} as any)
+    }
+
+    const saveFirstRun = async () => {
+        await save({...info, firstRun: firstRun === '1' ? '1' : '0'} as any)
+    }
+
+    const saveReadChapters = async () => {
+        await save({...info, read_chapters: readChapters !== '' ? parseInt(readChapters) : 0} as any)
+    }
+    
+    const saveMilestone = async () => {
+        await save({...info, current_chapter_milestone: chapterMilestone !== '' ? parseInt(chapterMilestone) : 0} as any)
     }
 
     if (loading) {
@@ -75,24 +161,52 @@ const DebugPage = () => {
             <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
                 <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled' >
                     <View style={{flex: 1, gap: AppConstants.GAP}} >
-                        <Text style={Typography.regular}>manhwas: {info?.total_manhwas}</Text>
-                        <Text style={Typography.regular}>chapters: {info?.total_chapters}</Text>
-                        <Text style={Typography.regular}>authors: {info?.total_authors}</Text>
-                        <Text style={Typography.regular}>manhwa_authors: {info?.total_manhwa_authors}</Text>
-                        <Text style={Typography.regular}>genres: {info?.total_genres}</Text>
-                        <Text style={Typography.regular}>manhwa_genres: {info?.total_manhwa_genres}</Text>
-                        <Text style={Typography.regular}>reading_status: {info?.total_reading_status}</Text>
-                        <Text style={Typography.regular}>reading_history: {info?.total_reading_history}</Text>
-                        <Text style={Typography.regular}>device: {info?.device}</Text>
-                        <Text style={Typography.regular}>first_run: {info?.first_run}</Text>
-                        <Text style={Typography.regular}>should_ask_for_donation: {info?.should_ask_for_donation}</Text>
-                        <Text style={Typography.regular}>show_last_3_chapters: {info?.show_last_3_chapters}</Text>
-                        <Text style={Typography.regular}>images: {info?.images}</Text>
-                        <Text style={Typography.regular}>current_chapter_milestone: {info?.current_chapter_milestone}</Text>
-                        <Text style={Typography.regular}>read_chapters: {info?.read_chapters}</Text>
+                        <ScrollView style={{width: '100%'}} horizontal={true} showsHorizontalScrollIndicator={false} >
+                            <Row>                                
+                                <Text style={styles.textItem}>manhwas: {info?.total_manhwas}</Text>
+                                <Text style={styles.textItem}>chapters: {info?.total_chapters}</Text>
+                                <Text style={styles.textItem}>authors: {info?.total_authors}</Text>
+                                <Text style={styles.textItem}>images: {info?.images}</Text>
+                                <Text style={styles.textItem}>manhwa_authors: {info?.total_manhwa_authors}</Text>
+                                <Text style={styles.textItem}>genres: {info?.total_genres}</Text>
+                                <Text style={styles.textItem}>manhwa_genres: {info?.total_manhwa_genres}</Text>
+                                <Text style={styles.textItem}>reading_status: {info?.total_reading_status}</Text>
+                                <Text style={styles.textItem}>reading_history: {info?.total_reading_history}</Text>
+                                <Text style={styles.textItem}>device: {info?.device}</Text>
+                            </Row>
+                        </ScrollView>
+
+                        {/* Manhwa Images */}
+                        <Text style={Typography.semibold} >Manhwa Images {manhwaImage.length > 0 ? manhwaImage.length : ''}</Text>
+                        <Row style={{gap: AppConstants.GAP}} >
+                            <TextInput
+                                style={styles.input}
+                                value={manhwaId.toString()}
+                                onChangeText={setManhwaId}
+                            />
+                            <Pressable onPress={loadManhwaImage} style={styles.button} >
+                                <Text style={styles.buttonText} >SET</Text>
+                            </Pressable>
+                        </Row>
+                        {
+                            manhwaImage.length > 0 &&
+                            <ScrollView style={{width: '100%'}} horizontal={true} showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps='handled' >
+                                { 
+                                    manhwaImage.map((item, index) => 
+                                        <ManhwaImagesComponent 
+                                        key={index} 
+                                        image={item} 
+                                        setCardToShow={setCardToShow} />
+                                    ) 
+                                }
+                            </ScrollView>
+                        }
 
                         {/* First Run */}
-                        <Text style={Typography.semibold} >First Run</Text>
+                        <View style={styles.title} >
+                            <Text style={Typography.semibold} >First Run</Text>
+                            <Text style={AppStyle.textOptional} >{info?.first_run}</Text>
+                        </View>
                         <Row style={{gap: AppConstants.GAP}} >
                             <TextInput
                                 style={styles.input}
@@ -101,13 +215,16 @@ const DebugPage = () => {
                                 maxLength={1}
                                 onChangeText={setFirstRun}
                             />
-                            <Pressable onPress={() => save({...info, first_run: firstRun!} as any)} style={styles.button} >
+                            <Pressable onPress={saveFirstRun} style={styles.button} >
                                 <Text style={styles.buttonText} >SET</Text>
                             </Pressable>
                         </Row>
 
                         {/* Should Ask for Donation */}
-                        <Text style={Typography.semibold} >Should Ask for Donation</Text>
+                        <View style={styles.title} >
+                            <Text style={Typography.semibold} >Should Ask for Donation</Text>
+                            <Text style={AppStyle.textOptional} >{info?.should_ask_for_donation}</Text>
+                        </View>
                         <Row style={{gap: AppConstants.GAP}} >
                             <TextInput
                                 style={styles.input}
@@ -116,13 +233,16 @@ const DebugPage = () => {
                                 maxLength={1}
                                 onChangeText={setShouldAskForDonation}
                             />
-                            <Pressable onPress={() => save({...info, should_ask_for_donation: shouldAskForDonation} as DebugInfo)} style={styles.button} >
+                            <Pressable onPress={saveAskForDonation} style={styles.button} >
                                 <Text style={styles.buttonText} >SET</Text>
                             </Pressable>
                         </Row>
 
                         {/* Num Chapter Readed */}
-                        <Text style={Typography.semibold} >Num Read Chapterss</Text>
+                        <View style={styles.title} >
+                            <Text style={Typography.semibold} >Num Read Chapters</Text>
+                            <Text style={AppStyle.textOptional} >{info?.read_chapters}/{info?.current_chapter_milestone}</Text>
+                        </View>
                         <Row style={{gap: AppConstants.GAP}} >
                             <TextInput
                                 style={styles.input}
@@ -134,10 +254,39 @@ const DebugPage = () => {
                                 <Text style={styles.buttonText} >SET</Text>
                             </Pressable>
                         </Row>
+
+                        {/* Chapter Milestone */}
+                        <View style={styles.title} >
+                            <Text style={Typography.semibold} >Chapter Milestone</Text>
+                            <Text style={AppStyle.textOptional} >{info?.current_chapter_milestone}</Text>
+                        </View>
+                        <Row style={{gap: AppConstants.GAP}} >
+                            <TextInput
+                                style={styles.input}
+                                value={chapterMilestone.toString()}
+                                keyboardType='numeric'
+                                onChangeText={setChapterMilestone}
+                            />
+                            <Pressable onPress={saveMilestone} style={styles.button} >
+                                <Text style={styles.buttonText} >SET</Text>
+                            </Pressable>
+                        </Row>
+
                     </View>
-                    <Footer/>
+                    <Footer height={120} />
                 </ScrollView>
             </KeyboardAvoidingView>
+            {
+                cardToShow &&
+                <View style={styles.cardPreviewContainer} >
+                    <Pressable onPress={() => setCardToShow(null)} >
+                        <Image 
+                            source={cardToShow} 
+                            style={styles.cardPreviewImage} 
+                            contentFit='contain' />
+                    </Pressable>
+                </View>
+            }
         </SafeAreaView>
     )
 }
@@ -156,5 +305,61 @@ const styles = StyleSheet.create({
     buttonText: {
         ...Typography.regular, 
         color: Colors.backgroundColor
+    },
+    image: {
+        width: wp(46), 
+        height: hp(35), 
+        borderRadius: AppConstants.BORDER_RADIUS
+    },
+    cardPreviewImage: {
+        width: AppConstants.RANDOM_MANHWAS.MAX_WIDTH, 
+        height: hp(92)
+    },
+    textItem: {
+        ...Typography.light, 
+        ...AppStyle.defaultGridItem, 
+        color: Colors.backgroundColor
+    },
+    title: {
+        flexDirection: 'row',
+        alignItems: "center",
+        justifyContent: "flex-start",
+        gap: AppConstants.GAP
+    },
+    debugManhwaImage: {
+        flexDirection: 'row',
+        gap: AppConstants.GAP, 
+        borderRadius: AppConstants.BORDER_RADIUS, 
+        marginRight: AppConstants.MARGIN * 2, 
+        padding: 10, 
+        backgroundColor: Colors.white
+    },
+    debugManhwaImageManhwaTitle: {
+        ...Typography.semibold, 
+        position: 'absolute', 
+        width: '100%', 
+        flexShrink: 1, 
+        left: 10, 
+        top: 10
+    },
+    debugManhwaImageManhwaId: {
+        ...Typography.regular, 
+        padding: 10, 
+        backgroundColor: Colors.backgroundColor, 
+        borderRadius: AppConstants.BORDER_RADIUS, 
+        position: 'absolute', 
+        flexShrink: 1, 
+        left: 10, 
+        bottom: 10
+    },
+    cardPreviewContainer: {
+        position: 'absolute', 
+        width: wp(100), 
+        height: hp(110), 
+        left: 0, 
+        top: 0, 
+        backgroundColor: 'rgba(0, 0, 0, 0.6)', 
+        alignItems: "center", 
+        justifyContent: "center"
     }
 })

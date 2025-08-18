@@ -2293,6 +2293,7 @@ export async function dbSetDebugInfo(db: SQLite.SQLiteDatabase, debug: DebugInfo
     dbSetInfo(db, 'should_ask_for_donation', debug.should_ask_for_donation ?? ''),
     dbSetInfo(db, 'show_last_3_chapters', debug.show_last_3_chapters ?? ''),
     dbSetNumericInfo(db, 'images', debug.images ?? 0),
-    dbSetNumericInfo(db, 'current_chapter_milestone', debug.current_chapter_milestone ?? 0)      
+    dbSetNumericInfo(db, 'current_chapter_milestone', debug.current_chapter_milestone ?? 0),
+    dbDebugSetNumChapterRead(db, debug.read_chapters)
   ]).catch(error => console.log("erro dbSetDebugInfo", error))
 }

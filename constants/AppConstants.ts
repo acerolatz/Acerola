@@ -7,7 +7,7 @@ const IS_TABLET_AUX = Math.min(wp(100), hp(100)) >= 600
 export const AppConstants = {
     APP_NAME: "Acerola",
     APP_VERSION: "v1.1.0",
-    DEBUB: { ENABLED: true },
+    DEBUB: { ENABLED: false },
     PAGES: {
         HOME: {
             MENU_WIDTH: wp(65),

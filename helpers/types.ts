@@ -159,3 +159,11 @@ export type DebugInfo = {
     total_reading_history: number;
     read_chapters: number
 }
+
+
+export type DebugManhwaImages = {
+    title: string
+    manhwa_id: number
+    cover: string | null
+    card: string | null
+}

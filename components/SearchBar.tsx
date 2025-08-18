@@ -3,7 +3,12 @@ import { Colors } from '@/constants/Colors'
 import { AppStyle } from '@/styles/AppStyle'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import React, { useRef } from 'react'
-import { Pressable, StyleSheet, TextInput, View, ViewStyle } from 'react-native'
+import { 
+    Pressable, 
+    TextInput, 
+    View, 
+    ViewStyle 
+} from 'react-native'
 
 
 interface SearchBarProps {

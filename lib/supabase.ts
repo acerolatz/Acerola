@@ -4,6 +4,7 @@ import {
     Chapter, 
     ChapterImage, 
     Collection, 
+    DebugManhwaImages, 
     DonateMethod,    
     Manhwa, 
     ManhwaCard, 
@@ -22,6 +23,7 @@ import * as RNLocalize from 'react-native-localize';
 import * as mime from 'react-native-mime-types';
 import Toast from "react-native-toast-message";
 import RNFS from 'react-native-fs';
+import { normalizeRandomManhwaCardHeight } from "@/helpers/normalize";
 
 
 export const supabase = createClient(supabaseUrl, supabaseKey as any, {
@@ -544,4 +546,126 @@ export async function spFetchLiveVersion(): Promise<string | null> {
     }
 
     return data.value
+}
+
+
+export async function spFetchCardImage(manhwa_id: number): Promise<ManhwaCard | null> {
+    const { data, error } = await supabase
+        .from("cards")
+        .select("manhwas (title, manhwa_id), width, height, image_url, created_at")
+        .eq("manhwa_id", manhwa_id)
+        .single()
+
+    if (error) {
+        console.log("error spFetchRandomManhwaCards", error)
+        return null
+    }
+
+    const { 
+        normalizedWidth, 
+        normalizedHeight 
+    } = normalizeRandomManhwaCardHeight(data.width, data.height)
+
+    return {
+        normalizedWidth: normalizedWidth,
+        normalizedHeight: normalizedHeight,
+        manhwa_id: (data.manhwas as any).manhwa_id,
+        title: (data.manhwas as any).title,
+        image_url: data.image_url,
+        width: data.width,
+        height: data.height
+    }
+}
+
+
+export async function spFetchCoverImage(manhwa_id: number): Promise<string | null> {
+    const { data, error } = await supabase
+        .from("manhwas")
+        .select("cover_image_url")
+        .eq("manhwa_id", manhwa_id)
+        .single()
+
+    if (error) {
+        console.log("error spFetchCoverImage", error)
+        return null
+    }
+
+    return data.cover_image_url
+}
+
+
+export async function spFetchCardAndCover(manhwa_id: number): Promise<DebugManhwaImages> {
+    const { data, error } = await supabase
+        .from("manhwas")
+        .select("title, cover_image_url, cards(image_url)")
+        .eq("manhwa_id", manhwa_id)
+        .single()
+
+    if (error) {
+        console.log("error spFetchCardAndCover", error)
+        return {title: '', cover : null, card: null, manhwa_id }
+    }
+
+    try {
+        return {
+            title: data.title,
+            cover: data.cover_image_url,
+            card: (data.cards as any).image_url ?? null,
+            manhwa_id
+        }
+    } catch (error) {
+        return {title: data.title, cover : data.cover_image_url, card: null, manhwa_id }
+    }
+}
+
+
+export async function spFetchCardAndCoverSearch(p_search_text: string): Promise<DebugManhwaImages[]> {
+    const { data, error } = await supabase
+        .from("manhwas")
+        .select("manhwa_id, title, cover_image_url, cards(image_url)")
+        .ilike("title", `%${p_search_text}%`)
+
+    if (error) {
+        console.log("error spFetchCardAndCoverSearch", error)
+        return []
+    }
+
+    return data.map(c => {
+        try {
+            return {
+                title: c.title,
+                cover: c.cover_image_url,
+                card: (c.cards as any).image_url ?? null,
+                manhwa_id: c.manhwa_id,
+            }
+        } catch (error) {
+            return {title: c.title, cover : c.cover_image_url, card: null, manhwa_id: c.manhwa_id }
+        }
+    })
+}
+
+export async function spFetchCardAndCoverLatest(p_limit: number = 32): Promise<DebugManhwaImages[]> {
+    const { data, error } = await supabase
+        .from("manhwas")
+        .select("manhwa_id, title, cover_image_url, cards(image_url)")
+        .order("updated_at", {ascending: false})
+        .limit(p_limit)
+
+    if (error) {
+        console.log("error spFetchCardAndCoverSearch", error)
+        return []
+    }
+
+    return data.map(c => {
+        try {
+            return {
+                title: c.title,
+                cover: c.cover_image_url,
+                card: (c.cards as any).image_url ?? null,
+                manhwa_id: c.manhwa_id,
+            }
+        } catch (error) {
+            return {title: c.title, cover : c.cover_image_url, card: null, manhwa_id: c.manhwa_id }
+        }
+    })
 }

@@ -59,7 +59,7 @@ const RandomManhwaCard = ({card}: RandomManhwaCardProps) => {
     }
 
     return (
-        <Pressable onPress={() => onPress()} >
+        <Pressable onPress={() => onPress()} style={{width: card.normalizedWidth, height: card.normalizedHeight}} >
             <Image 
                 source={card.image_url} 
                 style={{

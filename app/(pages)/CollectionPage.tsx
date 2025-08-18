@@ -32,9 +32,9 @@ const CollectionPage = () => {
                     const m = await spFetchCollectionItems(collection_id, 0, AppConstants.PAGE_LIMIT)
                     if (isCancelled) { return }
                     setManhwas(m)
-                    isInitialized.current = true
-                    hasResults.current = m.length >= AppConstants.PAGE_LIMIT
                 setLoading(false)
+                isInitialized.current = true
+                hasResults.current = m.length >= AppConstants.PAGE_LIMIT
             }
             init()
             return () => { isCancelled = true }
@@ -57,9 +57,9 @@ const CollectionPage = () => {
                 AppConstants.PAGE_LIMIT
             )
             setManhwas(prev => [...prev, ...m])
-            hasResults.current = m.length >= AppConstants.PAGE_LIMIT
-            fetchingOnEndReached.current = false
         setLoading(false)
+        hasResults.current = m.length >= AppConstants.PAGE_LIMIT
+        fetchingOnEndReached.current = false
     }
 
     return (

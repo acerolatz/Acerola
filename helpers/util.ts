@@ -9,6 +9,10 @@ import { Linking } from 'react-native';
 import RNFS from 'react-native-fs';
 
 
+export function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 const {
     width: deviceWidth, 
     height: deviceHeight

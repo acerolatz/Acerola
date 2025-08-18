@@ -54,9 +54,9 @@ const ManhwaSearch = () => {
         AppConstants.PAGE_LIMIT
       )
       setManhwas(m)
-      hasResults.current = m.length >= AppConstants.PAGE_LIMIT
-      flatListRef.current?.scrollToIndex({animated: false, index: 0})
     setLoading(false)
+    hasResults.current = m.length >= AppConstants.PAGE_LIMIT
+    flatListRef.current?.scrollToIndex({animated: false, index: 0})
   }
 
   const debounceSearch = debounce(handleSearch, 400)
@@ -77,9 +77,9 @@ const ManhwaSearch = () => {
         AppConstants.PAGE_LIMIT
       )
       setManhwas(prev => [...prev, ...m])
-      hasResults.current = m.length >= AppConstants.PAGE_LIMIT
-      fetchingOnEndReached.current = false
-    setLoading(false)    
+    setLoading(false)
+    hasResults.current = m.length >= AppConstants.PAGE_LIMIT
+    fetchingOnEndReached.current = false
   }
 
   const renderFooter = () => {
@@ -106,7 +106,7 @@ const ManhwaSearch = () => {
           data={manhwas}
           numColumns={2}
           keyExtractor={(item) => item.manhwa_id.toString()}
-          initialNumToRender={16}
+          initialNumToRender={12}
           scrollEventThrottle={16}
           onEndReached={onEndReached}
           onEndReachedThreshold={2}

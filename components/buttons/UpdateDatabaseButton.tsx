@@ -32,9 +32,9 @@ const UpdateDatabaseButton = ({
             return 
         }        
 
-        const shouldUpdate = await dbShouldUpdate(db, type)
+        const shouldUpdate = await dbShouldUpdate(db, type) || AppConstants.DEBUB.ENABLED
+        
         let hasNoMangas = true
-
         if (!shouldUpdate) { hasNoMangas = await dbHasNoManhwas(db) }
         
         if (!shouldUpdate && !hasNoMangas) {

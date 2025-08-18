@@ -25,8 +25,10 @@ const ReadingHistory = () => {
   useEffect(
     () => {
       const init = async () => {
-        const m = await dbGetReadingHistory(db, 0, AppConstants.PAGE_LIMIT)        
-        setManhwas(m)
+        setLoading(true)
+          const m = await dbGetReadingHistory(db, 0, AppConstants.PAGE_LIMIT)        
+          setManhwas(m)
+        setLoading(false)
         hasResults.current = m.length >= AppConstants.PAGE_LIMIT
         isInitialized.current = true
       }
@@ -50,9 +52,9 @@ const ReadingHistory = () => {
         AppConstants.PAGE_LIMIT
       )
       setManhwas(prev => [...prev, ...m])
-      hasResults.current = m.length >= AppConstants.PAGE_LIMIT
-      fetchingOnEndReached.current = true
     setLoading(false)
+    hasResults.current = m.length >= AppConstants.PAGE_LIMIT
+    fetchingOnEndReached.current = true
   }
 
 

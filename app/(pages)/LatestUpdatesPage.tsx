@@ -28,9 +28,9 @@ const LatestUpdatesPage = () => {
           setLoading(true)
             const m = await dbReadManhwasOrderedByUpdateAt(db, 0, AppConstants.PAGE_LIMIT)
             setManhwas(m)
-            hasResults.current = m.length >= AppConstants.PAGE_LIMIT
-            isInitialized.current = true
           setLoading(false)
+          hasResults.current = m.length >= AppConstants.PAGE_LIMIT
+          isInitialized.current = true
       }
       init()
     },
@@ -52,9 +52,9 @@ const LatestUpdatesPage = () => {
         AppConstants.PAGE_LIMIT
       )
       setManhwas(prev => [...prev, ...m])
-      hasResults.current = m.length >= AppConstants.PAGE_LIMIT
-      fetchingOnEndReached.current = false
     setLoading(false)
+    hasResults.current = m.length >= AppConstants.PAGE_LIMIT
+    fetchingOnEndReached.current = false
   }  
 
   return (

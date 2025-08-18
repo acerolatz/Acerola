@@ -33,9 +33,9 @@ const MangaByGenre = () => {
                 setLoading(true)
                     const m = await dbReadManhwasByGenreId(db, genre_id, 0, AppConstants.PAGE_LIMIT)
                     setManhwas(m)
-                    hasResults.current = m.length >= AppConstants.PAGE_LIMIT
-                    isInitialized.current = true
                 setLoading(false)
+                hasResults.current = m.length >= AppConstants.PAGE_LIMIT
+                isInitialized.current = true
             }
             init()
         },
@@ -58,9 +58,9 @@ const MangaByGenre = () => {
                 AppConstants.PAGE_LIMIT
             )
             setManhwas(prev => [...prev, ...m])
-            hasResults.current = m.length >= AppConstants.PAGE_LIMIT
-            fetchingOnEndReached.current = false
         setLoading(false)
+        hasResults.current = m.length >= AppConstants.PAGE_LIMIT
+        fetchingOnEndReached.current = false
     }  
 
     return (

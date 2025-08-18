@@ -26,6 +26,7 @@ interface ManhwaCardProps {
     showChaptersPreview?: boolean
     shouldShowChapterDate?: boolean
     showManhwaStatus?: boolean
+    imageTransition?: number
 }
 
 
@@ -37,7 +38,8 @@ const ManhwaCard = ({
     marginBottom = 0,
     showChaptersPreview = true,
     shouldShowChapterDate = true,
-    showManhwaStatus = true    
+    showManhwaStatus = true,
+    imageTransition = AppConstants.IMAGE_TRANSITION   
 }: ManhwaCardProps) => {        
 
     const onPress = useCallback(() => {
@@ -54,7 +56,7 @@ const ManhwaCard = ({
                     source={manhwa.cover_image_url} 
                     contentFit='cover'
                     style={[{width, height, borderRadius: AppConstants.BORDER_RADIUS}]}
-                    transition={AppConstants.IMAGE_TRANSITION}
+                    transition={imageTransition}
                 />
                 { showManhwaStatus && <ManhwaStatusComponent status={manhwa.status} /> }
                 <LinearGradient 

@@ -17,6 +17,7 @@ interface MangaGridProps {
     shouldShowChapterDate?: boolean
     showsVerticalScrollIndicator?: boolean
     showManhwaStatus?: boolean
+    imageTransition?: number
 }
 
 
@@ -29,7 +30,8 @@ const ManhwaGrid = ({
     showChaptersPreview = true,
     shouldShowChapterDate = true,
     showsVerticalScrollIndicator = true,
-    showManhwaStatus = true    
+    showManhwaStatus = true,
+    imageTransition = AppConstants.IMAGE_TRANSITION   
 }: MangaGridProps) => {    
 
     const renderFooter = () => {
@@ -51,7 +53,7 @@ const ManhwaGrid = ({
                 data={manhwas}
                 numColumns={numColumns}
                 keyExtractor={(item) => item.manhwa_id.toString()}
-                initialNumToRender={16}
+                initialNumToRender={12}
                 onEndReached={onEndReached}
                 scrollEventThrottle={16}
                 onEndReachedThreshold={2}
@@ -62,6 +64,7 @@ const ManhwaGrid = ({
                     width={AppConstants.MANHWA_COVER.WIDTH} 
                     height={AppConstants.MANHWA_COVER.HEIGHT}
                     marginBottom={AppConstants.GAP / 2}
+                    imageTransition={imageTransition}
                     manhwa={item}
                 />}
                 ListFooterComponent={renderFooter}/>
