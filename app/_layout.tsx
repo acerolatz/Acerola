@@ -82,7 +82,7 @@ const RootLayout = () => {
           <Stack.Screen name='(pages)/ManhwaByAuthor' options={{headerShown: false}} />
           <Stack.Screen name='(pages)/ReadingHistoryPage' options={{headerShown: false}} />
           <Stack.Screen name='(pages)/LatestUpdatesPage' options={{headerShown: false}} />
-          <Stack.Screen name='(pages)/MostViewPage' options={{headerShown: false}} />
+          <Stack.Screen name='(pages)/MostPopularPage' options={{headerShown: false}} />
           <Stack.Screen name='(pages)/BugReportPage' options={{headerShown: false}} />
           <Stack.Screen name='(pages)/LibraryPage' options={{headerShown: false}} />
           <Stack.Screen name='(pages)/DonatePage' options={{headerShown: false}} />              
@@ -90,7 +90,8 @@ const RootLayout = () => {
           <Stack.Screen name='(pages)/ReleasesPage' options={{headerShown: false}} />
           <Stack.Screen name='(pages)/EulaDisclaimerPage' options={{headerShown: false}} />
           <Stack.Screen name='(pages)/NewsPage' options={{headerShown: false}} />
-          <Stack.Screen name='(pages)/Settings' options={{headerShown: false}} />              
+          <Stack.Screen name='(pages)/Settings' options={{headerShown: false}} />
+          <Stack.Screen name='(pages)/DebugPage' options={{headerShown: false}} />
         </Stack>
         <Toast
           position={AppConstants.TOAST.POSITION as any}

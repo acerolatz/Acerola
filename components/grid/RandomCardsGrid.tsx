@@ -44,19 +44,17 @@ const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
                 <Title title='Random'/>
                 <RotatingButton onPress={debounceReload} />
             </Row>
-            <View style={styles.gridContainer} >
-                <FlatList
-                    ref={flatListRef}
-                    data={cards}
-                    initialNumToRender={4}
-                    ItemSeparatorComponent={() => <View style={{ width: AppConstants.MARGIN }} />}
-                    onEndReachedThreshold={1}
-                    showsHorizontalScrollIndicator={false}
-                    horizontal={true}
-                    keyExtractor={(item: ManhwaCard) => item.manhwa_id.toString()}
-                    renderItem={({item}) => <RandomManhwaCard card={item} />}
-                />
-            </View>
+            <FlatList
+                ref={flatListRef}
+                data={cards}
+                initialNumToRender={6}
+                ItemSeparatorComponent={() => <View style={{ width: AppConstants.MARGIN }} />}
+                onEndReachedThreshold={1}
+                showsHorizontalScrollIndicator={false}
+                horizontal={true}
+                keyExtractor={(item: ManhwaCard) => item.manhwa_id.toString()}
+                renderItem={({item}) => <RandomManhwaCard card={item} />}
+            />
         </View>
     )
 }
@@ -71,9 +69,5 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         gap: AppConstants.GAP
-    },    
-    gridContainer: {
-        flex: 1, 
-        height: AppConstants.RANDOM_MANHWAS.MAX_HEIGHT
     }    
 })

@@ -1,14 +1,12 @@
 import { AppConstants } from '@/constants/AppConstants'
-import { Manhwa } from '@/helpers/types'
-import { hp, wp } from '@/helpers/util'
-import { FlashList } from '@shopify/flash-list'
-import React from 'react'
-import { FlatList, StyleSheet, View } from 'react-native'
-import ManhwaCard from '../ManhwaCard'
-import Title from '../Title'
 import ViewAllButton from '../buttons/ViewAllButton'
-import Row from '../util/Row'
+import { FlatList, StyleSheet, View } from 'react-native'
 import { useSettingsState } from '@/store/settingsState'
+import { Manhwa } from '@/helpers/types'
+import ManhwaCard from '../ManhwaCard'
+import Row from '../util/Row'
+import Title from '../Title'
+import React from 'react'
 
 
 interface ManhwaHorizontalGridProps {    
@@ -42,9 +40,7 @@ const ManhwaHorizontalGrid = ({
                     showsHorizontalScrollIndicator={false}
                     keyExtractor={(item: Manhwa) => item.manhwa_id.toString()}
                     extraData={settings.showLast3Chapters}
-                    renderItem={
-                        ({item}) => <ManhwaCard manhwa={item} showChaptersPreview={settings.showLast3Chapters} />
-                    }
+                    renderItem={({item}) => <ManhwaCard manhwa={item} showChaptersPreview={settings.showLast3Chapters} />}
                 />
             </View>
         </View>

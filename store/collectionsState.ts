@@ -8,6 +8,20 @@ type CollectionState = {
 }
 
 
+/**
+ * Zustand store for managing pornhwa collections
+ * 
+ * This store maintains:
+ *   - `collections`: Array of Collection objects
+ * 
+ * The `setCollections` function provides a centralized way to update the entire collections array
+ * 
+ * @note Collections represent groups of manhwas such as:
+ *     - MILF
+ *     - Inverted Nipples
+ *     - Threesomes
+ *     - etc
+ */
 export const useCollectionState = create<CollectionState>(
     (set) => ({
         collections: [],

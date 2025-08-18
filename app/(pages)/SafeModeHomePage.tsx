@@ -5,12 +5,12 @@ import { AppStyle } from '@/styles/AppStyle'
 import Row from '@/components/util/Row'
 import Button from '@/components/buttons/Button'
 import { Colors } from '@/constants/Colors'
-import { hp } from '@/helpers/util'
+import { hasInternetAvailable, hp } from '@/helpers/util'
 import { AppConstants } from '@/constants/AppConstants'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useSQLiteContext } from 'expo-sqlite'
 import { Todo } from '@/helpers/types'
-import { dbCheckPassword, dbReadTodos } from '@/lib/database'
+import { dbCheckPassword, dbReadTodos, dbSetLastRefresh, dbShouldUpdate, dbUpdateDatabase } from '@/lib/database'
 import { TextInput } from 'react-native-gesture-handler'
 import Toast from 'react-native-toast-message'
 import { Keyboard } from 'react-native'
@@ -36,6 +36,8 @@ const SafeModeHomePage = () => {
     const bottomSheetRef = useRef<BottomSheet>(null)
     const [showPassword, setShowPassword] = useState(false)
     const passwordIcon = showPassword ? "eye-off-outline" : "eye-outline"
+    
+    const isCheckingPassword = useRef(false)
 
     useEffect(
         () => {
@@ -50,14 +52,24 @@ const SafeModeHomePage = () => {
     )
 
     const checkPassword = async () => {
-        Keyboard.dismiss()
-        const success = await dbCheckPassword(db, text)
-        if (success) {
-            Toast.show(ToastMessages.EN.GENERIC_SUCCESS)
-            router.replace("/HomePage")
-        } else {
-            Toast.show(ToastMessages.EN.INVALID_PASSWORD)
-        }
+        if (isCheckingPassword.current) { return }
+        isCheckingPassword.current = true
+            Keyboard.dismiss()
+            const success = await dbCheckPassword(db, text)
+            if (!success) {
+                Toast.show(ToastMessages.EN.INVALID_PASSWORD)
+                isCheckingPassword.current = false
+                return
+            }
+            
+            if (await hasInternetAvailable() && await dbShouldUpdate(db, 'server')) {
+                Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE);
+                await dbUpdateDatabase(db);
+                await dbSetLastRefresh(db, 'client');
+                Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED);
+            }
+        isCheckingPassword.current = false
+        router.replace("/(pages)/HomePage")
     }
 
     const handleOpenBottomSheet = useCallback(() => {

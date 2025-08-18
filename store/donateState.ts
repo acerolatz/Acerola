@@ -8,6 +8,18 @@ type DonateState = {
 }
 
 
+/**
+ * Zustand store for managing donation methods
+ * 
+ * This store maintains:
+ *   - `donates`: Array of DonateMethod objects representing available donation options
+ * 
+ * @note 
+ *   Donation methods typically include:
+ *     - Payment platforms (Patreon, PayPal, etc.)
+ *     - Cryptocurrency wallets
+ *     - Other support mechanisms
+ */
 export const useDonateState = create<DonateState>(
     (set) => ({
         donates: [],

@@ -17,6 +17,30 @@ type AppReleaseState = {
 }
 
 
+/**
+ * Zustand store for managing application version information
+ * 
+ * This store tracks:
+ *   - Current installed version (localVersion)
+ *   - Latest available version (liveVersion)
+ *   - Release metadata (releasesInfo)
+ *   - UI flag for new version warnings (shouldShowNewAppVersionWarning)
+ * 
+ * State properties:
+ *   - localVersion: Currently installed app version (null if unset)
+ *   - setLocalVersion: Updates the local version string
+ * 
+ *   - liveVersion: Latest available version from server (null if unset)
+ *   - setLiveVersion: Updates the live version string
+ * 
+ *   - releasesInfo: Container for release metadata including:
+ *        - releases: Available release versions
+ *        - source: Source of release information
+ *   - setReleasesInfo: Updates release metadata
+ * 
+ *   - shouldShowNewAppVersionWarning: Flag controlling new version alerts
+ *   - setShouldShowNewAppVersionWarning: Updates warning visibility state 
+ */
 export const useAppVersionState = create<AppReleaseState>(
     (set) => ({
         liveVersion: null,

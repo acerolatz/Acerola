@@ -12,7 +12,7 @@ const MostPopularGrid = ({manhwas}: MostPopularGridProps) => {
   return (
     <ManhwaHorizontalGrid
       title='Most Popular'
-      onViewAll={() => router.navigate("/(pages)/MostViewPage")}
+      onViewAll={() => router.navigate("/(pages)/MostPopularPage")}
       manhwas={manhwas}
     />
   )

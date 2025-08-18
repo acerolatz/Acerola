@@ -30,6 +30,7 @@ interface FormData {
     onEndReachedThreshold: number
 }
 
+
 const schema = yup.object().shape({  
     drawDistance: yup
         .number()

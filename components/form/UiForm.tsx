@@ -2,7 +2,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
 import { Typography } from '@/constants/typography'
 import Checkmark from '../util/Checkmark'
-import { formatTimestamp, getYesterday, hp, wp } from '@/helpers/util'
+import { formatTimestamp, getPastDate, hp, wp } from '@/helpers/util'
 import { AppConstants } from '@/constants/AppConstants'
 import { useSQLiteContext } from 'expo-sqlite'
 import { dbSetInfo } from '@/lib/database'
@@ -22,7 +22,7 @@ const DummyChapterLink = ({index}: DummyChapterLinkProps) => {
     return (
         <Row style={{justifyContent: "space-between", paddingRight: 6}} >
             <Text style={[Typography.regular, {fontSize: hp(1.4)}]}>Chapter {index}</Text>
-            <Text numberOfLines={1} style={[Typography.regular, {fontSize: hp(1.4)}]}>{formatTimestamp(getYesterday(3 - index).toISOString())}</Text>
+            <Text numberOfLines={1} style={[Typography.regular, {fontSize: hp(1.4)}]}>{formatTimestamp(getPastDate(3 - index).toISOString())}</Text>
         </Row>        
     )
 }

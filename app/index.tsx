@@ -8,9 +8,12 @@ import { useSQLiteContext } from 'expo-sqlite';
 import Toast from 'react-native-toast-message';
 import { AppStyle } from '@/styles/AppStyle';
 import { SafeAreaView } from 'react-native';
-import { clearCache } from '@/helpers/util';
+import { clearCache, hasInternetAvailable } from '@/helpers/util';
 import { router } from 'expo-router';
 import {
+    dbCleanTable,
+    dbCount,
+    dbFillReadingStatus,
     dbFirstRun,
     dbGetAppVersion,
     dbIsSafeModeEnabled,
@@ -67,29 +70,31 @@ const App = () => {
                 await Promise.all([
                     handleCache(),
                     updateLocalVersion(),
-                    dbFirstRun(db),
-                    loadSettings()
+                    loadSettings(),
+                    dbFirstRun(db)
                 ])
-                
-                const state = await NetInfo.fetch();
-                if (!state.isConnected) {
-                    Toast.show(ToastMessages.EN.NO_INTERNET);
-                    router.replace("/(pages)/HomePage");
-                    return;
-                }
-                
-                if (await dbShouldUpdate(db, 'server')) {
-                    Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE);
-                    await dbSetLastRefresh(db, 'client');
-                    await dbUpdateDatabase(db);
-                    Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED);
-                }
 
                 if (await dbIsSafeModeEnabled(db)) {
                     router.replace("/(pages)/SafeModeHomePage")
-                } else {
-                    router.replace("/(pages)/HomePage")
+                    return
                 }
+                
+                const hasInternet = await hasInternetAvailable()
+
+                if (!hasInternet) {
+                    Toast.show(ToastMessages.EN.NO_INTERNET);
+                    router.replace("/(pages)/HomePage");
+                    return;
+                }                
+                
+                if (await dbShouldUpdate(db, 'server')) {
+                    Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE);
+                    await dbUpdateDatabase(db);
+                    await dbSetLastRefresh(db, 'client');
+                    Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED);
+                }
+
+                router.replace("/(pages)/HomePage")
             }
             init()
         },

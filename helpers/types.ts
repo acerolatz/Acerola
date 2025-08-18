@@ -131,7 +131,7 @@ export type Feedback = {
 export type Settings = {
     showLast3Chapters: boolean
     drawDistance: number
-    onEndReachedThreshold: number
+    onEndReachedThreshold: number    
 }
 
 export type DownloadProgress = {
@@ -141,4 +141,21 @@ export type DownloadProgress = {
 }
 
 
-export type WriteTask = () => Promise<void>
+export type DebugInfo = {
+    device: string | null
+    first_run: string | null
+    last_sync_time: string | null
+    should_ask_for_donation: string | null
+    show_last_3_chapters: string | null
+    images: number | null
+    current_chapter_milestone: number | null
+    total_manhwas: number
+    total_chapters: number
+    total_authors: number
+    total_genres: number
+    total_manhwa_genres: number
+    total_manhwa_authors: number
+    total_reading_status: number
+    total_reading_history: number;
+    read_chapters: number
+}

@@ -14,32 +14,36 @@ const LatestUpdatesPage = () => {
 
   const db = useSQLiteContext()
   const page = useRef(0)
-  const hasResults = useRef(true)
-  const isInitialized = useRef(false)
-
+  
   const [manhwas, setManhwas] = useState<Manhwa[]>([])
   const [loading, setLoading] = useState(false)
 
+  const fetchingOnEndReached = useRef(false)
+  const isInitialized = useRef(false)
+  const hasResults = useRef(true)
+
   useEffect(
-    () => {
-      let isCancelled = false
+    () => {      
       async function init() {
           setLoading(true)
             const m = await dbReadManhwasOrderedByUpdateAt(db, 0, AppConstants.PAGE_LIMIT)
-            if (isCancelled) { return }
             setManhwas(m)
-            hasResults.current = m.length > 0
+            hasResults.current = m.length >= AppConstants.PAGE_LIMIT
             isInitialized.current = true
           setLoading(false)
       }
       init()
-      return () => { isCancelled = true }
     },
     [db]
   )
 
   const onEndReached = async () => {
-    if (!hasResults.current || !isInitialized.current) { return }
+    if (
+      fetchingOnEndReached.current ||
+      !hasResults.current || 
+      !isInitialized.current
+    ) { return }
+    fetchingOnEndReached.current = true
     page.current += 1
     setLoading(true)
       const m = await dbReadManhwasOrderedByUpdateAt(
@@ -47,8 +51,9 @@ const LatestUpdatesPage = () => {
         page.current * AppConstants.PAGE_LIMIT, 
         AppConstants.PAGE_LIMIT
       )
-      hasResults.current = m.length > 0
       setManhwas(prev => [...prev, ...m])
+      hasResults.current = m.length >= AppConstants.PAGE_LIMIT
+      fetchingOnEndReached.current = false
     setLoading(false)
   }  
 

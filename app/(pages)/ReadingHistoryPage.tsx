@@ -13,33 +13,35 @@ import { Manhwa } from '@/helpers/types'
 const ReadingHistory = () => {
 
   const db = useSQLiteContext()
-  const page = useRef(0)
-  const hasResults = useRef(true)
-  const isInitialized = useRef(false)
   
   const [manhwas, setManhwas] = useState<Manhwa[]>([])
   const [loading, setLoading] = useState(false)
 
+  const fetchingOnEndReached = useRef(false)
+  const isInitialized = useRef(false)
+  const hasResults = useRef(true)
+  const page = useRef(0)
+
   useEffect(
     () => {
-      let isCancelled = false
       const init = async () => {
-        if (isInitialized.current) { return }
-        isInitialized.current = true
-        const m = await dbGetReadingHistory(db, 0, AppConstants.PAGE_LIMIT)
-        if (isCancelled) { return }
+        const m = await dbGetReadingHistory(db, 0, AppConstants.PAGE_LIMIT)        
         setManhwas(m)
-        hasResults.current = m.length > 0
+        hasResults.current = m.length >= AppConstants.PAGE_LIMIT
+        isInitialized.current = true
       }
-
       init()
-      return () => { isCancelled = true }
     },
     [db]
   )
   
   const onEndReached = async () => {
-    if (!hasResults.current || !isInitialized.current) { return }
+    if (
+      fetchingOnEndReached.current ||
+      !hasResults.current || 
+      !isInitialized.current
+    ) { return }
+    fetchingOnEndReached.current = true
     setLoading(true)
       page.current += 1    
       const m = await dbGetReadingHistory(
@@ -48,7 +50,8 @@ const ReadingHistory = () => {
         AppConstants.PAGE_LIMIT
       )
       setManhwas(prev => [...prev, ...m])
-      hasResults.current = m.length > 0
+      hasResults.current = m.length >= AppConstants.PAGE_LIMIT
+      fetchingOnEndReached.current = true
     setLoading(false)
   }
 
@@ -60,9 +63,9 @@ const ReadingHistory = () => {
       </TopBar>
       <ManhwaGrid
         manhwas={manhwas}
+        loading={loading}
         hasResults={hasResults.current}
         showManhwaStatus={false}
-        loading={loading}
         showChaptersPreview={false}
         onEndReached={onEndReached}
       />

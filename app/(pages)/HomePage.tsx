@@ -19,6 +19,7 @@ import AppLogo from '@/components/util/Logo'
 import { Colors } from '@/constants/Colors'
 import Row from '@/components/util/Row'
 import {     
+    dbCount,
     dbGetReadingHistory,         
     dbReadGenres, 
     dbReadManhwasOrderedByUpdateAt, 
@@ -89,7 +90,7 @@ const HomePage = () => {
     // Lateral Menu
     const menuAnim = useRef(new Animated.Value(-AppConstants.PAGES.HOME.MENU_WIDTH)).current 
     const backgroundAnim = useRef(new Animated.Value(-AppConstants.SCREEN.WIDTH)).current
-    const menuVisible = useRef(false)    
+    const menuVisible = useRef(false)
 
     const reloadCards = async () => {
         const r = await spFetchRandomManhwaCards(AppConstants.PAGE_LIMIT)
@@ -144,7 +145,7 @@ const HomePage = () => {
                         setLatestUpdates(l)
                         setMostView(m)
                     })
-                setLoading(false)
+                setLoading(false)                
 
                 await Promise.all([
                     updateTop10(),
@@ -206,9 +207,10 @@ const HomePage = () => {
                     <Row style={{ gap: AppConstants.ICON.SIZE }}>
                         {!loading && (
                             <>
-                            <UpdateDatabaseButton type="client" />
-                            <Button iconName="search-outline" onPress={openManhwaSearch} />
-                            <RandomManhwaButton />
+                            {AppConstants.DEBUB.ENABLED && <Button iconName='bug-outline' onPress={() => router.navigate("/(pages)/DebugPage")} />}
+                                <UpdateDatabaseButton type="client" />
+                                <Button iconName="search-outline" onPress={openManhwaSearch} />
+                                <RandomManhwaButton />
                             </>
                         )}
                         <Button iconName="options-outline" onPress={toggleMenu} />

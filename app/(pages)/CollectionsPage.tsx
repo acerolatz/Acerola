@@ -3,9 +3,9 @@ import ReturnButton from '@/components/buttons/ReturnButton'
 import { AppConstants } from '@/constants/AppConstants'
 import { Typography } from '@/constants/typography'
 import Footer from '@/components/util/Footer'
+import { AppStyle } from '@/styles/AppStyle'
 import { Collection } from '@/helpers/types'
 import { Colors } from '@/constants/Colors'
-import { AppStyle } from '@/styles/AppStyle'
 import TopBar from '@/components/TopBar'
 import { hp, wp } from '@/helpers/util'
 import { router } from 'expo-router'
@@ -55,12 +55,12 @@ const CollectionsPage = () => {
             </TopBar>
             <FlatList
                 data={collections}
-                initialNumToRender={30}
+                initialNumToRender={20}
                 keyExtractor={(item) => item.collection_id.toString()}
                 showsVerticalScrollIndicator={false}
                 numColumns={2}
                 renderItem={renderItem}
-                ListFooterComponent={<Footer height={hp(12)}/>}
+                ListFooterComponent={<Footer/>}
             />
         </SafeAreaView>
     )

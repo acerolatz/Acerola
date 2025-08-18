@@ -11,6 +11,18 @@ type ChapterState = {
 }
 
 
+/**
+ * Zustand store for managing chapter navigation state
+ * 
+ * This store maintains:
+ *   - List of chapters (chapters)
+ *   - Index of the currently active chapter (currentChapterIndex)
+ * 
+ * State management functions:
+ *   - setChapters: Updates the entire chapter list
+ *   - setCurrentChapterIndex: Updates only the active chapter index
+ *   - setChapterState: Updates both chapter list and active index simultaneously
+ */
 export const useChapterState = create<ChapterState>(
     (set) => ({
         chapters: [],

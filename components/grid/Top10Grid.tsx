@@ -1,16 +1,16 @@
+import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import BooleanRotatingButton from '../buttons/BooleanRotatingButton'
 import { AppConstants } from '@/constants/AppConstants'
+import { LinearGradient } from 'expo-linear-gradient'
+import React, { useCallback, useRef, } from 'react'
+import { Typography } from '@/constants/typography'
 import { Colors } from '@/constants/Colors'
 import { Manhwa } from '@/helpers/types'
-import { Image } from 'expo-image'
-import { LinearGradient } from 'expo-linear-gradient'
-import { router } from 'expo-router'
-import React, { useCallback, useRef, } from 'react'
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
-import Title from '../Title'
-import Row from '../util/Row'
-import BooleanRotatingButton from '../buttons/BooleanRotatingButton'
-import { Typography } from '@/constants/typography'
 import { hp, wp } from '@/helpers/util'
+import { router } from 'expo-router'
+import { Image } from 'expo-image'
+import Row from '../util/Row'
+import Title from '../Title'
 
 
 const TOP_1O_ITEM_WIDTH = wp(30)
@@ -75,22 +75,21 @@ const Top10Grid = ({manhwas, reloadTop10}: Top10GridProps) => {
                 <Title title="Today's Top 10"/>                
                 <BooleanRotatingButton onPress={reload} iconName='reload-outline' />
             </Row>
-            <FlatList
-                ref={flatListRef}
-                data={manhwas}
-                horizontal={true}
-                showsHorizontalScrollIndicator={false}
-                keyExtractor={(item: Manhwa) => item.manhwa_id.toString()}
-                renderItem={
-                    ({item, index}) => 
-                        <Top10Item 
-                            title={item.title} 
-                            manhwa_id={item.manhwa_id} 
-                            image_url={item.cover_image_url} 
-                            index={index}
-                    />
+            <ScrollView style={{width: '100%'}} horizontal={true} showsHorizontalScrollIndicator={false} >
+                {
+                    manhwas.map(
+                        (item: Manhwa, index: number) => 
+                            <Top10Item
+                                key={item.manhwa_id}
+                                title={item.title} 
+                                manhwa_id={item.manhwa_id} 
+                                image_url={item.cover_image_url} 
+                                index={index}
+                            />
+                    )
                 }
-            />
+            </ScrollView>
+            
         </View>
     )
 }

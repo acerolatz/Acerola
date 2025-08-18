@@ -16,8 +16,7 @@ import {
     Pressable, 
     SafeAreaView, 
     StyleSheet, 
-    Text, 
-    View 
+    Text    
 } from 'react-native'
 
 
@@ -67,17 +66,15 @@ const GenresPage = () => {
             <TopBar title="Genres">
                 <ReturnButton/>
             </TopBar>
-            <View style={{width: '100%'}} >
-                <FlatList
-                    data={genres}
-                    numColumns={2}
-                    keyExtractor={(item) => item.genre_id.toString()}
-                    showsVerticalScrollIndicator={false}
-                    initialNumToRender={30}
-                    renderItem={renderItem}
-                    ListFooterComponent={<Footer height={hp(12)}/>}
-                />
-            </View>
+            <FlatList
+                data={genres}
+                numColumns={2}
+                keyExtractor={(item) => item.genre_id.toString()}
+                showsVerticalScrollIndicator={false}
+                initialNumToRender={30}
+                renderItem={renderItem}
+                ListFooterComponent={<Footer height={hp(12)}/>}
+            />
         </SafeAreaView>
     )
 }

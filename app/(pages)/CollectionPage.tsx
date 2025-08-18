@@ -1,13 +1,13 @@
-import ReturnButton from '@/components/buttons/ReturnButton'
-import ManhwaGrid from '@/components/grid/ManhwaGrid'
-import TopBar from '@/components/TopBar'
-import { AppConstants } from '@/constants/AppConstants'
-import { Manhwa } from '@/helpers/types'
-import { spFetchCollectionItems } from '@/lib/supabase'
-import { AppStyle } from '@/styles/AppStyle'
 import { useLocalSearchParams } from 'expo-router/build/hooks'
+import ReturnButton from '@/components/buttons/ReturnButton'
 import React, { useEffect, useRef, useState } from 'react'
+import { AppConstants } from '@/constants/AppConstants'
+import { spFetchCollectionItems } from '@/lib/supabase'
+import ManhwaGrid from '@/components/grid/ManhwaGrid'
+import { AppStyle } from '@/styles/AppStyle'
 import { SafeAreaView } from 'react-native'
+import TopBar from '@/components/TopBar'
+import { Manhwa } from '@/helpers/types'
 
 
 const CollectionPage = () => {
@@ -19,6 +19,7 @@ const CollectionPage = () => {
     const [manhwas, setManhwas] = useState<Manhwa[]>([])
     const [loading, setLoading] = useState(false)
     
+    const fetchingOnEndReached = useRef(false)
     const isInitialized = useRef(false)
     const hasResults = useRef(true)
     const page = useRef(0)
@@ -32,6 +33,7 @@ const CollectionPage = () => {
                     if (isCancelled) { return }
                     setManhwas(m)
                     isInitialized.current = true
+                    hasResults.current = m.length >= AppConstants.PAGE_LIMIT
                 setLoading(false)
             }
             init()
@@ -41,7 +43,12 @@ const CollectionPage = () => {
     )
 
     const onEndReached = async () => {
-        if (!hasResults.current || !isInitialized.current) { return }
+        if (
+            fetchingOnEndReached.current ||
+            !hasResults.current || 
+            !isInitialized.current
+        ) { return }        
+        fetchingOnEndReached.current = true
         page.current += 1
         setLoading(true)
             const m = await spFetchCollectionItems(
@@ -49,8 +56,9 @@ const CollectionPage = () => {
                 AppConstants.PAGE_LIMIT * page.current, 
                 AppConstants.PAGE_LIMIT
             )
-          hasResults.current = m.length > 0
-          setManhwas(prev => [...prev, ...m])
+            setManhwas(prev => [...prev, ...m])
+            hasResults.current = m.length >= AppConstants.PAGE_LIMIT
+            fetchingOnEndReached.current = false
         setLoading(false)
     }
 
@@ -63,6 +71,7 @@ const CollectionPage = () => {
                 manhwas={manhwas}
                 showChaptersPreview={false}
                 loading={loading}
+                hasResults={hasResults.current}
                 onEndReached={onEndReached}/>
         </SafeAreaView>
     )

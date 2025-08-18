@@ -13,16 +13,15 @@ import {
     SourceCodeLink 
 } from "@/helpers/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Image as CompressorImage } from 'react-native-compressor';
+import { decode, hasInternetAvailable } from "@/helpers/util";
+import { supabaseKey, supabaseUrl } from "./supabaseKey";
 import { createClient } from '@supabase/supabase-js';
+import { ToastMessages } from "@/constants/Messages";
 import * as RNLocalize from 'react-native-localize';
 import * as mime from 'react-native-mime-types';
-import { Image as CompressorImage } from 'react-native-compressor';
-import { supabaseKey, supabaseUrl } from "./supabaseKey";
-import RNFS from 'react-native-fs';
-import { decode, hasInternetAvailable } from "@/helpers/util";
 import Toast from "react-native-toast-message";
-import { Buffer } from 'buffer'
-import { ToastMessages } from "@/constants/Messages";
+import RNFS from 'react-native-fs';
 
 
 export const supabase = createClient(supabaseUrl, supabaseKey as any, {
@@ -35,9 +34,23 @@ export const supabase = createClient(supabaseUrl, supabaseKey as any, {
 });
 
 
+/**
+ * Fetches the complete list of manhwas from Supabase via an RPC call.
+ *
+ * Uses the `get_manhwas` RPC function in the database to check whether the
+ * client's data is outdated based on the provided `p_last_sync` timestamp.
+ *
+ * - If the client provides `null`, it is treated as an initial sync, fetching all data.
+ * - If the server determines that the client's data is outdated, it returns the full list of manhwas.
+ * - If the client is already up to date, the server returns an empty array.
+ *
+ * @param p_last_sync - The timestamp (ISO 8601 string) of the client's last successful sync, or `null` for an initial sync.
+ * @returns A promise that resolves with an array of `Manhwa` objects. 
+ * Returns an empty array if the client is up to date or if an error occurs during the fetch.
+ */
 export async function spGetManhwas(p_last_sync: string | null): Promise<Manhwa[]> {
     const { data, error } = await supabase
-        .rpc("get_manhwas", { p_last_sync })
+        .rpc("get_manhwas", { p_last_sync })        
     
     if (error) {
         console.log("error spGetManhwas", error)
@@ -48,21 +61,44 @@ export async function spGetManhwas(p_last_sync: string | null): Promise<Manhwa[]
 }
 
 
+/**
+ * Registers or updates a user run in the `users` table.
+ *
+ * Collects the device information, user language preferences (up to 5),
+ * and timezone from the device, then performs an UPSERT operation on Supabase. 
+ *
+ * @param user_id - Unique identifier for the user.
+ * @param device - Device identifier or description.
+ * @returns A promise that resolves when the operation completes.
+ */
 export async function spNewRun(user_id: string, device: string) {
     const timezone = RNLocalize.getTimeZone()
     const locales = RNLocalize.getLocales()
     const language = locales.length > 0 ? locales.slice(0, 5).map(i => i.languageTag).join(', ') : null
 
-    const { error } = await supabase
-        .from("users")
-        .insert([{ language, timezone, user_id, device}])
-    
-    if (error) {
-        console.log("error spNewRun", error)
+    try {
+        const { error } = await supabase
+          .from("users")
+          .upsert(
+            [{ user_id, device, language, timezone }],
+            { onConflict: "user_id" }
+          );
+        
+        if (error) {
+            console.log("error spNewRun", error)
+        }
+    } catch (error) {
+        console.log("unhandled error spNewRun", error)
     }
 }
 
 
+/**
+ * Fetches a single manhwa from Supabase by its unique identifier.
+ *
+ * @param manhwa_id - The unique numeric identifier of the manhwa to fetch.
+ * @returns A promise that resolves with a `Manhwa` object if found, or `null` if no record exists or an error occurs.
+ */
 export async function spFetchManhwaById(manhwa_id: number): Promise<Manhwa | null> {
     const { data, error } = await supabase
         .from("mv_manhwas")
@@ -79,6 +115,12 @@ export async function spFetchManhwaById(manhwa_id: number): Promise<Manhwa | nul
 }
 
 
+/**
+ * Fetches the list of chapters for a given manhwa from Supabase.
+ * 
+ * @param manhwa_id - The unique numeric identifier of the manhwa whose chapters are to be fetched.
+ * @returns A promise that resolves with an array of `Chapter` objects, or an empty array if no records are found or an error occurs.
+ */
 export async function spFetchChapterList(manhwa_id: number): Promise<Chapter[]> {
     const { data, error } = await supabase
         .from("chapters")
@@ -94,6 +136,13 @@ export async function spFetchChapterList(manhwa_id: number): Promise<Chapter[]> 
     return data
 }
 
+
+
+/**
+ * Updates the view count for a specific chapter.
+ * 
+ * @param p_chapter_id - The unique identifier of the chapter to update
+ */
 export async function spUpdateChapterView(p_chapter_id: number) {
     const { error } = await supabase
         .rpc("increment_chapter_view", { p_chapter_id })
@@ -103,6 +152,14 @@ export async function spUpdateChapterView(p_chapter_id: number) {
     }
 }
 
+
+/**
+ * Updates the view count for a manhwa card displayed on the HomePage.
+ * 
+ * This function is used for the random manhwa cards that appear on the HomePage.
+ * 
+ * @param p_manhwa_id - The unique identifier of the manhwa card to update
+ */
 export async function spUpdateManhwaCardView(p_manhwa_id: number) {
     const { error } = await supabase
         .rpc("increment_manhwa_card_view", { p_manhwa_id })
@@ -112,6 +169,12 @@ export async function spUpdateManhwaCardView(p_manhwa_id: number) {
     }
 }
 
+
+/**
+ * Updates the total view count for a specific manhwa.
+ * 
+ * @param p_manhwa_id - The unique identifier of the manhwa to update
+ */
 export async function spUpdateManhwaViews(p_manhwa_id: number) {
     const { error } = await supabase
         .rpc('increment_manhwa_views', { p_manhwa_id  });
@@ -122,6 +185,11 @@ export async function spUpdateManhwaViews(p_manhwa_id: number) {
 }
 
 
+/**
+ * Retrieves application release information from the database. 
+ * 
+ * @returns Promise resolving to an array of AppRelease objects. Returns empty array on error.
+ */
 export async function spGetReleases(): Promise<AppRelease[]> {
     const { data, error } = await supabase
         .from("app_infos")
@@ -138,6 +206,12 @@ export async function spGetReleases(): Promise<AppRelease[]> {
 }
 
 
+/**
+ * Fetches images for a specific chapter from the database. 
+ * 
+ * @param chapter_id - ID of the chapter to fetch images for
+ * @returns Promise resolving to an array of ChapterImage objects. Returns empty array on error
+ */
 export async function spFetchChapterImages(chapter_id: number): Promise<ChapterImage[]> {
     const { data, error } = await supabase
         .from("chapter_images")
@@ -159,6 +233,12 @@ export async function spFetchChapterImages(chapter_id: number): Promise<ChapterI
 }
 
 
+/**
+ * Submits a request to add a new manhwa to the application.
+ * 
+ * @param manhwa - Title of the manhwa being requested
+ * @param message - Optional additional context or message about the request
+ */
 export async function spRequestManhwa(manhwa: string, message: string | null) {
     const { error } = await supabase
         .from("manhwa_requests")
@@ -170,6 +250,18 @@ export async function spRequestManhwa(manhwa: string, message: string | null) {
 }
 
 
+/**
+ * Submits a bug report.
+ * 
+ * Creates a new bug report record with provided details and returns the generated bug ID.
+ * 
+ * @param title - Short description of the bug
+ * @param bug_type - Category/classification of the bug
+ * @param device - Optional device information where bug occurred
+ * @param descr - Optional detailed description of the bug
+ * @param has_images - Flag indicating if bug report includes screenshots
+ * @returns Promise resolving to the generated bug ID or null on failure
+ */
 export async function spReportBug(
     title: string, 
     bug_type: string,
@@ -192,6 +284,11 @@ export async function spReportBug(
 }
 
 
+/**
+ * Retrieves available donation methods from the database.
+ * 
+ * @returns Promise resolving to an array of donation methods. Returns empty array on error.
+ */
 export async function spGetDonationMethods(): Promise<DonateMethod[]> {
     const { data, error } = await supabase
         .from("app_infos")
@@ -208,6 +305,16 @@ export async function spGetDonationMethods(): Promise<DonateMethod[]> {
 }
 
 
+/**
+ * Fetches random manhwa cards for display on the HomePage.
+ * 
+ * Behavior varies based on debug mode:
+ *   - In debug: Returns most recently created cards from cards table
+ *   - In production: Calls optimized RPC function for random card selection
+ * 
+ * @param p_limit - Maximum number of cards to retrieve (default: 30)
+ * @returns Promise resolving to array of ManhwaCard objects. Returns empty array on error
+ */
 export async function spFetchRandomManhwaCards(p_limit: number = 30): Promise<ManhwaCard[]> {
     if (AppConstants.DEBUB.ENABLED) {
         const { data, error } = await supabase
@@ -232,14 +339,17 @@ export async function spFetchRandomManhwaCards(p_limit: number = 30): Promise<Ma
         }})
     }
 
-    const { data, error } = await supabase.rpc("get_random_cards", { p_limit })
+    const { data, error } = await supabase
+        .rpc("get_random_cards", { p_limit })
 
     if (error) {
         console.log("error spFetchRandomManhwaCards", error)
         return []
     }    
     
-    return data as ManhwaCard[]
+    return (data as ManhwaCard[]).map(i => {
+        return {...i, normalizedWidth: i.width, normalizedHeight: i.height}}
+    )
 }
 
 
@@ -316,6 +426,7 @@ export async function spGetTodayTop10(): Promise<Manhwa[]> {
 
     return data as Manhwa[]
 }
+
 
 export const uploadBugScreenshot = async (uri: string, bug_id: string, index: number) => {
     try {
@@ -412,6 +523,13 @@ export async function spFetchNews(p_offset: number = 0, p_limit: number = 30): P
 }
 
 
+/**
+ * Retrieves the current live version of the application from the database.
+ * 
+ * Fetches the 'live_version' record from the app_infos table. 
+ * 
+ * @returns Promise resolving to the version string if found, null on error or if not available
+ */
 export async function spFetchLiveVersion(): Promise<string | null> {
     const { data, error } = await supabase
         .from("app_infos")
