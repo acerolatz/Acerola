@@ -1,63 +1,63 @@
-import AddToLibray from '@/components/AddToLibray';
-import ManhwaAlternativeNames from '@/components/AltNames';
-import BugReportButton from '@/components/buttons/BugReportButton';
-import HomeButton from '@/components/buttons/HomeButton';
-import RandomManhwaButton from '@/components/buttons/OpenRandomManhwaButton';
-import ReturnButton from '@/components/buttons/ReturnButton';
-import ManhwaChapterGrid from '@/components/grid/ManhwaChapterGrid';
-import ManhwaAuthorInfo from '@/components/ManhwaAuthorInfo';
-import ManhwaGenreInfo from '@/components/ManhwaGenreInfo';
 import PageActivityIndicator from '@/components/util/PageActivityIndicator';
-import { Colors } from '@/constants/Colors';
+import RandomManhwaButton from '@/components/buttons/OpenRandomManhwaButton';
+import BugReportButton from '@/components/buttons/BugReportButton';
+import ManhwaChapterGrid from '@/components/grid/ManhwaChapterGrid';
+import ManhwaIdComponent from '@/components/ManhwaIdComponent';
+import ReturnButton from '@/components/buttons/ReturnButton';
+import ManhwaAuthorInfo from '@/components/ManhwaAuthorInfo';
+import ManhwaImageCover from '@/components/ManhwaImageCover';
+import { formatNumberWithSuffix } from '../../helpers/util';
+import ManhwaSummary from '@/components/util/ManhwaSummary';
+import ManhwaAlternativeNames from '@/components/AltNames';
+import ManhwaGenreInfo from '@/components/ManhwaGenreInfo';
+import { router, useLocalSearchParams } from 'expo-router';
+import HomeButton from '@/components/buttons/HomeButton';
+import { AppConstants } from '@/constants/AppConstants';
+import { useResponsive } from '@/helpers/useResponsive';
+import { LinearGradient } from 'expo-linear-gradient';
 import { ToastMessages } from '@/constants/Messages';
-import { Manhwa } from '@/helpers/types';
+import { spUpdateManhwaViews } from '@/lib/supabase';
+import { Typography } from '@/constants/typography';
+import AddToLibray from '@/components/AddToLibray';
 import { formatTimestamp } from '@/helpers/util';
+import Toast from 'react-native-toast-message';
+import { useSQLiteContext } from 'expo-sqlite';
+import Footer from '@/components/util/Footer';
+import { AppStyle } from '@/styles/AppStyle';
+import { Colors } from '@/constants/Colors';
+import Row from '@/components/util/Row';
+import { Manhwa } from '@/helpers/types';
 import { 
   dbGetManhwaAltNames, 
   dbReadManhwaById, 
   dbUpdateManhwaViews 
 } from '@/lib/database';
-import { spUpdateManhwaViews } from '@/lib/supabase';
-import { AppStyle } from '@/styles/AppStyle';
-import { LinearGradient } from 'expo-linear-gradient';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useSQLiteContext } from 'expo-sqlite';
 import React, {
+  memo,
     useEffect,
+    useMemo,
     useState
 } from 'react';
 import {  
-  SafeAreaView,
-  ScrollView,
+  FlatList,
+  SafeAreaView,  
   StyleSheet,
   Text,
   View  
 } from 'react-native';
-import Toast from 'react-native-toast-message';
-import { formatNumberWithSuffix } from '../../helpers/util';
-import Row from '@/components/util/Row';
-import ManhwaIdComponent from '@/components/ManhwaIdComponent';
-import Footer from '@/components/util/Footer';
-import { AppConstants } from '@/constants/AppConstants';
-import ManhwaImageCover from '@/components/ManhwaImageCover';
-import { Typography } from '@/constants/typography';
-import ManhwaSummary from '@/components/util/ManhwaSummary';
-import { useResponsive } from '@/helpers/useResponsive';
 
 
 interface ItemProps {
   text: string
-  backgroundColor: string  
+  backgroundColor: string
 }
 
 
-const Item = ({text, backgroundColor}: ItemProps) => {
-  return (
-    <View style={{...styles.item, backgroundColor}} >
-      <Text style={{...Typography.regular, color: Colors.backgroundColor}}>{text}</Text>
-    </View>
-  )
-}
+const Item = memo(({ text, backgroundColor }: ItemProps) => (
+  <View style={{ ...styles.item, backgroundColor }}>
+    <Text style={{ ...Typography.regular, color: Colors.backgroundColor }}>{text}</Text>
+  </View>
+));
 
 
 const ManhwaPage = () => {
@@ -89,7 +89,7 @@ const ManhwaPage = () => {
 
         if (isCancelled) { return }
         setManhwa(m)
-
+        
         await dbUpdateManhwaViews(db, manhwa_id)
         const names = await dbGetManhwaAltNames(db, manhwa_id, m.title)
 
@@ -105,6 +105,95 @@ const ManhwaPage = () => {
     },
     [db, manhwa_id]
   )  
+  
+  const sections = useMemo(() => {
+    return [
+      { key: 'linearBackground' },
+      { key: 'topBar' },
+      { key: 'image' },
+      { key: 'title' },
+      { key: 'summary' },
+      { key: 'authors' },
+      { key: 'genres' },
+      { key: 'library' },
+      { key: 'statusViews' },
+      { key: 'chapters' },
+      { key: 'footer' }
+    ];
+  }, []);
+
+  const renderItem = ({ item }: { item: { key: string } }) => {
+    switch (item.key) {
+      case 'linearBackground':
+        return (
+          <LinearGradient 
+            colors={[manhwa!.color, Colors.backgroundColor]} 
+            style={{...styles.linearBackground, height: hp(92)}} />
+        )        
+      case 'topBar':
+        return (
+          <Row style={styles.topBar}>
+            <HomeButton color={Colors.backgroundColor} iconName='home-outline' />
+            <Row style={{ gap: AppConstants.ICON.SIZE }}>
+              <BugReportButton title={manhwa!.title} color={Colors.backgroundColor} />
+              <RandomManhwaButton color={Colors.backgroundColor} />
+              <ReturnButton color={Colors.backgroundColor} />
+            </Row>
+          </Row>
+        );
+      case 'image':
+        return (
+          <View style={styles.padding} >
+            <ManhwaImageCover url={manhwa!.cover_image_url} />
+            <ManhwaIdComponent manhwa_id={manhwa!.manhwa_id} />
+          </View>
+        );
+      case 'title':
+        return (
+          <View style={styles.padding} >
+            <Text style={Typography.semiboldXl}>{manhwa!.title}</Text>
+            <ManhwaAlternativeNames names={altNames} />
+            <ManhwaSummary summary={manhwa!.descr} />
+            <Text style={Typography.regular}>last update: {formatTimestamp(manhwa!.updated_at)}</Text>
+          </View>
+        );
+      case 'authors':
+        return (
+          <View style={styles.padding} >
+            <ManhwaAuthorInfo manhwa={manhwa!} />
+          </View>
+        )
+      case 'genres':
+        return (
+          <View style={styles.padding} >
+            <ManhwaGenreInfo manhwa={manhwa!} />
+          </View>
+        )
+      case 'library':
+        return (
+          <View style={styles.padding} >
+            <AddToLibray manhwa={manhwa!} backgroundColor={manhwa!.color} />
+          </View>
+        )        
+      case 'statusViews':
+        return (
+          <Row style={{ gap: AppConstants.MARGIN, paddingHorizontal: AppConstants.SCREEN.PADDING_HORIZONTAL }}>
+            <Item text={manhwa!.status} backgroundColor={manhwa!.color} />
+            <Item text={`Views: ${formatNumberWithSuffix(manhwa!.views + 1)}`} backgroundColor={manhwa!.color} />
+          </Row>
+        );
+      case 'chapters':
+        return (
+          <View style={styles.padding} >
+            <ManhwaChapterGrid manhwa={manhwa!} />
+          </View>
+        )
+      case 'footer':
+        return <Footer />;
+      default:
+        return null;
+    }
+  };
 
   if (!manhwa) {
     return (
@@ -115,56 +204,15 @@ const ManhwaPage = () => {
   }
 
   return (
-    <SafeAreaView style={[AppStyle.safeArea, styles.container]} >
-      <ScrollView style={{flex: 1}} keyboardShouldPersistTaps={'always'} showsVerticalScrollIndicator={false} >
-        <LinearGradient 
-          colors={[manhwa.color, Colors.backgroundColor]}
-          style={{...styles.linearBackground, height: hp(92)}} />
-
-        {/* Top */}        
-        <Row style={styles.topBar} >
-          <HomeButton color={Colors.backgroundColor} iconName='home-outline'/>
-          <Row style={{gap: AppConstants.ICON.SIZE}} >
-            <BugReportButton title={manhwa.title} color={Colors.backgroundColor} /> 
-            <RandomManhwaButton color={Colors.backgroundColor} />
-            <ReturnButton color={Colors.backgroundColor} />
-          </Row>
-        </Row>
-
-        {/* Main Content */}
-        <View style={styles.manhwaContainer}>
-          
-          {/* Manhwa Image */}
-          <View>
-            <ManhwaImageCover url={manhwa.cover_image_url} />
-            <ManhwaIdComponent manhwa_id={manhwa.manhwa_id} />
-          </View>
-
-          {/* Title, Summary and Last Update */}          
-          <Text style={Typography.semiboldXl}>{manhwa!.title}</Text>
-          <ManhwaAlternativeNames names={altNames} />
-          <ManhwaSummary summary={manhwa.descr} />
-          <Text style={Typography.regular}>last update: {formatTimestamp(manhwa.updated_at)}</Text>
-          
-          {/* Genre and Authors Info */}
-          <ManhwaAuthorInfo manhwa={manhwa} />
-          <ManhwaGenreInfo manhwa={manhwa} />
-
-          {/* Libray */}
-          <AddToLibray manhwa={manhwa} backgroundColor={manhwa.color} />
-
-          {/* Status (OnGoing or Completed) and Num Views */}
-          <Row style={{gap: AppConstants.MARGIN}} >
-            <Item text={manhwa.status} backgroundColor={manhwa.color} />
-            <Item text={`Views: ${formatNumberWithSuffix(manhwa.views + 1)}`} backgroundColor={manhwa.color} />
-          </Row>
-          
-          {/* Chapter Grid */}
-          <ManhwaChapterGrid manhwa={manhwa} />
-
-          <Footer/>
-        </View>
-      </ScrollView>
+    <SafeAreaView style={[AppStyle.safeArea, styles.container]}>
+      <FlatList
+        data={sections}
+        keyExtractor={(item) => item.key}
+        ItemSeparatorComponent={() => <View style={{height: AppConstants.MARGIN}} />}
+        renderItem={renderItem}
+        scrollEnabled={true}
+        showsVerticalScrollIndicator={false}
+      />        
     </SafeAreaView>
   )
 }
@@ -179,7 +227,7 @@ const styles = StyleSheet.create({
   },
   linearBackground: {
     position: 'absolute',
-    width: '100%',    
+    width: '100%',
     left: 0,
     top: 0
   },
@@ -201,6 +249,9 @@ const styles = StyleSheet.create({
     width: '100%',
     gap: AppConstants.MARGIN,
     alignItems: "flex-start",
+    paddingHorizontal: AppConstants.SCREEN.PADDING_HORIZONTAL
+  },
+  padding: {
     paddingHorizontal: AppConstants.SCREEN.PADDING_HORIZONTAL
   }
 })

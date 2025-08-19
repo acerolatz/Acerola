@@ -1,5 +1,6 @@
 import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import BooleanRotatingButton from '../buttons/BooleanRotatingButton'
+import { useSettingsState } from '@/store/settingsState'
 import { AppConstants } from '@/constants/AppConstants'
 import { LinearGradient } from 'expo-linear-gradient'
 import React, { useCallback, useRef, } from 'react'
@@ -21,10 +22,15 @@ interface Top10ItemProps {
     title: string
     manhwa_id: number
     image_url: string
-    index: number
+    index: number    
 }
 
-const Top10Item = ({title, manhwa_id, image_url, index}: Top10ItemProps) => {
+const Top10Item = ({
+    title, 
+    manhwa_id, 
+    image_url, 
+    index    
+}: Top10ItemProps) => {
 
     const onPress = useCallback(() => {
         router.push({
@@ -40,7 +46,7 @@ const Top10Item = ({title, manhwa_id, image_url, index}: Top10ItemProps) => {
                     source={image_url} 
                     style={styles.image} 
                     contentFit='cover'
-                    transition={AppConstants.IMAGE_TRANSITION} />
+                    transition={AppConstants.DEFAULT_IMAGE_TRANSITION} />
                 <LinearGradient colors={['transparent', 'transparent', Colors.backgroundColor]} style={styles.linearGradient} >
                     <Text style={styles.number} >{index + 1}</Text>
                     <Text numberOfLines={1} style={styles.manhwaTitle} >{title}</Text>
@@ -57,7 +63,7 @@ interface Top10GridProps {
 }
 
 const Top10Grid = ({manhwas, reloadTop10}: Top10GridProps) => {
-
+        
     const flatListRef = useRef<FlatList>(null)
 
     const reload = async () => {

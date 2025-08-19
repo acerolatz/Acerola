@@ -8,11 +8,9 @@ type Top10ManhwasState = {
 }
 
 
-/**
- * Zustand store for managing the daily top 10 manhwas
- * 
+/** 
  * This store maintains:
- *   - `top10manhwas`: Array of Manhwa objects representing the daily highest-ranked content
+ *   - `top10manhwas`: Array of Manhwa objects representing the daily highest-ranked manhwas
  * 
  * The `setTop10manhwas` function provides a centralized way to update the daily top 10 list
  *  

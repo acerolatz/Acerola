@@ -9,7 +9,7 @@ type ManhwaCardState = {
 
 
 /**
- * Zustand store for managing manhwa cards displayed on the HomePage
+ * Zustand store for managing random manhwa cards displayed on the HomePage
  * 
  * This store maintains:
  *   - `cards`: Array of ManhwaCard objects representing random cards shown on HomePage

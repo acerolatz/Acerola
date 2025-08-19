@@ -14,19 +14,15 @@ type SettingsState = {
  * 
  * This store maintains:
  *   - `settings`: Object containing various user-configurable options
- * 
- * Current settings include:
- *   - showLast3Chapters: Toggles display of only recent chapters (default: false)
- *   - drawDistance: Virtualized list rendering distance optimization (default: 0)
- *   - onEndReachedThreshold: Threshold for triggering list end detection (default: 0)
  *  
  */
 export const useSettingsState = create<SettingsState>(
     (set) => ({
         settings: {
             showLast3Chapters: false,
-            drawDistance: AppConstants.DEFAULT_DRAW_DISTANCE, 
-            onEndReachedThreshold: AppConstants.DEFAULT_ON_END_REACHED_THRESHOLD            
+            windowSize: AppConstants.DEFAULT_WINDOW_SIZE, 
+            maxToRenderPerBatch: AppConstants.DEFAULT_MAX_TO_RENDER_PER_BATCH,
+            updateCellsBatchingPeriod: AppConstants.DEFAULT_UPDATE_CELLS_BATCHING_PERIOD            
         },
         setSettings: (settings: Settings) => {
             (set((state) => {return {...state, settings}}))

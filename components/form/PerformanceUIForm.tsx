@@ -23,25 +23,32 @@ import CustomActivityIndicator from '../util/CustomActivityIndicator'
 import Toast from 'react-native-toast-message'
 import { ToastMessages } from '@/constants/Messages'
 import Footer from '../util/Footer'
+import Row from '../util/Row'
 
 
 interface FormData {
-    drawDistance: number
-    onEndReachedThreshold: number
+    windowSize: number
+    maxToRenderPerBatch: number
+    updateCellsBatchingPeriod: number
 }
 
 
 const schema = yup.object().shape({  
-    drawDistance: yup
+    windowSize: yup
         .number()
-        .min(AppConstants.SCREEN.WIDTH, `Min ${AppConstants.SCREEN.WIDTH} pixels`)
-        .max(AppConstants.SCREEN.WIDTH * 20, `Max ${AppConstants.SCREEN.WIDTH * 20} pixels`)
-        .required('DrawDistance is required'),
-
-    onEndReachedThreshold: yup
+        .min(3, `Min 3`)
+        .max(32, `Max 32 pixels`)
+        .required('WindowSize is required'),
+    maxToRenderPerBatch: yup
         .number()
-        .min(0.5, 'Min 0.5')
+        .min(1, 'Min 1')
         .max(64, 'Max 64')
+        .required('MaxToRenderPerBatch is required'),
+    updateCellsBatchingPeriod: yup
+        .number()
+        .min(20, 'Min 20')
+        .max(6000,'Max 6000')
+        .required('UpdateCellsBatchingPeriod is required'),
 });
 
 const PerformanceUIForm = () => {
@@ -55,11 +62,13 @@ const PerformanceUIForm = () => {
         control,
         handleSubmit,
         formState: { errors },
+        reset: resetForm,
     } = useForm<FormData>({
         resolver: yupResolver(schema as any),
         defaultValues: {            
-            drawDistance: settings.drawDistance,
-            onEndReachedThreshold: settings.onEndReachedThreshold
+            windowSize: settings.windowSize,
+            maxToRenderPerBatch: settings.maxToRenderPerBatch,
+            updateCellsBatchingPeriod: settings.updateCellsBatchingPeriod
         },
     });
 
@@ -68,29 +77,58 @@ const PerformanceUIForm = () => {
             Keyboard.dismiss()
             setSettings({
                 ...settings, 
-                drawDistance: form_data.drawDistance, 
-                onEndReachedThreshold: form_data.onEndReachedThreshold
+                windowSize: form_data.windowSize, 
+                maxToRenderPerBatch: form_data.maxToRenderPerBatch,
+                updateCellsBatchingPeriod: form_data.updateCellsBatchingPeriod                
             })
             await Promise.all([
-                dbSetNumericInfo(db, 'drawDistance', form_data.drawDistance),
-                dbSetNumericInfo(db, 'onEndReachedThreshold', form_data.onEndReachedThreshold)
-            ])
+                dbSetNumericInfo(db, 'windowSize', form_data.windowSize),
+                dbSetNumericInfo(db, 'maxToRenderPerBatch', form_data.maxToRenderPerBatch),
+                dbSetNumericInfo(db, 'updateCellsBatchingPeriod', form_data.updateCellsBatchingPeriod)
+            ])            
             Toast.show(ToastMessages.EN.GENERIC_SUCCESS)
         setLoading(false)
     };
+
+    const reset = async () => {
+        setLoading(true)
+            const defaultValues = {
+                windowSize: AppConstants.DEFAULT_WINDOW_SIZE,
+                maxToRenderPerBatch: AppConstants.DEFAULT_MAX_TO_RENDER_PER_BATCH,
+                updateCellsBatchingPeriod: AppConstants.DEFAULT_UPDATE_CELLS_BATCHING_PERIOD
+            }
+            Keyboard.dismiss()
+            setSettings({ ...settings, ...defaultValues})
+            await Promise.all([
+                dbSetNumericInfo(db, 'windowSize', AppConstants.DEFAULT_WINDOW_SIZE),
+                dbSetNumericInfo(db, 'maxToRenderPerBatch', AppConstants.DEFAULT_MAX_TO_RENDER_PER_BATCH),
+                dbSetNumericInfo(db, 'updateCellsBatchingPeriod', AppConstants.DEFAULT_UPDATE_CELLS_BATCHING_PERIOD)
+            ])
+            Toast.show(ToastMessages.EN.GENERIC_SUCCESS)
+            resetForm(defaultValues)
+        setLoading(false)
+    }
     
     return (        
         <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled' >
             <View style={{flex: 1, gap: AppConstants.GAP, paddingHorizontal: wp(1)}} >
+                <Text style={{...Typography.regular, color: Colors.primary}} >
+                    This section defines some attributes related to the list that displays the images of a pornhwa chapter.
+                </Text>
+                <Text style={{...Typography.regular, color: Colors.primary}} >
+                    The images are downloaded as the chapter is read, which may cause empty areas on the screen for a moment.
+                </Text>
+                <Text style={{...Typography.regular, color: Colors.red}} >
+                    Change only if necessary.
+                </Text>
                 {/* Draw Distance */}
-                <View>
-                    <Text style={Typography.semibold}>DrawDistance</Text>
-                    <Text style={AppStyle.textOptional} >chapter reader</Text>
-                </View>
-                <Text style={Typography.regular}>Draw distance for advanced rendering (in px)</Text>
-                {errors.drawDistance && (<Text style={AppStyle.error}>{errors.drawDistance.message}</Text>)}
+                <Text style={Typography.semibold}>WindowSize</Text>                
+                <Text style={Typography.regular}>
+                    Determines the maximum number of items rendered outside of the visible area, in units of visible lengths. So if images list fills the screen, then windowSize=[{AppConstants.DEFAULT_WINDOW_SIZE}] (the default) will render the visible screen area plus up to {Math.floor(AppConstants.DEFAULT_WINDOW_SIZE / 2)} screens above and {Math.floor(AppConstants.DEFAULT_WINDOW_SIZE / 2)} below the viewport. Reducing this number will reduce memory consumption and may improve performance, but will increase the chance that fast scrolling may reveal momentary blank areas of unrendered content.
+                </Text>
+                {errors.windowSize && (<Text style={AppStyle.error}>{errors.windowSize.message}</Text>)}
                 <Controller
-                    name="drawDistance"
+                    name="windowSize"
                     control={control}
                     render={({ field: { onChange, onBlur, value } }) => (
                     <TextInput
@@ -102,17 +140,33 @@ const PerformanceUIForm = () => {
                     )}
                 />
 
-                {/* On End Reached Threshold */}
-                <View>
-                    <Text style={Typography.semibold}>EndReachedThreshold</Text>
-                    <Text style={AppStyle.textOptional} >chapter reader</Text>
-                </View>
+                {/* MaxToRenderPerBatch */}
+                <Text style={Typography.semibold}>MaxToRenderPerBatch</Text>                
                 <Text style={Typography.regular}>
-                    How far from the end (in units of visible length of the list) the bottom edge of the list must be from the end of the content to trigger the onEndReached callback. Thus a value of 0.5 will trigger onEndReached when the end of the content is within half the visible length of the list.
+                    The maximum number of items to render in each incremental render batch. The more rendered at once, the better the fill rate, but responsiveness may suffer because rendering content may interfere with responding to button taps or other interactions.
                 </Text>
-                {errors.onEndReachedThreshold && (<Text style={AppStyle.error}>{errors.onEndReachedThreshold.message}</Text>)}
+                {errors.maxToRenderPerBatch && (<Text style={AppStyle.error}>{errors.maxToRenderPerBatch.message}</Text>)}
                 <Controller
-                    name="onEndReachedThreshold"
+                    name="maxToRenderPerBatch"
+                    control={control}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                        style={AppStyle.input}
+                        keyboardType='numeric'
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value.toString()}/>
+                    )}
+                />
+
+                {/* UpdateCellsBatchingPeriod */}
+                <Text style={Typography.semibold}>UpdateCellsBatchingPeriod</Text>                
+                <Text style={Typography.regular}>
+                    Amount of time (milliseconds) between low-pri item render batches, e.g. for rendering items quite a ways off screen. Similar fill rate/responsiveness tradeoff as maxToRenderPerBatch.
+                </Text>
+                {errors.updateCellsBatchingPeriod && (<Text style={AppStyle.error}>{errors.updateCellsBatchingPeriod.message}</Text>)}
+                <Controller
+                    name="updateCellsBatchingPeriod"
                     control={control}
                     render={({ field: { onChange, onBlur, value } }) => (
                     <TextInput
@@ -127,14 +181,25 @@ const PerformanceUIForm = () => {
                 {
                     loading ?
 
-                    <View style={AppStyle.formButton} >
-                        <CustomActivityIndicator color={Colors.backgroundColor} />
-                    </View>
+                    <Row style={{gap: AppConstants.GAP}} >
+                        <View style={AppStyle.button} >
+                            <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Reset</Text>
+                        </View>
+                        <View style={AppStyle.button} >
+                            <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Save</Text>
+                        </View>
+                    </Row>
                     :
-                    <Pressable onPress={handleSubmit(onSubmit)} style={AppStyle.formButton} >
-                        <Text style={{...Typography.regular, color: Colors.backgroundColor}} >OK</Text>
-                    </Pressable>
+                    <Row style={{gap: AppConstants.GAP}} >
+                        <Pressable onPress={reset} style={AppStyle.button} >
+                            <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Reset</Text>
+                        </Pressable>
+                        <Pressable onPress={handleSubmit(onSubmit)} style={AppStyle.button} >
+                            <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Save</Text>
+                        </Pressable>
+                    </Row>
                 }
+
 
             </View>
             <Footer/>

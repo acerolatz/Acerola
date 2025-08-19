@@ -22,8 +22,7 @@ const BugImage = ({uri, setPhotos}: BubImageProps) => {
             <Image 
                 source={{uri}} 
                 style={styles.image} 
-                contentFit='cover'
-                transition={AppConstants.IMAGE_TRANSITION} />
+                contentFit='cover' />
             <Pressable onPress={onPress} style={styles.removeImageButton} hitSlop={AppConstants.HIT_SLOP.LARGE} >
                 <Ionicons name='trash-outline' size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />
             </Pressable>

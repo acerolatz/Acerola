@@ -9,15 +9,13 @@ import {
     Text, 
     View 
 } from 'react-native'
-import { dbDebugSetNumChapterRead, dbFetchDebugInfo, dbSetDebugInfo, dbSetNumericInfo } from '@/lib/database'
+import { dbFetchDebugInfo, dbSetDebugInfo } from '@/lib/database'
 import BooleanRotatingButton from '@/components/buttons/BooleanRotatingButton'
 import PageActivityIndicator from '@/components/util/PageActivityIndicator'
-import { spFetchCardAndCover, spFetchCardAndCoverLatest, spFetchCardAndCoverSearch, spFetchCardImage, spFetchCoverImage } from '@/lib/supabase'
-import RandomManhwaCard from '@/components/RandomManhwaCard'
-import ManhwaImageCover from '@/components/ManhwaImageCover'
+import { spFetchCardAndCover, spFetchCardAndCoverLatest, spFetchCardAndCoverSearch } from '@/lib/supabase'
 import ReturnButton from '@/components/buttons/ReturnButton'
 import { TextInput } from 'react-native-gesture-handler'
-import { DebugInfo, DebugManhwaImages, ManhwaCard } from '@/helpers/types'
+import { DebugInfo, DebugManhwaImages } from '@/helpers/types'
 import { AppConstants } from '@/constants/AppConstants'
 import { Typography } from '@/constants/typography'
 import React, { useEffect, useState } from 'react'

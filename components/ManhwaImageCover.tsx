@@ -5,7 +5,12 @@ import { getRelativeHeight } from '@/helpers/util'
 import { Image } from 'expo-image'
 
 
-const ManhwaImageCover = ({url}: {url: string}) => {  
+interface ManhwaImageCoverProps {
+  url: string
+}
+
+
+const ManhwaImageCover = ({ url }: ManhwaImageCoverProps) => {  
 
   const { width, height } = useWindowDimensions();
   const w = width * 0.92
@@ -16,7 +21,7 @@ const ManhwaImageCover = ({url}: {url: string}) => {
       source={url} 
       contentFit='cover' 
       style={{...styles.image, width: w, height: h}}
-      transition={AppConstants.IMAGE_TRANSITION} />
+      transition={AppConstants.DEFAULT_IMAGE_TRANSITION} />
   )
 }
 

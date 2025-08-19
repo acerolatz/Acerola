@@ -4,7 +4,7 @@ import { AppConstants } from '@/constants/AppConstants'
 import RotatingButton from '../buttons/RotatingButton'
 import RandomManhwaCard from '../RandomManhwaCard'
 import { ManhwaCard } from '@/helpers/types'
-import React, { useRef } from 'react'
+import React, { useCallback, useRef } from 'react'
 import { debounce } from 'lodash'
 import Row from '../util/Row'
 import Title from '../Title'
@@ -27,6 +27,12 @@ const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
 
     const debounceReload = debounce(reload, 800)    
 
+    const renderItem = useCallback(({item}: {item: ManhwaCard}) => (
+        <RandomManhwaCard card={item} />
+    ), [])
+
+    const keyExtractor = useCallback((item: ManhwaCard) => item.manhwa_id.toString(), [])
+
     if (cards.length === 0) {
         return (
             <View style={styles.container} >
@@ -36,7 +42,7 @@ const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
                 </Row>
             </View>
         )
-    }
+    }    
     
     return (
         <View style={styles.container} >
@@ -47,13 +53,11 @@ const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
             <FlatList
                 ref={flatListRef}
                 data={cards}
-                initialNumToRender={6}
+                keyExtractor={keyExtractor}
+                renderItem={renderItem}
                 ItemSeparatorComponent={() => <View style={{ width: AppConstants.MARGIN }} />}
-                onEndReachedThreshold={1}
                 showsHorizontalScrollIndicator={false}
                 horizontal={true}
-                keyExtractor={(item: ManhwaCard) => item.manhwa_id.toString()}
-                renderItem={({item}) => <RandomManhwaCard card={item} />}
             />
         </View>
     )

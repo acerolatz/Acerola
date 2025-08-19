@@ -1,10 +1,10 @@
 import CustomActivityIndicator from '../util/CustomActivityIndicator'
 import { FlatList, StyleSheet, View } from 'react-native'
 import { AppConstants } from '@/constants/AppConstants'
+import React, { useCallback } from 'react'
 import { Manhwa } from '@/helpers/types'
 import ManhwaCard from '../ManhwaCard'
 import Footer from '../util/Footer'
-import React from 'react'
 
 
 interface MangaGridProps {
@@ -16,8 +16,7 @@ interface MangaGridProps {
     showChaptersPreview?: boolean
     shouldShowChapterDate?: boolean
     showsVerticalScrollIndicator?: boolean
-    showManhwaStatus?: boolean
-    imageTransition?: number
+    showManhwaStatus?: boolean    
 }
 
 
@@ -30,8 +29,7 @@ const ManhwaGrid = ({
     showChaptersPreview = true,
     shouldShowChapterDate = true,
     showsVerticalScrollIndicator = true,
-    showManhwaStatus = true,
-    imageTransition = AppConstants.IMAGE_TRANSITION   
+    showManhwaStatus = true    
 }: MangaGridProps) => {    
 
     const renderFooter = () => {
@@ -44,6 +42,20 @@ const ManhwaGrid = ({
         }
         return <Footer/>
     }
+
+    const keyExtractor = useCallback((item: Manhwa) => item.manhwa_id.toString(), [])
+
+    const renderItem = useCallback(({item}: {item: Manhwa}) => (
+        <ManhwaCard
+            showChaptersPreview={showChaptersPreview} 
+            shouldShowChapterDate={shouldShowChapterDate}
+            showManhwaStatus={showManhwaStatus}
+            width={AppConstants.MANHWA_COVER.WIDTH} 
+            height={AppConstants.MANHWA_COVER.HEIGHT}
+            marginBottom={AppConstants.GAP / 2}
+            manhwa={item}
+        />
+      ), [])
     
     return (
         <View style={styles.container} >
@@ -52,21 +64,14 @@ const ManhwaGrid = ({
                 keyboardShouldPersistTaps={'handled'}
                 data={manhwas}
                 numColumns={numColumns}
-                keyExtractor={(item) => item.manhwa_id.toString()}
+                keyExtractor={keyExtractor}
                 initialNumToRender={12}
                 onEndReached={onEndReached}
-                scrollEventThrottle={16}
+                maxToRenderPerBatch={12}
+                updateCellsBatchingPeriod={100}
+                windowSize={5}
                 onEndReachedThreshold={2}
-                renderItem={({item}) => <ManhwaCard 
-                    showChaptersPreview={showChaptersPreview} 
-                    shouldShowChapterDate={shouldShowChapterDate}
-                    showManhwaStatus={showManhwaStatus}
-                    width={AppConstants.MANHWA_COVER.WIDTH} 
-                    height={AppConstants.MANHWA_COVER.HEIGHT}
-                    marginBottom={AppConstants.GAP / 2}
-                    imageTransition={imageTransition}
-                    manhwa={item}
-                />}
+                renderItem={renderItem}
                 ListFooterComponent={renderFooter}/>
         </View>
     )    

@@ -1,13 +1,13 @@
-import { AppConstants } from '@/constants/AppConstants';
-import { Colors } from '@/constants/Colors';
-import { Stack } from 'expo-router';
-import React from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StatusBar, StyleSheet, Text, View } from 'react-native';
+import { AppConstants } from '@/constants/AppConstants';
+import { Typography } from '@/constants/typography';
 import Toast from 'react-native-toast-message';
 import { SQLiteProvider } from 'expo-sqlite';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Colors } from '@/constants/Colors';
 import { dbMigrate } from '@/lib/database';
-import { Typography } from '@/constants/typography';
+import { Stack } from 'expo-router';
+import React from 'react';
 
 
 const TOAST_CONFIG = {

@@ -1,9 +1,6 @@
 import { hp, wp } from "@/helpers/util";
 
 
-const IS_TABLET_AUX = Math.min(wp(100), hp(100)) >= 600
-
-
 export const AppConstants = {
     APP_NAME: "Acerola",
     APP_VERSION: "v1.1.0",
@@ -67,11 +64,12 @@ export const AppConstants = {
         PADDING_HORIZONTAL: wp(4),
         PADDING_VERTICAL: hp(4)
     },
-    BOTTOMSHEET_HANDLE_RADIUS: wp(4),    
-    IMAGE_TRANSITION: 200,
-    IS_TABLET: IS_TABLET_AUX,
-    DEFAULT_DRAW_DISTANCE: Math.floor(IS_TABLET_AUX ? hp(150) : hp(200)),
-    DEFAULT_ON_END_REACHED_THRESHOLD: IS_TABLET_AUX ? 1 : 1.5,
+    BOTTOMSHEET_HANDLE_RADIUS: wp(4),
+    DEFAULT_WINDOW_SIZE: 9,
+    DEFAULT_MAX_TO_RENDER_PER_BATCH: 8,
+    DEFAULT_UPDATE_CELLS_BATCHING_PERIOD: 50,
+    DEFAULT_SHOW_LAST_3_CHAPTERS: '1',
+    DEFAULT_IMAGE_TRANSITION: 200,
     READING_STATUS: [
         'Completed',
         'Reading',
@@ -84,7 +82,7 @@ export const AppConstants = {
     ITEM_PADDING_HORIZONTAL: hp(1),
     ITEM_PADDING_VERTICAL: hp(1.4),
     CHAPTER_GOAL_START: 32,
-    CHAPTER_GOAL_INCREMENT: 92,
+    CHAPTER_GOAL_INCREMENT: 72,
     RANDOM_MANHWAS: {
         MAX_WIDTH: wp(87),
         MAX_HEIGHT: hp(88)

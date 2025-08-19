@@ -1,13 +1,13 @@
-import { Manhwa } from '@/helpers/types'
-import { Image } from 'expo-image'
-import { router } from 'expo-router'
-import React, { useCallback } from 'react'
 import { FlatList, Pressable, StyleSheet, View } from 'react-native'
-import Title from '../Title'
-import ViewAllButton from '../buttons/ViewAllButton'
-import Row from '../util/Row'
 import { AppConstants } from '@/constants/AppConstants'
+import ViewAllButton from '../buttons/ViewAllButton'
+import React, { useCallback } from 'react'
+import { Manhwa } from '@/helpers/types'
 import { hp, wp } from '@/helpers/util'
+import { router } from 'expo-router'
+import { Image } from 'expo-image'
+import Title from '../Title'
+import Row from '../util/Row'
 
 
 interface ItemProps {
@@ -31,22 +31,27 @@ const Item = ({manhwa_id, image_url} : ItemProps) => {
                 style={styles.image} 
                 source={image_url} 
                 contentFit='cover' 
-                transition={AppConstants.IMAGE_TRANSITION} />
+                transition={AppConstants.DEFAULT_IMAGE_TRANSITION} />
         </Pressable>
     )   
 }
 
 
-
 const ContinueReadingGrid = ({manhwas}: {manhwas: Manhwa[]}) => {
-
+    
     const onViewAll = () => {
         router.navigate("/ReadingHistoryPage")
     } 
 
-    if (manhwas.length === 0) {
-        return <></>
-    }
+    const keyExtractor = useCallback((item: Manhwa) => item.manhwa_id.toString(), [])
+    
+    const renderItem = useCallback(({item}: {item: Manhwa}) => (
+        <Item 
+            manhwa_id={item.manhwa_id} 
+            image_url={item.cover_image_url} />
+    ), [])
+
+    if (manhwas.length === 0) { return <></> }
     
     return (
         <View style={styles.container} >
@@ -58,8 +63,8 @@ const ContinueReadingGrid = ({manhwas}: {manhwas: Manhwa[]}) => {
                 data={manhwas}
                 horizontal={true}
                 showsHorizontalScrollIndicator={false}
-                keyExtractor={(item: Manhwa) => item.manhwa_id.toString()}
-                renderItem={({item}) => <Item manhwa_id={item.manhwa_id} image_url={item.cover_image_url} />}
+                keyExtractor={keyExtractor}
+                renderItem={renderItem}
             />
         </View>
     )

@@ -1,19 +1,15 @@
 import PageActivityIndicator from '@/components/util/PageActivityIndicator';
+import { clearCache, hasInternetAvailable } from '@/helpers/util';
 import { useAppVersionState } from '@/store/appVersionState';
 import { useSettingsState } from '@/store/settingsState';
-import NetInfo from '@react-native-community/netinfo';
 import { ToastMessages } from '@/constants/Messages';
 import React, { useEffect, useRef } from 'react';
 import { useSQLiteContext } from 'expo-sqlite';
 import Toast from 'react-native-toast-message';
 import { AppStyle } from '@/styles/AppStyle';
 import { SafeAreaView } from 'react-native';
-import { clearCache, hasInternetAvailable } from '@/helpers/util';
 import { router } from 'expo-router';
-import {
-    dbCleanTable,
-    dbCount,
-    dbFillReadingStatus,
+import {    
     dbFirstRun,
     dbGetAppVersion,
     dbIsSafeModeEnabled,

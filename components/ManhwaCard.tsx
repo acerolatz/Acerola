@@ -25,8 +25,7 @@ interface ManhwaCardProps {
     marginBottom?: number
     showChaptersPreview?: boolean
     shouldShowChapterDate?: boolean
-    showManhwaStatus?: boolean
-    imageTransition?: number
+    showManhwaStatus?: boolean    
 }
 
 
@@ -38,8 +37,7 @@ const ManhwaCard = ({
     marginBottom = 0,
     showChaptersPreview = true,
     shouldShowChapterDate = true,
-    showManhwaStatus = true,
-    imageTransition = AppConstants.IMAGE_TRANSITION   
+    showManhwaStatus = true    
 }: ManhwaCardProps) => {        
 
     const onPress = useCallback(() => {
@@ -56,7 +54,7 @@ const ManhwaCard = ({
                     source={manhwa.cover_image_url} 
                     contentFit='cover'
                     style={[{width, height, borderRadius: AppConstants.BORDER_RADIUS}]}
-                    transition={imageTransition}
+                    transition={AppConstants.DEFAULT_IMAGE_TRANSITION}
                 />
                 { showManhwaStatus && <ManhwaStatusComponent status={manhwa.status} /> }
                 <LinearGradient 
@@ -92,10 +90,18 @@ const ManhwaCard = ({
 
 
 function areEqual(prev: ManhwaCardProps, next: ManhwaCardProps) {
+  const prevM = prev.manhwa
+  const nextM = next.manhwa
+
   return (
-    prev.manhwa.manhwa_id === next.manhwa.manhwa_id &&
-    prev.showChaptersPreview === next.showChaptersPreview
-  );
+    prevM.manhwa_id === nextM.manhwa_id &&
+    prevM.title === nextM.title &&
+    prevM.status === nextM.status &&
+    prevM.cover_image_url === nextM.cover_image_url &&
+    prev.showChaptersPreview === next.showChaptersPreview &&
+    prev.shouldShowChapterDate === next.shouldShowChapterDate &&
+    prev.showManhwaStatus === next.showManhwaStatus    
+  )
 }
 
 

@@ -130,8 +130,9 @@ export type Feedback = {
 
 export type Settings = {
     showLast3Chapters: boolean
-    drawDistance: number
-    onEndReachedThreshold: number    
+    windowSize: number
+    maxToRenderPerBatch: number
+    updateCellsBatchingPeriod: number    
 }
 
 export type DownloadProgress = {

@@ -1,12 +1,12 @@
-import { AppConstants } from '@/constants/AppConstants'
-import ViewAllButton from '../buttons/ViewAllButton'
 import { FlatList, StyleSheet, View } from 'react-native'
 import { useSettingsState } from '@/store/settingsState'
+import { AppConstants } from '@/constants/AppConstants'
+import ViewAllButton from '../buttons/ViewAllButton'
+import React, { useCallback } from 'react'
 import { Manhwa } from '@/helpers/types'
 import ManhwaCard from '../ManhwaCard'
 import Row from '../util/Row'
 import Title from '../Title'
-import React from 'react'
 
 
 interface ManhwaHorizontalGridProps {    
@@ -22,8 +22,14 @@ const ManhwaHorizontalGrid = ({
     onViewAll    
 }: ManhwaHorizontalGridProps) => {
     
-    const { settings } = useSettingsState()
+    const showLast3Chapters = useSettingsState(s => s.settings.showLast3Chapters)    
 
+    const keyExtractor = useCallback((item: Manhwa) => item.manhwa_id.toString(), [])
+
+    const renderItem = useCallback(({item}: {item: Manhwa}) => (
+        <ManhwaCard manhwa={item} showChaptersPreview={showLast3Chapters} />
+      ), [])
+    
     if (manhwas.length === 0)  { return <></> }
     
     return (
@@ -38,9 +44,9 @@ const ManhwaHorizontalGrid = ({
                     horizontal={true}
                     initialNumToRender={10}
                     showsHorizontalScrollIndicator={false}
-                    keyExtractor={(item: Manhwa) => item.manhwa_id.toString()}
-                    extraData={settings.showLast3Chapters}
-                    renderItem={({item}) => <ManhwaCard manhwa={item} showChaptersPreview={settings.showLast3Chapters} />}
+                    keyExtractor={keyExtractor}
+                    extraData={showLast3Chapters}
+                    renderItem={renderItem}
                 />
             </View>
         </View>

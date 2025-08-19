@@ -19,8 +19,7 @@ import Footer from '@/components/util/Footer'
 import AppLogo from '@/components/util/Logo'
 import { Colors } from '@/constants/Colors'
 import Row from '@/components/util/Row'
-import {     
-    dbCount,
+import {
     dbGetReadingHistory,         
     dbReadGenres, 
     dbReadManhwasOrderedByUpdateAt, 

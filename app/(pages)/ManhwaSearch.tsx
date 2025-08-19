@@ -1,7 +1,7 @@
 import CustomActivityIndicator from '@/components/util/CustomActivityIndicator'
 import { FlatList, SafeAreaView, StyleSheet, View } from 'react-native'
 import ReturnButton from '@/components/buttons/ReturnButton'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { AppConstants } from '@/constants/AppConstants'
 import ManhwaCard from '@/components/ManhwaCard'
 import { dbSearchMangas } from '@/lib/database'
@@ -21,7 +21,8 @@ const ManhwaSearch = () => {
   
   const [manhwas, setManhwas] = useState<Manhwa[]>([])
   const [loading, setLoading] = useState(false)
-  
+
+  const [isPending, startTransition] = useTransition()
   const flatListRef = useRef<FlatList<Manhwa>>(null)  
   const fetchingOnEndReached = useRef(false)
   const isInitialized = useRef(false)
@@ -32,43 +33,49 @@ const ManhwaSearch = () => {
     () => {
       const init = async () => {
         setLoading(true)
+        try {
           const m = await dbSearchMangas(db, searchTerm.current, 0, AppConstants.PAGE_LIMIT)
           setManhwas(m)
           hasResults.current = m.length >= AppConstants.PAGE_LIMIT
           isInitialized.current = true
-        setLoading(false)
+        } finally {
+          setLoading(false)
+        }
       }
       init()
     },
     [db]
   )
 
-  const handleSearch = async (value: string) => {    
+  const handleSearch = useCallback(async (value: string) => {
     setLoading(true)
+    try {
       searchTerm.current = value.trim()
       page.current = 0
       const m = await dbSearchMangas(
         db, 
         searchTerm.current, 
-        page.current * AppConstants.PAGE_LIMIT, 
+        0, 
         AppConstants.PAGE_LIMIT
       )
-      setManhwas(m)
-    setLoading(false)
-    hasResults.current = m.length >= AppConstants.PAGE_LIMIT
-    flatListRef.current?.scrollToIndex({animated: false, index: 0})
-  }
+      startTransition(() => { setManhwas(m) })
+      hasResults.current = m.length >= AppConstants.PAGE_LIMIT
+      flatListRef.current?.scrollToIndex({animated: false, index: 0})
+    } finally {
+      setLoading(false)
+    }
+  }, [db])
 
-  const debounceSearch = debounce(handleSearch, 400)
+  const debounceSearch = useMemo(() => debounce(handleSearch, 400), [db])
 
-  const onEndReached = async () => {
+  const onEndReached = useCallback(async () => {
     if (
-      fetchingOnEndReached.current ||
+      fetchingOnEndReached.current || 
       !hasResults.current || 
       !isInitialized.current
     ) { return }
     fetchingOnEndReached.current = true
-    setLoading(true)
+    try {
       page.current += 1
       const m: Manhwa[] = await dbSearchMangas(
         db, 
@@ -76,22 +83,35 @@ const ManhwaSearch = () => {
         page.current * AppConstants.PAGE_LIMIT, 
         AppConstants.PAGE_LIMIT
       )
-      setManhwas(prev => [...prev, ...m])
-    setLoading(false)
-    hasResults.current = m.length >= AppConstants.PAGE_LIMIT
-    fetchingOnEndReached.current = false
-  }
+      startTransition(() => { setManhwas(prev => [...prev, ...m]) })
+      hasResults.current = m.length >= AppConstants.PAGE_LIMIT
+    } finally {
+      fetchingOnEndReached.current = false
+    }
+  }, [db])
 
-  const renderFooter = () => {
-    if (loading && hasResults) {
+  const renderFooter = useCallback(() => {
+    if ((loading || isPending) && hasResults.current) {
       return (
-          <View style={styles.footer} >
-              <CustomActivityIndicator/>
-          </View>
+        <View style={styles.footer} >
+          <CustomActivityIndicator/>
+        </View>
       )
     }
     return <Footer/>
-  }
+  }, [loading, isPending])
+
+  const renderItem = useCallback(({item}: {item: Manhwa}) => (
+    <ManhwaCard
+      showChaptersPreview={false} 
+      width={AppConstants.MANHWA_COVER.WIDTH} 
+      height={AppConstants.MANHWA_COVER.HEIGHT}
+      marginBottom={AppConstants.GAP / 2}
+      manhwa={item}      
+    />
+  ), [])
+
+  const keyExtractor = useCallback((item: Manhwa) => item.manhwa_id.toString(), [])
 
   return (
     <SafeAreaView style={AppStyle.safeArea} >
@@ -101,22 +121,18 @@ const ManhwaSearch = () => {
       <View style={styles.container} >
         <SearchBar onChangeText={debounceSearch} placeholder='pornhwa' />
         <FlatList
-          ref={flatListRef}
           keyboardShouldPersistTaps={'handled'}
+          ref={flatListRef}
           data={manhwas}
           numColumns={2}
-          keyExtractor={(item) => item.manhwa_id.toString()}
+          keyExtractor={keyExtractor}
           initialNumToRender={12}
-          scrollEventThrottle={16}
-          onEndReached={onEndReached}
+          maxToRenderPerBatch={12}
+          updateCellsBatchingPeriod={100}
           onEndReachedThreshold={2}
-          renderItem={({item}) => <ManhwaCard
-            showChaptersPreview={false} 
-            width={AppConstants.MANHWA_COVER.WIDTH} 
-            height={AppConstants.MANHWA_COVER.HEIGHT}
-            marginBottom={AppConstants.GAP / 2}
-            manhwa={item}
-          />}
+          windowSize={5}
+          onEndReached={onEndReached}          
+          renderItem={renderItem}
           ListFooterComponent={renderFooter}/>
       </View>
     </SafeAreaView>

@@ -16,9 +16,9 @@ type DonateState = {
  * 
  * @note 
  *   Donation methods typically include:
- *     - Payment platforms (Patreon, PayPal, etc.)
+ *     - Payment platforms (PayPal, etc.)
  *     - Cryptocurrency wallets
- *     - Other support mechanisms
+ *     - etc
  */
 export const useDonateState = create<DonateState>(
     (set) => ({

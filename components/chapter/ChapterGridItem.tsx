@@ -1,5 +1,5 @@
-import { Pressable, StyleSheet, Text } from 'react-native'
 import { getChapterGridNumColumns, wp } from '@/helpers/util'
+import { Pressable, StyleSheet, Text } from 'react-native'
 import { AppConstants } from '@/constants/AppConstants'
 import { Typography } from '@/constants/typography'
 import { Colors } from '@/constants/Colors'

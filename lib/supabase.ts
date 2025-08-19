@@ -24,6 +24,7 @@ import * as mime from 'react-native-mime-types';
 import Toast from "react-native-toast-message";
 import RNFS from 'react-native-fs';
 import { normalizeRandomManhwaCardHeight } from "@/helpers/normalize";
+import { PixelRatio } from "react-native";
 
 
 export const supabase = createClient(supabaseUrl, supabaseKey as any, {
@@ -230,8 +231,12 @@ export async function spFetchChapterImages(chapter_id: number): Promise<ChapterI
         )
         return []
     }
-
-    return data
+    
+    return data.map(i => {
+        const width = Math.min(i.width, AppConstants.SCREEN.WIDTH)
+        const height = PixelRatio.roundToNearestPixel((width * i.height) / i.width)
+        return { image_url: i.image_url, width, height}
+    })
 }
 
 

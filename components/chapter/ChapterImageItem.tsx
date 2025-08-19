@@ -1,39 +1,31 @@
-import { AppConstants } from '@/constants/AppConstants';
 import { ChapterImage } from '@/helpers/types';
+import { View } from 'react-native';
 import { Image } from 'expo-image';
 import React from 'react';
-import { PixelRatio, View } from 'react-native';
 
 
 type ChapterImageItemProps = {
-  item: ChapterImage | 'BoxHeader' | 'BoxFooter';
+  item: ChapterImage
 };
 
 
+function areEqual(prevProps: ChapterImageItemProps, nextProps: ChapterImageItemProps) {
+  return prevProps.item.image_url === nextProps.item.image_url
+}
+
+
 const ChapterImageItem = React.memo(({ item }: ChapterImageItemProps) => {
-
-  if (item === 'BoxHeader') {
-    return <View style={{ width: '100%', height: AppConstants.PAGES.CHAPTER.HEADER_HEIGHT }} />;
-  }
-
-  if (item === 'BoxFooter') {
-    return <View style={{ width: '100%', height: AppConstants.PAGES.CHAPTER.FOOTER_HEIGHT }} />;
-  }
-
-  const width = Math.min(item.width, AppConstants.SCREEN.WIDTH);
-  const height = PixelRatio.roundToNearestPixel((width * item.height) / item.width);
-  
   return (
-    <Image
-      style={{ width, height, alignSelf: "center" }}
-      source={item.image_url}
-      contentFit="cover"
-      placeholder={require("@/assets/images/chapter-image-placeholder.png")}
-      placeholderContentFit='cover'
-      transition={200}
-    />
-  );
-});
+    <View style={{width: item.width, height: item.height, alignSelf: "center"}} >
+      <Image
+        style={{ width: item.width, height: item.height }}
+        source={item.image_url}
+        contentFit="cover"
+        cachePolicy={'memory-disk'}
+      />
+    </View>
+  )}, areEqual
+)
 
 
 export default ChapterImageItem;

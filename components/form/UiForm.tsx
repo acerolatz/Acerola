@@ -1,16 +1,16 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useState } from 'react'
-import { Typography } from '@/constants/typography'
-import Checkmark from '../util/Checkmark'
 import { formatTimestamp, getPastDate, hp, wp } from '@/helpers/util'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { useSettingsState } from '@/store/settingsState'
 import { AppConstants } from '@/constants/AppConstants'
+import { LinearGradient } from 'expo-linear-gradient'
+import { Typography } from '@/constants/typography'
 import { useSQLiteContext } from 'expo-sqlite'
 import { dbSetInfo } from '@/lib/database'
-import { useSettingsState } from '@/store/settingsState'
-import { Image } from 'expo-image'
-import { LinearGradient } from 'expo-linear-gradient'
-import Row from '../util/Row'
+import Checkmark from '../util/Checkmark'
+import React, { useState } from 'react'
 import Footer from '../util/Footer'
+import { Image } from 'expo-image'
+import Row from '../util/Row'
 
 
 interface DummyChapterLinkProps {
@@ -35,7 +35,7 @@ const DummyManhwaCard = () => {
                 source={require("@/assets/images/Addicted to My Mom.webp")} 
                 style={{width: '100%', height: hp(36), borderRadius: AppConstants.BORDER_RADIUS}}
                 contentFit='cover'
-                transition={AppConstants.IMAGE_TRANSITION}
+                transition={AppConstants.DEFAULT_IMAGE_TRANSITION}
                 />
             <LinearGradient 
                 colors={['transparent', 'transparent', 'rgba(0, 0, 0, 0.7)']} 
@@ -74,7 +74,7 @@ const UiForm = () => {
         await dbSetInfo(db, 'show_last_3_chapters', newState ? '1' : '0')
         setEnable3LastChapter(newState)
         setSettings({...settings, showLast3Chapters: newState})
-    }
+    }    
 
     return (
         <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled' >

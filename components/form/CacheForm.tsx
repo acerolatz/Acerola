@@ -14,7 +14,7 @@ import { Colors } from '@/constants/Colors'
 import { AppConstants } from '@/constants/AppConstants'
 import { clearCache, formatBytes, wp } from '@/helpers/util'
 import { useSQLiteContext } from 'expo-sqlite'
-import { dbSetCacheSize } from '@/lib/database'
+import { dbSetCacheMaxSize, dbSetNumericInfo } from '@/lib/database'
 import { ToastMessages } from '@/constants/Messages'
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -66,8 +66,8 @@ const CacheForm = ({currentCacheSize, currentMaxCacheSize}: CacheFormProps) => {
             form_data.maxCacheSize > AppConstants.FORM.SETTINGS.MAX_CACHE_SIZE
         ) { return }
         setLoading(true)
-            await dbSetCacheSize(db, form_data.maxCacheSize * 1024 * 1024)
-            Toast.show(ToastMessages.EN.GENERIC_SUCCESS)
+        await dbSetCacheMaxSize(db, form_data.maxCacheSize * 1024 * 1024)
+        Toast.show(ToastMessages.EN.GENERIC_SUCCESS)
         setLoading(false)
     };
 

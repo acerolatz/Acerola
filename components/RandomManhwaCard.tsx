@@ -16,13 +16,19 @@ import { wp } from '@/helpers/util'
 
 
 interface RandomManhwaCardProps {
-    card: ManhwaCard
+    card: ManhwaCard    
 }
 
-const RandomManhwaCard = ({card}: RandomManhwaCardProps) => {
+
+function areEqual(prev: RandomManhwaCardProps, next: RandomManhwaCardProps) {
+  return prev.card.image_url === next.card.image_url
+}
+
+
+const RandomManhwaCard = React.memo(({ card }: RandomManhwaCardProps) => {
 
     const db = useSQLiteContext()
-
+    
     const [loading, setLoading] = useState(false)    
 
     const onPress = async () => {
@@ -67,15 +73,18 @@ const RandomManhwaCard = ({card}: RandomManhwaCardProps) => {
                     height: card.normalizedHeight,
                     borderRadius: AppConstants.BORDER_RADIUS * 2
                 }} 
-                transition={AppConstants.IMAGE_TRANSITION}
+                transition={AppConstants.DEFAULT_IMAGE_TRANSITION}
                 contentFit='cover' />
-            <LinearGradient colors={['transparent', 'transparent', 'rgba(0, 0, 0, 0.6)']} style={StyleSheet.absoluteFill} />
+            <LinearGradient 
+                colors={['transparent', 'transparent', 'rgba(0, 0, 0, 0.6)']} 
+                style={StyleSheet.absoluteFill}
+                pointerEvents='none' />
             <View style={styles.manhwaTitleContainer} >
                 <Text style={Typography.semibold}>{card.title}</Text>
             </View>
         </Pressable>
     )
-}
+}, areEqual)
 
 export default RandomManhwaCard
 

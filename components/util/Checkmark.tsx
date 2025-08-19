@@ -27,7 +27,7 @@ const Checkmark = ({title, value, check}: CheckmarkProps) => {
     if (loading) {
         return (
             <Row style={styles.container} >
-                <Text style={{...Typography.regular, flexShrink: 1}} >{title}</Text>
+                <Text style={styles.text} >{title}</Text>
                 <View style={{alignItems: "center", justifyContent: "center"}} >
                     <CustomActivityIndicator size={AppConstants.ICON.SIZE * 0.8} />
                 </View>
@@ -38,7 +38,7 @@ const Checkmark = ({title, value, check}: CheckmarkProps) => {
     if (value) {
         return (
             <Row style={styles.container} >
-                <Text style={{...Typography.regular, flexShrink: 1}} >{title}</Text>
+                <Text style={styles.text} >{title}</Text>
                 <Pressable onPress={onPress} style={styles.buttonMarked} hitSlop={AppConstants.HIT_SLOP.LARGE}>
                     <Ionicons 
                         name='checkmark-outline' 
@@ -51,7 +51,7 @@ const Checkmark = ({title, value, check}: CheckmarkProps) => {
     
     return (
         <Row style={styles.container} >
-            <Text style={{...Typography.regular, flexShrink: 1}} >{title}</Text>
+            <Text style={styles.text} >{title}</Text>
             <Pressable 
                 style={styles.button}
                 onPress={onPress}
@@ -85,5 +85,10 @@ const styles = StyleSheet.create({
         borderColor: Colors.primary,
         borderRadius: AppConstants.BORDER_RADIUS,
         backgroundColor: Colors.primary
+    },
+    text: {
+        ...Typography.semibold, 
+        flexShrink: 1, 
+        color: Colors.primary
     }
 })
