@@ -5,36 +5,28 @@ export const AppConstants = {
     APP_NAME: "Acerola",
     APP_VERSION: "v1.1.0",
     DEBUB: { ENABLED: false },
-    PAGES: {
-        HOME: {
-            MENU_WIDTH: wp(65),
-            MENU_ANIMATION_TIME: 300
-        },
-        CHAPTER: {
-            HEADER_HEIGHT: hp(20),
-            FOOTER_HEIGHT: hp(45)
-        }
+    MENU_WIDTH: wp(65),
+    MENU_ANIMATION_TIME: 300,
+
+    BUG_REPORT: {
+        DEVICE_MIN_LENGHT: 3,
+        DEVICE_MAX_LENGHT: 256,
+        TITLE_MIN_LENGTH: 3,
+        TITLE_MAX_LENGTH: 256,
+        DESCR_MAX_LENGTH: 1024,
+        BUG_TYPE_MAX_LENGTH: 64,
+        MAX_IMAGES: 5
     },
-    FORM: {
-        BUG_REPORT: {
-            DEVICE_MIN_LENGHT: 3,
-            DEVICE_MAX_LENGHT: 256,
-            TITLE_MIN_LENGTH: 3,
-            TITLE_MAX_LENGTH: 256,
-            DESCR_MAX_LENGTH: 1024,
-            BUG_TYPE_MAX_LENGTH: 64,
-            MAX_IMAGES: 5
-        },
-        MANHWA_REQUEST: {
-            TITLE_MIN_LENGTH: 3,
-            TITLE_MAX_LENGTH: 1024,
-            DESCR_MAX_LENGTH: 512
-        },        
-        SETTINGS: {
-            MIN_CACHE_SIZE: 64, // MiB
-            MAX_CACHE_SIZE: 256000 // MiB
-        }
-    },    
+    MANHWA_REQUEST: {
+        TITLE_MIN_LENGTH: 3,
+        TITLE_MAX_LENGTH: 1024,
+        DESCR_MAX_LENGTH: 512
+    },
+    SETTINGS: {
+        MIN_CACHE_SIZE: 64, // MiB
+        MAX_CACHE_SIZE: 256000 // MiB
+    },
+    
     DATABASE: {
         UPDATE_INTERVAL: {
             SERVER: 60 * 60 * 3, // 3 HOURS,
@@ -46,8 +38,12 @@ export const AppConstants = {
         }
     },
     HIT_SLOP: {
-        NORMAL: { left: 10, right: 10, top: 10, bottom: 10 },
-        LARGE: { left: 20, right: 20, top: 20, bottom: 20 }
+        NORMAL: { 
+            left: 10, right: 10, top: 10, bottom: 10 
+        },
+        LARGE: { 
+            left: 20, right: 20, top: 20, bottom: 20 
+        }
     },
     MANHWA_COVER: {
         WIDTH: wp(46) - hp(1.2) / 2,
@@ -65,11 +61,23 @@ export const AppConstants = {
         PADDING_VERTICAL: hp(4)
     },
     BOTTOMSHEET_HANDLE_RADIUS: wp(4),
+
     DEFAULT_WINDOW_SIZE: 9,
     DEFAULT_MAX_TO_RENDER_PER_BATCH: 8,
     DEFAULT_UPDATE_CELLS_BATCHING_PERIOD: 50,
     DEFAULT_SHOW_LAST_3_CHAPTERS: '1',
     DEFAULT_IMAGE_TRANSITION: 200,
+
+    ITEM_PADDING_HORIZONTAL: hp(1),
+    ITEM_PADDING_VERTICAL: hp(1.4),
+
+    CHAPTER_GOAL_START: 32,
+    CHAPTER_GOAL_INCREMENT: 72,
+    RANDOM_MANHWAS: {
+        MAX_WIDTH: wp(87),
+        MAX_HEIGHT: hp(88)
+    },
+
     READING_STATUS: [
         'Completed',
         'Reading',
@@ -78,15 +86,7 @@ export const AppConstants = {
         'Plan to Read',
         'Re-Reading',
         'None'
-    ],  
-    ITEM_PADDING_HORIZONTAL: hp(1),
-    ITEM_PADDING_VERTICAL: hp(1.4),
-    CHAPTER_GOAL_START: 32,
-    CHAPTER_GOAL_INCREMENT: 72,
-    RANDOM_MANHWAS: {
-        MAX_WIDTH: wp(87),
-        MAX_HEIGHT: hp(88)
-    },
+    ],
     BUG_TYPE_LIST: [
         "Bug",            
         "Sugestion",
@@ -94,7 +94,8 @@ export const AppConstants = {
         "ImagesOutOfOrder",
         "MissingImages",
         "Other"
-    ],    
+    ],
+
     TOAST: {
         HEIGHT: 66,
         WIDTH: wp(92),

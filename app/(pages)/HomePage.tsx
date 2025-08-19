@@ -71,7 +71,7 @@ const HomePage = () => {
     const [readingHistoryManhwas, setReadingHistoryManhwas] = useState<Manhwa[]>([])
 
     // Lateral Menu
-    const menuAnim = useRef(new Animated.Value(-AppConstants.PAGES.HOME.MENU_WIDTH)).current 
+    const menuAnim = useRef(new Animated.Value(-AppConstants.MENU_WIDTH)).current 
     const backgroundAnim = useRef(new Animated.Value(-AppConstants.SCREEN.WIDTH)).current
     const menuVisible = useRef(false)
 
@@ -154,29 +154,29 @@ const HomePage = () => {
     const openMenu = () => {
         Animated.timing(menuAnim, {
             toValue: 0,
-            duration: AppConstants.PAGES.HOME.MENU_ANIMATION_TIME,
+            duration: AppConstants.MENU_ANIMATION_TIME,
             useNativeDriver: true
         }).start(() => {
             menuVisible.current = true
         })
         Animated.timing(backgroundAnim, {
             toValue: 0,
-            duration: AppConstants.PAGES.HOME.MENU_ANIMATION_TIME * 1.2,
+            duration: AppConstants.MENU_ANIMATION_TIME * 1.2,
             useNativeDriver: true
         }).start()
     }
 
     const closeMenu = () => {
         Animated.timing(menuAnim, {
-            toValue: -AppConstants.PAGES.HOME.MENU_WIDTH,
-            duration: AppConstants.PAGES.HOME.MENU_ANIMATION_TIME,
+            toValue: -AppConstants.MENU_WIDTH,
+            duration: AppConstants.MENU_ANIMATION_TIME,
             useNativeDriver: true
         }).start(() => {
             menuVisible.current = false
         })
         Animated.timing(backgroundAnim, {
             toValue: -AppConstants.SCREEN.WIDTH,
-            duration: AppConstants.PAGES.HOME.MENU_ANIMATION_TIME,
+            duration: AppConstants.MENU_ANIMATION_TIME,
             useNativeDriver: true
         }).start()
     }
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: 0,        
         backgroundColor: Colors.backgroundColor,
-        width: AppConstants.PAGES.HOME.MENU_WIDTH,
+        width: AppConstants.MENU_WIDTH,
         elevation: 5,        
         zIndex: 100
     },

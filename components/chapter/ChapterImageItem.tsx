@@ -16,14 +16,12 @@ function areEqual(prevProps: ChapterImageItemProps, nextProps: ChapterImageItemP
 
 const ChapterImageItem = React.memo(({ item }: ChapterImageItemProps) => {
   return (
-    <View style={{width: item.width, height: item.height, alignSelf: "center"}} >
-      <Image
-        style={{ width: item.width, height: item.height }}
-        source={item.image_url}
-        contentFit="cover"
-        cachePolicy={'memory-disk'}
-      />
-    </View>
+    <Image
+      style={{ width: item.width, height: item.height }}
+      source={item.image_url}
+      contentFit="cover"
+      cachePolicy={'memory-disk'}
+    />
   )}, areEqual
 )
 

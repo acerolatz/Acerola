@@ -87,10 +87,10 @@ const ChapterPage = () => {
 
   const listFooter = useMemo(() => (
     <ChapterFooter 
-      mangaTitle={manhwaTitle} 
-      chapterName={currentChapter.chapter_name}
+      mangaTitle={manhwaTitle}
+      loading={loading}
     />
-  ), [manhwaTitle, currentChapter.chapter_name])
+  ), [manhwaTitle, loading])
 
   return (
     <View style={styles.container} >

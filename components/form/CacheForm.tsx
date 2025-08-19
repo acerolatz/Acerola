@@ -33,8 +33,8 @@ interface FormData {
 const schema = yup.object().shape({  
     maxCacheSize: yup
         .number()
-        .min(AppConstants.FORM.SETTINGS.MIN_CACHE_SIZE, `Min ${AppConstants.FORM.SETTINGS.MIN_CACHE_SIZE} MB`)
-        .max(AppConstants.FORM.SETTINGS.MAX_CACHE_SIZE, `Max ${AppConstants.FORM.SETTINGS.MAX_CACHE_SIZE} MB`)    
+        .min(AppConstants.SETTINGS.MIN_CACHE_SIZE, `Min ${AppConstants.SETTINGS.MIN_CACHE_SIZE} MB`)
+        .max(AppConstants.SETTINGS.MAX_CACHE_SIZE, `Max ${AppConstants.SETTINGS.MAX_CACHE_SIZE} MB`)    
 });
 
 
@@ -62,8 +62,8 @@ const CacheForm = ({currentCacheSize, currentMaxCacheSize}: CacheFormProps) => {
     const onSubmit = async (form_data: FormData) => {
         Keyboard.dismiss()
         if (
-            form_data.maxCacheSize < AppConstants.FORM.SETTINGS.MIN_CACHE_SIZE ||
-            form_data.maxCacheSize > AppConstants.FORM.SETTINGS.MAX_CACHE_SIZE
+            form_data.maxCacheSize < AppConstants.SETTINGS.MIN_CACHE_SIZE ||
+            form_data.maxCacheSize > AppConstants.SETTINGS.MAX_CACHE_SIZE
         ) { return }
         setLoading(true)
         await dbSetCacheMaxSize(db, form_data.maxCacheSize * 1024 * 1024)
@@ -97,7 +97,7 @@ const CacheForm = ({currentCacheSize, currentMaxCacheSize}: CacheFormProps) => {
                     <TextInput
                         style={AppStyle.input}
                         keyboardType='numeric'
-                        maxLength={AppConstants.FORM.SETTINGS.MAX_CACHE_SIZE.toString().length}
+                        maxLength={AppConstants.SETTINGS.MAX_CACHE_SIZE.toString().length}
                         onBlur={onBlur}
                         onChangeText={onChange}
                         value={value.toString()}/>

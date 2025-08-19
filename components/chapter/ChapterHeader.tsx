@@ -8,6 +8,8 @@ import Ionicons from '@expo/vector-icons/Ionicons'
 import ReturnButton from '../buttons/ReturnButton'
 import { Colors } from '@/constants/Colors'
 import { router } from 'expo-router'
+import Footer from '../util/Footer'
+import Column from '../util/Column'
 import { Image } from 'expo-image'
 import TopBar from '../TopBar'
 import Row from '../util/Row'
@@ -23,7 +25,7 @@ interface ChapterHeaderProps {
 
 const ChapterHeader = ({ 
   mangaTitle,
-  loading, 
+  loading,
   reloadChapter  
 }: ChapterHeaderProps) => {
 
@@ -52,7 +54,7 @@ const ChapterHeader = ({
   }
 
   return (
-    <View style={styles.container} >
+    <Column style={styles.container} >
       <TopBar title={mangaTitle} titleColor={'white'} >
         <ReturnButton onPress={exitChapter} color={'white'}/>
       </TopBar>
@@ -84,7 +86,8 @@ const ChapterHeader = ({
           }
         </Row>
       </Row>
-    </View>
+      <Footer/>
+    </Column>
   )
 }
 
@@ -94,7 +97,6 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     gap: AppConstants.GAP,
-    height: AppConstants.PAGES.CHAPTER.HEADER_HEIGHT,
     paddingHorizontal: AppConstants.SCREEN.PADDING_HORIZONTAL, 
     paddingTop: AppConstants.SCREEN.PADDING_VERTICAL
   }  

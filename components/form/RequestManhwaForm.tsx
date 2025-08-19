@@ -32,12 +32,12 @@ interface FormData {
 const schema = yup.object().shape({  
     pornhwaTitle: yup
         .string()
-        .min(AppConstants.FORM.MANHWA_REQUEST.TITLE_MIN_LENGTH, `Min ${AppConstants.FORM.MANHWA_REQUEST.TITLE_MIN_LENGTH} characters`)
-        .max(AppConstants.FORM.MANHWA_REQUEST.TITLE_MAX_LENGTH, `Max ${AppConstants.FORM.MANHWA_REQUEST.TITLE_MAX_LENGTH} characters`)
+        .min(AppConstants.MANHWA_REQUEST.TITLE_MIN_LENGTH, `Min ${AppConstants.MANHWA_REQUEST.TITLE_MIN_LENGTH} characters`)
+        .max(AppConstants.MANHWA_REQUEST.TITLE_MAX_LENGTH, `Max ${AppConstants.MANHWA_REQUEST.TITLE_MAX_LENGTH} characters`)
         .required('Manga name is required'),
     message: yup
         .string()
-        .max(AppConstants.FORM.MANHWA_REQUEST.DESCR_MAX_LENGTH, `Max ${AppConstants.FORM.MANHWA_REQUEST.DESCR_MAX_LENGTH} characters`)
+        .max(AppConstants.MANHWA_REQUEST.DESCR_MAX_LENGTH, `Max ${AppConstants.MANHWA_REQUEST.DESCR_MAX_LENGTH} characters`)
 });
 
 

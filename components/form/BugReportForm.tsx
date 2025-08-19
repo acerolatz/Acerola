@@ -37,15 +37,15 @@ import { Typography } from '@/constants/typography';
 const schema = yup.object().shape({  
     title: yup
         .string()
-        .min(AppConstants.FORM.BUG_REPORT.TITLE_MIN_LENGTH, `Min ${AppConstants.FORM.BUG_REPORT.TITLE_MIN_LENGTH} characters`)
-        .max(AppConstants.FORM.BUG_REPORT.TITLE_MAX_LENGTH, `Max ${AppConstants.FORM.BUG_REPORT.TITLE_MAX_LENGTH} characters`)
+        .min(AppConstants.BUG_REPORT.TITLE_MIN_LENGTH, `Min ${AppConstants.BUG_REPORT.TITLE_MIN_LENGTH} characters`)
+        .max(AppConstants.BUG_REPORT.TITLE_MAX_LENGTH, `Max ${AppConstants.BUG_REPORT.TITLE_MAX_LENGTH} characters`)
         .required('Title is required'),
     descr: yup
         .string()
-        .max(AppConstants.FORM.BUG_REPORT.DESCR_MAX_LENGTH, `Max ${AppConstants.FORM.BUG_REPORT.DESCR_MAX_LENGTH} characters`),
+        .max(AppConstants.BUG_REPORT.DESCR_MAX_LENGTH, `Max ${AppConstants.BUG_REPORT.DESCR_MAX_LENGTH} characters`),
     bugType: yup
         .string()
-        .max(AppConstants.FORM.BUG_REPORT.BUG_TYPE_MAX_LENGTH, `Max ${AppConstants.FORM.BUG_REPORT.BUG_TYPE_MAX_LENGTH} characters`)    
+        .max(AppConstants.BUG_REPORT.BUG_TYPE_MAX_LENGTH, `Max ${AppConstants.BUG_REPORT.BUG_TYPE_MAX_LENGTH} characters`)    
 });
 
 
@@ -74,10 +74,10 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
     };
 
     const handlePickPhoto = async () => {
-        if (photos.length >= AppConstants.FORM.BUG_REPORT.MAX_IMAGES) {
+        if (photos.length >= AppConstants.BUG_REPORT.MAX_IMAGES) {
             Toast.show({
                 text1: "Warning",
-                text2: `Max ${AppConstants.FORM.BUG_REPORT.MAX_IMAGES} images`,
+                text2: `Max ${AppConstants.BUG_REPORT.MAX_IMAGES} images`,
                 type: "info"
             })
             return

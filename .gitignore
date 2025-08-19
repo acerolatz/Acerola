@@ -9,6 +9,11 @@ dist/
 web-build/
 expo-env.d.ts
 
+# APK
+android/
+android/app/my-release-key.keystore
+android/gradle.properties
+
 # Native
 .kotlin/
 *.orig.*
@@ -40,6 +45,7 @@ yarn-error.*
 .vscode
 .idea
 .env
+config
 
 # supabase
 lib/supabaseKey.ts
