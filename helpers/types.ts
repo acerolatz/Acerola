@@ -5,6 +5,7 @@ export type Genre = {
     genre_id: number    
 }
 
+
 export type Chapter = {
     chapter_id: number
     manhwa_id: number
@@ -12,6 +13,7 @@ export type Chapter = {
     chapter_num: number
     created_at: string
 }
+
 
 export type Author = {
     author_id: number
@@ -129,7 +131,6 @@ export type Feedback = {
 
 
 export type Settings = {
-    showLast3Chapters: boolean
     windowSize: number
     maxToRenderPerBatch: number
     updateCellsBatchingPeriod: number    
@@ -147,7 +148,6 @@ export type DebugInfo = {
     first_run: string | null
     last_sync_time: string | null
     should_ask_for_donation: string | null
-    show_last_3_chapters: string | null
     images: number | null
     current_chapter_milestone: number | null
     total_manhwas: number

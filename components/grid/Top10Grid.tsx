@@ -1,6 +1,5 @@
-import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 import BooleanRotatingButton from '../buttons/BooleanRotatingButton'
-import { useSettingsState } from '@/store/settingsState'
 import { AppConstants } from '@/constants/AppConstants'
 import { LinearGradient } from 'expo-linear-gradient'
 import React, { useCallback, useRef, } from 'react'
@@ -70,10 +69,20 @@ const Top10Grid = ({manhwas, reloadTop10}: Top10GridProps) => {
         await reloadTop10()
         flatListRef.current?.scrollToIndex({index: 0, animated: true})
     }    
+
+    const keyExtractor = useCallback((item: Manhwa) => item.manhwa_id.toString(), [])
+
+    const renderItem = useCallback(({item, index}: {item: Manhwa, index: number}) => (
+        <Top10Item
+            key={item.manhwa_id}
+            title={item.title} 
+            manhwa_id={item.manhwa_id} 
+            image_url={item.cover_image_url} 
+            index={index}
+        />
+    ), [])
     
-    if (manhwas.length === 0) {
-        return <></>
-    }
+    if (manhwas.length === 0) { return <></> }
 
     return (
         <View style={styles.container} >
@@ -81,21 +90,14 @@ const Top10Grid = ({manhwas, reloadTop10}: Top10GridProps) => {
                 <Title title="Today's Top 10"/>                
                 <BooleanRotatingButton onPress={reload} iconName='reload-outline' />
             </Row>
-            <ScrollView style={{width: '100%'}} horizontal={true} showsHorizontalScrollIndicator={false} >
-                {
-                    manhwas.map(
-                        (item: Manhwa, index: number) => 
-                            <Top10Item
-                                key={item.manhwa_id}
-                                title={item.title} 
-                                manhwa_id={item.manhwa_id} 
-                                image_url={item.cover_image_url} 
-                                index={index}
-                            />
-                    )
-                }
-            </ScrollView>
-            
+            <FlatList
+                ref={flatListRef}
+                data={manhwas}
+                keyExtractor={keyExtractor}
+                renderItem={renderItem}
+                horizontal={true}
+                showsHorizontalScrollIndicator={false}
+            />
         </View>
     )
 }

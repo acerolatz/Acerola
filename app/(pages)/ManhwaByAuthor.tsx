@@ -20,24 +20,19 @@ const ManhwaByAuthor = () => {
     const t = author_role == "Author" ? "Story" : "Art"
     
     const [manhwas, setManhwas] = useState<Manhwa[]>([])
-    const [loading, setLoading] = useState(false)
 
-    const isInitialized = useRef(false)
+    const isMounted = useRef(true)
     
     useEffect(
         () => {
-            let isCancelled = false
-            if (isInitialized.current) { return }
-            isInitialized.current = true
+            isMounted.current = true
             async function init() {
-                setLoading(true)
-                    const m = await dbReadManhwasByAuthorId(db, author_id)
-                    if (isCancelled) { return }
-                    setManhwas(m)
-                setLoading(false)
+                const m = await dbReadManhwasByAuthorId(db, author_id)
+                if (!isMounted.current) { return }
+                setManhwas(m)
             }
             init()
-            return () => { isCancelled = true }
+            return () => { isMounted.current = false }
         },
         [db]
     )
@@ -47,11 +42,7 @@ const ManhwaByAuthor = () => {
             <TopBar title={`${t}: ${author_name}`} >
                 <ReturnButton/>
             </TopBar>
-            <ManhwaGrid
-                manhwas={manhwas}
-                loading={loading}
-                showChaptersPreview={false}
-            />
+            <ManhwaGrid manhwas={manhwas} />
         </SafeAreaView>
   )
 }

@@ -323,29 +323,6 @@ export async function spGetDonationMethods(): Promise<DonateMethod[]> {
  * @returns Promise resolving to array of ManhwaCard objects. Returns empty array on error
  */
 export async function spFetchRandomManhwaCards(p_limit: number = 30): Promise<ManhwaCard[]> {
-    if (AppConstants.DEBUB.ENABLED) {
-        const { data, error } = await supabase
-            .from("cards")
-            .select("manhwas (title, manhwa_id), width, height, image_url, created_at")
-            .order("created_at", {ascending: false})
-            .limit(p_limit)
-
-        if (error) {
-            console.log("error spFetchRandomManhwaCards", error)
-            return []
-        }
-
-        return data.map(i => {return {
-            normalizedWidth: i.width,
-            normalizedHeight: i.height,
-            manhwa_id: (i.manhwas as any).manhwa_id,
-            title: (i.manhwas as any).title,
-            image_url: i.image_url,
-            width: i.width,
-            height: i.height
-        }})
-    }
-
     const { data, error } = await supabase
         .rpc("get_random_cards", { p_limit })
 
@@ -355,8 +332,36 @@ export async function spFetchRandomManhwaCards(p_limit: number = 30): Promise<Ma
     }    
     
     return (data as ManhwaCard[]).map(i => {
-        return {...i, normalizedWidth: i.width, normalizedHeight: i.height}}
+        const { 
+            normalizedWidth, 
+            normalizedHeight 
+        } = normalizeRandomManhwaCardHeight(i.width, i.height)
+        return {...i, normalizedWidth, normalizedHeight}}
     )
+}
+
+export async function spFetchLatestManhwaCardsDebug(p_limit: number = 30): Promise<{
+    title: string,
+    manhwa_id: number,
+    image_url: string
+}[]> {
+    const { data, error } = await supabase
+        .from("cards")
+        .select("manhwas (title, manhwa_id), image_url")
+        .order("created_at", {ascending: false})
+        .limit(p_limit)
+
+    if (error) {
+        console.log("error spFetchRandomManhwaCards", error)
+        return []
+    }
+    
+    return data.map(i => {
+        return {
+            manhwa_id: (i.manhwas as any).manhwa_id,
+            title: (i.manhwas as any).title,
+            image_url: i.image_url
+    }})
 }
 
 

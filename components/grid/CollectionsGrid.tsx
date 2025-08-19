@@ -1,14 +1,13 @@
-import { Colors } from '@/constants/Colors'
-import { Collection } from '@/helpers/types'
-import { AppStyle } from '@/styles/AppStyle'
-import { router } from 'expo-router'
-import React from 'react'
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 import ViewAllButton from '../buttons/ViewAllButton'
-import Title from '../Title'
-import Row from '../util/Row'
 import { Typography } from '@/constants/typography'
-
+import { Collection } from '@/helpers/types'
+import { AppStyle } from '@/styles/AppStyle'
+import { Colors } from '@/constants/Colors'
+import React, { useCallback } from 'react'
+import { router } from 'expo-router'
+import Row from '../util/Row'
+import Title from '../Title'
 
 
 
@@ -24,9 +23,9 @@ const CollectionGrid = ({collections}: {collections: Collection[]}) => {
         })
     }
 
-    const viewAllCollections = () => {
+    const viewAllCollections = useCallback(() => {
         router.navigate("/(pages)/CollectionsPage")
-    }
+    }, [])
 
     const renderItem = ({item}: {item: Collection}) => {
         return (
@@ -36,9 +35,7 @@ const CollectionGrid = ({collections}: {collections: Collection[]}) => {
         )
     }    
 
-    if (collections.length === 0) {
-        return <></>
-    }
+    if (collections.length === 0) { return <></> }
 
     return (
         <View style={styles.container} >

@@ -39,16 +39,14 @@ const Item = ({manhwa_id, image_url} : ItemProps) => {
 
 const ContinueReadingGrid = ({manhwas}: {manhwas: Manhwa[]}) => {
     
-    const onViewAll = () => {
+    const onViewAll = useCallback(() => {
         router.navigate("/ReadingHistoryPage")
-    } 
+    }, [])
 
     const keyExtractor = useCallback((item: Manhwa) => item.manhwa_id.toString(), [])
     
     const renderItem = useCallback(({item}: {item: Manhwa}) => (
-        <Item 
-            manhwa_id={item.manhwa_id} 
-            image_url={item.cover_image_url} />
+        <Item manhwa_id={item.manhwa_id} image_url={item.cover_image_url} />
     ), [])
 
     if (manhwas.length === 0) { return <></> }

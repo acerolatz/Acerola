@@ -1,6 +1,22 @@
 import { hp, wp } from "@/helpers/util";
 
 
+/**
+ * Centralized application constants for configuration, styling, and limits.
+ *
+ * Contains static values for UI layout, database update intervals,
+ * validation constraints, animation timings, default settings, and
+ * external URLs. These values should be referenced throughout the app
+ * instead of hardcoding literals.
+ *
+ * Grouped by feature or domain (e.g. `BUG_REPORT`, `DATABASE`, `MANHWA_COVER`).
+ *
+ * @remarks
+ * - Dimensions use helper functions `wp` (width-percentage) and `hp` (height-percentage)
+ *   to adapt to different screen sizes.
+ * - Units are documented where relevant (e.g. MiB, pixels, seconds).
+ *
+ */
 export const AppConstants = {
     APP_NAME: "Acerola",
     APP_VERSION: "v1.1.0",

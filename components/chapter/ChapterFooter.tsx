@@ -5,21 +5,23 @@ import { Typography } from '@/constants/typography'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { Colors } from '@/constants/Colors'
 import { router } from 'expo-router'
+import Footer from '../util/Footer'
 import Column from '../util/Column'
 import Row from '../util/Row'
 import React from 'react'
-import Footer from '../util/Footer'
 
 
 interface ChapterFooterProps {
   mangaTitle: string  
   loading: boolean
+  scrollToTop: () => any
 }
 
 
 const ChapterFooter = ({
   mangaTitle,  
-  loading
+  loading,
+  scrollToTop
 }: ChapterFooterProps) => {  
 
   const { chapters, currentChapterIndex, setCurrentChapterIndex } = useChapterState()
@@ -37,13 +39,17 @@ const ChapterFooter = ({
   }
 
   const goToNextChapter = () => {
+    if (loading) { return }
     if (currentChapterIndex + 1 < chapters.length) {
+      scrollToTop()
       setCurrentChapterIndex(currentChapterIndex + 1)
     }
   }
 
   const goToPreviousChapter = () => {
+    if (loading) { return }
     if (currentChapterIndex - 1 >= 0) {
+      scrollToTop()
       setCurrentChapterIndex(currentChapterIndex - 1)      
     }
   }
@@ -78,9 +84,9 @@ const ChapterFooter = ({
         <Text style={styles.text}>
           If you encounter broken or missing images, please use the bug-report option.
         </Text>
-        <Ionicons name='bug-outline' color={Colors.primary} size={AppConstants.ICON.SIZE}/>
+        <Ionicons name='bug-outline' color={Colors.white} size={AppConstants.ICON.SIZE}/>
       </Pressable>
-      <Footer/>
+      <Footer height={120} />
     </Column>
   )
 }
@@ -92,6 +98,8 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: "center",
     justifyContent: "center",
+    marginTop: AppConstants.GAP * 2,
+    gap: AppConstants.GAP * 2,
     paddingHorizontal: AppConstants.SCREEN.PADDING_HORIZONTAL
   },
   button: {

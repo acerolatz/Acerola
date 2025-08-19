@@ -17,93 +17,74 @@ import { debounce } from 'lodash'
 const ManhwaSearch = () => {
   
   const db = useSQLiteContext()
-  const page = useRef(0)
   
   const [manhwas, setManhwas] = useState<Manhwa[]>([])
-  const [loading, setLoading] = useState(false)
+  const flatListRef = useRef<FlatList<Manhwa>>(null) 
 
-  const [isPending, startTransition] = useTransition()
-  const flatListRef = useRef<FlatList<Manhwa>>(null)  
-  const fetchingOnEndReached = useRef(false)
-  const isInitialized = useRef(false)
-  const hasResults = useRef(true)
   const searchTerm = useRef('')
+  const manhwasRef = useRef<Manhwa[]>([])
+  const fetching = useRef(false)
+  const hasResults = useRef(true)
+  const isMounted = useRef(true)
+  const page = useRef(0)
   
-  useEffect(
-    () => {
-      const init = async () => {
-        setLoading(true)
-        try {
-          const m = await dbSearchMangas(db, searchTerm.current, 0, AppConstants.PAGE_LIMIT)
-          setManhwas(m)
-          hasResults.current = m.length >= AppConstants.PAGE_LIMIT
-          isInitialized.current = true
-        } finally {
-          setLoading(false)
-        }
-      }
-      init()
-    },
-    [db]
+  useEffect(() => {
+    isMounted.current = true
+    const init = async () => {
+      const m = await dbSearchMangas(db, searchTerm.current, 0, AppConstants.PAGE_LIMIT)
+      if (!isMounted.current) { return }
+      setManhwas(m)
+      manhwasRef.current = m
+      hasResults.current = m.length >= AppConstants.PAGE_LIMIT
+    }
+    init()
+    return () => { isMounted.current = false }
+    },[db]
   )
 
   const handleSearch = useCallback(async (value: string) => {
-    setLoading(true)
-    try {
-      searchTerm.current = value.trim()
-      page.current = 0
-      const m = await dbSearchMangas(
-        db, 
-        searchTerm.current, 
-        0, 
-        AppConstants.PAGE_LIMIT
-      )
-      startTransition(() => { setManhwas(m) })
+    searchTerm.current = value.trim()
+    page.current = 0
+    const m = await dbSearchMangas(
+      db, 
+      searchTerm.current, 
+      0, 
+      AppConstants.PAGE_LIMIT
+    )
+    if (isMounted.current && m.length) {
+      manhwasRef.current = m
+      setManhwas([...manhwasRef.current])
       hasResults.current = m.length >= AppConstants.PAGE_LIMIT
       flatListRef.current?.scrollToIndex({animated: false, index: 0})
-    } finally {
-      setLoading(false)
     }
   }, [db])
 
   const debounceSearch = useMemo(() => debounce(handleSearch, 400), [db])
 
   const onEndReached = useCallback(async () => {
-    if (
-      fetchingOnEndReached.current || 
-      !hasResults.current || 
-      !isInitialized.current
-    ) { return }
-    fetchingOnEndReached.current = true
-    try {
-      page.current += 1
-      const m: Manhwa[] = await dbSearchMangas(
-        db, 
-        searchTerm.current, 
-        page.current * AppConstants.PAGE_LIMIT, 
-        AppConstants.PAGE_LIMIT
-      )
-      startTransition(() => { setManhwas(prev => [...prev, ...m]) })
+    if (fetching.current || !hasResults.current) { return }
+    fetching.current = true    
+    page.current += 1
+    const m: Manhwa[] = await dbSearchMangas(
+      db, 
+      searchTerm.current, 
+      page.current * AppConstants.PAGE_LIMIT, 
+      AppConstants.PAGE_LIMIT
+    )
+    if (isMounted.current && m.length) {
+      manhwasRef.current.push(...m)
+      setManhwas([...manhwasRef.current])
       hasResults.current = m.length >= AppConstants.PAGE_LIMIT
-    } finally {
-      fetchingOnEndReached.current = false
     }
+    fetching.current = false
   }, [db])
 
   const renderFooter = useCallback(() => {
-    if ((loading || isPending) && hasResults.current) {
-      return (
-        <View style={styles.footer} >
-          <CustomActivityIndicator/>
-        </View>
-      )
-    }
     return <Footer/>
-  }, [loading, isPending])
+  }, [])
 
   const renderItem = useCallback(({item}: {item: Manhwa}) => (
-    <ManhwaCard
-      showChaptersPreview={false} 
+    <ManhwaCard      
       width={AppConstants.MANHWA_COVER.WIDTH} 
       height={AppConstants.MANHWA_COVER.HEIGHT}
       marginBottom={AppConstants.GAP / 2}

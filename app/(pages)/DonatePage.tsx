@@ -68,40 +68,35 @@ const Donate = () => {
     return <DonateComponent item={item} />
   }
 
-  if (loading) {
-    return (
-      <SafeAreaView style={AppStyle.safeArea} >
-        <TopBar title='Donate'>
-            <ReturnButton/>
-        </TopBar>
-        <PageActivityIndicator/>
-      </SafeAreaView>  
-    )
-  }
-
   return (
     <SafeAreaView style={AppStyle.safeArea} >
         <TopBar title='Donate'>
             <ReturnButton />
-        </TopBar>        
-        <FlatList
-            data={donates.filter(i => i.method !== 'donation-banner')}
-            keyExtractor={(item) => item.value}
-            showsVerticalScrollIndicator={false}
-            ListHeaderComponent={
-              <>
-                {
-                  donateImageUrl && 
-                  <Image 
-                    source={donateImageUrl} 
-                    style={styles.image} 
-                    contentFit='cover' />
-                }                
-              </>
-            }
-            ListFooterComponent={<Footer/>}
-            renderItem={renderItem}
-        />
+        </TopBar>
+        {
+          loading ?
+          <PageActivityIndicator/> :
+          (
+            <FlatList
+                data={donates.filter(i => i.method !== 'donation-banner')}
+                keyExtractor={(item) => item.value}
+                showsVerticalScrollIndicator={false}
+                ListHeaderComponent={
+                  <>
+                    {
+                      donateImageUrl && 
+                      <Image 
+                        source={donateImageUrl} 
+                        style={styles.image} 
+                        contentFit='cover' />
+                    }                
+                  </>
+                }
+                ListFooterComponent={<Footer/>}
+                renderItem={renderItem}
+            />
+          )
+        }       
     </SafeAreaView>
   )
 }

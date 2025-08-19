@@ -46,12 +46,7 @@ const Library = () => {
         </TopBar>
         <View style={{flex: 1, gap: AppConstants.GAP}} >
           <ReadingStatusPicker onChangeValue={onChangeValue} isActive={!loading}/>
-          <ManhwaGrid
-            manhwas={manhwas}
-            loading={false}
-            showChaptersPreview={false}
-            showManhwaStatus={false}
-          />
+          <ManhwaGrid manhwas={manhwas} showManhwaStatus={false} />
         </View>
     </SafeAreaView>
   )

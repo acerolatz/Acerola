@@ -152,9 +152,9 @@ const ManhwaPage = () => {
         return (
           <View style={styles.padding} >
             <Text style={Typography.semiboldXl}>{manhwa!.title}</Text>
+            <Text style={Typography.light}>last update: {formatTimestamp(manhwa!.updated_at)}</Text>
             <ManhwaAlternativeNames names={altNames} />
             <ManhwaSummary summary={manhwa!.descr} />
-            <Text style={Typography.regular}>last update: {formatTimestamp(manhwa!.updated_at)}</Text>
           </View>
         );
       case 'authors':
@@ -242,8 +242,8 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: "space-between",
     paddingHorizontal: AppConstants.SCREEN.PADDING_HORIZONTAL,
-    paddingVertical: AppConstants.SCREEN.PADDING_VERTICAL,
-    paddingBottom: 20
+    paddingTop: AppConstants.SCREEN.PADDING_VERTICAL,
+    paddingBottom: AppConstants.GAP    
   },
   manhwaContainer: {
     width: '100%',

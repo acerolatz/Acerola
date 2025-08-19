@@ -12,6 +12,24 @@ interface TopBarProps {
 } 
 
 
+/**
+ * TopBar component for displaying a title and optional child elements.
+ *
+ * Renders a single-line title text with a customizable color and optional
+ * children elements (e.g., buttons, icons) aligned in the top bar.
+ *
+ * @param title - Text displayed in the top bar. Required.
+ * @param titleColor - Optional color of the title text. Defaults to `Colors.primary`.
+ * @param children - Optional React element(s) to render inside the top bar.
+ *
+ * @example
+ * <TopBar title="Manhwa List" titleColor={Colors.yellow}>
+ *   <IconButton icon="search" onPress={handleSearch} />
+ * </TopBar>
+ *
+ * @remarks 
+ * - Title is constrained to a single line via `numberOfLines={1}`.
+ */
 const TopBar = ({title, children, titleColor = Colors.primary}: TopBarProps) => {
   return (
     <View style={styles.container} >

@@ -1,5 +1,5 @@
 import { AppConstants } from '@/constants/AppConstants';
-import { Chapter, Manhwa } from '@/helpers/types';
+import { Manhwa } from '@/helpers/types';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { memo, useCallback } from 'react';
@@ -9,7 +9,6 @@ import {
     Text,
     View    
 } from 'react-native';
-import ChapterLink from './chapter/ChapterLink';
 import ManhwaIdComponent from './ManhwaIdComponent';
 import ManhwaStatusComponent from './ManhwaStatusComponent';
 import { Typography } from '@/constants/typography';
@@ -23,8 +22,6 @@ interface ManhwaCardProps {
     height?: number
     marginRight?: number
     marginBottom?: number
-    showChaptersPreview?: boolean
-    shouldShowChapterDate?: boolean
     showManhwaStatus?: boolean    
 }
 
@@ -35,8 +32,6 @@ const ManhwaCard = ({
     height = hp(50),
     marginRight = AppConstants.MARGIN,
     marginBottom = 0,
-    showChaptersPreview = true,
-    shouldShowChapterDate = true,
     showManhwaStatus = true    
 }: ManhwaCardProps) => {        
 
@@ -48,43 +43,22 @@ const ManhwaCard = ({
     }, [manhwa.manhwa_id]);    
 
     return (
-        <View style={styles.container} >
-            <Pressable onPress={onPress} style={[{width, height, marginRight, marginBottom}]} >
-                <Image
-                    source={manhwa.cover_image_url} 
-                    contentFit='cover'
-                    style={[{width, height, borderRadius: AppConstants.BORDER_RADIUS}]}
-                    transition={AppConstants.DEFAULT_IMAGE_TRANSITION}
-                />
-                { showManhwaStatus && <ManhwaStatusComponent status={manhwa.status} /> }
-                <LinearGradient 
-                    colors={['transparent', 'transparent', 'rgba(0, 0, 0, 0.7)']} 
-                    style={StyleSheet.absoluteFill} />
-                <ManhwaIdComponent manhwa_id={manhwa.manhwa_id} position='r' />
-                <View style={styles.manhwaTitleContainer} >
-                    <Text style={Typography.semibold}>{manhwa.title}</Text>
-                </View>
-            </Pressable>
-            {
-                showChaptersPreview &&
-                <View style={styles.chapterLinkContainer} >
-                    {
-                        manhwa.chapters.map((item: Chapter, index: number) => 
-                            <ChapterLink
-                                key={index}
-                                chapter_name={item.chapter_name}
-                                chapter_id={item.chapter_id}
-                                manhwa_id={item.manhwa_id}
-                                manhwa_title={manhwa.title}
-                                shouldShowChapterDate={shouldShowChapterDate}
-                                index={index}
-                                chapter_created_at={item.created_at}
-                            />
-                        )
-                    }
-                </View>
-            }
-        </View>
+        <Pressable onPress={onPress} style={{width, height, marginRight, marginBottom, gap: AppConstants.GAP}} >
+            <Image
+                source={manhwa.cover_image_url} 
+                contentFit='cover'
+                style={[{width, height, borderRadius: AppConstants.BORDER_RADIUS}]}
+                transition={AppConstants.DEFAULT_IMAGE_TRANSITION}
+            />
+            { showManhwaStatus && <ManhwaStatusComponent status={manhwa.status} /> }
+            <LinearGradient 
+                colors={['transparent', 'transparent', 'rgba(0, 0, 0, 0.7)']} 
+                style={StyleSheet.absoluteFill} />
+            <ManhwaIdComponent manhwa_id={manhwa.manhwa_id} position='r' />
+            <View style={styles.manhwaTitleContainer} >
+                <Text style={Typography.semibold}>{manhwa.title}</Text>
+            </View>            
+        </Pressable>
     )
 }
 
@@ -98,8 +72,6 @@ function areEqual(prev: ManhwaCardProps, next: ManhwaCardProps) {
     prevM.title === nextM.title &&
     prevM.status === nextM.status &&
     prevM.cover_image_url === nextM.cover_image_url &&
-    prev.showChaptersPreview === next.showChaptersPreview &&
-    prev.shouldShowChapterDate === next.shouldShowChapterDate &&
     prev.showManhwaStatus === next.showManhwaStatus    
   )
 }

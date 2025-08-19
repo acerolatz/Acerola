@@ -42,12 +42,14 @@ const ChapterHeader = ({
   const isLastChapter = currentChapterIndex >= chapters.length - 1
 
   const goToNextChapter = () => {
+    if (loading) { return }
     if (currentChapterIndex + 1 < chapters.length) {
       setCurrentChapterIndex(currentChapterIndex + 1)
     }
   }
 
   const goToPreviousChapter = () => {
+    if (loading) { return }
     if (currentChapterIndex - 1 >= 0) {
       setCurrentChapterIndex(currentChapterIndex - 1)      
     }
@@ -86,7 +88,6 @@ const ChapterHeader = ({
           }
         </Row>
       </Row>
-      <Footer/>
     </Column>
   )
 }
@@ -98,6 +99,7 @@ const styles = StyleSheet.create({
     width: '100%',
     gap: AppConstants.GAP,
     paddingHorizontal: AppConstants.SCREEN.PADDING_HORIZONTAL, 
-    paddingTop: AppConstants.SCREEN.PADDING_VERTICAL
+    paddingTop: AppConstants.SCREEN.PADDING_VERTICAL,
+    marginBottom: AppConstants.GAP * 2
   }  
 })

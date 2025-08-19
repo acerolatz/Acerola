@@ -1,31 +1,64 @@
+import { dbCheckPassword, dbReadTodos, dbSetLastRefresh, dbShouldUpdate, dbUpdateDatabase } from '@/lib/database'
+import PageActivityIndicator from '@/components/util/PageActivityIndicator'
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { SafeAreaView } from 'react-native'
-import { AppStyle } from '@/styles/AppStyle'
-import Row from '@/components/util/Row'
-import Button from '@/components/buttons/Button'
-import { Colors } from '@/constants/Colors'
-import { hasInternetAvailable, hp } from '@/helpers/util'
-import { AppConstants } from '@/constants/AppConstants'
-import Ionicons from '@expo/vector-icons/Ionicons'
-import { useSQLiteContext } from 'expo-sqlite'
-import { Todo } from '@/helpers/types'
-import { dbCheckPassword, dbReadTodos, dbSetLastRefresh, dbShouldUpdate, dbUpdateDatabase } from '@/lib/database'
-import { TextInput } from 'react-native-gesture-handler'
-import Toast from 'react-native-toast-message'
-import { Keyboard } from 'react-native'
-import PageActivityIndicator from '@/components/util/PageActivityIndicator'
-import { router } from 'expo-router'
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
-import TopBar from '@/components/TopBar'
-import Footer from '@/components/util/Footer'
-import CloseBtn from '@/components/buttons/CloseButton'
-import { Typography } from '@/constants/typography'
-import { ToastMessages } from '@/constants/Messages'
-import TodoComponent from '@/components/TodoComponent'
 import CreateTodoComponent from '@/components/CreateTodoComponent'
+import { hasInternetAvailable, hp } from '@/helpers/util'
+import { TextInput } from 'react-native-gesture-handler'
+import { AppConstants } from '@/constants/AppConstants'
+import CloseBtn from '@/components/buttons/CloseButton'
+import TodoComponent from '@/components/TodoComponent'
+import { ToastMessages } from '@/constants/Messages'
+import { Typography } from '@/constants/typography'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import Button from '@/components/buttons/Button'
+import { useSQLiteContext } from 'expo-sqlite'
+import Toast from 'react-native-toast-message'
+import Footer from '@/components/util/Footer'
+import { AppStyle } from '@/styles/AppStyle'
+import { Colors } from '@/constants/Colors'
+import { SafeAreaView } from 'react-native'
+import TopBar from '@/components/TopBar'
+import Row from '@/components/util/Row'
+import { Keyboard } from 'react-native'
+import { Todo } from '@/helpers/types'
+import { router } from 'expo-router'
 
 
+/**
+ * SafeModeHomePage component – manages a local todo list with protected settings.
+ *
+ * Features:
+ * - Displays todos fetched from local SQLite database (`dbReadTodos`).
+ * - Supports creating, updating, and deleting todos via `CreateTodoComponent` and `TodoComponent`.
+ * - Settings require a password check (`dbCheckPassword`) to access.
+ * - Syncs local database with server if internet is available and update is needed.
+ * - BottomSheet is used for password-protected settings, with show/hide password toggle.
+ *
+ * State:
+ * - `todos` – list of Todo items.
+ * - `loading` – boolean to indicate data fetching.
+ * - `text` – password input text.
+ * - `showPassword` – toggles password visibility.
+ *
+ * Refs:
+ * - `bottomSheetRef` – controls the BottomSheet instance.
+ * - `isCheckingPassword` – prevents multiple password check triggers.
+ *
+ * Methods:
+ * - `checkPassword()` – validates password, optionally syncs database, and navigates to HomePage.
+ * - `handleOpenBottomSheet()` – opens settings BottomSheet.
+ * - `handleCloseBottomSheet()` – closes BottomSheet and clears input.
+ * - `handleShowPassword()` – toggles password visibility.
+ *
+ * Components:
+ * - `TopBar` – page header with title and settings button.
+ * - `FlatList` – lists todos with create component as header and footer.
+ * - `BottomSheet` – password-protected settings area.
+ * - `CreateTodoComponent`, `TodoComponent`, `Footer` – manage todos and page layout.
+ *
+ */
 const SafeModeHomePage = () => {
 
     const db = useSQLiteContext()

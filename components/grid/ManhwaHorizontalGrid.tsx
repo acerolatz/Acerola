@@ -21,13 +21,11 @@ const ManhwaHorizontalGrid = ({
     manhwas,
     onViewAll    
 }: ManhwaHorizontalGridProps) => {
-    
-    const showLast3Chapters = useSettingsState(s => s.settings.showLast3Chapters)    
 
     const keyExtractor = useCallback((item: Manhwa) => item.manhwa_id.toString(), [])
 
     const renderItem = useCallback(({item}: {item: Manhwa}) => (
-        <ManhwaCard manhwa={item} showChaptersPreview={showLast3Chapters} />
+        <ManhwaCard manhwa={item} />
       ), [])
     
     if (manhwas.length === 0)  { return <></> }
@@ -43,9 +41,7 @@ const ManhwaHorizontalGrid = ({
                     data={manhwas}
                     horizontal={true}
                     initialNumToRender={10}
-                    showsHorizontalScrollIndicator={false}
                     keyExtractor={keyExtractor}
-                    extraData={showLast3Chapters}
                     renderItem={renderItem}
                 />
             </View>

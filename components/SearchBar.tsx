@@ -19,6 +19,30 @@ interface SearchBarProps {
 }
 
 
+/**
+ * SearchBar component with a clear button.
+ *
+ * Renders a TextInput with an optional placeholder and color. Includes
+ * a clear icon to reset the input and trigger `onChangeText` with an
+ * empty string.
+ *
+ * @param onChangeText - Callback triggered whenever the input text changes.
+ * @param placeholder - Optional placeholder text. Defaults to `'search'`.
+ * @param color - Optional text and icon color. Defaults to `Colors.primary`.
+ * @param style - Optional ViewStyle to customize container styling.
+ *
+ * @example
+ * <SearchBar 
+ *   placeholder="Search manhwas..."
+ *   color={Colors.yellow}
+ *   onChangeText={(text) => console.log(text)} 
+ * />
+ *
+ * @remarks
+ * - Uses `AppStyle.input` for the TextInput styling.
+ * - `AppConstants.HIT_SLOP.LARGE` is applied to the clear button for easier tapping.
+ * - The clear button resets the TextInput and triggers `onChangeText('')`.
+ */
 const SearchBar = ({ 
     onChangeText, 
     style, 

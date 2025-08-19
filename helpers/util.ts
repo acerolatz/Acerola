@@ -9,9 +9,20 @@ import { Linking } from 'react-native';
 import RNFS from 'react-native-fs';
 
 
+/**
+ * Pauses execution for the specified number of milliseconds.
+ *
+ * Useful for delaying operations, throttling requests, or waiting
+ * between asynchronous steps without blocking the event loop.
+ *
+ * @param ms - Number of milliseconds to wait. Must be a non-negative integer.
+ * @returns A Promise that resolves after the delay with no value.
+ *
+ */
 export function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
 
 const {
     width: deviceWidth, 

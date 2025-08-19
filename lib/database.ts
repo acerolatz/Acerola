@@ -151,8 +151,7 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
         ('last_sync_time', ''),
         ('should_ask_for_donation', '1'),
         ('password', ''),
-        ('is_safe_mode_on', '0'),
-        ('show_last_3_chapters', '0')
+        ('is_safe_mode_on', '0')        
       ON CONFLICT 
         (name) 
       DO NOTHING;
@@ -2192,19 +2191,16 @@ export async function dbResetApp(db: SQLite.SQLiteDatabase) {
  */
 export async function dbLoadSettings(db: SQLite.SQLiteDatabase): Promise<Settings> {
   const r: Settings | null = await Promise.all([
-    dbReadInfo(db, 'show_last_3_chapters'),
     dbReadNumericInfo(db, 'windowSize'),
     dbReadNumericInfo(db, 'maxToRenderPerBatch'),
     dbReadNumericInfo(db, 'updateCellsBatchingPeriod'),
     dbReadNumericInfo(db, 'imageTransition')
-  ]).then(([
-    showLast3Chapters,
+  ]).then(([    
     windowSize,
     maxToRenderPerBatch,
     updateCellsBatchingPeriod    
   ]) => {
     return {
-      showLast3Chapters: showLast3Chapters ? showLast3Chapters === '1' : AppConstants.DEFAULT_SHOW_LAST_3_CHAPTERS === '1',
       windowSize: windowSize ?? AppConstants.DEFAULT_WINDOW_SIZE,
       maxToRenderPerBatch: maxToRenderPerBatch ?? AppConstants.DEFAULT_MAX_TO_RENDER_PER_BATCH,
       updateCellsBatchingPeriod: updateCellsBatchingPeriod ?? AppConstants.DEFAULT_UPDATE_CELLS_BATCHING_PERIOD      
@@ -2215,7 +2211,6 @@ export async function dbLoadSettings(db: SQLite.SQLiteDatabase): Promise<Setting
   })
 
   return r ? r : {
-    showLast3Chapters: AppConstants.DEFAULT_SHOW_LAST_3_CHAPTERS === '1',
     windowSize: AppConstants.DEFAULT_WINDOW_SIZE,
     maxToRenderPerBatch: AppConstants.DEFAULT_MAX_TO_RENDER_PER_BATCH,
     updateCellsBatchingPeriod: AppConstants.DEFAULT_UPDATE_CELLS_BATCHING_PERIOD
@@ -2256,6 +2251,37 @@ export async function dbFillReadingStatus(db: SQLite.SQLiteDatabase, status: str
         manhwas;
     `
   ).catch(error => console.log("error dbFillReadingStatus", error))
+}
+
+
+/**
+ * Resets the reading history to simulate that a specific number of chapters have been read.
+ * 
+ * This function first clears the entire `reading_history` table, then inserts the first `n` chapters
+ * from the `chapters` table to simulate reading progress for debugging purposes.
+ *
+ * @param db - An open SQLite database instance.
+ * @param n - The number of chapters to mark as read.
+ *
+ * @returns A promise that resolves when the operations are complete. Errors are logged to the console
+ *          but do not throw.
+ */
+export async function dbDebugSetNumChapterRead(db: SQLite.SQLiteDatabase, n: number) {
+  await dbCleanTable(db, 'reading_history')
+  await db.runAsync(
+    `
+      INSERT INTO reading_history (
+        manhwa_id,
+        chapter_id
+      )
+      SELECT
+        manhwa_id, chapter_id
+      FROM
+        chapters
+      LIMIT ?;
+    `,
+    [n]
+  ).catch(error => console.log("error dbDebugSetNumChapterRead", error))
 }
 
 
@@ -2305,7 +2331,6 @@ export async function dbFetchDebugInfo(db: SQLite.SQLiteDatabase): Promise<Debug
     dbReadInfo(db, 'first_run'),
     dbReadInfo(db, 'last_sync_time'),
     dbReadInfo(db, 'should_ask_for_donation'),
-    dbReadInfo(db, 'show_last_3_chapters'),
     dbReadNumericInfo(db, 'images'),
     dbReadNumericInfo(db, 'current_chapter_milestone'),
     dbGetReadChaptersCount(db)
@@ -2313,8 +2338,7 @@ export async function dbFetchDebugInfo(db: SQLite.SQLiteDatabase): Promise<Debug
     device,
     first_run,
     last_sync_time,
-    should_ask_for_donation,
-    show_last_3_chapters,
+    should_ask_for_donation,    
     images,
     current_chapter_milestone,
     read_chapters
@@ -2324,7 +2348,6 @@ export async function dbFetchDebugInfo(db: SQLite.SQLiteDatabase): Promise<Debug
       first_run,
       last_sync_time,
       should_ask_for_donation,
-      show_last_3_chapters,
       images,
       current_chapter_milestone,
       read_chapters
@@ -2333,38 +2356,6 @@ export async function dbFetchDebugInfo(db: SQLite.SQLiteDatabase): Promise<Debug
 
   return {...part1, ...part2}
 }
-
-
-/**
- * Resets the reading history to simulate that a specific number of chapters have been read.
- * 
- * This function first clears the entire `reading_history` table, then inserts the first `n` chapters
- * from the `chapters` table to simulate reading progress for debugging purposes.
- *
- * @param db - An open SQLite database instance.
- * @param n - The number of chapters to mark as read.
- *
- * @returns A promise that resolves when the operations are complete. Errors are logged to the console
- *          but do not throw.
- */
-export async function dbDebugSetNumChapterRead(db: SQLite.SQLiteDatabase, n: number) {
-  await dbCleanTable(db, 'reading_history')
-  await db.runAsync(
-    `
-      INSERT INTO reading_history (
-        manhwa_id,
-        chapter_id
-      )
-      SELECT
-        manhwa_id, chapter_id
-      FROM
-        chapters
-      LIMIT ?;
-    `,
-    [n]
-  ).catch(error => console.log("error dbDebugSetNumChapterRead", error))
-}
-
 
 /**
  * Saves debug information into the SQLite database.
@@ -2381,12 +2372,12 @@ export async function dbSetDebugInfo(
 ) {
   await Promise.all([
     dbSetInfo(db, 'device', debug.device ?? ''),
-    dbSetInfo(db, 'first_run', debug.first_run ?? ''),
+    dbSetInfo(db, 'first_run', debug.first_run === '1' ? '1' : '0'),
     dbSetInfo(db, 'last_sync_time', debug.last_sync_time ?? ''),
-    dbSetInfo(db, 'should_ask_for_donation', debug.should_ask_for_donation ?? ''),
-    dbSetInfo(db, 'show_last_3_chapters', debug.show_last_3_chapters ?? ''),
+    dbSetInfo(db, 'should_ask_for_donation', debug.should_ask_for_donation ?? '1'),
     dbSetNumericInfo(db, 'images', debug.images ?? 0),
-    dbSetNumericInfo(db, 'current_chapter_milestone', debug.current_chapter_milestone ?? 0),
+    dbSetNumericInfo(db, 'current_chapter_milestone', debug.current_chapter_milestone ?? AppConstants.CHAPTER_GOAL_START),
     dbDebugSetNumChapterRead(db, debug.read_chapters)
   ]).catch(error => console.log("erro dbSetDebugInfo", error))
 }
+

@@ -15,46 +15,41 @@ const ReadingHistory = () => {
   const db = useSQLiteContext()
   
   const [manhwas, setManhwas] = useState<Manhwa[]>([])
-  const [loading, setLoading] = useState(false)
-
-  const fetchingOnEndReached = useRef(false)
-  const isInitialized = useRef(false)
+  
+  const manhwasRef = useRef<Manhwa[]>([])
+  const fetching = useRef(false)
   const hasResults = useRef(true)
+  const isMounted = useRef(true)
   const page = useRef(0)
 
-  useEffect(
-    () => {
-      const init = async () => {
-        setLoading(true)
-          const m = await dbGetReadingHistory(db, 0, AppConstants.PAGE_LIMIT)        
-          setManhwas(m)
-        setLoading(false)
-        hasResults.current = m.length >= AppConstants.PAGE_LIMIT
-        isInitialized.current = true
-      }
-      init()
-    },
-    [db]
-  )
+  useEffect(() => {
+    isMounted.current = true
+    const init = async () => {
+      const m = await dbGetReadingHistory(db, 0, AppConstants.PAGE_LIMIT)        
+      if (!isMounted.current) { return }
+      setManhwas(m)
+      manhwasRef.current = m
+      hasResults.current = m.length >= AppConstants.PAGE_LIMIT
+    }
+    init()
+    return () => { isMounted.current = false }
+  }, [db])
   
   const onEndReached = async () => {
-    if (
-      fetchingOnEndReached.current ||
-      !hasResults.current || 
-      !isInitialized.current
-    ) { return }
-    fetchingOnEndReached.current = true
-    setLoading(true)
-      page.current += 1    
-      const m = await dbGetReadingHistory(
-        db, 
-        page.current * AppConstants.PAGE_LIMIT, 
-        AppConstants.PAGE_LIMIT
-      )
-      setManhwas(prev => [...prev, ...m])
-    setLoading(false)
-    hasResults.current = m.length >= AppConstants.PAGE_LIMIT
-    fetchingOnEndReached.current = true
+    if (fetching.current || !hasResults.current) { return }
+    fetching.current = true
+    page.current += 1    
+    const m = await dbGetReadingHistory(
+      db, 
+      page.current * AppConstants.PAGE_LIMIT, 
+      AppConstants.PAGE_LIMIT
+    )
+    if (isMounted.current && m.length) {
+      manhwasRef.current.push(...m)
+      setManhwas([...manhwasRef.current])
+      hasResults.current = m.length >= AppConstants.PAGE_LIMIT
+    }
+    fetching.current = true
   }
 
 
@@ -65,10 +60,7 @@ const ReadingHistory = () => {
       </TopBar>
       <ManhwaGrid
         manhwas={manhwas}
-        loading={loading}
-        hasResults={hasResults.current}
         showManhwaStatus={false}
-        showChaptersPreview={false}
         onEndReached={onEndReached}
       />
     </SafeAreaView>

@@ -1,4 +1,5 @@
 import { 
+    FlatList,
     Keyboard, 
     KeyboardAvoidingView, 
     Platform, 
@@ -9,16 +10,26 @@ import {
     Text, 
     View 
 } from 'react-native'
-import { dbFetchDebugInfo, dbSetDebugInfo } from '@/lib/database'
+import { 
+    spFetchCardAndCover, 
+    spFetchCardAndCoverLatest, 
+    spFetchCardAndCoverSearch, 
+    spFetchLatestManhwaCardsDebug 
+} from '@/lib/supabase'
 import BooleanRotatingButton from '@/components/buttons/BooleanRotatingButton'
 import PageActivityIndicator from '@/components/util/PageActivityIndicator'
-import { spFetchCardAndCover, spFetchCardAndCoverLatest, spFetchCardAndCoverSearch } from '@/lib/supabase'
+import { dbFetchDebugInfo, dbSetDebugInfo } from '@/lib/database'
+import { DebugInfo, DebugManhwaImages } from '@/helpers/types'
+import ManhwaIdComponent from '@/components/ManhwaIdComponent'
+import { hasOnlyDigits, hp, sleep, wp } from '@/helpers/util'
 import ReturnButton from '@/components/buttons/ReturnButton'
 import { TextInput } from 'react-native-gesture-handler'
-import { DebugInfo, DebugManhwaImages } from '@/helpers/types'
 import { AppConstants } from '@/constants/AppConstants'
+import { LinearGradient } from 'expo-linear-gradient'
+import { ToastMessages } from '@/constants/Messages'
 import { Typography } from '@/constants/typography'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
+import Toast from 'react-native-toast-message'
 import { useSQLiteContext } from 'expo-sqlite'
 import Footer from '@/components/util/Footer'
 import { AppStyle } from '@/styles/AppStyle'
@@ -26,9 +37,6 @@ import { Colors } from '@/constants/Colors'
 import TopBar from '@/components/TopBar'
 import Row from '@/components/util/Row'
 import { Image } from 'expo-image'
-import { hasOnlyDigits, hp, sleep, wp } from '@/helpers/util'
-import Toast from 'react-native-toast-message'
-import { LinearGradient } from 'expo-linear-gradient'
 
 
 interface ManhwaImagesComponentProps {
@@ -39,12 +47,12 @@ interface ManhwaImagesComponentProps {
 
 const ManhwaImagesComponent = ({image, setCardToShow}: ManhwaImagesComponentProps) => {
 
-    const onPress = () => {
+    const onPress = useCallback(() => {
         if (image.card) {
             Keyboard.dismiss()
             setCardToShow(image.card)
         }
-    }
+    }, [image.card])
 
     return (
         <Pressable onPress={onPress} >
@@ -59,6 +67,50 @@ const ManhwaImagesComponent = ({image, setCardToShow}: ManhwaImagesComponentProp
     )
 }
 
+
+const LastestManhwaCards = ({setCardToShow}: {setCardToShow: React.Dispatch<React.SetStateAction<string | null>>}) => {
+
+    const [manhwas, setManhwas] = useState<{
+        title: string, manhwa_id: number, image_url: string
+    }[]>([])
+
+    useEffect(() => {
+        const init = async () => {
+            const m = await spFetchLatestManhwaCardsDebug()
+            setManhwas(m)
+        }
+        init()
+    }, [])
+
+    const renderItem = ({item}: {item: {title: string, manhwa_id: number, image_url: string}}) => {
+        return (
+            <Pressable onPress={() => setCardToShow(item.image_url)} >
+                <Image
+                    source={item.image_url} 
+                    style={styles.image} 
+                    contentFit='contain' />
+                <LinearGradient     
+                    colors={['transparent', 'transparent', 'rgba(0, 0, 0, 0.6)']} 
+                    style={StyleSheet.absoluteFill}
+                    pointerEvents='none' />
+                <View style={styles.manhwaTitleContainer} >
+                    <Text style={Typography.semibold}>{item.title}</Text>
+                </View>
+                <ManhwaIdComponent manhwa_id={item.manhwa_id} />
+            </Pressable>
+        )
+    }
+
+    return (
+        <FlatList
+            data={manhwas}
+            keyExtractor={(item) => item.image_url}
+            renderItem={renderItem}
+            ItemSeparatorComponent={() => <View style={{width: AppConstants.MARGIN}} />}
+            horizontal={true}
+        />
+    )
+}
 
 const DebugPage = () => {
 
@@ -91,9 +143,9 @@ const DebugPage = () => {
     )
 
     const reload = async () => {
-        await sleep(150)
         const d = await dbFetchDebugInfo(db)
         setInfo(d)
+        Toast.show(ToastMessages.EN.GENERIC_SUCCESS)
     }
 
     const loadManhwaImage = async () => {
@@ -107,7 +159,7 @@ const DebugPage = () => {
                 setManhwaImage([d])
             }
         } else {
-         const d = await spFetchCardAndCoverSearch(manhwaId)
+            const d = await spFetchCardAndCoverSearch(manhwaId)
             if (d.length === 0) {
                 Toast.show({text1: "No Manhwas found", type: "error"})
             }
@@ -119,6 +171,7 @@ const DebugPage = () => {
         Keyboard.dismiss()
         await dbSetDebugInfo(db, debug)
         await reload()
+        Toast.show(ToastMessages.EN.GENERIC_SUCCESS)
     }
 
     const saveAskForDonation = async () => {
@@ -126,7 +179,7 @@ const DebugPage = () => {
     }
 
     const saveFirstRun = async () => {
-        await save({...info, firstRun: firstRun === '1' ? '1' : '0'} as any)
+        await save({...info, first_run: firstRun.trim() === '1' ? '1' : '0'} as any)
     }
 
     const saveReadChapters = async () => {
@@ -175,7 +228,7 @@ const DebugPage = () => {
                         </ScrollView>
 
                         {/* Manhwa Images */}
-                        <Text style={Typography.semibold} >Manhwa Images {manhwaImage.length > 0 ? manhwaImage.length : ''}</Text>
+                        <Text style={Typography.semibold} >Images {manhwaImage.length > 0 ? manhwaImage.length : ''}</Text>
                         <Row style={{gap: AppConstants.GAP}} >
                             <TextInput
                                 style={styles.input}
@@ -199,6 +252,8 @@ const DebugPage = () => {
                                 }
                             </ScrollView>
                         }
+
+                        <LastestManhwaCards setCardToShow={setCardToShow} />
 
                         {/* First Run */}
                         <View style={styles.title} >
@@ -314,7 +369,7 @@ const styles = StyleSheet.create({
         height: hp(92)
     },
     textItem: {
-        ...Typography.light, 
+        ...Typography.regular, 
         ...AppStyle.defaultGridItem, 
         color: Colors.backgroundColor
     },
@@ -359,5 +414,11 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.6)', 
         alignItems: "center", 
         justifyContent: "center"
+    },
+    manhwaTitleContainer: {
+        position: 'absolute',
+        left: wp(2),
+        paddingRight: wp(2),
+        bottom: 10
     }
 })

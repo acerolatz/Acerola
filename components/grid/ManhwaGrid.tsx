@@ -10,11 +10,7 @@ import Footer from '../util/Footer'
 interface MangaGridProps {
     manhwas: Manhwa[]
     onEndReached?: () => void
-    loading?: boolean
-    hasResults?: boolean
     numColumns?: number
-    showChaptersPreview?: boolean
-    shouldShowChapterDate?: boolean
     showsVerticalScrollIndicator?: boolean
     showManhwaStatus?: boolean    
 }
@@ -23,32 +19,19 @@ interface MangaGridProps {
 const ManhwaGrid = ({
     manhwas, 
     onEndReached,
-    loading = false, 
-    hasResults = true,
-    numColumns = 2,
-    showChaptersPreview = true,
-    shouldShowChapterDate = true,
+    numColumns = 2,    
     showsVerticalScrollIndicator = true,
     showManhwaStatus = true    
 }: MangaGridProps) => {    
 
-    const renderFooter = () => {
-        if (loading && hasResults) {
-            return (
-                <View style={styles.footer} >
-                    <CustomActivityIndicator/>
-                </View>
-            )
-        }
+    const renderFooter = useCallback(() => {
         return <Footer/>
-    }
+    }, [])
 
     const keyExtractor = useCallback((item: Manhwa) => item.manhwa_id.toString(), [])
 
     const renderItem = useCallback(({item}: {item: Manhwa}) => (
         <ManhwaCard
-            showChaptersPreview={showChaptersPreview} 
-            shouldShowChapterDate={shouldShowChapterDate}
             showManhwaStatus={showManhwaStatus}
             width={AppConstants.MANHWA_COVER.WIDTH} 
             height={AppConstants.MANHWA_COVER.HEIGHT}

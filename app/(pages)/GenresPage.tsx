@@ -1,16 +1,16 @@
-import TopBar from '@/components/TopBar'
 import ReturnButton from '@/components/buttons/ReturnButton'
-import Footer from '@/components/util/Footer'
 import { AppConstants } from '@/constants/AppConstants'
-import { Colors } from '@/constants/Colors'
 import { Typography } from '@/constants/typography'
+import React, { useEffect, useState } from 'react'
+import { useSQLiteContext } from 'expo-sqlite'
+import { dbReadGenres } from '@/lib/database'
+import Footer from '@/components/util/Footer'
+import { AppStyle } from '@/styles/AppStyle'
+import { Colors } from '@/constants/Colors'
+import TopBar from '@/components/TopBar'
 import { Genre } from '@/helpers/types'
 import { hp, wp } from '@/helpers/util'
-import { dbReadGenres } from '@/lib/database'
-import { AppStyle } from '@/styles/AppStyle'
 import { router } from 'expo-router'
-import { useSQLiteContext } from 'expo-sqlite'
-import React, { useEffect, useState } from 'react'
 import { 
     FlatList, 
     Pressable, 

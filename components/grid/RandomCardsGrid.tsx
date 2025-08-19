@@ -1,10 +1,10 @@
 import { useManhwaCardsState } from '@/store/randomManhwaState'
+import React, { useCallback, useMemo, useRef } from 'react'
 import { FlatList, StyleSheet, View } from 'react-native'
 import { AppConstants } from '@/constants/AppConstants'
 import RotatingButton from '../buttons/RotatingButton'
 import RandomManhwaCard from '../RandomManhwaCard'
 import { ManhwaCard } from '@/helpers/types'
-import React, { useCallback, useRef } from 'react'
 import { debounce } from 'lodash'
 import Row from '../util/Row'
 import Title from '../Title'
@@ -20,18 +20,20 @@ const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
     const { cards } = useManhwaCardsState()
     const flatListRef = useRef<FlatList<ManhwaCard>>(null)
 
-    const reload = async () => {
+    const reload = useCallback(async () => {
         await reloadCards()
-        flatListRef.current?.scrollToIndex({index: 0, animated: true})
-    }
+        flatListRef.current?.scrollToIndex({ index: 0, animated: true })
+    }, [reloadCards])
 
-    const debounceReload = debounce(reload, 800)    
+    const debounceReload = useMemo(() => debounce(reload, 800), [reload])
 
     const renderItem = useCallback(({item}: {item: ManhwaCard}) => (
         <RandomManhwaCard card={item} />
     ), [])
 
     const keyExtractor = useCallback((item: ManhwaCard) => item.manhwa_id.toString(), [])
+
+    const ItemSeparator = useCallback(() => <View style={{ width: AppConstants.MARGIN }} />, [])
 
     if (cards.length === 0) {
         return (
@@ -50,15 +52,19 @@ const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
                 <Title title='Random'/>
                 <RotatingButton onPress={debounceReload} />
             </Row>
-            <FlatList
-                ref={flatListRef}
-                data={cards}
-                keyExtractor={keyExtractor}
-                renderItem={renderItem}
-                ItemSeparatorComponent={() => <View style={{ width: AppConstants.MARGIN }} />}
-                showsHorizontalScrollIndicator={false}
-                horizontal={true}
-            />
+            {
+                cards.length > 0 && (
+                    <FlatList
+                        ref={flatListRef}
+                        data={cards}
+                        keyExtractor={keyExtractor}
+                        renderItem={renderItem}
+                        ItemSeparatorComponent={ItemSeparator}
+                        showsHorizontalScrollIndicator={false}
+                        horizontal={true}
+                    />
+                )
+            }
         </View>
     )
 }

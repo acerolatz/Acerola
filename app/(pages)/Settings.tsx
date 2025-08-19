@@ -59,7 +59,6 @@ const Settings = () => {
             <TopBar title='Settings'>
                 <ReturnButton/>
             </TopBar>
-
             <SettingsForm 
                 currentMaxCacheSize={cache_size} 
                 currentCacheSize={currentCacheSize!} 

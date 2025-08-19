@@ -19,7 +19,6 @@ type SettingsState = {
 export const useSettingsState = create<SettingsState>(
     (set) => ({
         settings: {
-            showLast3Chapters: false,
             windowSize: AppConstants.DEFAULT_WINDOW_SIZE, 
             maxToRenderPerBatch: AppConstants.DEFAULT_MAX_TO_RENDER_PER_BATCH,
             updateCellsBatchingPeriod: AppConstants.DEFAULT_UPDATE_CELLS_BATCHING_PERIOD            

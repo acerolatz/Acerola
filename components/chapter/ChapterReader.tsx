@@ -1,27 +1,29 @@
 import ChapterArrowUpButton from '../buttons/ChapterArrowUpButton'
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback, useMemo, useRef } from 'react'
 import ChapterImageItem from './ChapterImageItem'
 import { FlatList, View } from 'react-native'
 import { ChapterImage } from '@/helpers/types'
 import { useSettingsState } from '@/store/settingsState'
+import ChapterFooter from './ChapterFooter'
 
 
 interface ChapterReaderProps {
     images: ChapterImage[]
+    manhwaTitle: string
+    loading: boolean
     listHeader: React.ComponentType<any> | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | null | undefined
-    listFooter: React.ComponentType<any> | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | null | undefined
 }
 
 
 const ChapterReader = ({
     images, 
-    listHeader,
-    listFooter
+    manhwaTitle,
+    loading,
+    listHeader    
 }: ChapterReaderProps) => {
         
     const flatListRef = useRef<FlatList>(null)
     const { settings } = useSettingsState()
-    console.log(settings)
 
     const scrollToTop = useCallback(() => {
         flatListRef.current?.scrollToOffset({ animated: false, offset: 0 })
@@ -32,6 +34,14 @@ const ChapterReader = ({
     ), []);
 
     const keyExtractor = useCallback((item: ChapterImage) => item.image_url, [])
+
+    const listFooter = useMemo(() => (
+        <ChapterFooter 
+            mangaTitle={manhwaTitle}
+            loading={loading}
+            scrollToTop={scrollToTop}
+        />
+    ), [manhwaTitle, loading])
 
     return (
         <View>

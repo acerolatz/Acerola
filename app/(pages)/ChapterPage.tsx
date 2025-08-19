@@ -1,6 +1,5 @@
 import { spFetchChapterImages, spUpdateChapterView } from '@/lib/supabase'
 import { dbAddNumericInfo, dbUpsertReadingHistory } from '@/lib/database'
-import ChapterFooter from '@/components/chapter/ChapterFooter'
 import ChapterReader from '@/components/chapter/ChapterReader'
 import ChapterHeader from '@/components/chapter/ChapterHeader'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -71,7 +70,6 @@ const ChapterPage = () => {
       return () => { isCancelled = true; };
   }, [db, currentChapterIndex])  
 
-
   const data = useMemo(() => {
     if (loading) return []
     return images
@@ -83,21 +81,15 @@ const ChapterPage = () => {
       mangaTitle={manhwaTitle}
       loading={loading}
     />
-  ), [reloadChapter, manhwaTitle, loading])
-
-  const listFooter = useMemo(() => (
-    <ChapterFooter 
-      mangaTitle={manhwaTitle}
-      loading={loading}
-    />
-  ), [manhwaTitle, loading])
+  ), [reloadChapter, manhwaTitle, loading])  
 
   return (
     <View style={styles.container} >
       <ChapterReader 
         images={data}
-        listHeader={listHeader}
-        listFooter={listFooter}
+        manhwaTitle={manhwaTitle}
+        loading={loading}
+        listHeader={listHeader}        
       />
     </View>
   )

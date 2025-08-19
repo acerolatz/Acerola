@@ -7,7 +7,7 @@ import ReturnButton from '@/components/buttons/ReturnButton'
 import { useAppVersionState } from '@/store/appVersionState'
 import { AppConstants } from '@/constants/AppConstants'
 import { Typography } from '@/constants/typography'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import AppVersion from '@/components/AppVersion'
 import { AppStyle } from '@/styles/AppStyle'
 import TopBar from '@/components/TopBar'
@@ -18,61 +18,56 @@ const Releases = () => {
 
     const { releasesInfo, setReleasesInfo } = useAppVersionState()
     const [loading, setLoading] = useState(false)
+    const isMounted = useRef(true)
 
     useEffect(
         () => {
-            let isCancelled = false
+            isMounted.current = true
             async function init() {
                 if (releasesInfo.releases.length === 0 || releasesInfo.source.length === 0) {
                     setLoading(true)
-                        const r = await spFetchReleasesAndSourceCode()
-                        if (isCancelled) { return }
-                        setReleasesInfo(r)
+                    const r = await spFetchReleasesAndSourceCode()
+                    if (!isMounted.current) { return }
+                    setReleasesInfo(r)
                     setLoading(false)
                 }
             }
             init()
-            return () => { isCancelled = true }
+            return () => { isMounted.current = false }
         },
         []
     )
-
-    if (loading) {
-        return (
-            <SafeAreaView style={AppStyle.safeArea} >
-                <TopBar title='Releases'>
-                    <ReturnButton/>
-                </TopBar>
-                <PageActivityIndicator/>
-            </SafeAreaView>
-        )
-    }
 
     return (
         <SafeAreaView style={AppStyle.safeArea} >
             <TopBar title='Releases'>
                 <ReturnButton/>
             </TopBar>
-            <View style={styles.flatListContainer} >
-                
-                <Text style={Typography.semibold} >Source Code</Text>
-                <FlatList
-                    data={releasesInfo.source}
-                    showsHorizontalScrollIndicator={false}
-                    keyExtractor={(item) => item.url}
-                    horizontal={true}
-                    renderItem={({item}) => <SourceCodeButton item={item} />}
-                />
+            {
+                loading ? 
+                <PageActivityIndicator/> :
+                <View style={styles.flatListContainer} >
+                    
+                    <Text style={Typography.semibold} >Source Code</Text>
+                    <FlatList
+                        data={releasesInfo.source}
+                        showsHorizontalScrollIndicator={false}
+                        keyExtractor={(item) => item.url}
+                        horizontal={true}
+                        renderItem={({item}) => <SourceCodeButton item={item} />}
+                    />
 
-                <Text style={Typography.semibold} >Packages</Text>
-                <AppVersion/>
-                <FlatList
-                    data={releasesInfo.releases}
-                    keyExtractor={(item) => item.url}
-                    showsVerticalScrollIndicator={false}
-                    renderItem={({item}) => <ReleaseButton release={item} />}
-                />
-            </View>
+                    <Text style={Typography.semibold} >Packages</Text>
+                    <AppVersion/>
+                    <FlatList
+                        data={releasesInfo.releases}
+                        keyExtractor={(item) => item.url}
+                        showsVerticalScrollIndicator={false}
+                        renderItem={({item}) => <ReleaseButton release={item} />}
+                    />
+                </View>
+
+            }
         </SafeAreaView>
     )
 }

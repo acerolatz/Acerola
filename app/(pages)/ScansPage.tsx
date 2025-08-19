@@ -1,18 +1,18 @@
-import ReturnButton from '@/components/buttons/ReturnButton'
-import TopBar from '@/components/TopBar'
-import Footer from '@/components/util/Footer'
 import PageActivityIndicator from '@/components/util/PageActivityIndicator'
-import Row from '@/components/util/Row'
+import ReturnButton from '@/components/buttons/ReturnButton'
 import { AppConstants } from '@/constants/AppConstants'
-import { Colors } from '@/constants/Colors'
 import { Typography } from '@/constants/typography'
-import { Scan } from '@/helpers/types'
-import { openUrl } from '@/helpers/util'
-import { spFetchScans } from '@/lib/supabase'
-import { useScanState } from '@/store/scansState'
-import { AppStyle } from '@/styles/AppStyle'
-import Ionicons from '@expo/vector-icons/Ionicons'
 import React, { useEffect, useState } from 'react'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import { useScanState } from '@/store/scansState'
+import Footer from '@/components/util/Footer'
+import { spFetchScans } from '@/lib/supabase'
+import { AppStyle } from '@/styles/AppStyle'
+import { Colors } from '@/constants/Colors'
+import TopBar from '@/components/TopBar'
+import { openUrl } from '@/helpers/util'
+import Row from '@/components/util/Row'
+import { Scan } from '@/helpers/types'
 import { FlatList } from 'react-native'
 import { 
     Pressable, 
@@ -40,6 +40,26 @@ const Item = ({item}: {item: Scan}) => {
 }
 
 
+/**
+ * ScansPage component – displays a list of scan sources.
+ *
+ * Fetches scans from Supabase and renders them in a scrollable FlatList.
+ * Includes a header with the title, a return button, and a footer.
+ * Each scan item can be pressed to open its associated URL.
+ *
+ * @remarks
+ * - Uses Zustand `useScanState` for global scan list and title management.
+ * - Shows `PageActivityIndicator` while loading.
+ * - The first item in the list header displays the `title` scan URL.
+ * - Each item uses `Item` sub-component with `Pressable` and `Ionicons`.
+ *
+ * @components
+ * - `TopBar` – shows page title and return button.
+ * - `ReturnButton` – navigates back.
+ * - `PageActivityIndicator` – shows loading spinner.
+ * - `Footer` – optional page footer.
+ *
+ */
 const ScansPage = () => {
 
     const { scans, setScans, title, setTitle } = useScanState()
@@ -48,9 +68,7 @@ const ScansPage = () => {
     useEffect(
         () => {
             const init = async () => {
-                if (scans.length != 0) {
-                    return
-                }
+                if (scans.length != 0) { return }
                 setLoading(true)
                     const r = await spFetchScans()
                     const t = r.find(i => i.name === 'title')

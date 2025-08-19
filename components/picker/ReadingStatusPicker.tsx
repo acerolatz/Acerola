@@ -1,13 +1,11 @@
-import { AppConstants } from '@/constants/AppConstants'
-import { Colors } from '@/constants/Colors'
 import { FontSizes, Typography } from '@/constants/typography'
-import { hp } from '@/helpers/util'
-import { AppStyle } from '@/styles/AppStyle'
-import Ionicons from '@expo/vector-icons/Ionicons'
-import React, { useState } from 'react'
-import { ActivityIndicator, Text, StyleSheet, View } from 'react-native'
 import DropDownPicker from 'react-native-dropdown-picker'
-import Row from '../util/Row'
+import { AppConstants } from '@/constants/AppConstants'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import { Colors } from '@/constants/Colors'
+import {  StyleSheet } from 'react-native'
+import React, { useState } from 'react'
+import { hp } from '@/helpers/util'
 
 
 interface ReadingStatusPickerProps {
@@ -23,15 +21,6 @@ const ReadingStatusPicker = ({onChangeValue, isActive}: ReadingStatusPickerProps
     const [items, setItems] = useState(
         AppConstants.READING_STATUS.map(i => {return {label: i, value: i}})
     )
-
-    if (!isActive) {
-        return (
-            <Row style={{...AppStyle.formButton, paddingHorizontal: AppConstants.GAP, justifyContent: "space-between"}} >
-                <Text style={{...Typography.regular, color: Colors.backgroundColor}}>{value}</Text>
-                <ActivityIndicator size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />
-            </Row>
-        )
-    }
 
     return (
         <DropDownPicker
@@ -52,6 +41,7 @@ const ReadingStatusPicker = ({onChangeValue, isActive}: ReadingStatusPickerProps
             setOpen={setOpen}
             setValue={setValue}
             setItems={setItems}
+            disabled={!isActive}
             listMode='SCROLLVIEW'
             theme="DARK"                
             onChangeValue={onChangeValue}

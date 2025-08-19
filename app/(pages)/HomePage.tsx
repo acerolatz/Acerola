@@ -57,6 +57,36 @@ const openManhwaSearch = () => {
 }
 
 
+/**
+ * HomePage component – main screen of the app.
+ *
+ * Displays a top header with logo and action buttons, multiple manhwa grids
+ * (genre, collection, reading history, top 10, latest updates, most popular,
+ * random cards), and a footer. Supports lateral menu and bottom sheets
+ * for app release info and donations.
+ *
+ * @remarks
+ * - Uses `expo-sqlite` for local database access.
+ * - Fetches remote data via Supabase for random cards, top 10, and collections.
+ * - Animates lateral menu and background using `Animated.Value`.
+ * - `useFocusEffect` reloads reading history when the screen gains focus.
+ * - Grid components are lazy-loaded and updated using app state hooks.
+ *
+ * @hooks
+ * - `useState` for local state (loading, genres, manhwas).
+ * - `useRef` for menu animation state and references.
+ * - `useEffect` to initialize genres, latest updates, most viewed, top 10, collections, random cards.
+ * - `useFocusEffect` to reload reading history on screen focus.
+ *
+ * @components
+ * - `GenreGrid`, `CollectionGrid`, `ContinueReadingGrid`, `Top10Grid`, `LatestUpdatesGrid`, `MostPopularGrid`, `RandomCardsGrid`
+ * - `NewAppReleaseBottomSheet`, `DonationBottomSheet`
+ * - `LateralMenu`, `AppLogo`, `Footer`, `RandomManhwaButton`, `UpdateDatabaseButton`, `Button`
+ *
+ * @constants
+ * - `AppConstants` for layout, animation, and limits.
+ * - `Colors` for consistent theming.
+ */
 const HomePage = () => {
 
     const db = useSQLiteContext()
@@ -77,13 +107,7 @@ const HomePage = () => {
 
     const reloadCards = async () => {
         const r = await spFetchRandomManhwaCards(AppConstants.PAGE_LIMIT)
-        setCards(r.map(c => {
-            const {
-                normalizedWidth, 
-                normalizedHeight
-            } = normalizeRandomManhwaCardHeight(c.width, c.height)
-            return {...c, normalizedWidth, normalizedHeight}
-        }))
+        setCards(r)
     }
     
     const updateCollections = async () => {
