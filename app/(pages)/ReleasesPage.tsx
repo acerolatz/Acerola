@@ -1,82 +1,101 @@
-import PageActivityIndicator from '@/components/util/PageActivityIndicator'
-import SourceCodeButton from '@/components/buttons/SourceCodeButton'
-import { FlatList, SafeAreaView, View, Text } from 'react-native'
-import { spFetchReleasesAndSourceCode } from '../../lib/supabase'
-import ReleaseButton from '@/components/buttons/ReleaseButton'
-import ReturnButton from '@/components/buttons/ReturnButton'
-import { useAppVersionState } from '@/store/appVersionState'
-import { AppConstants } from '@/constants/AppConstants'
-import { Typography } from '@/constants/typography'
-import React, { useEffect, useRef, useState } from 'react'
-import AppVersion from '@/components/AppVersion'
-import { AppStyle } from '@/styles/AppStyle'
-import TopBar from '@/components/TopBar'
-import { StyleSheet } from 'react-native'
+import { FlatList, SafeAreaView, View, Text, StyleSheet } from 'react-native';
+import PageActivityIndicator from '@/components/util/PageActivityIndicator';
+import SourceCodeButton from '@/components/buttons/SourceCodeButton';
+import { spFetchReleasesAndSourceCode } from '../../lib/supabase';
+import React, { useEffect, useState, useCallback } from 'react';
+import ReleaseButton from '@/components/buttons/ReleaseButton';
+import ReturnButton from '@/components/buttons/ReturnButton';
+import { useAppVersionState } from '@/store/appVersionState';
+import { AppRelease, SourceCodeLink } from '@/helpers/types';
+import { AppConstants } from '@/constants/AppConstants';
+import { Typography } from '@/constants/typography';
+import AppVersion from '@/components/AppVersion';
+import Footer from '@/components/util/Footer';
+import { AppStyle } from '@/styles/AppStyle';
+import TopBar from '@/components/TopBar';
 
 
 const Releases = () => {
+  const { releasesInfo, setReleasesInfo } = useAppVersionState();
+  const [loading, setLoading] = useState(false);
 
-    const { releasesInfo, setReleasesInfo } = useAppVersionState()
-    const [loading, setLoading] = useState(false)
-    const isMounted = useRef(true)
+  const loadReleases = useCallback(async () => {
+    if (releasesInfo.releases.length > 0 && releasesInfo.source.length > 0) return;
 
-    useEffect(
-        () => {
-            isMounted.current = true
-            async function init() {
-                if (releasesInfo.releases.length === 0 || releasesInfo.source.length === 0) {
-                    setLoading(true)
-                    const r = await spFetchReleasesAndSourceCode()
-                    if (!isMounted.current) { return }
-                    setReleasesInfo(r)
-                    setLoading(false)
-                }
-            }
-            init()
-            return () => { isMounted.current = false }
-        },
-        []
-    )
+    try {
+      setLoading(true);
+      const data = await spFetchReleasesAndSourceCode();
+      setReleasesInfo(data);
+    } catch (error) {
+      console.error('Error fetching releases:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [releasesInfo.releases, releasesInfo.source, setReleasesInfo]);
 
-    return (
-        <SafeAreaView style={AppStyle.safeArea} >
-            <TopBar title='Releases'>
-                <ReturnButton/>
-            </TopBar>
-            {
-                loading ? 
-                <PageActivityIndicator/> :
-                <View style={styles.flatListContainer} >
-                    
-                    <Text style={Typography.semibold} >Source Code</Text>
-                    <FlatList
+  useEffect(() => { loadReleases(); }, [loadReleases]);
+
+  const renderSourceItem = useCallback(
+    ({ item }: {item: SourceCodeLink}) => <SourceCodeButton item={item} />,
+    []
+  );
+
+  const renderReleaseItem = useCallback(
+    ({ item }: {item: AppRelease}) => <ReleaseButton release={item} />,
+    []
+  );
+
+  return (
+    <SafeAreaView style={AppStyle.safeArea}>
+        <TopBar title="Releases">
+            <ReturnButton />
+        </TopBar>
+
+        {
+            loading ? (<PageActivityIndicator />) : 
+            (
+                <View style={styles.container}>
+                    {/* Source Code Section */}
+                    <View style={{gap: AppConstants.GAP}}>
+                        <Text style={Typography.semibold}>Source Code</Text>
+                        <FlatList
                         data={releasesInfo.source}
+                        keyExtractor={(item) => item.url}
+                        horizontal
                         showsHorizontalScrollIndicator={false}
-                        keyExtractor={(item) => item.url}
-                        horizontal={true}
-                        renderItem={({item}) => <SourceCodeButton item={item} />}
-                    />
+                        renderItem={renderSourceItem}
+                        />
+                    </View>
 
-                    <Text style={Typography.semibold} >Packages</Text>
-                    <AppVersion/>
-                    <FlatList
+                    {/* Packages Section */}
+                    <View style={styles.section}>
+                        <Text style={Typography.semibold}>Packages</Text>
+                        <AppVersion />
+                        <FlatList
                         data={releasesInfo.releases}
-                        keyExtractor={(item) => item.url}
+                        keyExtractor={(item, index) => `${item.version}-${index}`}
+                        renderItem={renderReleaseItem}
+                        ListFooterComponent={<Footer />}
                         showsVerticalScrollIndicator={false}
-                        renderItem={({item}) => <ReleaseButton release={item} />}
-                    />
+                        />
+                    </View>
                 </View>
+            )
+        }
+    </SafeAreaView>
+  );
+};
 
-            }
-        </SafeAreaView>
-    )
-}
-
-export default Releases
+export default Releases;
 
 const styles = StyleSheet.create({
-    flatListContainer: {
-        width: '100%',
-        gap: AppConstants.GAP
-    }    
-})
+  container: {
+    width: '100%',
+    flex: 1,
+    gap: AppConstants.GAP,
+  },
+  section: {
+    flex: 1,
+    gap: AppConstants.GAP,
+  },
+});

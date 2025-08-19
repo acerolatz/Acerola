@@ -43,9 +43,7 @@ const MangaByGenre = () => {
     )
 
     const onEndReached = useCallback(async () => {
-        if (fetching.current || !hasResults.current) {
-            return
-        }
+        if (fetching.current || !hasResults.current) { return }
         fetching.current = true
         page.current += 1
         const m = await dbReadManhwasByGenreId(

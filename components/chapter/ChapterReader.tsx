@@ -1,9 +1,9 @@
 import ChapterArrowUpButton from '../buttons/ChapterArrowUpButton'
 import React, { useCallback, useMemo, useRef } from 'react'
-import ChapterImageItem from './ChapterImageItem'
-import { FlatList, View } from 'react-native'
-import { ChapterImage } from '@/helpers/types'
 import { useSettingsState } from '@/store/settingsState'
+import ChapterImageItem from './ChapterImageItem'
+import { ChapterImage } from '@/helpers/types'
+import { FlatList, View } from 'react-native'
 import ChapterFooter from './ChapterFooter'
 
 

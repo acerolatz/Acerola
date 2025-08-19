@@ -11,7 +11,7 @@ import { SafeAreaView } from 'react-native';
 import { router } from 'expo-router';
 import {    
     dbFirstRun,
-    dbGetAppVersion,
+    dbReadAppVersion,
     dbIsSafeModeEnabled,
     dbLoadSettings,
     dbSetLastRefresh,
@@ -42,7 +42,7 @@ const App = () => {
     });
 
     const updateLocalVersion = async () => {
-        const l = await dbGetAppVersion(db)
+        const l = await dbReadAppVersion(db)
         setLocalVersion(l)
     }
 

@@ -20,7 +20,7 @@ import AppLogo from '@/components/util/Logo'
 import { Colors } from '@/constants/Colors'
 import Row from '@/components/util/Row'
 import {
-    dbGetReadingHistory,         
+    dbGetManhwaReadingHistory,         
     dbReadGenres, 
     dbReadManhwasOrderedByUpdateAt, 
     dbReadManhwasOrderedByViews
@@ -165,15 +165,14 @@ const HomePage = () => {
         [db]
     )
 
-    useFocusEffect(
-        useCallback(
-            () => {
-                const reload = async () => {
-                    await dbGetReadingHistory(db, 0, AppConstants.PAGE_LIMIT)
-                        .then(v => setReadingHistoryManhwas(v))
-                }
-                reload()
-            },[]))
+    useFocusEffect(useCallback(
+        () => {
+            const reload = async () => {
+                await dbGetManhwaReadingHistory(db, 0, AppConstants.PAGE_LIMIT)
+                    .then(v => setReadingHistoryManhwas(v))
+            }
+            reload()
+    }, []))
 
     const openMenu = () => {
         Animated.timing(menuAnim, {

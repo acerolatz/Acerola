@@ -1,5 +1,5 @@
 import { Manhwa, ManhwaAuthor } from "@/helpers/types"
-import { dbReadMangaAuthors } from "@/lib/database"
+import { dbReadManhwaAuthors } from "@/lib/database"
 import { AppStyle } from "@/styles/AppStyle"
 import { useRouter } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
@@ -25,7 +25,7 @@ const ManhwaAuthorInfo = ({manhwa}: ManhwaAuthorInfoProps) => {
   useEffect(
     () => {
       async function init() {
-        await dbReadMangaAuthors(db, manhwa!.manhwa_id).then(values => setAuthors(values))
+        await dbReadManhwaAuthors(db, manhwa!.manhwa_id).then(values => setAuthors(values))
         flatListRef.current?.scrollToIndex({animated: false, index: 0})
       }
       init()

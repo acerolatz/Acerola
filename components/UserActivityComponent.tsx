@@ -2,23 +2,28 @@ import { StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { AppConstants } from '@/constants/AppConstants'
 import { useSQLiteContext } from 'expo-sqlite'
-import { dbGetUserHistory } from '@/lib/database'
-import { UserHistory } from '@/helpers/types'
+import { dbGetUserData } from '@/lib/database'
+import { UserData } from '@/helpers/types'
 import { Typography } from '@/constants/typography'
 import { formatNumberWithSuffix } from '@/helpers/util'
 import { Colors } from '@/constants/Colors'
 
 
-const UserActivityHistory = () => {
+const UserDataComponent = () => {
 
     const db = useSQLiteContext()
-    const [userHistory, setUserHistory] = useState<UserHistory>({manhwas: 0, chapters: 0, images: 0})
+    const [data, setData] = useState<UserData>({
+        manhwas: 0, 
+        chapters: 0, 
+        images: 0,
+        device: ''
+    })
 
     useEffect(
         () => {
             const init = async () => {
-                const u = await dbGetUserHistory(db)
-                setUserHistory(u)
+                const u = await dbGetUserData(db)
+                setData(u)
             }
             init()
         },
@@ -28,19 +33,24 @@ const UserActivityHistory = () => {
   return (
     <View style={styles.container} >
         <View style={styles.item}>
-            <Text style={{...Typography.regular, color: Colors.backgroundColor}}>{formatNumberWithSuffix(userHistory.images)} images</Text>
+            <Text style={styles.text}>{formatNumberWithSuffix(data.images)} images</Text>
         </View>
         <View style={styles.item}>
-            <Text style={{...Typography.regular, color: Colors.backgroundColor}}>{formatNumberWithSuffix(userHistory.chapters)} chapters</Text>
+            <Text style={styles.text}>{formatNumberWithSuffix(data.chapters)} chapters</Text>
         </View>
         <View style={styles.item}>
-            <Text style={{...Typography.regular, color: Colors.backgroundColor}}>{formatNumberWithSuffix(userHistory.manhwas)} pornhwas</Text>
+            <Text style={styles.text}>{formatNumberWithSuffix(data.manhwas)} pornhwas</Text>
+        </View>
+        <View style={styles.item}>
+            <Text style={styles.text}>{data.device}</Text>
         </View>
     </View>
   )
 }
 
-export default UserActivityHistory
+
+export default UserDataComponent
+
 
 const styles = StyleSheet.create({
     container: {
@@ -56,5 +66,10 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         borderRadius: AppConstants.BORDER_RADIUS,
         backgroundColor: Colors.primary
+    },
+    text: {
+        ...Typography.regular, 
+        color: Colors.backgroundColor, 
+        textAlign: "center"
     }
 })

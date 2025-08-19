@@ -3,7 +3,7 @@ import { Colors } from '@/constants/Colors';
 import { FontSizes, Typography } from '@/constants/typography';
 import { Manhwa } from '@/helpers/types';
 import { hp } from '@/helpers/util';
-import { dbGetManhwaReadingStatus, dbUpdateManhwaReadingStatus } from '@/lib/database';
+import { dbReadManhwaReadingStatus, dbUpdateManhwaReadingStatus } from '@/lib/database';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useSQLiteContext } from 'expo-sqlite';
 import React, { useEffect, useRef, useState } from 'react';
@@ -32,7 +32,7 @@ const AddToLibray = ({manhwa, backgroundColor = Colors.primary}: AddToLibrayProp
     useEffect(
         () => {
             async function init() {
-                const value = await dbGetManhwaReadingStatus(db, manhwa.manhwa_id)                    
+                const value = await dbReadManhwaReadingStatus(db, manhwa.manhwa_id)                    
                 if (!value) { 
                     dbValue.current = ''
                     setValue(undefined)

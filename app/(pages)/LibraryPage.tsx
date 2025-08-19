@@ -1,6 +1,6 @@
 import ReadingStatusPicker from '@/components/picker/ReadingStatusPicker'
 import ReturnButton from '@/components/buttons/ReturnButton'
-import { dbGetManhwasByReadingStatus } from '@/lib/database'
+import { dbReadManhwasByReadingStatus } from '@/lib/database'
 import React, { useCallback, useRef, useState } from 'react'
 import { AppConstants } from '@/constants/AppConstants'
 import ManhwaGrid from '@/components/grid/ManhwaGrid'
@@ -22,7 +22,7 @@ const Library = () => {
 
   const init = async () => {
     setLoading(true)
-      const m = await dbGetManhwasByReadingStatus(db, status.current)
+      const m = await dbReadManhwasByReadingStatus(db, status.current)
       setManhwas(m)
     setLoading(false)
   }

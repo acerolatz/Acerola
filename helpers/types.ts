@@ -93,10 +93,11 @@ export type Post = {
 }
 
 
-export type UserHistory = {
+export type UserData = {
     manhwas: number
     chapters: number
     images: number
+    device: string
 }
 
 
@@ -144,14 +145,13 @@ export type DownloadProgress = {
 
 
 export type DebugInfo = {
-    device: string | null
-    first_run: string | null
-    last_sync_time: string | null
-    should_ask_for_donation: string | null
-    images: number | null
-    current_chapter_milestone: number | null
+    device: string
+    first_run: number
+    should_ask_for_donation: number
+    last_sync_time: string
+    images: number
+    current_chapter_milestone: number
     total_manhwas: number
-    total_chapters: number
     total_authors: number
     total_genres: number
     total_manhwa_genres: number

@@ -28,7 +28,7 @@ const DonationBottomSheet = () => {
     }, []);    
     
     const neverShowDonationMessageAgain =  async () => {
-        await dbSetShouldAskForDonation(db, '0')
+        await dbSetShouldAskForDonation(db, 0)
         handleCloseDonationBottomSheet()
     }
     

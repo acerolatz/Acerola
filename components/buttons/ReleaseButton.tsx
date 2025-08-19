@@ -1,61 +1,68 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { useCallback } from 'react'
 import { AppRelease } from '@/helpers/types'
-import Row from '../util/Row'
-import Ionicons from '@expo/vector-icons/Ionicons'
-import { AppStyle } from '@/styles/AppStyle'
 import { openUrl } from '@/helpers/util'
 import { Colors } from '@/constants/Colors'
 import { AppConstants } from '@/constants/AppConstants'
-import CustomActivityIndicator from '../util/CustomActivityIndicator'
 import { Typography } from '@/constants/typography'
+import Ionicons from '@expo/vector-icons/Ionicons'
 
 
-const ReleaseButton = ({release}: {release: AppRelease}) => {
+interface ReleaseButtonProps {
+    release: AppRelease
+}
 
-    const [loading, setLoading] = useState(false)
 
-    const onPress = async () => {
-        setLoading(true)
+const ReleaseButton = React.memo(({ release }: ReleaseButtonProps) => {    
+
+    const onPress = useCallback(async () => {
         await openUrl(release.url)
-        setLoading(false)
-    }
-
-    if (loading) {
-        return (
-            <View style={styles.container}>
-                <Row style={{width: '100%', justifyContent: "space-between"}} >
-                    <Text style={{...Typography.regular, color: Colors.backgroundColor}} >{release.version}</Text>
-                    <CustomActivityIndicator size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />
-                </Row>
-                {
-                    release.action &&
-                    <Text style={{...Typography.regular, color: Colors.backgroundColor}} >{release.action}</Text>
-                }
-            </View>
-        )
-    }
-
+    }, [release.url])
+    
+    const border = release.action !== null ? 0 : AppConstants.BORDER_RADIUS
+    
     return (
-        <Pressable onPress={onPress} style={styles.container}>
-            <Row style={{width: '100%', justifyContent: "space-between"}} >
-                <Text style={{...Typography.regular, color: Colors.backgroundColor}} >{release.version}</Text>
+        <Pressable onPress={onPress} style={styles.itemContainer}>
+            <View style={{...styles.itemTitleContainer, borderBottomLeftRadius: border, borderBottomRightRadius: border}}>
+                <Text style={[Typography.regular, { color: Colors.backgroundColor }]}>{release.version}</Text>
                 <Ionicons name='download-outline' size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />
-            </Row>
+            </View>
             {
                 release.action &&
-                <Text style={{...Typography.regular, color: Colors.backgroundColor}} >{release.action}</Text>
+                <View style={styles.itemBodyContainer}>
+                    <Text style={{...Typography.regular, color: Colors.white}}>{release.action}</Text>
+                </View>
             }
         </Pressable>
     )
-}
+})
+
 
 export default ReleaseButton
 
+
 const styles = StyleSheet.create({
-    container: {
-        ...AppStyle.defaultGridItem,
-        width: '100%',
-        marginBottom: AppConstants.MARGIN
+    itemContainer: {
+        width: '100%', 
+        marginBottom: 10
+    },
+    itemTitleContainer: {
+        flexDirection: 'row',
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: 10, 
+        backgroundColor: Colors.primary, 
+        borderRadius: AppConstants.BORDER_RADIUS, 
+        borderBottomLeftRadius: 0, 
+        borderBottomRightRadius: 0
+    },
+    itemBodyContainer: {
+        padding: 10, 
+        borderWidth: 1, 
+        borderTopWidth: 0, 
+        borderTopLeftRadius: 0, 
+        borderTopRightRadius: 0, 
+        borderColor: Colors.primary, 
+        borderRadius: AppConstants.BORDER_RADIUS
     }
 })

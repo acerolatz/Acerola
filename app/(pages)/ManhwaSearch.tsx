@@ -4,7 +4,7 @@ import ReturnButton from '@/components/buttons/ReturnButton'
 import React, { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { AppConstants } from '@/constants/AppConstants'
 import ManhwaCard from '@/components/ManhwaCard'
-import { dbSearchMangas } from '@/lib/database'
+import { dbSearchManhwas } from '@/lib/database'
 import { useSQLiteContext } from 'expo-sqlite'
 import SearchBar from '@/components/SearchBar'
 import Footer from '@/components/util/Footer'
@@ -31,7 +31,7 @@ const ManhwaSearch = () => {
   useEffect(() => {
     isMounted.current = true
     const init = async () => {
-      const m = await dbSearchMangas(db, searchTerm.current, 0, AppConstants.PAGE_LIMIT)
+      const m = await dbSearchManhwas(db, searchTerm.current, 0, AppConstants.PAGE_LIMIT)
       if (!isMounted.current) { return }
       setManhwas(m)
       manhwasRef.current = m
@@ -45,7 +45,7 @@ const ManhwaSearch = () => {
   const handleSearch = useCallback(async (value: string) => {
     searchTerm.current = value.trim()
     page.current = 0
-    const m = await dbSearchMangas(
+    const m = await dbSearchManhwas(
       db, 
       searchTerm.current, 
       0, 
@@ -65,7 +65,7 @@ const ManhwaSearch = () => {
     if (fetching.current || !hasResults.current) { return }
     fetching.current = true    
     page.current += 1
-    const m: Manhwa[] = await dbSearchMangas(
+    const m: Manhwa[] = await dbSearchManhwas(
       db, 
       searchTerm.current, 
       page.current * AppConstants.PAGE_LIMIT, 

@@ -1,5 +1,5 @@
 import { Typography } from '@/constants/typography'
-import { dbGetAppVersion } from '@/lib/database'
+import { dbReadAppVersion } from '@/lib/database'
 import { useAppVersionState } from '@/store/appVersionState'
 import { useSQLiteContext } from 'expo-sqlite'
 import React, { useEffect } from 'react'
@@ -14,7 +14,7 @@ const AppVersion = () => {
         () => {
             const init = async () => {
                 if (localVersion) { return }
-                await dbGetAppVersion(db).then(v => setLocalVersion(v))
+                await dbReadAppVersion(db).then(v => setLocalVersion(v))
             }
             init()
         },

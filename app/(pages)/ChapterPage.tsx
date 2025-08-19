@@ -1,5 +1,5 @@
 import { spFetchChapterImages, spUpdateChapterView } from '@/lib/supabase'
-import { dbAddNumericInfo, dbUpsertReadingHistory } from '@/lib/database'
+import { dbAddNumericInfo, dbUpsertManhwaReadingHistory } from '@/lib/database'
 import ChapterReader from '@/components/chapter/ChapterReader'
 import ChapterHeader from '@/components/chapter/ChapterHeader'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -57,7 +57,7 @@ const ChapterPage = () => {
           if (imgs.length === 0) { setImages([]); setLoading(false); return }
           if (isCancelled) return;
           await Promise.all([
-            dbUpsertReadingHistory(db, currentChapter.manhwa_id, currentChapter.chapter_id),
+            dbUpsertManhwaReadingHistory(db, currentChapter.manhwa_id, currentChapter.chapter_id),
             spUpdateChapterView(currentChapter.chapter_id),
             dbAddNumericInfo(db, 'images', imgs.length),
             Image.prefetch(imgs.slice(0, 5).map(i => i.image_url))

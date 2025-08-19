@@ -21,7 +21,7 @@ import PageActivityIndicator from '@/components/util/PageActivityIndicator'
 import { dbFetchDebugInfo, dbSetDebugInfo } from '@/lib/database'
 import { DebugInfo, DebugManhwaImages } from '@/helpers/types'
 import ManhwaIdComponent from '@/components/ManhwaIdComponent'
-import { hasOnlyDigits, hp, sleep, wp } from '@/helpers/util'
+import { hasOnlyDigits, hp, wp } from '@/helpers/util'
 import ReturnButton from '@/components/buttons/ReturnButton'
 import { TextInput } from 'react-native-gesture-handler'
 import { AppConstants } from '@/constants/AppConstants'
@@ -118,8 +118,7 @@ const DebugPage = () => {
     const [info, setInfo] = useState<DebugInfo | null>(null)
     const [loading, setLoading] = useState(false)
     const [firstRun, setFirstRun] = useState<string>('')
-    const [shouldAskForDonation, setShouldAskForDonation] = useState<string>('')
-    const [readChapters, setReadChapters] = useState<string>('')
+    const [shouldAskForDonation, setShouldAskForDonation] = useState<string>('') 
     const [manhwaImage, setManhwaImage] = useState<DebugManhwaImages[]>([])
     const [manhwaId, setManhwaId] = useState<string>('')
     const [cardToShow, setCardToShow] = useState<string | null>(null)
@@ -175,19 +174,21 @@ const DebugPage = () => {
     }
 
     const saveAskForDonation = async () => {
-        await save({...info, should_ask_for_donation: shouldAskForDonation === '1' ? '1' : '0'} as any)
+        await save({...info!, should_ask_for_donation: shouldAskForDonation === '1' ? 1 : 0})
     }
 
     const saveFirstRun = async () => {
-        await save({...info, first_run: firstRun.trim() === '1' ? '1' : '0'} as any)
-    }
-
-    const saveReadChapters = async () => {
-        await save({...info, read_chapters: readChapters !== '' ? parseInt(readChapters) : 0} as any)
-    }
+        await save({...info!, first_run: firstRun.trim() === '1' ? 1 : 0})
+    }    
     
     const saveMilestone = async () => {
-        await save({...info, current_chapter_milestone: chapterMilestone !== '' ? parseInt(chapterMilestone) : 0} as any)
+        await save({
+            ...info!, 
+            current_chapter_milestone: chapterMilestone !== '' ? 
+                parseInt(chapterMilestone) : 
+                info!.current_chapter_milestone
+            }
+        )
     }
 
     if (loading) {
@@ -215,14 +216,13 @@ const DebugPage = () => {
                         <ScrollView style={{width: '100%'}} horizontal={true} showsHorizontalScrollIndicator={false} >
                             <Row>                                
                                 <Text style={styles.textItem}>manhwas: {info?.total_manhwas}</Text>
-                                <Text style={styles.textItem}>chapters: {info?.total_chapters}</Text>
-                                <Text style={styles.textItem}>authors: {info?.total_authors}</Text>
                                 <Text style={styles.textItem}>images: {info?.images}</Text>
+                                <Text style={styles.textItem}>reading_status: {info?.total_reading_status}</Text>
+                                <Text style={styles.textItem}>reading_history: {info?.total_reading_history}</Text>
+                                <Text style={styles.textItem}>authors: {info?.total_authors}</Text>
                                 <Text style={styles.textItem}>manhwa_authors: {info?.total_manhwa_authors}</Text>
                                 <Text style={styles.textItem}>genres: {info?.total_genres}</Text>
                                 <Text style={styles.textItem}>manhwa_genres: {info?.total_manhwa_genres}</Text>
-                                <Text style={styles.textItem}>reading_status: {info?.total_reading_status}</Text>
-                                <Text style={styles.textItem}>reading_history: {info?.total_reading_history}</Text>
                                 <Text style={styles.textItem}>device: {info?.device}</Text>
                             </Row>
                         </ScrollView>
@@ -287,23 +287,6 @@ const DebugPage = () => {
                                 onChangeText={setShouldAskForDonation}
                             />
                             <Pressable onPress={saveAskForDonation} style={styles.button} >
-                                <Text style={styles.buttonText} >SET</Text>
-                            </Pressable>
-                        </Row>
-
-                        {/* Num Chapter Readed */}
-                        <View style={styles.title} >
-                            <Text style={Typography.semibold} >Num Read Chapters</Text>
-                            <Text style={AppStyle.textOptional} >{info?.read_chapters}/{info?.current_chapter_milestone}</Text>
-                        </View>
-                        <Row style={{gap: AppConstants.GAP}} >
-                            <TextInput
-                                style={styles.input}
-                                value={readChapters.toString()}
-                                keyboardType='numeric'
-                                onChangeText={setReadChapters}
-                            />
-                            <Pressable onPress={saveReadChapters} style={styles.button} >
                                 <Text style={styles.buttonText} >SET</Text>
                             </Pressable>
                         </Row>

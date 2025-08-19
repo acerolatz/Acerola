@@ -1,8 +1,7 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import {
   View,
   Animated,  
-  Text,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
@@ -13,8 +12,8 @@ import CacheForm from './CacheForm';
 import { Colors } from '@/constants/Colors';
 import { wp } from '@/helpers/util';
 import { Typography } from '@/constants/typography';
-import UserActivityHistory from '../UserActivityHistory';
 import { AppConstants } from '@/constants/AppConstants';
+import UserDataComponent from '../UserActivityComponent';
 
 interface SettingsFormProps {
   currentMaxCacheSize: number;
@@ -32,13 +31,13 @@ const SettingsForm = ({
   safeModeOn,
 }: SettingsFormProps) => {
 
-    const titles = ['Safe Mode', 'Optimization', 'Cache', 'History']
+    const titles = ['Safe Mode', 'Optimization', 'Cache', 'User Data']
 
     const forms = [
       <SafeModeForm key="safe" safeModeOn={safeModeOn} safeModePassword={safeModePassword} />,      
       <PerformanceUIForm key="perf" />,
       <CacheForm key="cache" currentCacheSize={currentCacheSize} currentMaxCacheSize={currentMaxCacheSize} />,
-      <UserActivityHistory/>
+      <UserDataComponent/>
     ];
 
     const scrollX = useRef(new Animated.Value(0)).current;

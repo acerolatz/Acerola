@@ -1,31 +1,33 @@
 import { FlatList, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native'
-import ReturnButton from '@/components/buttons/ReturnButton'
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react'
+import PageActivityIndicator from '@/components/util/PageActivityIndicator'
+import ReturnButton from '@/components/buttons/ReturnButton'
 import { AppConstants } from '@/constants/AppConstants'
 import { Typography } from '@/constants/typography'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { formatTimestamp } from '@/helpers/util'
-import { Post } from '@/helpers/types'
+import Footer from '@/components/util/Footer'
 import { AppStyle } from '@/styles/AppStyle'
 import { spFetchNews } from '@/lib/supabase'
-import Footer from '@/components/util/Footer'
 import { Colors } from '@/constants/Colors'
 import TopBar from '@/components/TopBar'
 import Row from '@/components/util/Row'
-import PageActivityIndicator from '@/components/util/PageActivityIndicator'
+import { Post } from '@/helpers/types'
 
 
 const PAGE_LIMIT = 16
 const TEXT_LENGTH_LIMIT = 128
 
+
 interface ItemProps {
     item: Post
 }
 
+
 const Item = memo(({ item }: ItemProps) => {
     const [expandText, setExpandText] = useState(false)
 
-    const toggleExpand = useCallback(() => setExpandText(prev => !prev), [])
+    const toggleExpand = useCallback(() => setExpandText(prev => !prev), [])    
 
     const text = expandText || item.message.length <= TEXT_LENGTH_LIMIT
         ? item.message

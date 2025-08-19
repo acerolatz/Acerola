@@ -6,6 +6,7 @@ import * as Clipboard from 'expo-clipboard'
 import { DownloadProgress } from './types';
 import { Platform } from 'react-native';
 import { Linking } from 'react-native';
+import DeviceInfo from 'react-native-device-info';
 import RNFS from 'react-native-fs';
 
 
@@ -514,3 +515,14 @@ export const downloadManhwaChapter = async (
   await Promise.all(pool);  
   return downloadedPaths.sort();
 };
+
+
+
+export async function getDeviceName(): Promise<string> {
+  const model = DeviceInfo.getModel()
+  const systemName = DeviceInfo.getSystemName()
+  const systemVersion = DeviceInfo.getSystemVersion()
+  const supportedAbis = (await DeviceInfo.supportedAbis()).join(", "); 
+  const device = `${model}, ${supportedAbis}, ${systemName}[${systemVersion}]`
+  return device
+}

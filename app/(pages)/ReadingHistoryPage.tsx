@@ -2,7 +2,7 @@ import ReturnButton from '@/components/buttons/ReturnButton'
 import React, { useEffect, useRef, useState } from 'react'
 import { AppConstants } from '@/constants/AppConstants'
 import ManhwaGrid from '@/components/grid/ManhwaGrid'
-import { dbGetReadingHistory } from '@/lib/database'
+import { dbGetManhwaReadingHistory } from '@/lib/database'
 import { useSQLiteContext } from 'expo-sqlite'
 import { AppStyle } from '@/styles/AppStyle'
 import { SafeAreaView } from 'react-native'
@@ -25,7 +25,7 @@ const ReadingHistory = () => {
   useEffect(() => {
     isMounted.current = true
     const init = async () => {
-      const m = await dbGetReadingHistory(db, 0, AppConstants.PAGE_LIMIT)        
+      const m = await dbGetManhwaReadingHistory(db, 0, AppConstants.PAGE_LIMIT)        
       if (!isMounted.current) { return }
       setManhwas(m)
       manhwasRef.current = m
@@ -39,7 +39,7 @@ const ReadingHistory = () => {
     if (fetching.current || !hasResults.current) { return }
     fetching.current = true
     page.current += 1    
-    const m = await dbGetReadingHistory(
+    const m = await dbGetManhwaReadingHistory(
       db, 
       page.current * AppConstants.PAGE_LIMIT, 
       AppConstants.PAGE_LIMIT

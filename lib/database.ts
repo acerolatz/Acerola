@@ -8,9 +8,9 @@ import {
   ManhwaGenre, 
   Settings, 
   Todo, 
-  UserHistory 
+  UserData 
 } from '@/helpers/types';
-import {formatBytes, getCacheSizeBytes, secondsSince } from '@/helpers/util';
+import {formatBytes, getCacheSizeBytes, getDeviceName, secondsSince } from '@/helpers/util';
 import { AppConstants } from '@/constants/AppConstants';
 import DeviceInfo from 'react-native-device-info';
 import { spGetManhwas, spNewRun } from './supabase';
@@ -18,17 +18,38 @@ import { GenreSet } from '@/helpers/GenreSet';
 import * as SQLite from 'expo-sqlite';
 import uuid from 'react-native-uuid';
 import { AuthorSet } from '@/helpers/AuthorSet';
+import { setUrlAsync } from 'expo-clipboard';
 
 
 export async function dbMigrate(db: SQLite.SQLiteDatabase) {
   console.log("[DATABASE MIGRATION START]")
   await db.execAsync(`
-    PRAGMA journal_mode = WAL;
-    PRAGMA synchronous = NORMAL;
-    PRAGMA foreign_keys = ON;
-    PRAGMA temp_store = MEMORY;
-    PRAGMA cache_size = 512;
+    
+    -- ===============================
+    --             PRAGMAs
+    -- ===============================
+      PRAGMA journal_mode = WAL;
+      PRAGMA synchronous = NORMAL;
+      PRAGMA foreign_keys = ON;
+      PRAGMA temp_store = MEMORY;
+      PRAGMA cache_size = -1024;
+      PRAGMA mmap_size = 268435456;
+      PRAGMA optimize;
+    -- ===============================
+    
 
+
+    -- ===============================
+    ---             DROP
+    -- ===============================
+    DROP TABLE IF EXISTS chapters;
+    DROP TABLE IF EXISTS collections;
+    -- ===============================
+
+
+    -- ===============================
+    --            TABLES
+    -- ===============================
     CREATE TABLE IF NOT EXISTS app_info (
       name TEXT NOT NULL PRIMARY KEY,
       value TEXT NOT NULL
@@ -37,28 +58,23 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
     CREATE TABLE IF NOT EXISTS app_numeric_info (
       name TEXT NOT NULL PRIMARY KEY,
       value INTEGER NOT NULL DEFAULT 0
-    );
-
-    CREATE TABLE IF NOT EXISTS collections (
-      collection_id INTEGER PRIMARY KEY,
-      name TEXT NOT NULL
-    );
+    );    
 
     CREATE TABLE IF NOT EXISTS update_history (
-        name TEXT NOT NULL PRIMARY KEY,
-        refresh_cycle INTEGER,
-        last_refreshed_at TIMESTAMP DEFAULT NULL
+      name TEXT NOT NULL PRIMARY KEY,
+      refresh_cycle INTEGER,
+      last_refreshed_at TIMESTAMP DEFAULT NULL
     );
 
     CREATE TABLE IF NOT EXISTS manhwas (
-        manhwa_id INTEGER PRIMARY KEY,
-        title TEXT NOT NULL,
-        descr TEXT NOT NULL,
-        cover_image_url TEXT NOT NULL,
-        status TEXT NOT NULL,
-        color TEXT NOT NULL,
-        views INTEGER NOT NULL DEFAULT 0,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      manhwa_id INTEGER PRIMARY KEY,
+      title TEXT NOT NULL,
+      descr TEXT NOT NULL,
+      cover_image_url TEXT NOT NULL,
+      status TEXT NOT NULL,
+      color TEXT NOT NULL,
+      views INTEGER NOT NULL DEFAULT 0,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE TABLE IF NOT EXISTS alt_titles (
@@ -92,15 +108,6 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       role TEXT NOT NULL,
       CONSTRAINT manhwa_authors_pkey PRIMARY KEY (manhwa_id, author_id, role),
       CONSTRAINT manhwa_authors_manhwa_id_fkey FOREIGN KEY (manhwa_id) REFERENCES manhwas (manhwa_id) ON UPDATE CASCADE ON DELETE CASCADE
-    );      
-
-    CREATE TABLE IF NOT EXISTS chapters (
-      chapter_id INTEGER PRIMARY KEY,
-      manhwa_id INTEGER,
-      chapter_num INTEGER NOT NULL,
-      chapter_name TEXT NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (manhwa_id) REFERENCES manhwas(manhwa_id) ON DELETE CASCADE ON UPDATE CASCADE
     );
 
     CREATE TABLE IF NOT EXISTS reading_status (
@@ -124,18 +131,31 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       finished_at TIMESTAMP DEFAULT NULL
     );
+    -- ===============================
 
-    CREATE INDEX IF NOT EXISTS idx_ma_manhwa_id ON manhwa_authors(manhwa_id);
+    -- ===============================
+    --              INDEX
+    -- ===============================
     CREATE INDEX IF NOT EXISTS idx_authors_name ON authors(name);
-
-    CREATE INDEX IF NOT EXISTS idx_chapters_manhwa_num ON chapters(manhwa_id, chapter_num DESC);
-    CREATE INDEX IF NOT EXISTS idx_reading_status_manhwa_id_status ON reading_status (manhwa_id, status);
-    CREATE INDEX IF NOT EXISTS idx_reading_history_readed_at ON reading_history(manhwa_id, readed_at DESC);
-    CREATE INDEX IF NOT EXISTS idx_alt_titles ON alt_titles(title, manhwa_id);
-          
-    CREATE INDEX IF NOT EXISTS idx_manhwas_views ON manhwas(views DESC);
-    CREATE INDEX IF NOT EXISTS idx_manhwas_updated_at ON manhwas(updated_at DESC);    
+    CREATE INDEX IF NOT EXISTS idx_ma_author_id ON manhwa_authors(author_id);
+    CREATE INDEX IF NOT EXISTS idx_ma_manhwa_id ON manhwa_authors(manhwa_id);
     
+    CREATE INDEX IF NOT EXISTS idx_reading_status_manhwa_id_status ON reading_status(manhwa_id, status);
+    CREATE INDEX IF NOT EXISTS idx_reading_history_readed_at ON reading_history(manhwa_id, readed_at DESC);
+
+    CREATE INDEX IF NOT EXISTS idx_manhwa_genres_genre_id ON manhwa_genres(genre_id);
+    
+    CREATE INDEX IF NOT EXISTS idx_manhwas_views ON manhwas(views DESC);
+    
+    CREATE INDEX IF NOT EXISTS idx_alt_titles ON alt_titles(title, manhwa_id);
+    CREATE INDEX IF NOT EXISTS idx_alt_titles_manhwa ON alt_titles(manhwa_id);
+    CREATE INDEX IF NOT EXISTS idx_manhwas_updated_at ON manhwas(updated_at DESC);    
+    -- ================================
+    
+
+    -- ===============================
+    --             INSERT
+    -- ===============================
     BEGIN TRANSACTION;
       
       INSERT OR REPLACE INTO 
@@ -146,21 +166,20 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       INSERT INTO 
         app_info (name, value)
       VALUES 
-        ('device', 'null'),
-        ('first_run', '1'),
+        ('device', ''),
         ('last_sync_time', ''),
-        ('should_ask_for_donation', '1'),
-        ('password', ''),
-        ('is_safe_mode_on', '0')        
+        ('password', '')
       ON CONFLICT 
         (name) 
       DO NOTHING;
-
-      -- Insert default numeric info
+      
       INSERT INTO 
         app_numeric_info (name, value)
       VALUES
         ('images', 0),
+        ('first_run', 1),
+        ('should_ask_for_donation', 1),
+        ('is_safe_mode_on', 0),
         ('current_chapter_milestone', ${AppConstants.CHAPTER_GOAL_START}),
         ('windowSize', ${AppConstants.DEFAULT_WINDOW_SIZE}),
         ('maxToRenderPerBatch', ${AppConstants.DEFAULT_MAX_TO_RENDER_PER_BATCH}),
@@ -169,14 +188,12 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       ON CONFLICT
         (name) 
       DO NOTHING;
-
-      -- Insert or update update_history entries
+      
       INSERT INTO 
         update_history (name, refresh_cycle)
       VALUES
         ('server', ${AppConstants.DATABASE.UPDATE_INTERVAL.SERVER}),
-        ('client', ${AppConstants.DATABASE.UPDATE_INTERVAL.CLIENT}),
-        ('collections', ${AppConstants.DATABASE.UPDATE_INTERVAL.COLLECTIONS})
+        ('client', ${AppConstants.DATABASE.UPDATE_INTERVAL.CLIENT})
       ON CONFLICT 
         (name) 
       DO UPDATE SET 
@@ -298,7 +315,7 @@ async function dbGetTotalSizeMiB(db: SQLite.SQLiteDatabase): Promise<number | nu
  * Includes:
  * - Total number of tables
  * - Database size in MiB
- * - Row counts for key tables (manhwas, chapters, genres, etc.)
+ * - Row counts for key tables (manhwas, genres, etc.)
  * - Maximum allowed image cache size
  * - Current image cache size
  *
@@ -311,8 +328,7 @@ export async function dbLog(db: SQLite.SQLiteDatabase) {
   const r = [
     'num_tables: ' + (await db.getFirstAsync<{num_tables: number}>(`SELECT count(*) as num_tables FROM sqlite_master WHERE type='table';`))?.num_tables,
     'size_mib: ' + await dbGetTotalSizeMiB(db),
-    'manhwas: ' + await dbCount(db, 'manhwas'),
-    'chapters: ' + await dbCount(db, 'chapters'),
+    'manhwas: ' + await dbCount(db, 'manhwas'),    
     'genres: ' + await dbCount(db, 'genres'),
     'manhwa_genres: ' + await dbCount(db, 'manhwa_genres'),
     'authors: ' + await dbCount(db, 'authors'),
@@ -387,9 +403,9 @@ export async function dbCleanTable(db: SQLite.SQLiteDatabase, table: string) {
  * Currently clears:
  * - manhwas
  * - genres 
- * - chapters (ON DELETE CASCADE)
- * - manhwa_authors (ON DELETE CASCADE)
- * - manhwa_genres (ON DELETE CASCADE)
+ * - authors
+ * - manhwa_authors (VIA ON DELETE CASCADE)
+ * - manhwa_genres (VIA ON DELETE CASCADE)
  *
  * @param db - The SQLite database instance.
  * @returns A promise that resolves once the database has been cleared.
@@ -398,6 +414,7 @@ export async function dbCleanTable(db: SQLite.SQLiteDatabase, table: string) {
  */
 export async function dbClearDatabase(db: SQLite.SQLiteDatabase) {
   await db.runAsync('DELETE FROM manhwas;').catch(error => console.log("error dbClearDatabase manhwas", error))
+  await db.runAsync('DELETE FROM authors;').catch(error => console.log("error dbClearDatabase authors", error))
   await db.runAsync('DELETE FROM genres;').catch(error => console.log("error dbClearDatabase genres", error))
   console.log("[DATABASE CLEAR]")
 }
@@ -409,12 +426,29 @@ export async function dbClearDatabase(db: SQLite.SQLiteDatabase) {
  * @param name - The name of the info entry to read.
  * @returns A promise that resolves to the value as a string, or `null` if not found.
  */
-export async function dbReadInfo(db: SQLite.SQLiteDatabase, name: string): Promise<string | null> {
+export async function dbReadInfo(
+  db: SQLite.SQLiteDatabase, 
+  name: string,
+  defaultValue: string = ''
+): Promise<string> {
   const r = await db.getFirstAsync<{value: string}>(
-    "SELECT value FROM app_info WHERE name = ?;",
+    `
+      SELECT 
+        value 
+      FROM 
+        app_info 
+      WHERE 
+        name = ?;
+    `,
     [name]
-  ).catch(error => console.log("error dbReadInfo", name, error))
-  return r?.value ? r.value : null
+  ).catch(error => console.log("error dbReadInfo", name, defaultValue, error))
+
+  if (!r) {
+    await dbSetInfo(db, name, defaultValue)
+    return defaultValue
+  }
+
+  return r.value
 }
 
 
@@ -465,7 +499,6 @@ export async function dbGetUserUUID(db: SQLite.SQLiteDatabase): Promise<string> 
   return user_id!
 }
 
-
 /**
  * Handles first-run initialization of the app.
  * - Checks the `first_run` flag in `app_info`.
@@ -477,13 +510,14 @@ export async function dbGetUserUUID(db: SQLite.SQLiteDatabase): Promise<string> 
  * @returns A promise that resolves when first-run initialization is complete.
  */
 export async function dbFirstRun(db: SQLite.SQLiteDatabase) {
-  const r = await dbReadInfo(db, 'first_run')  
-  if (r === '1') {
+  const r = await dbReadNumericInfo(db, 'first_run')  
+  if (r === 1) {
+    const supportedAbis = (await DeviceInfo.supportedAbis()).join(', '); 
     const model = DeviceInfo.getModel()
     const systemName = DeviceInfo.getSystemName()
     const systemVersion = DeviceInfo.getSystemVersion()
-    const device = `${model}, ${systemName}[${systemVersion}]`
-    await dbSetInfo(db, 'first_run', '0')
+    const device = `${model}, ${supportedAbis}, ${systemName}[${systemVersion}]`
+    await dbSetNumericInfo(db, 'first_run', 0)
     await dbSetInfo(db, 'device', device)
     const user_id = await dbSetUserUUID(db)
     spNewRun(user_id, device)
@@ -633,7 +667,7 @@ export async function dbShouldUpdate(
 
 /**
  * Inserts or updates a `Manhwa` record in the database along with its related data.
- * This includes genres, authors, chapters, and alternative titles.
+ * This includes genres, authors, and alternative titles.
  * @param db - An instance of `SQLiteDatabase`.
  * @param manhwa - The `Manhwa` object containing all relevant information to upsert.
  * @returns A promise that resolves when the manhwa and all related data have been upserted.
@@ -671,10 +705,7 @@ export async function dbUpsertManhwa(db: SQLite.SQLiteDatabase, manhwa: Manhwa) 
 
   // Authors
   await dbUpsertAuthors(db, manhwa.authors)
-  await dbUpsertManhwaAuthors(db, manhwa.authors.map(a => {return {author_id: a.author_id, manhwa_id: manhwa.manhwa_id, name: a.name, role: a.role}}))
-  
-  // Chapters
-  await dbUpsertChapter(db, manhwa.chapters.map(i => {return {...i, manhwa_id: manhwa.manhwa_id}}))
+  await dbUpsertManhwaAuthors(db, manhwa.authors.map(a => {return {author_id: a.author_id, manhwa_id: manhwa.manhwa_id, name: a.name, role: a.role}}))  
     
   await dbUpsertAltTitles(
     db, 
@@ -738,37 +769,6 @@ async function dbUpsertManhwas(db: SQLite.SQLiteDatabase, manhwas: Manhwa[]) {
     VALUES ${placeholders};`, 
     params
   ).catch(error => console.log("error dbUpsertManhwas", error));
-}
-
-
-/**
- * Inserts or updates multiple `Chapter` records in the `chapters` table.
- * @param db - An instance of `SQLiteDatabase`.
- * @param chapters - An array of `Chapter` objects to upsert.
- * @returns A promise that resolves when all chapter records have been inserted or updated.
- */
-async function dbUpsertChapter(db: SQLite.SQLiteDatabase, chapters: Chapter[]) {
-  const placeholders = chapters.map(() => '(?,?,?,?,?)').join(',');  
-  const params = chapters.flatMap(i => [
-      i.chapter_id, 
-      i.manhwa_id,
-      i.chapter_num,
-      i.chapter_name,
-      i.created_at
-  ]);
-  await db.runAsync(
-    `
-      INSERT OR REPLACE INTO chapters (
-        chapter_id,
-        manhwa_id,
-        chapter_num,
-        chapter_name,
-        created_at
-      )
-      VALUES ${placeholders};
-    `,
-    params
-  ).catch(error => console.log("error dbUpsertChapter", error));
 }
 
 
@@ -942,7 +942,7 @@ async function dbUpsertManhwaAuthors(db: SQLite.SQLiteDatabase, manhwaAuthor: Ma
 /**
  * Updates the local SQLite database with the latest manhwa data from Supabase.
  * - Fetches manhwas updated since the last database update.
- * - Clears the current database and upserts the latest manhwas, chapters, authors, genres, manhwa-author relationships, manhwa-genre relationships, and alternative titles.
+ * - Clears the current database and upserts the latest manhwas, authors, genres, manhwa-author relationships, manhwa-genre relationships, and alternative titles.
  * - Updates the last database update timestamp.
  * - Logs the duration of the Supabase fetch and SQLite update operations.
  * @param db - An instance of `SQLiteDatabase`.
@@ -969,7 +969,6 @@ export async function dbUpdateDatabase(db: SQLite.SQLiteDatabase): Promise<numbe
   await dbClearDatabase(db)
   await dbUpsertManhwas(db, manhwas)
 
-  const chapters: any[] = []
   const authors: AuthorSet = new AuthorSet()
   const genres: GenreSet = new GenreSet()
   const manhwaAuthors: any[] = []
@@ -977,17 +976,6 @@ export async function dbUpdateDatabase(db: SQLite.SQLiteDatabase): Promise<numbe
   const altTitles: (number | string)[] = []
 
   manhwas.forEach(manhwa => {
-    // Only Last 3 chapters
-    manhwa.chapters.forEach(
-      c => {
-        chapters.push(c.chapter_id)
-        chapters.push(manhwa.manhwa_id)
-        chapters.push(c.chapter_num)
-        chapters.push(c.chapter_name)
-        chapters.push(c.created_at)
-      }
-    )
-      
     // Genres
     manhwa.genres.forEach(g => {
       genres.add(g)
@@ -1014,23 +1002,6 @@ export async function dbUpdateDatabase(db: SQLite.SQLiteDatabase): Promise<numbe
   
   await Promise.all([
     dbUpsertGenres(db, genres.values()),
-    dbUpsertBatch(
-      db,
-      chapters,
-      'chapters',
-      'chapter_id, manhwa_id, chapter_num, chapter_name, created_at',
-      "(?,?,?,?,?)",
-      5,
-      `
-      ON CONFLICT 
-        (chapter_id) 
-      DO UPDATE SET
-        manhwa_id = EXCLUDED.manhwa_id,
-        chapter_num = EXCLUDED.chapter_num,
-        chapter_name = EXCLUDED.chapter_name,
-        created_at = EXCLUDED.created_at
-      `
-    ),
     dbUpsertBatch(
       db,
       altTitles,
@@ -1142,40 +1113,11 @@ export async function dbGetRandomManhwaId(db: SQLite.SQLiteDatabase): Promise<nu
 
 
 /**
- * Retrieves the last three chapters of a specific manhwa, ordered by chapter number descending.
- * @param db - An instance of `SQLiteDatabase`.
- * @param manhwa_id - The ID of the manhwa to fetch chapters for.
- * @returns A promise that resolves to an array of up to three `Chapter` objects. Returns an empty array if no chapters are found.
- */
-export async function dbReadLast3Chapters(
-  db: SQLite.SQLiteDatabase,
-  manhwa_id: number
-): Promise<Chapter[]> {
-  const rows = await db.getAllAsync(
-    `
-      SELECT
-        *
-      FROM
-        chapters
-      WHERE
-        manhwa_id = ?
-      ORDER BY 
-        chapter_num DESC
-      LIMIT 3;
-    `,
-    [manhwa_id]
-  ).catch(error => console.log("error dbReadLast3Chapters", manhwa_id, error));
-
-  return rows ? rows as Chapter[] : []
-}
-
-
-/**
  * Retrieves the current app version from the `app_info` table.
  * @param db - An instance of `SQLiteDatabase`.
  * @returns A promise that resolves to the app version string.
  */
-export async function dbGetAppVersion(db: SQLite.SQLiteDatabase): Promise<string> {
+export async function dbReadAppVersion(db: SQLite.SQLiteDatabase): Promise<string> {
   const r = await dbReadInfo(db, 'version')
   return r!
 }
@@ -1221,8 +1163,7 @@ export async function dbReadManhwaById(
 
 
 /**
- * Retrieves a paginated list of manhwas ordered by their `updated_at` timestamp in descending order.
- * Each manhwa includes its last three chapters.
+ * Retrieves a paginated list of manhwas ordered by their `updated_at` timestamp in descending order. 
  * @param db - An instance of `SQLiteDatabase`.
  * @param p_offset - The offset for pagination. Defaults to 0.
  * @param p_limit - The maximum number of manhwas to return. Defaults to 30.
@@ -1233,13 +1174,7 @@ export async function dbReadManhwasOrderedByUpdateAt(
   p_offset: number = 0, 
   p_limit: number = 30
 ): Promise<Manhwa[]> {
-  const rows = await db.getAllAsync<{
-    manhwa_id: number, 
-    title: string, 
-    status: string, 
-    cover_image_url: string, 
-    chapters: Chapter[]
-  }>(
+  const rows = await db.getAllAsync(
     `
       SELECT 
         manhwa_id,
@@ -1255,20 +1190,12 @@ export async function dbReadManhwasOrderedByUpdateAt(
     `,
     [p_limit, p_offset]
   ).catch(error => console.log("error dbReadManhwasOrderedByUpdateAt", error));
-
-  if (rows) {
-    rows.forEach(async m => {
-      m.chapters = await dbReadLast3Chapters(db, m.manhwa_id)
-    })
-  }
-
   return rows ? rows as Manhwa[]  : []
 }
 
 
 /**
- * Retrieves a paginated list of manhwas ordered by their view count in descending order.
- * Each manhwa includes its last three chapters.
+ * Retrieves a paginated list of manhwas ordered by their view count in descending order. 
  * @param db - An instance of `SQLiteDatabase`.
  * @param p_offset - The offset for pagination. Defaults to 0.
  * @param p_limit - The maximum number of manhwas to return. Defaults to 30.
@@ -1279,13 +1206,7 @@ export async function dbReadManhwasOrderedByViews(
   p_offset: number = 0, 
   p_limit: number = 30
 ): Promise<Manhwa[]> {  
-  const rows = await db.getAllAsync<{
-    manhwa_id: number, 
-    title: string, 
-    status: string, 
-    cover_image_url: string, 
-    chapters: Chapter[]
-  }>(
+  const rows = await db.getAllAsync(
     `
       SELECT
         manhwa_id,
@@ -1301,13 +1222,6 @@ export async function dbReadManhwasOrderedByViews(
     `,
     [p_limit, p_offset]
   ).catch(error => console.log("error dbReadManhwasOrderedByViews", error));
-  
-  if (rows) {
-    rows.forEach(async m => {
-      m.chapters = await dbReadLast3Chapters(db, m.manhwa_id)
-    })
-  }
-
   return rows ? rows as Manhwa[]  : []
 }
 
@@ -1321,7 +1235,7 @@ export async function dbReadManhwasOrderedByViews(
  * @param p_limit - The maximum number of manhwas to return. Defaults to 30.
  * @returns A promise that resolves to an array of `Manhwa` objects matching the search criteria. Returns an empty array if no matches are found.
  */
-export async function dbSearchMangas(
+export async function dbSearchManhwas(
   db: SQLite.SQLiteDatabase, 
   p_search_text: string,
   p_offset: number = 0,
@@ -1414,7 +1328,7 @@ export async function dbReadManhwaGenres(
  * @param manhwa_id - The ID of the manhwa to fetch authors for.
  * @returns A promise that resolves to an array of `ManhwaAuthor` objects. Returns an empty array if no authors are found.
  */
-export async function dbReadMangaAuthors(
+export async function dbReadManhwaAuthors(
   db: SQLite.SQLiteDatabase,
   manhwa_id: number
 ): Promise<ManhwaAuthor[]> {
@@ -1438,7 +1352,7 @@ export async function dbReadMangaAuthors(
 /**
  * Retrieves the set of chapter IDs that the user has read for a specific manhwa.
  * @param db - An instance of `SQLiteDatabase`.
- * @param manhwa_id - The ID of the manhwa to fetch read chapters for.
+ * @param manhwa_id - The ID of the manhwa to fetch read for.
  * @returns A promise that resolves to a `Set` of chapter IDs. Returns an empty set if no chapters have been read.
  */
 export async function dbGetManhwaReadChapters(
@@ -1472,7 +1386,7 @@ export async function dbGetManhwaReadChapters(
  * @param manhwa_id - The ID of the manhwa to fetch the reading status for.
  * @returns A promise that resolves to the reading status string, or `null` if no status is recorded.
  */
-export async function dbGetManhwaReadingStatus(
+export async function dbReadManhwaReadingStatus(
   db: SQLite.SQLiteDatabase,
   manhwa_id: number
 ): Promise<string | null> {
@@ -1598,7 +1512,7 @@ export async function dbReadManhwasByGenreId(
  * @param chapter_id - The ID of the chapter being marked as read.
  * @returns A promise that resolves when the operation is complete.
  */
-export async function dbUpsertReadingHistory(
+export async function dbUpsertManhwaReadingHistory(
   db: SQLite.SQLiteDatabase,
   manhwa_id: number, 
   chapter_id: number
@@ -1629,7 +1543,7 @@ export async function dbUpsertReadingHistory(
  * @param p_limit - The maximum number of manhwas to return. Defaults to 30.
  * @returns A promise that resolves to an array of `Manhwa` objects. Returns an empty array if no reading history exists.
  */
-export async function dbGetReadingHistory(
+export async function dbGetManhwaReadingHistory(
   db: SQLite.SQLiteDatabase,
   p_offset: number = 0,
   p_limit: number = 30
@@ -1667,7 +1581,7 @@ export async function dbGetReadingHistory(
  * @param p_limit - The maximum number of manhwas to return. Defaults to 30.
  * @returns A promise that resolves to an array of `Manhwa` objects. Returns an empty array if no manhwas match the status.
  */
-export async function dbGetManhwasByReadingStatus(
+export async function dbReadManhwasByReadingStatus(
   db: SQLite.SQLiteDatabase,
   status: string  
 ): Promise<Manhwa[]> {
@@ -1698,10 +1612,15 @@ export async function dbGetManhwasByReadingStatus(
  * @param db - An instance of `SQLiteDatabase`.
  * @returns A promise that resolves to the total count of read chapters. Returns 0 if no chapters have been read.
  */
-export async function dbGetReadChaptersCount(db: SQLite.SQLiteDatabase): Promise<number> {
+export async function dbReadChaptersCount(db: SQLite.SQLiteDatabase): Promise<number> {
   const r = await db.getFirstAsync<{total: number}>(
-    'SELECT count(*) as total FROM reading_history;', ['chapters']
-  ).catch(error => console.log("error dbNumReadedChapters", error))
+    `
+      SELECT 
+        count(*) as total 
+      FROM 
+        reading_history;
+    `    
+  ).catch(error => console.log("error dbReadChaptersCount", error))
   return r ? r.total : 0
 }
 
@@ -1711,7 +1630,7 @@ export async function dbGetReadChaptersCount(db: SQLite.SQLiteDatabase): Promise
  * @param db - An instance of `SQLiteDatabase`.
  * @returns A promise that resolves to the count of unique manhwas read. Returns 0 if no manhwas have been read.
  */
-export async function dbGetReadManhwasCount(db: SQLite.SQLiteDatabase): Promise<number> {
+export async function dbReadManhwasCount(db: SQLite.SQLiteDatabase): Promise<number> {
   const r = await db.getFirstAsync<{total: number}>(
     'SELECT COUNT(DISTINCT manhwa_id) AS total FROM reading_history;'
   ).catch(error => console.log("error dbNumUniqueManhwasReaded", error))
@@ -1724,7 +1643,7 @@ export async function dbGetReadManhwasCount(db: SQLite.SQLiteDatabase): Promise<
  * @param db - An instance of `SQLiteDatabase`.
  * @returns A promise that resolves to the count of fetched images.
  */
-export async function dbGetNumImagesFetchedCount(db: SQLite.SQLiteDatabase): Promise<number> {
+export async function dbReadNumImagesFetchedCount(db: SQLite.SQLiteDatabase): Promise<number> {
   const r = await db.getFirstAsync<{value: number}>(
     `SELECT value FROM app_numeric_info WHERE name = 'images'`
   ).catch(error => console.log("error dbGetNumImagesFetched", error))
@@ -1732,18 +1651,42 @@ export async function dbGetNumImagesFetchedCount(db: SQLite.SQLiteDatabase): Pro
 }
 
 
+export async function dbReadDeviceName(db: SQLite.SQLiteDatabase): Promise<string> {
+  let device = await dbReadInfo(db, 'device')
+  if (!device) {
+    device = await getDeviceName()
+    await dbSetInfo(db, 'device', device)
+  }
+  return device
+}
+
 /**
  * Retrieves a numeric value stored in the `app_numeric_info` table by its name.
  * @param db - An instance of `SQLiteDatabase`.
  * @param name - The key/name of the numeric info to retrieve.
  * @returns A promise that resolves to the numeric value if found, or `null` if not found.
  */
-export async function dbReadNumericInfo(db: SQLite.SQLiteDatabase, name: string): Promise<number | null> {
+export async function dbReadNumericInfo(
+  db: SQLite.SQLiteDatabase, 
+  name: string,
+  defaultValue: number = 0
+): Promise<number> {
   const r = await db.getFirstAsync<{value: number}>(
-    'SELECT value FROM app_numeric_info WHERE name = ?;',
+    `
+      SELECT 
+        value 
+      FROM 
+        app_numeric_info 
+      WHERE 
+        name = ?;
+      `,
     [name]
   ).catch(error => console.log("error dbGetNumericInfo", error))
-  return r ? r.value : null
+  if (!r) {
+    await dbSetNumericInfo(db, name, defaultValue)
+    return defaultValue
+  }
+  return r.value
 }
 
 
@@ -1813,18 +1756,20 @@ export async function dbSetNumericInfo(db: SQLite.SQLiteDatabase, name: string, 
 /**
  * Retrieves the user's overall reading history statistics.
  * @param db - An instance of `SQLiteDatabase`.
- * @returns A promise that resolves to a `UserHistory` object containing:
+ * @returns A promise that resolves to a `UserData` object containing:
  *   - `manhwas`: Total number of distinct manhwas read.
  *   - `chapters`: Total number of chapters read.
  *   - `images`: Total number of images fetched.
+ *   - `device`: Device name
  */
-export async function dbGetUserHistory(db: SQLite.SQLiteDatabase): Promise<UserHistory> {
-  const [manhwas, chapters, images] = await Promise.all([
-    dbGetReadManhwasCount(db),
-    dbGetReadChaptersCount(db),
-    dbGetNumImagesFetchedCount(db)
+export async function dbGetUserData(db: SQLite.SQLiteDatabase): Promise<UserData> {
+  const [manhwas, chapters, images, device] = await Promise.all([
+    dbReadManhwasCount(db),
+    dbReadChaptersCount(db),
+    dbReadNumImagesFetchedCount(db),
+    dbReadDeviceName(db)
   ])
-  return { manhwas, chapters, images }
+  return { manhwas, chapters, images, device }
 }
 
 
@@ -1836,8 +1781,8 @@ export async function dbGetUserHistory(db: SQLite.SQLiteDatabase): Promise<UserH
  * @param db - The local SQLite database instance.
  * @param value - A string representing the new state. Typically `'1'` to enable asking for donations, or `'0'` to disable.
  */
-export async function dbSetShouldAskForDonation(db: SQLite.SQLiteDatabase, value: string) {
-  await dbSetInfo(db, 'should_ask_for_donation', value)
+export async function dbSetShouldAskForDonation(db: SQLite.SQLiteDatabase, value: number) {
+  await dbSetNumericInfo(db, 'should_ask_for_donation', value)
 }
 
 
@@ -1851,8 +1796,8 @@ export async function dbSetShouldAskForDonation(db: SQLite.SQLiteDatabase, value
  * @returns A promise resolving to `true` if the app should ask for a donation, otherwise `false`.
  */
 export async function dbShouldAskForDonation(db: SQLite.SQLiteDatabase): Promise<boolean> {
-  const r = await dbReadInfo(db, 'should_ask_for_donation')
-  return r !== null && r === '1'
+  const r = await dbReadNumericInfo(db, 'should_ask_for_donation', 1)
+  return r === 1
 }
 
 
@@ -1875,7 +1820,7 @@ export async function dbIsChapterMilestoneReached(db: SQLite.SQLiteDatabase): Pr
   const shouldAsk = await dbShouldAskForDonation(db)
   if (!shouldAsk) { return false }
 
-  const readChaptersCount = await dbGetReadChaptersCount(db)
+  const readChaptersCount = await dbReadChaptersCount(db)
   
   let currentMilestone = await dbReadNumericInfo(db, 'current_chapter_milestone')
   if (!currentMilestone) {
@@ -1904,8 +1849,8 @@ export async function dbIsChapterMilestoneReached(db: SQLite.SQLiteDatabase): Pr
  * @returns `true` if Safe Mode is enabled, `false` otherwise.
  */
 export async function dbIsSafeModeEnabled(db: SQLite.SQLiteDatabase): Promise<boolean> {
-  const r = await dbReadInfo(db, 'is_safe_mode_on')
-  return r === '1'
+  const r = await dbReadNumericInfo(db, 'is_safe_mode_on')
+  return r === 1
 }
 
 
@@ -1918,7 +1863,7 @@ export async function dbIsSafeModeEnabled(db: SQLite.SQLiteDatabase): Promise<bo
  * @param state - `true` to enable Safe Mode, `false` to disable it.
  */
 export async function dbSetSafeModeState(db: SQLite.SQLiteDatabase, state: boolean) {
-  await dbSetInfo(db, 'is_safe_mode_on', state ? '1' : '0')
+  await dbSetNumericInfo(db, 'is_safe_mode_on', state ? 1 : 0)
 }
 
 
@@ -2122,66 +2067,6 @@ export async function dbCheckPassword(db: SQLite.SQLiteDatabase, password: strin
 
 
 /**
- * Resets the app to its initial state by:
- *  - Re-initializing `app_info` with default values
- *  - Setting numeric app info values (`images`, `current_chapter_milestone`)
- *  - Ensuring a default entry in `update_history` for caching
- *  - Clearing all entries in `chapters`, `reading_status`, `reading_history`, and `todos` tables
- *
- * @param db - SQLite database instance
- */
-export async function dbResetApp(db: SQLite.SQLiteDatabase) {
-  await db.execAsync(
-    `
-    BEGIN TRANSACTION;
-
-      INSERT OR REPLACE INTO 
-        app_info (name, value)
-      VALUES 
-        ('version', '${AppConstants.APP_VERSION}');
-
-        INSERT INTO app_info 
-          (name, value)
-        VALUES
-          ('device', 'null'),
-          ('last_sync_time', ''),
-          ('should_ask_for_donation', '1'),
-          ('password', ''),
-          ('is_safe_mode_on', '0')
-        ON CONFLICT 
-          (name)
-        DO UPDATE SET
-          value = EXCLUDED.value;
-
-        INSERT INTO app_numeric_info
-          (name, value)        
-        VALUES
-          ('images', 0),
-          ('current_chapter_milestone', ${AppConstants.CHAPTER_GOAL_START})
-        ON CONFLICT 
-          (name)
-        DO UPDATE SET
-          value = EXCLUDED.value;
-
-        INSERT INTO 
-          update_history (name, refresh_cycle)
-        VALUES
-          ('cache', ${AppConstants.DATABASE.SIZE.CACHE})
-        ON CONFLICT  
-          (name)
-        DO NOTHING;
-
-    COMMIT;
-    `
-  ).catch(error => console.log("error dbResetApp", error))
-  await dbCleanTable(db, 'chapters')
-  await dbCleanTable(db, 'reading_status')
-  await dbCleanTable(db, 'reading_history')
-  await dbCleanTable(db, 'todos')
-}
-
-
-/**
  * Loads the app's user settings from the database.
  *  
  * Returns default values if any setting is not found or if an error occurs.
@@ -2255,37 +2140,6 @@ export async function dbFillReadingStatus(db: SQLite.SQLiteDatabase, status: str
 
 
 /**
- * Resets the reading history to simulate that a specific number of chapters have been read.
- * 
- * This function first clears the entire `reading_history` table, then inserts the first `n` chapters
- * from the `chapters` table to simulate reading progress for debugging purposes.
- *
- * @param db - An open SQLite database instance.
- * @param n - The number of chapters to mark as read.
- *
- * @returns A promise that resolves when the operations are complete. Errors are logged to the console
- *          but do not throw.
- */
-export async function dbDebugSetNumChapterRead(db: SQLite.SQLiteDatabase, n: number) {
-  await dbCleanTable(db, 'reading_history')
-  await db.runAsync(
-    `
-      INSERT INTO reading_history (
-        manhwa_id,
-        chapter_id
-      )
-      SELECT
-        manhwa_id, chapter_id
-      FROM
-        chapters
-      LIMIT ?;
-    `,
-    [n]
-  ).catch(error => console.log("error dbDebugSetNumChapterRead", error))
-}
-
-
-/**
  * Fetches debug information and statistics from the SQLite database.
  * 
  * This function collects both aggregate counts from various tables and stored debug metadata.
@@ -2297,7 +2151,6 @@ export async function dbDebugSetNumChapterRead(db: SQLite.SQLiteDatabase, n: num
 export async function dbFetchDebugInfo(db: SQLite.SQLiteDatabase): Promise<DebugInfo> {
   const part1 = await Promise.all([
     dbCount(db, 'manhwas'),
-    dbCount(db, 'chapters'),
     dbCount(db, 'authors'),
     dbCount(db, 'genres'),
     dbCount(db, 'manhwa_genres'),
@@ -2306,7 +2159,6 @@ export async function dbFetchDebugInfo(db: SQLite.SQLiteDatabase): Promise<Debug
     dbCount(db, 'reading_history')
   ]).then(([
     total_manhwas,
-    total_chapters,
     total_authors,
     total_genres,
     total_manhwa_genres,
@@ -2316,7 +2168,6 @@ export async function dbFetchDebugInfo(db: SQLite.SQLiteDatabase): Promise<Debug
   ]) => {
     return {
       total_manhwas,
-      total_chapters,
       total_authors,
       total_genres,
       total_manhwa_genres,
@@ -2327,13 +2178,13 @@ export async function dbFetchDebugInfo(db: SQLite.SQLiteDatabase): Promise<Debug
   })
 
   const part2 = await Promise.all([
-    dbReadInfo(db, 'device'),
-    dbReadInfo(db, 'first_run'),
+    dbReadDeviceName(db),
+    dbReadNumericInfo(db, 'first_run', 1),
     dbReadInfo(db, 'last_sync_time'),
-    dbReadInfo(db, 'should_ask_for_donation'),
+    dbReadNumericInfo(db, 'should_ask_for_donation', 1),
     dbReadNumericInfo(db, 'images'),
-    dbReadNumericInfo(db, 'current_chapter_milestone'),
-    dbGetReadChaptersCount(db)
+    dbReadNumericInfo(db, 'current_chapter_milestone', AppConstants.CHAPTER_GOAL_START),
+    dbReadChaptersCount(db)
   ]).then(([
     device,
     first_run,
@@ -2372,12 +2223,11 @@ export async function dbSetDebugInfo(
 ) {
   await Promise.all([
     dbSetInfo(db, 'device', debug.device ?? ''),
-    dbSetInfo(db, 'first_run', debug.first_run === '1' ? '1' : '0'),
+    dbSetNumericInfo(db, 'first_run', debug.first_run),
     dbSetInfo(db, 'last_sync_time', debug.last_sync_time ?? ''),
-    dbSetInfo(db, 'should_ask_for_donation', debug.should_ask_for_donation ?? '1'),
-    dbSetNumericInfo(db, 'images', debug.images ?? 0),
-    dbSetNumericInfo(db, 'current_chapter_milestone', debug.current_chapter_milestone ?? AppConstants.CHAPTER_GOAL_START),
-    dbDebugSetNumChapterRead(db, debug.read_chapters)
+    dbSetNumericInfo(db, 'should_ask_for_donation', debug.should_ask_for_donation),
+    dbSetNumericInfo(db, 'images', debug.images),
+    dbSetNumericInfo(db, 'current_chapter_milestone', debug.current_chapter_milestone)
   ]).catch(error => console.log("erro dbSetDebugInfo", error))
 }
 
