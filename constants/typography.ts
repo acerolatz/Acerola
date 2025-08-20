@@ -55,6 +55,13 @@ export const Typography = StyleSheet.create({
     fontSize: FontSizes.xs,
     color: Colors.white
   },
+  lightUnderline: {
+    fontFamily: "LeagueSpartan_200ExtraLight",
+    fontWeight: "200",
+    fontSize: FontSizes.xs,
+    color: Colors.white,
+    textDecorationLine: "underline"
+  },
   regular: {
     fontFamily: "LeagueSpartan_400Regular",
     fontWeight: "400",

@@ -189,27 +189,6 @@ export async function spUpdateManhwaViews(p_manhwa_id: number) {
 
 
 /**
- * Retrieves application release information from the database. 
- * 
- * @returns Promise resolving to an array of AppRelease objects. Returns empty array on error.
- */
-export async function spGetReleases(): Promise<AppRelease[]> {
-    const { data, error } = await supabase
-        .from("app_infos")
-        .select("name, value, action")
-        .order("created_at", {ascending: false})
-        .eq("type", "release")
-        
-    if (error) { 
-        console.log("error spGetAllAppVersions", error)
-        return [] 
-    }    
-
-    return data.map(r => {return {version: r.name, url: r.value, action: r.action}})
-}
-
-
-/**
  * Fetches images for a specific chapter from the database. 
  * 
  * @param chapter_id - ID of the chapter to fetch images for
@@ -476,6 +455,7 @@ export async function spFetchReleasesAndSourceCode(): Promise<ReleaseWrapper> {
         .from("app_infos")
         .select('name, value, action, type')
         .or("type.eq.source, type.eq.release")
+        .order("created_at", {ascending: false})
 
     if (error) {
         console.log("error spFetchReleasesAndSourceCode", error)
@@ -484,7 +464,7 @@ export async function spFetchReleasesAndSourceCode(): Promise<ReleaseWrapper> {
 
     const releases: AppRelease[] = data
         .filter(i => i.type === "release")
-        .map(i => {return {version: i.name, url: i.value, action: i.action}})
+        .map(i => {return {version: i.name, url: i.value, descr: i.action}})
 
     const source: SourceCodeLink[] = data
         .filter(i => i.type === "source")

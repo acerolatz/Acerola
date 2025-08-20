@@ -140,7 +140,7 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
                             iconName='logo-reddit'
                         />
 
-                        <MenuButton 
+                        <MenuButton
                             onPress={openSettings} 
                             title='Settings' 
                             iconName='settings-outline'
@@ -151,9 +151,10 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
                 </View>
             </ScrollView>
             <Pressable 
-                onPress={openDisclaimer} style={{paddingBottom: 62, alignItems: "center"}} 
+                onPress={openDisclaimer} 
+                style={styles.disclaimer} 
                 hitSlop={AppConstants.HIT_SLOP.LARGE} >
-                <Text style={{...Typography.light, textDecorationLine: 'underline'}} >eula & disclaimer</Text>
+                <Text style={Typography.lightUnderline} >eula & disclaimer</Text>
             </Pressable>
         </SafeAreaView>
     )
@@ -166,5 +167,9 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "space-between",
         paddingTop: 10
+    },
+    disclaimer: {
+        paddingBottom: 62, 
+        alignItems: "center"
     }
 })

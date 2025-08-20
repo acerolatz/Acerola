@@ -41,6 +41,7 @@ const ChapterGridItem = ({
 
 export default ChapterGridItem
 
+
 const styles = StyleSheet.create({
   chapterItem: {    
     width: ITEM_SIZE, 

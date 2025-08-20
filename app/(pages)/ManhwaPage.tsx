@@ -133,7 +133,7 @@ const ManhwaPage = () => {
       case 'topBar':
         return (
           <Row style={styles.topBar}>
-            <HomeButton color={Colors.backgroundColor} iconName='home-outline' />
+            <HomeButton />
             <Row style={{ gap: AppConstants.ICON.SIZE }}>
               <BugReportButton title={manhwa!.title} color={Colors.backgroundColor} />
               <RandomManhwaButton color={Colors.backgroundColor} />

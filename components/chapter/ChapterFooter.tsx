@@ -56,8 +56,9 @@ const ChapterFooter = ({
 
   return (
     <Column style={styles.container} >
-      <Row style={{justifyContent: "space-between"}} >
-        <Row style={{gap: AppConstants.GAP, justifyContent: "flex-start"}} >
+      {
+        !loading &&
+        <Row style={{gap: AppConstants.GAP}} >
           <Text style={Typography.regular}>Chapter</Text>
           {
             !isFirstChapter &&
@@ -66,11 +67,7 @@ const ChapterFooter = ({
             </Pressable>
           }
           <View style={{alignItems: "center", justifyContent: "center"}} >
-            {
-              loading ?
-              <ActivityIndicator size={AppConstants.ICON.SIZE} color={Colors.white} /> :
-              <Text style={Typography.regular}>{chapterName}</Text>
-            }
+            <Text style={Typography.regular}>{chapterName}</Text>
           </View>
           {
             !isLastChapter &&
@@ -79,7 +76,7 @@ const ChapterFooter = ({
             </Pressable>
           }
         </Row>
-      </Row>
+      }
       <Pressable onPress={openBugReport} style={styles.button} >
         <Text style={styles.text}>
           If you encounter broken or missing images, please use the bug-report option.
@@ -113,7 +110,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.backgroundSecondary
   },
   text: {
-    ...Typography.regular, 
+    ...Typography.regular,
     flexShrink: 1, 
     textAlign: "center"
   }

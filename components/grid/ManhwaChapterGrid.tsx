@@ -1,18 +1,18 @@
-import { Colors } from "@/constants/Colors"
-import { Manhwa } from '@/helpers/types'
-import { dbGetManhwaReadChapters } from '@/lib/database'
-import { spFetchChapterList } from "@/lib/supabase"
-import { useChapterState } from "@/store/chapterState"
-import { AppStyle } from "@/styles/AppStyle"
-import { router, useFocusEffect } from "expo-router"
-import { useSQLiteContext } from "expo-sqlite"
-import { useCallback, useEffect, useState } from "react"
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native"
-import Row from "../util/Row"
-import { AppConstants } from "@/constants/AppConstants"
-import { Typography } from "@/constants/typography"
 import ChapterPageSelector from "../chapter/ChapterPageSelector"
 import ChapterGridItem from "../chapter/ChapterGridItem"
+import { useCallback, useEffect, useState } from "react"
+import { dbGetManhwaReadChapters } from '@/lib/database'
+import { AppConstants } from "@/constants/AppConstants"
+import { useChapterState } from "@/store/chapterState"
+import { router, useFocusEffect } from "expo-router"
+import { Typography } from "@/constants/typography"
+import { spFetchChapterList } from "@/lib/supabase"
+import { useSQLiteContext } from "expo-sqlite"
+import { AppStyle } from "@/styles/AppStyle"
+import { Colors } from "@/constants/Colors"
+import { Manhwa } from '@/helpers/types'
+import Row from "../util/Row"
 
 
 const PAGE_LIMIT = 96

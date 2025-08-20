@@ -1,4 +1,12 @@
+import UserDataComponent from '../UserActivityComponent';
+import { AppConstants } from '@/constants/AppConstants';
+import PerformanceUIForm from './PerformanceUIForm';
+import { Typography } from '@/constants/typography';
+import { Colors } from '@/constants/Colors';
+import SafeModeForm from './SafeModeForm';
 import React, { useRef } from 'react';
+import CacheForm from './CacheForm';
+import { wp } from '@/helpers/util';
 import {
   View,
   Animated,  
@@ -6,14 +14,6 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import PerformanceUIForm from './PerformanceUIForm';
-import SafeModeForm from './SafeModeForm';
-import CacheForm from './CacheForm';
-import { Colors } from '@/constants/Colors';
-import { wp } from '@/helpers/util';
-import { Typography } from '@/constants/typography';
-import { AppConstants } from '@/constants/AppConstants';
-import UserDataComponent from '../UserActivityComponent';
 
 interface SettingsFormProps {
   currentMaxCacheSize: number;
@@ -95,7 +95,8 @@ const SettingsForm = ({
                 pagingEnabled
                 showsHorizontalScrollIndicator={false}
                 snapToInterval={width}
-                decelerationRate="normal"
+                decelerationRate='fast'
+                disableIntervalMomentum={true}
                 bounces
                 onScroll={Animated.event(
                     [{ nativeEvent: { contentOffset: { x: scrollX } } }],

@@ -214,7 +214,7 @@ const HomePage = () => {
                         {!loading && (
                             <>
                             {AppConstants.DEBUB.ENABLED && <Button iconName='bug-outline' onPress={() => router.navigate("/(pages)/DebugPage")} />}
-                                <UpdateDatabaseButton type="client" />
+                                <UpdateDatabaseButton />
                                 <Button iconName="search-outline" onPress={openManhwaSearch} />
                                 <RandomManhwaButton />
                             </>

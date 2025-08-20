@@ -1,74 +1,59 @@
-import { Colors } from '@/constants/Colors'
-import { ToastMessages } from '@/constants/Messages'
-import { hasInternetAvailable } from '@/helpers/util'
-import { dbCheckSecondsSinceLastRefresh, dbHasNoManhwas, dbShouldUpdate, dbUpdateDatabase } from '@/lib/database'
-import { router } from 'expo-router'
-import { useSQLiteContext } from 'expo-sqlite'
-import React from 'react'
-import Toast from 'react-native-toast-message'
 import BooleanRotatingButton from './BooleanRotatingButton'
 import { AppConstants } from '@/constants/AppConstants'
+import { hasInternetAvailable } from '@/helpers/util'
+import { ToastMessages } from '@/constants/Messages'
+import React, { useCallback, useRef } from 'react'
+import { dbUpdateDatabase } from '@/lib/database'
+import { useSQLiteContext } from 'expo-sqlite'
+import Toast from 'react-native-toast-message'
+import { Colors } from '@/constants/Colors'
+import { router } from 'expo-router'
 
 
 interface UpdateDatabaseProps {
     iconSize?: number
-    iconColor?: string,
-    type: "server" | "client"
+    iconColor?: string    
 }
 
 
-const UpdateDatabaseButton = ({
+const UpdateDatabaseButton = ({ 
     iconSize = AppConstants.ICON.SIZE, 
-    iconColor = Colors.white,
-    type
+    iconColor = Colors.white 
 }: UpdateDatabaseProps) => {
 
-    const db = useSQLiteContext()    
+    const db = useSQLiteContext()
+    const fetching = useRef(false) 
 
-    const update = async () => {
+    const update = useCallback(async () => {
+        if (fetching.current) return
+        fetching.current = true
+
         const hasInternet = await hasInternetAvailable()
-        if (!hasInternet) { 
+        if (!hasInternet) {
+            fetching.current = false
             Toast.show(ToastMessages.EN.NO_INTERNET)
-            return 
-        }        
-
-        const shouldUpdate = await dbShouldUpdate(db, type) || AppConstants.DEBUB.ENABLED
-        
-        let hasNoMangas = true
-        if (!shouldUpdate) { hasNoMangas = await dbHasNoManhwas(db) }
-        
-        if (!shouldUpdate && !hasNoMangas) {
-            const secondsUntilRefresh = await dbCheckSecondsSinceLastRefresh(db, type)
-            Toast.show({
-                text1: "Wait",
-                text2: `You can try again in ${secondsUntilRefresh} seconds.`,
-                type: 'info',
-                visibilityTime: 3000
-            })
-        } else {
-            Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE)
-            try {
-                const n = await dbUpdateDatabase(db)
-                if (n > 0) {
-                    Toast.show({
-                        text1: "Sync completed",
-                        text2: `Pornhwas: ${n}`,
-                        type: "info"
-                    })
-                    router.replace("/(pages)/HomePage")
-                    return
-                } else {
-                    Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED1)
-                }                
-            } catch (error) {
-                console.log(error)
-            }
+            return
         }
-        
-    }
+
+        Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE)
+
+        try {
+            const n = await dbUpdateDatabase(db)
+            if (n > 0) {
+                Toast.show({ text1: 'Sync completed', text2: `Pornhwas: ${n}`, type: 'info' })
+                router.replace('/(pages)/HomePage')
+            } else {
+                Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED1)
+            }
+        } catch (error) {
+            console.error(error)
+        } finally {
+            fetching.current = false
+        }
+    }, [db])    
 
     return (           
-        <BooleanRotatingButton 
+        <BooleanRotatingButton
             onPress={update} 
             iconSize={iconSize} 
             iconColor={iconColor}

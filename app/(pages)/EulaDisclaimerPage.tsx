@@ -149,13 +149,13 @@ const styles = StyleSheet.create({
     dotsContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
-        marginVertical: AppConstants.MARGIN
+        marginBottom: AppConstants.GAP
     },
     dot: {
         height: AppConstants.ICON.SIZE * 0.5,
         width: AppConstants.ICON.SIZE * 0.5,
         borderRadius: AppConstants.ICON.SIZE,
         backgroundColor: Colors.primary,
-        marginHorizontal: 4,
+        marginHorizontal: AppConstants.MARGIN
     }
 })

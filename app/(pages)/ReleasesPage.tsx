@@ -16,24 +16,19 @@ import TopBar from '@/components/TopBar';
 
 
 const Releases = () => {
+  
   const { releasesInfo, setReleasesInfo } = useAppVersionState();
-  const [loading, setLoading] = useState(false);
-
-  const loadReleases = useCallback(async () => {
-    if (releasesInfo.releases.length > 0 && releasesInfo.source.length > 0) return;
-
-    try {
+  const [loading, setLoading] = useState(false);  
+  
+  useEffect(() => { 
+    const init = async () => {
       setLoading(true);
       const data = await spFetchReleasesAndSourceCode();
       setReleasesInfo(data);
-    } catch (error) {
-      console.error('Error fetching releases:', error);
-    } finally {
-      setLoading(false);
+      setLoading(false);        
     }
-  }, [releasesInfo.releases, releasesInfo.source, setReleasesInfo]);
-
-  useEffect(() => { loadReleases(); }, [loadReleases]);
+    init()
+  }, []);
 
   const renderSourceItem = useCallback(
     ({ item }: {item: SourceCodeLink}) => <SourceCodeButton item={item} />,

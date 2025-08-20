@@ -46,7 +46,7 @@ export type Manhwa = {
 export type AppRelease = {
     version: string
     url: string
-    action: string | null
+    descr: string | null
 }
 
 export type ManhwaGenre = {

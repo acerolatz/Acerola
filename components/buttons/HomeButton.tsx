@@ -16,8 +16,8 @@ interface HomeButtonProps {
 
 const HomeButton = ({
   size = AppConstants.ICON.SIZE, 
-  color = Colors.white, 
-  iconName = 'home'
+  color = Colors.backgroundColor, 
+  iconName = 'home-outline'
 }: HomeButtonProps) => {
   return (
     <Pressable 
