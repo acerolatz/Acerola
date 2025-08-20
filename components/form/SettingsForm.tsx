@@ -31,7 +31,7 @@ const SettingsForm = ({
   safeModeOn,
 }: SettingsFormProps) => {
 
-    const titles = ['Safe Mode', 'Optimization', 'Cache', 'User Data']
+    const titles = ['Safe Mode', 'Optimization', 'Cache', 'Log']
 
     const forms = [
       <SafeModeForm key="safe" safeModeOn={safeModeOn} safeModePassword={safeModePassword} />,      

@@ -8,7 +8,6 @@ import Ionicons from '@expo/vector-icons/Ionicons'
 import ReturnButton from '../buttons/ReturnButton'
 import { Colors } from '@/constants/Colors'
 import { router } from 'expo-router'
-import Footer from '../util/Footer'
 import Column from '../util/Column'
 import { Image } from 'expo-image'
 import TopBar from '../TopBar'
@@ -36,7 +35,7 @@ const ChapterHeader = ({
   const exitChapter = async () => {
     Image.clearMemoryCache()
     router.back()
-  }  
+  }
   
   const isFirstChapter = currentChapterIndex === 0
   const isLastChapter = currentChapterIndex >= chapters.length - 1

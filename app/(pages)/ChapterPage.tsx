@@ -39,7 +39,7 @@ const ChapterPage = () => {
         Toast.show({text1: "Error", text2: "Could not fetch the chapter images", type: 'info'})
         return 
       }
-      await Image.prefetch(imgs.slice(0, 5).map(i => i.image_url))
+      await Image.prefetch(imgs.slice(0, 2).map(i => i.image_url))
       setImages(imgs)
     setLoading(false)
   }
@@ -52,7 +52,7 @@ const ChapterPage = () => {
       }
       async function init() {
         setLoading(true)
-          await Image.clearMemoryCache();
+          await Image.clearMemoryCache()
           const imgs: ChapterImage[] = await spFetchChapterImages(currentChapter.chapter_id)
           if (imgs.length === 0) { setImages([]); setLoading(false); return }
           if (isCancelled) return;
@@ -60,7 +60,7 @@ const ChapterPage = () => {
             dbUpsertManhwaReadingHistory(db, currentChapter.manhwa_id, currentChapter.chapter_id),
             spUpdateChapterView(currentChapter.chapter_id),
             dbAddNumericInfo(db, 'images', imgs.length),
-            Image.prefetch(imgs.slice(0, 5).map(i => i.image_url))
+            Image.prefetch(imgs.slice(0, 2).map(i => i.image_url))
           ])
           setImages(imgs)
         setLoading(false)

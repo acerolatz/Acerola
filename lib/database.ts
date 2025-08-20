@@ -3,6 +3,7 @@ import {
   Chapter,  
   DebugInfo,  
   Genre,  
+  Log,  
   Manhwa, 
   ManhwaAuthor, 
   ManhwaGenre, 
@@ -10,7 +11,7 @@ import {
   Todo, 
   UserData 
 } from '@/helpers/types';
-import {formatBytes, getCacheSizeBytes, getDeviceName, secondsSince } from '@/helpers/util';
+import {dbGetSupportedAbis, formatBytes, getCacheSizeBytes, getDeviceName, secondsSince } from '@/helpers/util';
 import { AppConstants } from '@/constants/AppConstants';
 import DeviceInfo from 'react-native-device-info';
 import { spGetManhwas, spNewRun } from './supabase';
@@ -50,6 +51,14 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
     -- ===============================
     --            TABLES
     -- ===============================
+
+    CREATE TABLE IF NOT EXISTS logs (
+      log_id INTEGER PRIMARY KEY,
+      title TEXT NOT NULL,
+      descr TEXT NOT NULL,
+      created_at INTEGER NOT NULL
+    );
+
     CREATE TABLE IF NOT EXISTS app_info (
       name TEXT NOT NULL PRIMARY KEY,
       value TEXT NOT NULL
@@ -184,7 +193,8 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
         ('windowSize', ${AppConstants.DEFAULT_WINDOW_SIZE}),
         ('maxToRenderPerBatch', ${AppConstants.DEFAULT_MAX_TO_RENDER_PER_BATCH}),
         ('updateCellsBatchingPeriod', ${AppConstants.DEFAULT_UPDATE_CELLS_BATCHING_PERIOD}),
-        ('maxCacheSize', ${AppConstants.DATABASE.SIZE.CACHE})
+        ('maxCacheSize', ${AppConstants.DATABASE.SIZE.CACHE}),
+        ('itemVisiblePercentThreshold', ${AppConstants.DEFAULT_ITEM_VISIBLE_PERCENTAGE_THRESHOLD})
       ON CONFLICT
         (name) 
       DO NOTHING;
@@ -206,11 +216,41 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
 }
 
 
+export async function dbAddLog(db: SQLite.SQLiteDatabase, title: string, descr: string = '') {
+  await db.runAsync(
+    'INSERT INTO logs (title, descr, created_at) VALUES (?,?,?);',
+    [title, descr, Date.now()]
+  ).catch(error => console.log("error dbAddLog", error))
+}
+
+
+export async function dbReadLogs(
+  db: SQLite.SQLiteDatabase, 
+  p_offset: number = 0, 
+  p_limit: number = 30
+): Promise<Log[]> {
+  const r = await db.getAllAsync<Log>(
+    `
+      SELECT
+        *
+      FROM
+        logs
+      ORDER BY
+        created_at DESC
+      LIMIT ?
+      OFFSET ?;
+    `,
+    [p_limit, p_offset]
+  ).catch(error => console.log("error dbReadLogs", error))
+
+  return r ?? []
+}
+
 /**
- * Reads all rows from a given SQLite table.
+ * Reads all rows from a given **local SQLite database** table.
  *
  * @template T - The expected type of each row returned.
- * @param db - The SQLite database instance.
+ * @param db - SQLite database instance.
  * @param table - The name of the table to query.
  * @returns A promise that resolves to an array of rows of type T. Returns an empty array if the query fails.
  */
@@ -224,12 +264,13 @@ export async function dbReadAll<T>(db: SQLite.SQLiteDatabase, table: string): Pr
 
 
 /**
- * Retrieves the maximum size allowed for the **image cache stored on the device** in bytes.
+ * Retrieves the maximum size allowed for the **image cache stored on the device** in bytes
+ * from the **local SQLite database**.
  *
  * If the value is not found in the database, it will initialize it with the default size
  * from AppConstants and return that default.
  *
- * @param db - The SQLite database instance.
+ * @param db - SQLite database instance.
  * @returns A promise that resolves to the maximum image cache size in bytes.
  */
 export async function dbGetCacheMaxSize(db: SQLite.SQLiteDatabase): Promise<number> {
@@ -243,9 +284,10 @@ export async function dbGetCacheMaxSize(db: SQLite.SQLiteDatabase): Promise<numb
 
 
 /**
- * Sets the maximum allowed size for the **image cache stored on the device** in bytes.
+ * Sets the maximum allowed size for the **image cache stored on the device** in bytes
+ * in the **local SQLite database**.
  *
- * @param db - The SQLite database instance.
+ * @param db - SQLite database instance.
  * @param size - The new maximum image cache size in bytes.
  * @returns A promise that resolves once the value has been saved.
  */
@@ -255,12 +297,13 @@ export async function dbSetCacheMaxSize(db: SQLite.SQLiteDatabase, totalBytes: n
 
 
 /**
- * Determines whether the **image cache stored on the device** should be cleared.
+ * Determines whether the **image cache stored on the device** should be cleared
+ * by checking the **local SQLite database**.
  *
  * Compares the current cache size in bytes with the maximum allowed cache size
  * stored in the database.
  *
- * @param db - The SQLite database instance.
+ * @param db - SQLite database instance.
  * @returns A promise that resolves to `true` if the current cache size exceeds
  *          the maximum allowed size, otherwise `false`.
  */
@@ -270,9 +313,11 @@ export async function dbShouldClearCache(db: SQLite.SQLiteDatabase): Promise<boo
   return cacheSize > maxSize;
 }
 
+
 /**
- * Counts the number of rows in a specified table.
- * @param db - An instance of `SQLiteDatabase`.
+ * Counts the number of rows in a specified table from the **local SQLite database**.
+ *
+ * @param db - SQLite database instance
  * @param table - The name of the table to count rows from.
  * @returns A promise that resolves to the total number of rows in the table.
  */
@@ -290,8 +335,9 @@ export async function dbCount(db: SQLite.SQLiteDatabase, table: string): Promise
 
 
 /**
- * Calculates the total size of the SQLite database in megabytes (MiB).
- * @param db - An instance of `SQLiteDatabase`.
+ * Calculates the total size of the **local SQLite database** in megabytes (MiB).
+ *
+ * @param db - SQLite database instance
  * @returns A promise that resolves to the total database size in MiB, or `null` if the size could not be determined.
  */
 async function dbGetTotalSizeMiB(db: SQLite.SQLiteDatabase): Promise<number | null> {
@@ -309,7 +355,7 @@ async function dbGetTotalSizeMiB(db: SQLite.SQLiteDatabase): Promise<number | nu
 
 
 /**
- * Logs detailed information about the current state of the database and
+ * Logs detailed information about the current state of the **local SQLite database** and
  * the device image cache to the console.
  *
  * Includes:
@@ -319,12 +365,12 @@ async function dbGetTotalSizeMiB(db: SQLite.SQLiteDatabase): Promise<number | nu
  * - Maximum allowed image cache size
  * - Current image cache size
  *
- * @param db - The SQLite database instance.
+ * @param db - SQLite database instance
  * @returns A promise that resolves once all information has been logged.
  */
 export async function dbLog(db: SQLite.SQLiteDatabase) {  
-  console.log("=========================")
-  console.log("[ACEROLA DATABASE START]")
+  console.log("==========================")
+  console.log("=====ACEROLA DATABASE=====")
   const r = [
     'num_tables: ' + (await db.getFirstAsync<{num_tables: number}>(`SELECT count(*) as num_tables FROM sqlite_master WHERE type='table';`))?.num_tables,
     'size_mib: ' + await dbGetTotalSizeMiB(db),
@@ -337,14 +383,15 @@ export async function dbLog(db: SQLite.SQLiteDatabase) {
     'max_cache_size: ' + await dbGetCacheMaxSize(db) / 1024 / 1024 + ' MB',
     'current_cache_size: ' + formatBytes(await getCacheSizeBytes())
   ].forEach(i => console.log(i))
-  console.log("[ACEROLA DATABASE END]")
+  console.log("=========================")
   console.log("=========================")
 }
 
 
 /**
- * Retrieves and logs all rows from a specified table.
- * @param db - An instance of `SQLiteDatabase`.
+ * Retrieves and logs all rows from a specified table in the **local SQLite database**.
+ *
+ * @param db - SQLite database instance
  * @param table - The name of the table to list rows from.
  * @returns A promise that resolves when the operation is complete. Each row is logged to the console.
  */
@@ -357,8 +404,9 @@ export async function dbListTable(db: SQLite.SQLiteDatabase, table: string) {
 
 
 /**
- * Retrieves the timestamp of the last database update from the `app_info` table.
- * @param db - An instance of `SQLiteDatabase`.
+ * Retrieves the timestamp of the last database update from the `app_info` table in the **local SQLite database**.
+ *
+ * @param db - SQLite database instance
  * @returns A promise that resolves to the last update timestamp as a string, or `null` if not found or empty.
  */
 export async function dbGetLastDatabaseUpdateTimestamp(db: SQLite.SQLiteDatabase): Promise<string | null> {
@@ -370,9 +418,11 @@ export async function dbGetLastDatabaseUpdateTimestamp(db: SQLite.SQLiteDatabase
   return r?.value && r.value.trim() !== '' ? r.value : null
 }
 
+
 /**
- * Updates the timestamp of the last database update in the `app_info` table.
- * @param db - An instance of `SQLiteDatabase`.
+ * Updates the timestamp of the last database update in the `app_info` table of the **local SQLite database**.
+ *
+ * @param db - SQLite database instance
  * @param value - The timestamp string to set as the last update time.
  * @returns A promise that resolves when the update is complete.
  */
@@ -385,9 +435,9 @@ export async function dbSetLastDatabaseUpdateTimestamp(db: SQLite.SQLiteDatabase
 
 
 /**
- * Deletes all rows from a specific table in the database.
+ * Deletes all rows from a specific table in the **local SQLite database**.
  *
- * @param db - The SQLite database instance.
+ * @param db - SQLite database instance
  * @param table - The name of the table to clear.
  * @returns A promise that resolves once the table has been cleared.
  *          Logs an error to the console if the operation fails.
@@ -398,7 +448,7 @@ export async function dbCleanTable(db: SQLite.SQLiteDatabase, table: string) {
 
 
 /**
- * Clears the main database tables by deleting all rows from key tables.
+ * Clears the main tables in the **local SQLite database** by deleting all rows from key tables.
  *
  * Currently clears:
  * - manhwas
@@ -407,7 +457,7 @@ export async function dbCleanTable(db: SQLite.SQLiteDatabase, table: string) {
  * - manhwa_authors (VIA ON DELETE CASCADE)
  * - manhwa_genres (VIA ON DELETE CASCADE)
  *
- * @param db - The SQLite database instance.
+ * @param db - SQLite database instance
  * @returns A promise that resolves once the database has been cleared.
  *          Logs errors to the console if any deletion fails.
  * @note This does not reset autoincrement counters or foreign key references.
@@ -421,8 +471,9 @@ export async function dbClearDatabase(db: SQLite.SQLiteDatabase) {
 
 
 /**
- * Reads a value from the `app_info` table by its name.
- * @param db - An instance of `SQLiteDatabase`.
+ * Reads a value from the `app_info` table in the **local SQLite database** by its name.
+ *
+ * @param db - SQLite database instance
  * @param name - The name of the info entry to read.
  * @returns A promise that resolves to the value as a string, or `null` if not found.
  */
@@ -453,8 +504,9 @@ export async function dbReadInfo(
 
 
 /**
- * Insert or replace the value of an existing entry in the `app_info` table.
- * @param db - An instance of `SQLiteDatabase`.
+ * Inserts or replaces the value of an existing entry in the `app_info` table in the **local SQLite database**.
+ *
+ * @param db - SQLite database instance
  * @param name - The name of the info entry to update.
  * @param value - The new value to set for the entry.
  * @returns A promise that resolves when the update is complete.
@@ -473,9 +525,10 @@ export async function dbSetInfo(db: SQLite.SQLiteDatabase, name: string, value: 
 
 
 /**
- * Generates a new UUID for the user and stores it in the `app_info` table under the key `user_id`.
+ * Generates a new UUID for the user and stores it in the `app_info` table under the key `user_id` in the **local SQLite database**.
  * If an entry already exists, it will be replaced.
- * @param db - An instance of `SQLiteDatabase`.
+ *
+ * @param db - SQLite database instance
  * @returns A promise that resolves to the newly generated user UUID as a string.
  */
 async function dbSetUserUUID(db: SQLite.SQLiteDatabase): Promise<string> {
@@ -486,11 +539,11 @@ async function dbSetUserUUID(db: SQLite.SQLiteDatabase): Promise<string> {
 
 
 /**
- * Retrieves the user's UUID from the database.
+ * Retrieves the user's UUID from the **local SQLite database**.
  *
- * If the UUID does not exist, it will generate a new one using and store it in the database.
+ * If the UUID does not exist, it will generate a new one and store it in the database.
  *
- * @param db - The SQLite database instance.
+ * @param db - SQLite database instance
  * @returns A promise that resolves to the user's UUID as a string.
  */
 export async function dbGetUserUUID(db: SQLite.SQLiteDatabase): Promise<string> {  
@@ -499,14 +552,16 @@ export async function dbGetUserUUID(db: SQLite.SQLiteDatabase): Promise<string> 
   return user_id!
 }
 
+
 /**
- * Handles first-run initialization of the app.
+ * Handles first-run initialization of the app using the **local SQLite database**.
  * - Checks the `first_run` flag in `app_info`.
  * - If it is the first run:
- *   - Stores device information in the database.
- *   - Generates and stores a new user UUID.
- *   - Invokes spNewRun to transmit first-run user and device information to Supabase.
- * @param db - An instance of `SQLiteDatabase`.
+ *   - Stores device information in the **local database**.
+ *   - Generates and stores a new user UUID in the **local database**.
+ *   - Invokes `spNewRun` to transmit first-run user and device information to Supabase.
+ *
+ * @param db - SQLite database instance
  * @returns A promise that resolves when first-run initialization is complete.
  */
 export async function dbFirstRun(db: SQLite.SQLiteDatabase) {
@@ -521,17 +576,18 @@ export async function dbFirstRun(db: SQLite.SQLiteDatabase) {
     await dbSetInfo(db, 'device', device)
     const user_id = await dbSetUserUUID(db)
     spNewRun(user_id, device)
-    console.log("[NEW USER]", device, user_id)
+    dbAddLog(db, "new_user_created", `user_id: ${user_id}, device: ${device}`)
   }
 }
 
 
 /**
- * Retrieves all alternative titles for a specific manhwa, excluding the main title.
- * @param db - An instance of `SQLiteDatabase`.
- * @param manhwa_id - The unique ID of the manhwa.
- * @param manhwa_title - The main title of the manhwa to exclude from results.
- * @returns A promise that resolves to an array of alternative titles.
+ * Retrieves all alternative titles for a specific manhwa, excluding the main title, from the **local SQLite database**.
+ * 
+ * @param db - SQLite database instance
+ * @param manhwa_id - The unique ID of the manhwa
+ * @param manhwa_title - The main title of the manhwa to exclude from results
+ * @returns A promise that resolves to an array of alternative titles
  */
 export async function dbGetManhwaAltNames(
   db: SQLite.SQLiteDatabase, 
@@ -555,11 +611,12 @@ export async function dbGetManhwaAltNames(
 
 
 /**
- * Calculates the remaining seconds until the next allowed refresh for a given resource.
- * @param db - An instance of `SQLiteDatabase`.
- * @param name - The name of the resource in the `update_history` table.
+ * Calculates the remaining seconds until the next allowed refresh for a given resource using the **local SQLite database**.
+ * 
+ * @param db - SQLite database instance
+ * @param name - The name of the resource in the `update_history` table
  * @returns A promise that resolves to the number of seconds remaining until the next refresh.
- *          Returns a negative value (-1) if the resource is not found.
+ *          Returns a negative value (-1) if the resource is not found
  */
 export async function dbCheckSecondsSinceLastRefresh(
   db: SQLite.SQLiteDatabase, 
@@ -592,10 +649,11 @@ export async function dbCheckSecondsSinceLastRefresh(
 
 
 /**
- * Updates the `last_refreshed_at` timestamp for a given resource in the `update_history` table to the current time.
- * @param db - An instance of `SQLiteDatabase`.
- * @param name - The name of the resource to update.
- * @returns A promise that resolves when the update is complete.
+ * Updates the `last_refreshed_at` timestamp for a given resource in the `update_history` table using the **local SQLite database**.
+ * 
+ * @param db - SQLite database instance
+ * @param name - The name of the resource to update
+ * @returns A promise that resolves when the update is complete
  */
 export async function dbSetLastRefresh(db: SQLite.SQLiteDatabase, name: string) {    
     await db.runAsync(
@@ -611,11 +669,12 @@ export async function dbSetLastRefresh(db: SQLite.SQLiteDatabase, name: string) 
 }
 
 /**
- * Determines whether a resource should be updated based on its refresh cycle and last refreshed timestamp.
+ * Determines whether a resource should be updated based on its refresh cycle and last refreshed timestamp using the **local SQLite database**.
  * If an update is required, the `last_refreshed_at` timestamp is updated to the current time.
- * @param db - An instance of `SQLiteDatabase`.
- * @param name - The name of the resource in the `update_history` table.
- * @returns A promise that resolves to `true` if the resource should be updated, `false` otherwise.
+ * 
+ * @param db - SQLite database instance
+ * @param name - The name of the resource in the `update_history` table
+ * @returns A promise that resolves to `true` if the resource should be updated, `false` otherwise
  */
 export async function dbShouldUpdate(
   db: SQLite.SQLiteDatabase, 
@@ -666,11 +725,12 @@ export async function dbShouldUpdate(
 
 
 /**
- * Inserts or updates a `Manhwa` record in the database along with its related data.
+ * Inserts or updates a `Manhwa` record in the **local SQLite database** along with its related data.
  * This includes genres, authors, and alternative titles.
- * @param db - An instance of `SQLiteDatabase`.
- * @param manhwa - The `Manhwa` object containing all relevant information to upsert.
- * @returns A promise that resolves when the manhwa and all related data have been upserted.
+ * 
+ * @param db - SQLite database instance
+ * @param manhwa - The `Manhwa` object containing all relevant information to upsert
+ * @returns A promise that resolves when the manhwa and all related data have been upserted
  */
 export async function dbUpsertManhwa(db: SQLite.SQLiteDatabase, manhwa: Manhwa) {
   await db.runAsync(
@@ -716,11 +776,12 @@ export async function dbUpsertManhwa(db: SQLite.SQLiteDatabase, manhwa: Manhwa) 
 
 
 /**
- * Inserts or updates alternative titles for a specific manhwa in the `alt_titles` table.
- * @param db - An instance of `SQLiteDatabase`.
- * @param manhwa_id - The ID of the manhwa to associate the alternative titles with.
- * @param titles - An array of alternative title strings to upsert.
- * @returns A promise that resolves when all titles have been inserted or updated.
+ * Inserts or updates alternative titles for a specific manhwa in the `alt_titles` table using the **local SQLite database**.
+ * 
+ * @param db - SQLite database instance
+ * @param manhwa_id - The ID of the manhwa to associate the alternative titles with
+ * @param titles - An array of alternative title strings to upsert
+ * @returns A promise that resolves when all titles have been inserted or updated
  */
 async function dbUpsertAltTitles(db: SQLite.SQLiteDatabase, manhwa_id: number, titles: string[]) {  
   const placeholders = titles.map(() => `(${manhwa_id},?)`).join(',');
@@ -738,10 +799,11 @@ async function dbUpsertAltTitles(db: SQLite.SQLiteDatabase, manhwa_id: number, t
 
 
 /**
- * Inserts or updates multiple `Manhwa` records in the `manhwas` table.
- * @param db - An instance of `SQLiteDatabase`.
- * @param manhwas - An array of `Manhwa` objects to upsert.
- * @returns A promise that resolves when all manhwa records have been inserted or updated.
+ * Inserts or updates multiple `Manhwa` records in the `manhwas` table in the **local SQLite database**.
+ * 
+ * @param db - SQLite database instance
+ * @param manhwas - An array of `Manhwa` objects to upsert
+ * @returns A promise that resolves when all manhwa records have been inserted or updated
  */
 async function dbUpsertManhwas(db: SQLite.SQLiteDatabase, manhwas: Manhwa[]) {
   const placeholders = manhwas.map(() => '(?,?,?,?,?,?,?,?)').join(',');  
@@ -773,16 +835,17 @@ async function dbUpsertManhwas(db: SQLite.SQLiteDatabase, manhwas: Manhwa[]) {
 
 
 /**
- * Inserts data into a specified table in batches, handling large numbers of parameters to avoid SQLite limits.
+ * Inserts data into a specified table in batches in the **local SQLite database**, handling large numbers of parameters to avoid SQLite limits.
  * Supports optional `ON CONFLICT` behavior.
- * @param db - An instance of `SQLiteDatabase`.
- * @param params - A flat array of values to insert.
- * @param table - The name of the table to insert data into.
- * @param columns - A comma-separated string of column names corresponding to the values.
- * @param rowPlaceholder - A string representing the placeholders for a single row, e.g., `(?,?,?)`.
- * @param numColumns - The number of columns per row (used to split params into correct batches).
- * @param onConflict - Optional SQL clause for handling conflicts, e.g., `ON CONFLICT(...) DO UPDATE SET ...`.
- * @returns A promise that resolves when all batches have been processed.
+ * 
+ * @param db - SQLite database instance
+ * @param params - A flat array of values to insert
+ * @param table - The name of the table to insert data into
+ * @param columns - A comma-separated string of column names corresponding to the values
+ * @param rowPlaceholder - A string representing the placeholders for a single row, e.g., `(?,?,?)`
+ * @param numColumns - The number of columns per row (used to split params into correct batches)
+ * @param onConflict - Optional SQL clause for handling conflicts, e.g., `ON CONFLICT(...) DO UPDATE SET ...`
+ * @returns A promise that resolves when all batches have been processed
  */
 async function dbUpsertBatch(
   db: SQLite.SQLiteDatabase,
@@ -826,11 +889,12 @@ async function dbUpsertBatch(
 
 
 /**
- * Inserts or updates multiple `Genre` records in the `genres` table.
+ * Inserts or updates multiple `Genre` records in the `genres` table in the **local SQLite database**.
  * If a genre with the same `genre_id` already exists, its name will be updated.
- * @param db - An instance of `SQLiteDatabase`.
- * @param genres - An array of `Genre` objects to upsert.
- * @returns A promise that resolves when all genre records have been inserted or updated.
+ * 
+ * @param db - SQLite database instance
+ * @param genres - An array of `Genre` objects to upsert
+ * @returns A promise that resolves when all genre records have been inserted or updated
  */
 async function dbUpsertGenres(db: SQLite.SQLiteDatabase, genres: Genre[]) {
   const placeholders = genres.map(() => '(?,?)').join(',');
@@ -854,11 +918,12 @@ async function dbUpsertGenres(db: SQLite.SQLiteDatabase, genres: Genre[]) {
 
 
 /**
- * Inserts multiple `ManhwaGenre` relationships into the `manhwa_genres` table.
+ * Inserts multiple `ManhwaGenre` relationships into the `manhwa_genres` table in the **local SQLite database**.
  * If a relationship already exists (same `genre_id` and `manhwa_id`), it will be ignored.
- * @param db - An instance of `SQLiteDatabase`.
- * @param manhwaGenres - An array of `ManhwaGenre` objects to upsert.
- * @returns A promise that resolves when all genre relationships have been inserted.
+ * 
+ * @param db - SQLite database instance
+ * @param manhwaGenres - An array of `ManhwaGenre` objects to upsert
+ * @returns A promise that resolves when all genre relationships have been inserted
  */
 async function dbUpsertManhwaGenres(db: SQLite.SQLiteDatabase, manhwaGenres: ManhwaGenre[]) {
   const placeholders = manhwaGenres.map(() => '(?,?)').join(',');  
@@ -882,11 +947,12 @@ async function dbUpsertManhwaGenres(db: SQLite.SQLiteDatabase, manhwaGenres: Man
 
 
 /**
- * Inserts or updates multiple `Author` records in the `authors` table.
+ * Inserts or updates multiple `Author` records in the `authors` table in the **local SQLite database**.
  * Existing authors with the same `author_id` will be replaced.
- * @param db - An instance of `SQLiteDatabase`.
- * @param authors - An array of `Author` objects to upsert.
- * @returns A promise that resolves when all author records have been inserted or updated.
+ * 
+ * @param db - SQLite database instance
+ * @param authors - An array of `Author` objects to upsert
+ * @returns A promise that resolves when all author records have been inserted or updated
  */
 async function dbUpsertAuthors(db: SQLite.SQLiteDatabase, authors: Author[]) {  
   const placeholders = authors.map(() => '(?,?,?)').join(',');  
@@ -908,12 +974,14 @@ async function dbUpsertAuthors(db: SQLite.SQLiteDatabase, authors: Author[]) {
   ).catch(error => console.log("error dbUpsertAuthors", error));
 }
 
+
 /**
- * Inserts multiple `ManhwaAuthor` relationships into the `manhwa_authors` table.
+ * Inserts multiple `ManhwaAuthor` relationships into the `manhwa_authors` table in the **local SQLite database**.
  * If a relationship with the same `author_id`, `manhwa_id`, and `role` already exists, it will be ignored.
- * @param db - An instance of `SQLiteDatabase`.
- * @param manhwaAuthor - An array of `ManhwaAuthor` objects to upsert.
- * @returns A promise that resolves when all author-manwha relationships have been inserted.
+ * 
+ * @param db - SQLite database instance
+ * @param manhwaAuthor - An array of `ManhwaAuthor` objects to upsert
+ * @returns A promise that resolves when all author-manhwa relationships have been inserted
  */
 async function dbUpsertManhwaAuthors(db: SQLite.SQLiteDatabase, manhwaAuthor: ManhwaAuthor[]) {
   const placeholders = manhwaAuthor.map(() => '(?,?,?)').join(',');
@@ -940,13 +1008,14 @@ async function dbUpsertManhwaAuthors(db: SQLite.SQLiteDatabase, manhwaAuthor: Ma
 
 
 /**
- * Updates the local SQLite database with the latest manhwa data from Supabase.
+ * Updates the **local SQLite database** with the latest manhwa data from Supabase.
  * - Fetches manhwas updated since the last database update.
  * - Clears the current database and upserts the latest manhwas, authors, genres, manhwa-author relationships, manhwa-genre relationships, and alternative titles.
  * - Updates the last database update timestamp.
  * - Logs the duration of the Supabase fetch and SQLite update operations.
- * @param db - An instance of `SQLiteDatabase`.
- * @returns A promise that resolves to the number of manhwas fetched and updated in the database.
+ * 
+ * @param db - SQLite database instance
+ * @returns A promise that resolves to the number of manhwas fetched and updated in the **local database**
  */
 export async function dbUpdateDatabase(db: SQLite.SQLiteDatabase): Promise<number> {
   console.log('[UPDATING DATABASE]')
@@ -1058,8 +1127,9 @@ export async function dbUpdateDatabase(db: SQLite.SQLiteDatabase): Promise<numbe
 }
 
 /**
- * Checks whether the `manhwas` table in the database contains any entries.
- * @param db - An instance of `SQLiteDatabase`.
+ * Checks whether the `manhwas` table in the **local SQLite database** contains any entries.
+ * 
+ * @param db - SQLite database instance
  * @returns A promise that resolves to `true` if there are no manhwas in the table, or `false` otherwise.
  */
 export async function dbHasNoManhwas(db: SQLite.SQLiteDatabase): Promise<boolean> {
@@ -1077,8 +1147,9 @@ export async function dbHasNoManhwas(db: SQLite.SQLiteDatabase): Promise<boolean
 
 
 /**
- * Checks whether a manhwa with a given ID exists in the `manhwas` table.
- * @param db - An instance of `SQLiteDatabase`.
+ * Checks whether a manhwa with a given ID exists in the `manhwas` table in the **local SQLite database**.
+ * 
+ * @param db - SQLite database instance
  * @param manhwa_id - The ID of the manhwa to check.
  * @returns A promise that resolves to `true` if the manhwa exists, `false` otherwise.
  */
@@ -1113,8 +1184,9 @@ export async function dbGetRandomManhwaId(db: SQLite.SQLiteDatabase): Promise<nu
 
 
 /**
- * Retrieves the current app version from the `app_info` table.
- * @param db - An instance of `SQLiteDatabase`.
+ * Retrieves the current app version from the `app_info` table in the **local SQLite database**.
+ * 
+ * @param db - SQLite database instance
  * @returns A promise that resolves to the app version string.
  */
 export async function dbReadAppVersion(db: SQLite.SQLiteDatabase): Promise<string> {
@@ -1124,8 +1196,9 @@ export async function dbReadAppVersion(db: SQLite.SQLiteDatabase): Promise<strin
 
 
 /**
- * Retrieves all genres from the `genres` table, ordered alphabetically by genre name.
- * @param db - An instance of `SQLiteDatabase`.
+ * Retrieves all genres from the `genres` table in the **local SQLite database**, ordered alphabetically by genre name.
+ * 
+ * @param db - SQLite database instance
  * @returns A promise that resolves to an array of `Genre` objects. Returns an empty array if no genres are found.
  */
 export async function dbReadGenres(db: SQLite.SQLiteDatabase): Promise<Genre[]> {
@@ -1144,8 +1217,9 @@ export async function dbReadGenres(db: SQLite.SQLiteDatabase): Promise<Genre[]> 
 
 
 /**
- * Retrieves a manhwa record by its ID from the `manhwas` table.
- * @param db - An instance of `SQLiteDatabase`.
+ * Retrieves a manhwa record by its ID from the `manhwas` table in the **local SQLite database**.
+ * 
+ * @param db - SQLite database instance
  * @param manhwa_id - The ID of the manhwa to fetch.
  * @returns A promise that resolves to a `Manhwa` object if found, or `null` if no matching record exists.
  */
@@ -1163,8 +1237,9 @@ export async function dbReadManhwaById(
 
 
 /**
- * Retrieves a paginated list of manhwas ordered by their `updated_at` timestamp in descending order. 
- * @param db - An instance of `SQLiteDatabase`.
+ * Retrieves a paginated list of manhwas ordered by their `updated_at` timestamp in descending order from the **local SQLite database**.
+ * 
+ * @param db - SQLite database instance
  * @param p_offset - The offset for pagination. Defaults to 0.
  * @param p_limit - The maximum number of manhwas to return. Defaults to 30.
  * @returns A promise that resolves to an array of `Manhwa` objects. Returns an empty array if no manhwas are found.
@@ -1195,8 +1270,9 @@ export async function dbReadManhwasOrderedByUpdateAt(
 
 
 /**
- * Retrieves a paginated list of manhwas ordered by their view count in descending order. 
- * @param db - An instance of `SQLiteDatabase`.
+ * Retrieves a paginated list of manhwas ordered by their view count in descending order from the **local SQLite database**.
+ * 
+ * @param db - SQLite database instance
  * @param p_offset - The offset for pagination. Defaults to 0.
  * @param p_limit - The maximum number of manhwas to return. Defaults to 30.
  * @returns A promise that resolves to an array of `Manhwa` objects. Returns an empty array if no manhwas are found.
@@ -1227,9 +1303,10 @@ export async function dbReadManhwasOrderedByViews(
 
 
 /**
- * Searches for manhwas whose titles or alternative titles match the provided search text (case-insensitive).
+ * Searches for manhwas whose titles or alternative titles match the provided search text (case-insensitive) in the **local SQLite database**.
  * Results are grouped by manhwa and ordered by view count descending, then by manhwa ID.
- * @param db - An instance of `SQLiteDatabase`.
+ * 
+ * @param db - SQLite database instance
  * @param p_search_text - The text to search for in manhwa titles and alternative titles.
  * @param p_offset - The offset for pagination. Defaults to 0.
  * @param p_limit - The maximum number of manhwas to return. Defaults to 30.
@@ -1269,8 +1346,9 @@ export async function dbSearchManhwas(
 
 
 /**
- * Increments the view count of a specific manhwa by 1.
- * @param db - An instance of `SQLiteDatabase`.
+ * Increments the view count of a specific manhwa by 1 in the **local SQLite database**.
+ * 
+ * @param db - SQLite database instance
  * @param manhwa_id - The ID of the manhwa whose views should be incremented.
  * @returns A promise that resolves when the update is complete.
  */
@@ -1293,8 +1371,9 @@ export async function dbUpdateManhwaViews(
 
 
 /**
- * Retrieves all genres associated with a specific manhwa, ordered alphabetically by genre name.
- * @param db - An instance of `SQLiteDatabase`.
+ * Retrieves all genres associated with a specific manhwa from the **local SQLite database**, ordered alphabetically by genre name.
+ * 
+ * @param db - SQLite database instance
  * @param manhwa_id - The ID of the manhwa to fetch genres for.
  * @returns A promise that resolves to an array of `Genre` objects. Returns an empty array if no genres are found.
  */
@@ -1323,8 +1402,9 @@ export async function dbReadManhwaGenres(
 
 
 /**
- * Retrieves all authors associated with a specific manhwa.
- * @param db - An instance of `SQLiteDatabase`.
+ * Retrieves all authors associated with a specific manhwa from the **local SQLite database**.
+ * 
+ * @param db - SQLite database instance
  * @param manhwa_id - The ID of the manhwa to fetch authors for.
  * @returns A promise that resolves to an array of `ManhwaAuthor` objects. Returns an empty array if no authors are found.
  */
@@ -1349,10 +1429,12 @@ export async function dbReadManhwaAuthors(
   return rows ? rows as ManhwaAuthor[] : []
 }
 
+
 /**
- * Retrieves the set of chapter IDs that the user has read for a specific manhwa.
- * @param db - An instance of `SQLiteDatabase`.
- * @param manhwa_id - The ID of the manhwa to fetch read for.
+ * Retrieves the set of chapter IDs that the user has read for a specific manhwa from the **local SQLite database**.
+ * 
+ * @param db - SQLite database instance
+ * @param manhwa_id - The ID of the manhwa to fetch read chapters for.
  * @returns A promise that resolves to a `Set` of chapter IDs. Returns an empty set if no chapters have been read.
  */
 export async function dbGetManhwaReadChapters(
@@ -1381,8 +1463,9 @@ export async function dbGetManhwaReadChapters(
 
 
 /**
- * Retrieves the reading status of a specific manhwa for the local user.
- * @param db - An instance of `SQLiteDatabase`.
+ * Retrieves the reading status of a specific manhwa for the local user from the **local SQLite database**.
+ * 
+ * @param db - SQLite database instance
  * @param manhwa_id - The ID of the manhwa to fetch the reading status for.
  * @returns A promise that resolves to the reading status string, or `null` if no status is recorded.
  */
@@ -1400,9 +1483,10 @@ export async function dbReadManhwaReadingStatus(
 
 
 /**
- * Updates or inserts the reading status of a specific manhwa for the local user.
+ * Updates or inserts the reading status of a specific manhwa for the local user in the **local SQLite database**.
  * If a status already exists for the given manhwa, it will be updated along with the timestamp.
- * @param db - An instance of `SQLiteDatabase`.
+ * 
+ * @param db - SQLite database instance
  * @param manhwa_id - The ID of the manhwa to update the reading status for.
  * @param status - The new reading status to set (e.g., "reading", "completed").
  * @returns A promise that resolves when the operation is complete.
@@ -1431,8 +1515,9 @@ export async function dbUpdateManhwaReadingStatus(
 
 
 /**
- * Retrieves all manhwas associated with a specific author, ordered by view count in descending order.
- * @param db - An instance of `SQLiteDatabase`.
+ * Retrieves all manhwas associated with a specific author from the **local SQLite database**, ordered by view count in descending order.
+ * 
+ * @param db - SQLite database instance
  * @param author_id - The ID of the author to fetch manhwas for.
  * @returns A promise that resolves to an array of `Manhwa` objects. Returns an empty array if no manhwas are found for the author.
  */
@@ -1464,8 +1549,9 @@ export async function dbReadManhwasByAuthorId(
 
 
 /**
- * Retrieves a paginated list of manhwas associated with a specific genre, ordered by view count descending and then by manhwa ID ascending.
- * @param db - An instance of `SQLiteDatabase`.
+ * Retrieves a paginated list of manhwas associated with a specific genre from the **local SQLite database**, ordered by view count descending and then by manhwa ID ascending.
+ * 
+ * @param db - SQLite database instance
  * @param genre_id - The ID of the genre to fetch manhwas for.
  * @param p_offset - The offset for pagination. Defaults to 0.
  * @param p_limit - The maximum number of manhwas to return. Defaults to 30.
@@ -1505,9 +1591,10 @@ export async function dbReadManhwasByGenreId(
 
 
 /**
- * Inserts or updates the reading history for a specific manhwa chapter.
+ * Inserts or updates the reading history for a specific manhwa chapter in the **local SQLite database**.
  * If the chapter has already been marked as read, its timestamp will be updated to the current time.
- * @param db - An instance of `SQLiteDatabase`.
+ * 
+ * @param db - SQLite database instance
  * @param manhwa_id - The ID of the manhwa.
  * @param chapter_id - The ID of the chapter being marked as read.
  * @returns A promise that resolves when the operation is complete.
@@ -1536,9 +1623,10 @@ export async function dbUpsertManhwaReadingHistory(
 }
 
 /**
- * Retrieves a paginated list of manhwas that the user has read, ordered by the most recently read chapters.
+ * Retrieves a paginated list of manhwas that the user has read from the **local SQLite database**, ordered by the most recently read chapters.
  * Each manhwa appears only once in the list.
- * @param db - An instance of `SQLiteDatabase`.
+ * 
+ * @param db - SQLite database instance
  * @param p_offset - The offset for pagination. Defaults to 0.
  * @param p_limit - The maximum number of manhwas to return. Defaults to 30.
  * @returns A promise that resolves to an array of `Manhwa` objects. Returns an empty array if no reading history exists.
@@ -1574,8 +1662,9 @@ export async function dbGetManhwaReadingHistory(
 
 
 /**
- * Retrieves a paginated list of manhwas filtered by a specific reading status, ordered by the most recent status update.
- * @param db - An instance of `SQLiteDatabase`.
+ * Retrieves a paginated list of manhwas filtered by a specific reading status from the **local SQLite database**, ordered by the most recent status update.
+ * 
+ * @param db - SQLite database instance
  * @param status - The reading status to filter by (e.g., "Reading", "Plan to Read").
  * @param p_offset - The offset for pagination. Defaults to 0.
  * @param p_limit - The maximum number of manhwas to return. Defaults to 30.
@@ -1608,8 +1697,9 @@ export async function dbReadManhwasByReadingStatus(
 
 
 /**
- * Retrieves the total number of chapters that the user has read across all manhwas.
- * @param db - An instance of `SQLiteDatabase`.
+ * Retrieves the total number of chapters that the user has read across all manhwas from the **local SQLite database**.
+ * 
+ * @param db - SQLite database instance
  * @returns A promise that resolves to the total count of read chapters. Returns 0 if no chapters have been read.
  */
 export async function dbReadChaptersCount(db: SQLite.SQLiteDatabase): Promise<number> {
@@ -1626,8 +1716,9 @@ export async function dbReadChaptersCount(db: SQLite.SQLiteDatabase): Promise<nu
 
 
 /**
- * Retrieves the total number of distinct manhwas that the user has read at least one chapter of.
- * @param db - An instance of `SQLiteDatabase`.
+ * Retrieves the total number of distinct manhwas that the user has read at least one chapter of from the **local SQLite database**.
+ * 
+ * @param db - SQLite database instance
  * @returns A promise that resolves to the count of unique manhwas read. Returns 0 if no manhwas have been read.
  */
 export async function dbReadManhwasCount(db: SQLite.SQLiteDatabase): Promise<number> {
@@ -1639,8 +1730,9 @@ export async function dbReadManhwasCount(db: SQLite.SQLiteDatabase): Promise<num
 
 
 /**
- * Retrieves the total number of images that have been fetched by the app.
- * @param db - An instance of `SQLiteDatabase`.
+ * Retrieves the total number of images that have been fetched by the app from the **local SQLite database**.
+ * 
+ * @param db - SQLite database instance
  * @returns A promise that resolves to the count of fetched images.
  */
 export async function dbReadNumImagesFetchedCount(db: SQLite.SQLiteDatabase): Promise<number> {
@@ -1651,6 +1743,16 @@ export async function dbReadNumImagesFetchedCount(db: SQLite.SQLiteDatabase): Pr
 }
 
 
+/**
+ * Retrieves the device name from the **local SQLite database**.
+ * 
+ * If the device name is not already stored in the database, it will:
+ * - Fetch the device name using `getDeviceName()`.
+ * - Store the retrieved device name in the database under the key `device`.
+ * 
+ * @param db - SQLite database instance
+ * @returns A promise that resolves to the device name as a string.
+ */
 export async function dbReadDeviceName(db: SQLite.SQLiteDatabase): Promise<string> {
   let device = await dbReadInfo(db, 'device')
   if (!device) {
@@ -1660,11 +1762,13 @@ export async function dbReadDeviceName(db: SQLite.SQLiteDatabase): Promise<strin
   return device
 }
 
+
 /**
- * Retrieves a numeric value stored in the `app_numeric_info` table by its name.
- * @param db - An instance of `SQLiteDatabase`.
- * @param name - The key/name of the numeric info to retrieve.
- * @returns A promise that resolves to the numeric value if found, or `null` if not found.
+ * Retrieves a numeric value from the **local SQLite database** `app_numeric_info` table by its name.
+ * 
+ * @param db - SQLite database instance
+ * @param name - The key/name of the numeric info to retrieve
+ * @returns A promise that resolves to the numeric value if found, or `null` if not found
  */
 export async function dbReadNumericInfo(
   db: SQLite.SQLiteDatabase, 
@@ -1691,11 +1795,12 @@ export async function dbReadNumericInfo(
 
 
 /**
- * Increments a numeric value in the `app_numeric_info` table by a specified amount.
- * @param db - An instance of `SQLiteDatabase`.
- * @param name - The key/name of the numeric info to update.
- * @param delta - The amount to add to the current value. Defaults to 1.
- * @returns A promise that resolves when the update operation is complete.
+ * Increments a numeric value in the **local SQLite database** `app_numeric_info` table by a specified amount.
+ * 
+ * @param db - SQLite database instance
+ * @param name - The key/name of the numeric info to update
+ * @param delta - The amount to add to the current value. Defaults to 1
+ * @returns A promise that resolves when the update operation is complete
  */
 export async function dbAddNumericInfo(db: SQLite.SQLiteDatabase, name: string, delta: number = 1) {
   await db.runAsync(
@@ -1713,12 +1818,13 @@ export async function dbAddNumericInfo(db: SQLite.SQLiteDatabase, name: string, 
 
 
 /**
- * Creates or updates a numeric entry in the `app_numeric_info` table.
+ * Creates or updates a numeric entry in the **local SQLite database** `app_numeric_info` table.
  * If an entry with the given name already exists, its value is replaced.
- * @param db - An instance of `SQLiteDatabase`.
- * @param name - The key/name of the numeric info to create or update.
- * @param value - The numeric value to set.
- * @returns A promise that resolves when the insert or update operation is complete.
+ * 
+ * @param db - SQLite database instance
+ * @param name - The key/name of the numeric info to create or update
+ * @param value - The numeric value to set
+ * @returns A promise that resolves when the insert or update operation is complete
  */
 export async function dbCreateNumericInfo(db: SQLite.SQLiteDatabase, name: string, value: number) {
   await db.runAsync(
@@ -1734,11 +1840,12 @@ export async function dbCreateNumericInfo(db: SQLite.SQLiteDatabase, name: strin
 
 
 /**
- * Update or create a numeric value in the `app_numeric_info` table for a given name.
- * @param db - An instance of `SQLiteDatabase`.
- * @param name - The key/name of the numeric info to update.
- * @param value - The numeric value to set/update.
- * @returns A promise that resolves when the update operation is complete.
+ * Updates or creates a numeric value in the **local SQLite database** `app_numeric_info` table for a given name.
+ * 
+ * @param db - SQLite database instance
+ * @param name - The key/name of the numeric info to update
+ * @param value - The numeric value to set or update
+ * @returns A promise that resolves when the update operation is complete
  */
 export async function dbSetNumericInfo(db: SQLite.SQLiteDatabase, name: string, value: number) {
   await db.runAsync(
@@ -1754,32 +1861,28 @@ export async function dbSetNumericInfo(db: SQLite.SQLiteDatabase, name: string, 
 
 
 /**
- * Retrieves the user's overall reading history statistics.
- * @param db - An instance of `SQLiteDatabase`.
+ * @param db - SQLite database instance
  * @returns A promise that resolves to a `UserData` object containing:
- *   - `manhwas`: Total number of distinct manhwas read.
- *   - `chapters`: Total number of chapters read.
- *   - `images`: Total number of images fetched.
- *   - `device`: Device name
+ *   - `chapters`: Total number of chapters read
+ *   - `images`: Total number of images fetched
+ *   - `supportedAbis`: arm64-v8a, x86_64 etc
  */
 export async function dbGetUserData(db: SQLite.SQLiteDatabase): Promise<UserData> {
-  const [manhwas, chapters, images, device] = await Promise.all([
-    dbReadManhwasCount(db),
+  const [chapters, images, supportedAbis] = await Promise.all([
     dbReadChaptersCount(db),
     dbReadNumImagesFetchedCount(db),
-    dbReadDeviceName(db)
+    dbGetSupportedAbis()
   ])
-  return { manhwas, chapters, images, device }
+  return { chapters, images, supportedAbis }
 }
 
 
 /**
- * Updates the local setting that controls whether the app should prompt the user for a donation.
- *
- * This modifies the `should_ask_for_donation` key in the `app_info` table.
- *
- * @param db - The local SQLite database instance.
- * @param value - A string representing the new state. Typically `'1'` to enable asking for donations, or `'0'` to disable.
+ * Updates the local setting in the **SQLite database** that controls whether the app should prompt the user for a donation.
+ * Modifies the `should_ask_for_donation` key in the `app_info` table.
+ * 
+ * @param db - SQLite database instance
+ * @param value - A string representing the new state. Typically `'1'` to enable asking for donations, or `'0'` to disable
  */
 export async function dbSetShouldAskForDonation(db: SQLite.SQLiteDatabase, value: number) {
   await dbSetNumericInfo(db, 'should_ask_for_donation', value)
@@ -1787,13 +1890,11 @@ export async function dbSetShouldAskForDonation(db: SQLite.SQLiteDatabase, value
 
 
 /**
- * Determines whether the app should currently prompt the user for a donation.
- *
- * The check is based on a local app setting stored in `app_info` under the key `should_ask_for_donation`.
- * A value of `'1'` indicates that the app should ask for a donation; any other value or absence of the key means no prompt.
- *
- * @param db - The local SQLite database instance.
- * @returns A promise resolving to `true` if the app should ask for a donation, otherwise `false`.
+ * Determines whether the app should currently prompt the user for a donation based on the **local SQLite database** setting.
+ * The check is performed on the `should_ask_for_donation` key in the `app_info` table.
+ * 
+ * @param db - SQLite database instance
+ * @returns A promise resolving to `true` if the app should ask for a donation, otherwise `false`
  */
 export async function dbShouldAskForDonation(db: SQLite.SQLiteDatabase): Promise<boolean> {
   const r = await dbReadNumericInfo(db, 'should_ask_for_donation', 1)
@@ -1802,19 +1903,19 @@ export async function dbShouldAskForDonation(db: SQLite.SQLiteDatabase): Promise
 
 
 /**
- * Checks whether the user has reached the next chapter milestone for prompting a donation message.
+ * Checks whether the user has reached the next chapter milestone for prompting a donation message in the **local SQLite database**.
  * 
  * Logic:
  * 1. Verifies if the app should ask for a donation (`dbShouldAskForDonation`).
- * 2. Reads the total number of chapters the user has read.
+ * 2. Reads the total number of chapters the user has read from the local database.
  * 3. Retrieves the current milestone from the database, initializing it if missing.
  * 4. If the read chapters count meets or exceeds the milestone:
  *    - Updates the milestone by adding a defined increment.
  *    - Returns `true` to indicate the milestone has been reached.
  * 5. Otherwise, returns `false`.
  *
- * @param db - The local SQLite database instance.
- * @returns A promise resolving to `true` if a chapter milestone is reached, `false` otherwise.
+ * @param db - SQLite database instance
+ * @returns A promise resolving to `true` if a chapter milestone is reached, `false` otherwise
  */
 export async function dbIsChapterMilestoneReached(db: SQLite.SQLiteDatabase): Promise<boolean> {
   const shouldAsk = await dbShouldAskForDonation(db)
@@ -1841,12 +1942,12 @@ export async function dbIsChapterMilestoneReached(db: SQLite.SQLiteDatabase): Pr
 
 
 /**
- * Checks whether the app's "Safe Mode" is currently enabled.
+ * Checks whether the app's "Safe Mode" is currently enabled in the **local SQLite database**.
  *
  * Safe Mode may be used to filter or restrict certain content in the app.
  *
- * @param db - The local SQLite database instance.
- * @returns `true` if Safe Mode is enabled, `false` otherwise.
+ * @param db - SQLite database instance
+ * @returns `true` if Safe Mode is enabled, `false` otherwise
  */
 export async function dbIsSafeModeEnabled(db: SQLite.SQLiteDatabase): Promise<boolean> {
   const r = await dbReadNumericInfo(db, 'is_safe_mode_on')
@@ -1854,13 +1955,14 @@ export async function dbIsSafeModeEnabled(db: SQLite.SQLiteDatabase): Promise<bo
 }
 
 
+
 /**
- * Sets the state of the app's "Safe Mode".
+ * Sets the state of the app's "Safe Mode" in the **local SQLite database**.
  *
  * Safe Mode may be used to filter or restrict certain content in the app.
  *
- * @param db - The local SQLite database instance.
- * @param state - `true` to enable Safe Mode, `false` to disable it.
+ * @param db - SQLite database instance
+ * @param state - `true` to enable Safe Mode, `false` to disable it
  */
 export async function dbSetSafeModeState(db: SQLite.SQLiteDatabase, state: boolean) {
   await dbSetNumericInfo(db, 'is_safe_mode_on', state ? 1 : 0)
@@ -1868,15 +1970,15 @@ export async function dbSetSafeModeState(db: SQLite.SQLiteDatabase, state: boole
 
 
 /**
- * Reads TODO items from the local database.
+ * Reads TODO items from the **local SQLite database**.
  *
  * Retrieves all TODOs, optionally filtered by their completion status.
  *
- * @param db - The SQLite database instance.
+ * @param db - SQLite database instance
  * @param completed - If `true`, returns only completed TODOs; 
  *                    if `false`, returns only incomplete TODOs;
- *                    if `null` (default), returns all TODOs.
- * @returns An array of TODO items, ordered by completion and creation date.
+ *                    if `null` (default), returns all TODOs
+ * @returns An array of TODO items, ordered by completion and creation date
  */
 export async function dbReadTodos(
   db: SQLite.SQLiteDatabase,
@@ -1913,11 +2015,11 @@ export async function dbReadTodos(
 
 
 /**
- * Retrieves a single TODO item by its ID.
+ * Retrieves a single TODO item by its ID from the **local SQLite database**.
  *
- * @param db - The SQLite database instance.
- * @param todo_id - The unique ID of the TODO item to retrieve.
- * @returns The TODO item if found, otherwise `null`.
+ * @param db - SQLite database instance
+ * @param todo_id - The unique ID of the TODO item to retrieve
+ * @returns The TODO item if found, otherwise `null`
  */
 export async function dbReadTodoById(db: SQLite.SQLiteDatabase, todo_id: number): Promise<Todo | null> {
   const r = await db.getFirstAsync<Todo>(
@@ -1929,12 +2031,12 @@ export async function dbReadTodoById(db: SQLite.SQLiteDatabase, todo_id: number)
 
 
 /**
- * Creates a new TODO item in the database.
+ * Creates a new TODO item in the **local SQLite database**.
  *
- * @param db - The SQLite database instance.
- * @param title - The title of the TODO item.
- * @param descr - An optional description of the TODO item.
- * @returns The newly created TODO item if successful, otherwise `null`.
+ * @param db - SQLite database instance
+ * @param title - The title of the TODO item
+ * @param descr - An optional description of the TODO item
+ * @returns The newly created TODO item if successful, otherwise `null`
  */
 export async function dbCreateTodo(db: SQLite.SQLiteDatabase, title: string, descr: string | null = null): Promise<Todo | null> {
   const r = await db.getFirstAsync<{todo_id: number}>(
@@ -1960,9 +2062,9 @@ export async function dbCreateTodo(db: SQLite.SQLiteDatabase, title: string, des
 
 
 /**
- * Deletes all TODO items that have been marked as completed from the database.
+ * Deletes all TODO items marked as completed from the **local SQLite database**.
  *
- * @param db - The SQLite database instance.
+ * @param db - SQLite database instance
  */
 export async function dbDeleteCompletedTodos(db: SQLite.SQLiteDatabase) {
   await db.runAsync(
@@ -1972,9 +2074,9 @@ export async function dbDeleteCompletedTodos(db: SQLite.SQLiteDatabase) {
 
 
 /**
- * Updates a TODO item in the database.
+ * Updates a TODO item in the **local SQLite database**.
  *
- * @param db - The SQLite database instance.
+ * @param db - SQLite database instance
  * @param todo_id - The ID of the TODO item to update.
  * @param title - The new title of the TODO.
  * @param descr - The new description of the TODO (optional).
@@ -2009,10 +2111,11 @@ export async function dbUpdateTodo(
 }
 
 
+
 /**
- * Deletes a TODO item from the database by its ID.
+ * Deletes a TODO item from the **local SQLite database** by its ID.
  *
- * @param db - The SQLite database instance.
+ * @param db - SQLite database instance
  * @param todo_id - The ID of the TODO item to delete.
  * @returns A boolean indicating whether the deletion was successful.
  */
@@ -2026,10 +2129,10 @@ export async function dbDeleteTodo(db: SQLite.SQLiteDatabase, todo_id: number): 
 
 
 /**
- * Retrieves the Safe Mode password from the local database.
+ * Retrieves the Safe Mode password from the **local SQLite database**.
  * If no password exists, initializes it with an empty string and returns ''.
  *
- * @param db - The SQLite database instance.
+ * @param db - SQLite database instance
  * @returns The Safe Mode password as a string.
  */
 export async function dbReadSafeModePassword(db: SQLite.SQLiteDatabase): Promise<string> {
@@ -2042,10 +2145,11 @@ export async function dbReadSafeModePassword(db: SQLite.SQLiteDatabase): Promise
 }
 
 
+
 /**
- * Insert or replace the Safe Mode password in the local database.
+ * Inserts or replaces the Safe Mode password in the **local SQLite database**.
  *
- * @param db - The SQLite database instance.
+ * @param db - SQLite database instance
  * @param password - The password string to store.
  */
 export async function dbCreateSafeModePassword(db: SQLite.SQLiteDatabase, password: string) {
@@ -2054,7 +2158,7 @@ export async function dbCreateSafeModePassword(db: SQLite.SQLiteDatabase, passwo
 
 
 /**
- * Checks if the provided password matches the stored safe mode password.
+ * Checks if the provided password matches the stored Safe Mode password in the **local SQLite database**.
  * 
  * @param db - SQLite database instance
  * @param password - Password string to check
@@ -2066,8 +2170,9 @@ export async function dbCheckPassword(db: SQLite.SQLiteDatabase, password: strin
 }
 
 
+
 /**
- * Loads the app's user settings from the database.
+ * Loads the app's user settings from the **local SQLite database**.
  *  
  * Returns default values if any setting is not found or if an error occurs.
  *
@@ -2076,19 +2181,22 @@ export async function dbCheckPassword(db: SQLite.SQLiteDatabase, password: strin
  */
 export async function dbLoadSettings(db: SQLite.SQLiteDatabase): Promise<Settings> {
   const r: Settings | null = await Promise.all([
-    dbReadNumericInfo(db, 'windowSize'),
-    dbReadNumericInfo(db, 'maxToRenderPerBatch'),
-    dbReadNumericInfo(db, 'updateCellsBatchingPeriod'),
-    dbReadNumericInfo(db, 'imageTransition')
+    dbReadNumericInfo(db, 'windowSize', AppConstants.DEFAULT_WINDOW_SIZE),
+    dbReadNumericInfo(db, 'maxToRenderPerBatch', AppConstants.DEFAULT_MAX_TO_RENDER_PER_BATCH),
+    dbReadNumericInfo(db, 'updateCellsBatchingPeriod', AppConstants.DEFAULT_UPDATE_CELLS_BATCHING_PERIOD),
+    dbReadNumericInfo(db, 'itemVisiblePercentThreshold', AppConstants.DEFAULT_ITEM_VISIBLE_PERCENTAGE_THRESHOLD)
   ]).then(([    
     windowSize,
     maxToRenderPerBatch,
-    updateCellsBatchingPeriod    
+    updateCellsBatchingPeriod,
+    itemVisiblePercentThreshold
   ]) => {
     return {
-      windowSize: windowSize ?? AppConstants.DEFAULT_WINDOW_SIZE,
-      maxToRenderPerBatch: maxToRenderPerBatch ?? AppConstants.DEFAULT_MAX_TO_RENDER_PER_BATCH,
-      updateCellsBatchingPeriod: updateCellsBatchingPeriod ?? AppConstants.DEFAULT_UPDATE_CELLS_BATCHING_PERIOD      
+      windowSize,
+      maxToRenderPerBatch,
+      updateCellsBatchingPeriod,
+      itemVisiblePercentThreshold
+      
     }
   }).catch(error => {
     console.log("error dbLoadSettings", error); 
@@ -2098,21 +2206,20 @@ export async function dbLoadSettings(db: SQLite.SQLiteDatabase): Promise<Setting
   return r ? r : {
     windowSize: AppConstants.DEFAULT_WINDOW_SIZE,
     maxToRenderPerBatch: AppConstants.DEFAULT_MAX_TO_RENDER_PER_BATCH,
-    updateCellsBatchingPeriod: AppConstants.DEFAULT_UPDATE_CELLS_BATCHING_PERIOD
+    updateCellsBatchingPeriod: AppConstants.DEFAULT_UPDATE_CELLS_BATCHING_PERIOD,
+    itemVisiblePercentThreshold: AppConstants.DEFAULT_ITEM_VISIBLE_PERCENTAGE_THRESHOLD
   }
 }
 
 
 /**
- * Fills the `reading_status` table for all manhwas with a specified status.
+ * Fills the `reading_status` table in the **local SQLite database** for all manhwas with a specified status.
  * 
- * This function inserts or replaces entries in the `reading_status` table for every manhwa in the database.
- * The `updated_at` field is set to the current timestamp.
+ * Inserts or replaces entries for every manhwa in the database. The `updated_at` field is set to the current timestamp.
  *
- * @param db - An open SQLite database instance.
+ * @param db - SQLite database instance
  * @param status - The status value to assign to all manhwas (e.g., "unread", "reading", "completed").
- *
- * @returns A promise that resolves when the operation is complete. Any errors are logged to the console but do not throw.
+ * @returns A promise that resolves when the operation is complete. Errors are logged to the console but do not throw.
  *
  * @example
  * ```ts
@@ -2140,13 +2247,13 @@ export async function dbFillReadingStatus(db: SQLite.SQLiteDatabase, status: str
 
 
 /**
- * Fetches debug information and statistics from the SQLite database.
+ * Fetches debug information and statistics from the **local SQLite database**.
  * 
- * This function collects both aggregate counts from various tables and stored debug metadata.
- * It returns a combined object with all debug-related values.
+ * Collects aggregate counts from various tables (e.g., manhwas, authors, genres) and stored debug metadata.
+ * Returns a combined object containing all debug-related values for inspection or logging.
  *
- * @param db - An open SQLite database instance.
- * 
+ * @param db - SQLite database instance
+ * @returns A promise that resolves to an object containing database debug statistics and metadata.
  */
 export async function dbFetchDebugInfo(db: SQLite.SQLiteDatabase): Promise<DebugInfo> {
   const part1 = await Promise.all([
@@ -2208,14 +2315,15 @@ export async function dbFetchDebugInfo(db: SQLite.SQLiteDatabase): Promise<Debug
   return {...part1, ...part2}
 }
 
+
 /**
- * Saves debug information into the SQLite database.
+ * Saves debug information into the **local SQLite database**.
  * 
- * This function writes multiple debug-related fields concurrently into the database.
- * It handles both string and numeric values, and logs errors if any operation fails.
+ * Writes multiple debug-related fields concurrently into the database, handling both string and numeric values.
+ * Any errors encountered are logged to the console but do not throw.
  *
- * @returns A promise that resolves when all database operations are complete.
- *          Errors are caught and logged to the console but do not throw.
+ * @param db - SQLite database instance
+ * @returns A promise that resolves when all debug data has been saved.
  */
 export async function dbSetDebugInfo(
   db: SQLite.SQLiteDatabase, 

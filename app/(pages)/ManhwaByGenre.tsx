@@ -1,5 +1,5 @@
-import ReturnButton from '@/components/buttons/ReturnButton'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
+import ReturnButton from '@/components/buttons/ReturnButton'
 import { dbReadManhwasByGenreId } from '@/lib/database'
 import { AppConstants } from '@/constants/AppConstants'
 import ManhwaGrid from '@/components/grid/ManhwaGrid'
@@ -65,7 +65,7 @@ const MangaByGenre = () => {
             <TopBar title={genre} >
                 <ReturnButton/>
             </TopBar>
-            <ManhwaGrid manhwas={manhwas} onEndReached={onEndReached}/>
+            <ManhwaGrid manhwas={manhwas} onEndReached={onEndReached}/>            
         </SafeAreaView>
     )
 }

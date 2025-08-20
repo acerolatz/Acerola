@@ -5,6 +5,7 @@ import ChapterImageItem from './ChapterImageItem'
 import { ChapterImage } from '@/helpers/types'
 import { FlatList, View } from 'react-native'
 import ChapterFooter from './ChapterFooter'
+import { Image } from 'expo-image'
 
 
 interface ChapterReaderProps {
@@ -22,8 +23,10 @@ const ChapterReader = ({
     listHeader    
 }: ChapterReaderProps) => {
         
-    const flatListRef = useRef<FlatList>(null)
     const { settings } = useSettingsState()
+    const ticks = useRef(0)
+
+    const flatListRef = useRef<FlatList>(null)
 
     const scrollToTop = useCallback(() => {
         flatListRef.current?.scrollToOffset({ animated: false, offset: 0 })
@@ -31,7 +34,7 @@ const ChapterReader = ({
 
     const renderItem = useCallback(({item}: {item: ChapterImage}) => (
         <ChapterImageItem item={item} />
-    ), []);
+    ), [])
 
     const keyExtractor = useCallback((item: ChapterImage) => item.image_url, [])
 
@@ -41,7 +44,25 @@ const ChapterReader = ({
             loading={loading}
             scrollToTop={scrollToTop}
         />
-    ), [manhwaTitle, loading])
+    ), [manhwaTitle, loading])        
+
+    const onViewableItemsChanged = useCallback(({ viewableItems }: any) => {
+        if (viewableItems.length > 0) { ticks.current += 1 }
+        if (ticks.current >= 10) {
+            ticks.current = 0
+            console.log("clear")
+            Image.clearDiskCache()
+        }
+    }, [images]);
+
+    const viewabilityConfig = useMemo(() => ({
+        itemVisiblePercentThreshold: 25,
+        minimumViewTime: 100,
+    }), []);
+
+    const viewabilityConfigCallbackPairs = useRef([
+        { viewabilityConfig, onViewableItemsChanged },
+    ]);
 
     return (
         <View>
@@ -55,6 +76,8 @@ const ChapterReader = ({
                 keyExtractor={keyExtractor}
                 ListHeaderComponent={listHeader}
                 ListFooterComponent={listFooter}
+                viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
+                removeClippedSubviews={true}
             />
             <ChapterArrowUpButton onPress={scrollToTop} />
         </View>

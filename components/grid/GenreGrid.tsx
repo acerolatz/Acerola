@@ -1,19 +1,14 @@
-import { Colors } from '@/constants/Colors'
-import { Genre } from '@/helpers/types'
-import { AppStyle } from '@/styles/AppStyle'
-import { router } from 'expo-router'
-import React, { useCallback } from 'react'
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
-import ViewAllButton from '../buttons/ViewAllButton'
-import Title from '../Title'
-import Row from '../util/Row'
+import { FlatList, Pressable, StyleSheet, View, Text } from 'react-native'
 import { AppConstants } from '@/constants/AppConstants'
+import ViewAllButton from '../buttons/ViewAllButton'
 import { Typography } from '@/constants/typography'
-
-
-interface GenreGridProps {
-    genres: Genre[]
-}
+import { AppStyle } from '@/styles/AppStyle'
+import { Colors } from '@/constants/Colors'
+import React, { useCallback } from 'react'
+import { Genre } from '@/helpers/types'
+import { router } from 'expo-router'
+import Row from '../util/Row'
+import Title from '../Title'
 
 
 const Item = ({item}: {item: Genre}) => {
@@ -36,12 +31,11 @@ const Item = ({item}: {item: Genre}) => {
 }
 
 
-const GenreGrid = ({genres}: GenreGridProps) => {
-
+const GenreGrid = ({genres}: {genres: Genre[]}) => {    
 
     const viewAllGenres = () => {
         router.navigate("/(pages)/GenresPage")
-    }    
+    }
 
     if (genres.length === 0) { return <></> }
 

@@ -12,11 +12,10 @@ import { Colors } from '@/constants/Colors'
 const UserDataComponent = () => {
 
     const db = useSQLiteContext()
-    const [data, setData] = useState<UserData>({
-        manhwas: 0, 
+    const [data, setData] = useState<UserData>({        
         chapters: 0, 
         images: 0,
-        device: ''
+        supportedAbis: ''
     })
 
     useEffect(
@@ -33,16 +32,10 @@ const UserDataComponent = () => {
   return (
     <View style={styles.container} >
         <View style={styles.item}>
-            <Text style={styles.text}>{formatNumberWithSuffix(data.images)} images</Text>
+            <Text style={styles.text}>Read {formatNumberWithSuffix(data.chapters)} chapters ({formatNumberWithSuffix(data.images)} images) </Text>
         </View>
         <View style={styles.item}>
-            <Text style={styles.text}>{formatNumberWithSuffix(data.chapters)} chapters</Text>
-        </View>
-        <View style={styles.item}>
-            <Text style={styles.text}>{formatNumberWithSuffix(data.manhwas)} pornhwas</Text>
-        </View>
-        <View style={styles.item}>
-            <Text style={styles.text}>{data.device}</Text>
+            <Text style={styles.text}>arch: {data.supportedAbis}</Text>
         </View>
     </View>
   )

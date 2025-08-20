@@ -152,8 +152,8 @@ const ManhwaPage = () => {
         return (
           <View style={styles.padding} >
             <Text style={Typography.semiboldXl}>{manhwa!.title}</Text>
-            <Text style={Typography.light}>last update: {formatTimestamp(manhwa!.updated_at)}</Text>
             <ManhwaAlternativeNames names={altNames} />
+            <Text style={Typography.light}>last update: {formatTimestamp(manhwa!.updated_at)}</Text>
             <ManhwaSummary summary={manhwa!.descr} />
           </View>
         );

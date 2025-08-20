@@ -2,7 +2,7 @@ import { ReleaseWrapper } from '@/helpers/types'
 import { create } from 'zustand'
 
 
-type AppReleaseState = {
+type AppVersionState = {
     localVersion: string | null
     setLocalVersion: (version: string | null) => void
     
@@ -41,7 +41,7 @@ type AppReleaseState = {
  *   - shouldShowNewAppVersionWarning: Flag controlling new version alerts
  *   - setShouldShowNewAppVersionWarning: Updates warning visibility state 
  */
-export const useAppVersionState = create<AppReleaseState>(
+export const useAppVersionState = create<AppVersionState>(
     (set) => ({
         liveVersion: null,
         setLiveVersion: (liveVersion: string | null) => {

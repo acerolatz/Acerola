@@ -20,6 +20,7 @@ const ManhwaImageCover = ({ url }: ManhwaImageCoverProps) => {
     <Image 
       source={url} 
       contentFit='cover' 
+      cachePolicy={'disk'}
       style={{...styles.image, width: w, height: h}}
       transition={AppConstants.DEFAULT_IMAGE_TRANSITION} />
   )

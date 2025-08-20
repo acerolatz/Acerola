@@ -46,7 +46,8 @@ const ManhwaCard = ({
         <Pressable onPress={onPress} style={{width, height, marginRight, marginBottom, gap: AppConstants.GAP}} >
             <Image
                 source={manhwa.cover_image_url} 
-                contentFit='cover'
+                contentFit='cover'                
+                cachePolicy={'disk'}
                 style={[{width, height, borderRadius: AppConstants.BORDER_RADIUS}]}
                 transition={AppConstants.DEFAULT_IMAGE_TRANSITION}
             />

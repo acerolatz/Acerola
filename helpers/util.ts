@@ -518,11 +518,16 @@ export const downloadManhwaChapter = async (
 
 
 
+export async function dbGetSupportedAbis(): Promise<string> {
+  return (await DeviceInfo.supportedAbis()).join(", "); 
+}
+
+
 export async function getDeviceName(): Promise<string> {
   const model = DeviceInfo.getModel()
   const systemName = DeviceInfo.getSystemName()
   const systemVersion = DeviceInfo.getSystemVersion()
-  const supportedAbis = (await DeviceInfo.supportedAbis()).join(", "); 
+  const supportedAbis = await dbGetSupportedAbis()
   const device = `${model}, ${supportedAbis}, ${systemName}[${systemVersion}]`
   return device
 }

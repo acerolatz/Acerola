@@ -78,10 +78,10 @@ export const AppConstants = {
     },
     BOTTOMSHEET_HANDLE_RADIUS: wp(4),
 
-    DEFAULT_WINDOW_SIZE: 9,
-    DEFAULT_MAX_TO_RENDER_PER_BATCH: 8,
+    DEFAULT_WINDOW_SIZE: 5,
+    DEFAULT_MAX_TO_RENDER_PER_BATCH: 5,
     DEFAULT_UPDATE_CELLS_BATCHING_PERIOD: 50,
-    DEFAULT_SHOW_LAST_3_CHAPTERS: '1',
+    DEFAULT_ITEM_VISIBLE_PERCENTAGE_THRESHOLD: 50,
     DEFAULT_IMAGE_TRANSITION: 200,
 
     ITEM_PADDING_HORIZONTAL: hp(1),
@@ -93,6 +93,13 @@ export const AppConstants = {
         MAX_WIDTH: wp(87),
         MAX_HEIGHT: hp(88)
     },
+
+    GENRES: {
+        ORIGINAL_WIDTH: 700,
+        ORIGINAL_HEIGHT: 460,
+        WIDTH: wp(42),
+        HEIGHT: wp(42) * (460 / 700)
+    },  
 
     READING_STATUS: [
         'Completed',

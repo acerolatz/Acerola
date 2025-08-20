@@ -26,7 +26,7 @@ import {
     dbReadManhwasOrderedByViews
 } from '@/lib/database'
 import { 
-    spFetchCollections,  
+    spFetchCollections,
     spFetchRandomManhwaCards, 
     spGetTodayTop10 
 } from '@/lib/supabase'
@@ -50,6 +50,7 @@ import {
     StyleSheet,
     View
 } from 'react-native'
+import { Image } from 'expo-image'
 
 
 const openManhwaSearch = () => {
@@ -94,8 +95,8 @@ const HomePage = () => {
 
     const { top10manhwas, setTop10manhwas } = useTop10ManhwasState()
     const { collections, setCollections } = useCollectionState()
-    const [loading, setLoading] = useState(true)
     const [genres, setGenres] = useState<Genre[]>([])
+    const [loading, setLoading] = useState(true)
     const [latestUpdate, setLatestUpdates] = useState<Manhwa[]>([])
     const [mostView, setMostView] = useState<Manhwa[]>([])    
     const [readingHistoryManhwas, setReadingHistoryManhwas] = useState<Manhwa[]>([])
@@ -133,7 +134,7 @@ const HomePage = () => {
         if (cards.length == 0) {
             await reloadCards()
         }
-    }    
+    }        
 
     const toggleMenu = () => {
         menuVisible.current ? closeMenu() : openMenu()
@@ -148,7 +149,7 @@ const HomePage = () => {
                         dbReadManhwasOrderedByUpdateAt(db, 0, AppConstants.PAGE_LIMIT),
                         dbReadManhwasOrderedByViews(db, 0, AppConstants.PAGE_LIMIT)
                     ]).then(([g, l, m]) => {
-                        setGenres(g)
+                        setGenres(g),
                         setLatestUpdates(l)
                         setMostView(m)
                     })
@@ -168,6 +169,7 @@ const HomePage = () => {
     useFocusEffect(useCallback(
         () => {
             const reload = async () => {
+                Image.clearMemoryCache()
                 await dbGetManhwaReadingHistory(db, 0, AppConstants.PAGE_LIMIT)
                     .then(v => setReadingHistoryManhwas(v))
             }

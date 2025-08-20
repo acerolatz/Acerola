@@ -1,7 +1,7 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import ChapterPageSelector from "../chapter/ChapterPageSelector"
 import ChapterGridItem from "../chapter/ChapterGridItem"
-import { useCallback, useEffect, useState } from "react"
 import { dbGetManhwaReadChapters } from '@/lib/database'
 import { AppConstants } from "@/constants/AppConstants"
 import { useChapterState } from "@/store/chapterState"
@@ -19,15 +19,11 @@ const PAGE_LIMIT = 96
 
 
 interface ManhwaChapterGridProps {
-  manhwa: Manhwa
-  textColor?: string
+  manhwa: Manhwa  
 }
 
 
-const ManhwaChapterGrid = ({  
-  manhwa,
-  textColor = Colors.backgroundColor
-}: ManhwaChapterGridProps) => {
+const ManhwaChapterGrid = ({ manhwa }: ManhwaChapterGridProps) => {
   
   const db = useSQLiteContext()
   const manhwa_id = manhwa.manhwa_id
@@ -37,78 +33,64 @@ const ManhwaChapterGrid = ({
   const [currentPage, setCurrentPage] = useState(0)
     
   const [chaptersReadSet, setChaptersReadSet] = useState<Set<number>>(new Set())
-  const maxChapterPageNum = Math.floor(chapters.length / PAGE_LIMIT)  
 
-  useEffect(
-    () => {
-      let isCancelled = false
+  const maxChapterPageNum = useMemo(() => Math.floor(chapters.length / PAGE_LIMIT), [chapters.length])
 
-      async function init() {
-        setLoading(true)
-          const c = await spFetchChapterList(manhwa_id)
-          if (isCancelled) { return }
-          setCurrentPage(0)
-          setChapters(c)
-        setLoading(false)
+  // Fetch chapters
+  useEffect(() => {
+    let isCancelled = false
+    const init = async () => {
+      setLoading(true)
+      const c = await spFetchChapterList(manhwa_id)
+      if (!isCancelled) {
+        setChapters(c)
+        setCurrentPage(0)
       }
+      setLoading(false)
+    }
+    init()
+    return () => { isCancelled = true }
+  }, [manhwa_id, setChapters])
 
-      init()
-      return () => { isCancelled = true }
-    },
-    [manhwa_id]
-  )
-
+  // Fetch read chapters on focus
   useFocusEffect(
     useCallback(() => {
       const reload = async () => {
         const r = await dbGetManhwaReadChapters(db, manhwa_id)
         setChaptersReadSet(r)
       }
-      reload()      
+      reload()
     }, [db, manhwa_id])
   )
   
-  const readFirst = () => {
-    if (chapters.length > 0) {
-      setCurrentChapterIndex(0)
-      router.navigate({
-        pathname: "/(pages)/ChapterPage",
-        params: {
-          manhwaTitle: manhwa.title
-        }
-      })
-    }
-  }
-
-  const readLast = () => {
-    if (chapters.length > 0) {
-      setCurrentChapterIndex(chapters.length - 1)
-      router.navigate({
-        pathname: "/(pages)/ChapterPage",
-        params: {
-          manhwaTitle: manhwa.title
-        }
-      })
-    }
-  }
-
-  const readChapter = useCallback((index: number) => {
+  const navigateToChapter = useCallback((index: number) => {
     setCurrentChapterIndex(index)
     router.navigate({
-      pathname: "/(pages)/ChapterPage", 
-      params: {
-        manhwaTitle: manhwa.title
-      }
+      pathname: "/(pages)/ChapterPage",
+      params: { manhwaTitle: manhwa.title }
     })
-  }, [manhwa_id])
+  }, [manhwa.title, setCurrentChapterIndex])
 
-  const moveToNextChapterPage = () => {
-    setCurrentPage(prev => prev > maxChapterPageNum - 1 ? 0 : prev + 1)
-  }
+  const readFirst = useCallback(() => {
+    if (chapters.length > 0) navigateToChapter(0)
+  }, [chapters.length, navigateToChapter])
 
-  const moveToPreviousChapterPage = () => {
-    setCurrentPage(prev => prev === 0 ? prev = maxChapterPageNum : prev - 1)
-  }
+  const readLast = useCallback(() => {
+    if (chapters.length > 0) navigateToChapter(chapters.length - 1)
+  }, [chapters.length, navigateToChapter])
+
+  const moveToNextChapterPage = useCallback(() => {
+    setCurrentPage(prev => prev >= maxChapterPageNum ? 0 : prev + 1)
+  }, [maxChapterPageNum])
+
+  const moveToPreviousChapterPage = useCallback(() => {
+    setCurrentPage(prev => prev === 0 ? maxChapterPageNum : prev - 1)
+  }, [maxChapterPageNum])
+
+  const displayedChapters = useMemo(
+    () => chapters.slice(currentPage * PAGE_LIMIT, (currentPage + 1) * PAGE_LIMIT),
+    [chapters, currentPage]
+  )
 
   if (loading) {
     return (
@@ -118,18 +100,16 @@ const ManhwaChapterGrid = ({
     )
   }  
 
-  if (!manhwa || chapters.length === 0) {
-    return <></>
-  }
+  if (!manhwa || chapters.length === 0) { return <></> }
 
   return (    
     <View style={styles.container} >
       <Row style={{gap: AppConstants.MARGIN}} >
         <Pressable onPress={readFirst} style={{...AppStyle.button, backgroundColor: manhwa.color}}>
-          <Text style={{...Typography.regular, color: textColor}}>Read First</Text>
+          <Text style={{...Typography.regular, color: Colors.backgroundColor}}>Read First</Text>
         </Pressable>
         <Pressable onPress={readLast} style={{...AppStyle.button, backgroundColor: manhwa.color}}>
-          <Text style={{...Typography.regular, color: textColor}}>Read Last</Text>
+          <Text style={{...Typography.regular, color: Colors.backgroundColor}}>Read Last</Text>
         </Pressable>
       </Row>
       
@@ -143,12 +123,12 @@ const ManhwaChapterGrid = ({
       
       <View style={styles.chapterGrid}>
         {
-          chapters.slice(currentPage * PAGE_LIMIT, (currentPage + 1) * PAGE_LIMIT).map(( item, index ) => 
+          displayedChapters.map(( item, index ) => 
             <ChapterGridItem
+              key={item.chapter_id}
               manhwaColor={manhwa.color}
               index={currentPage * PAGE_LIMIT + index}
-              onPress={readChapter}
-              key={item.chapter_id}
+              onPress={navigateToChapter}
               chapterName={item.chapter_name}
               isReaded={chaptersReadSet.has(item.chapter_id)}
             />

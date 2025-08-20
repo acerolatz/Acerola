@@ -94,10 +94,9 @@ export type Post = {
 
 
 export type UserData = {
-    manhwas: number
     chapters: number
     images: number
-    device: string
+    supportedAbis: string
 }
 
 
@@ -134,7 +133,8 @@ export type Feedback = {
 export type Settings = {
     windowSize: number
     maxToRenderPerBatch: number
-    updateCellsBatchingPeriod: number    
+    updateCellsBatchingPeriod: number
+    itemVisiblePercentThreshold: number
 }
 
 export type DownloadProgress = {
@@ -167,4 +167,10 @@ export type DebugManhwaImages = {
     manhwa_id: number
     cover: string | null
     card: string | null
+}
+
+export type Log = {
+    title: string
+    descr: string | null
+    created_at: number
 }

@@ -2,8 +2,6 @@ import ReturnButton from '@/components/buttons/ReturnButton'
 import { AppConstants } from '@/constants/AppConstants'
 import { Typography } from '@/constants/typography'
 import React, { useEffect, useState } from 'react'
-import { useSQLiteContext } from 'expo-sqlite'
-import { dbReadGenres } from '@/lib/database'
 import Footer from '@/components/util/Footer'
 import { AppStyle } from '@/styles/AppStyle'
 import { Colors } from '@/constants/Colors'
@@ -15,9 +13,11 @@ import {
     FlatList, 
     Pressable, 
     SafeAreaView, 
-    StyleSheet, 
-    Text    
+    StyleSheet,
+    Text
 } from 'react-native'
+import { dbReadGenres } from '@/lib/database'
+import { useSQLiteContext } from 'expo-sqlite'
 
 
 const NUM_COLUMNS = 2
@@ -29,18 +29,18 @@ const GenresPage = () => {
 
     const db = useSQLiteContext()
     const [genres, setGenres] = useState<Genre[]>([])
-    
+
     useEffect(
         () => {
             const init = async () => {
                 const g = await dbReadGenres(db)
                 setGenres(g)
             }
-            init()            
+            init()
         },
-        [db]
+        []
     )
-
+        
     const onPress = async (genre: Genre) => {
         router.navigate({
             pathname: '/(pages)/ManhwaByGenre', 
@@ -60,6 +60,7 @@ const GenresPage = () => {
             </Pressable>
         )
     }    
+
 
     return (
         <SafeAreaView style={AppStyle.safeArea}>

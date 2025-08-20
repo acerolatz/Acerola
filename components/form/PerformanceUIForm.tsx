@@ -26,29 +26,50 @@ import Footer from '../util/Footer'
 import Row from '../util/Row'
 
 
+const ItemVisiblePercentThresholdDescr = `It defines the minimum percentage of an item that must be visible on the screen for it to be considered “viewable.”
+
+Helps with:
+
+    • Prefetching only imagens that are about to appear.
+    • Lazy-loading content or unloading items from memory.
+    
+Recommended value: 50`
+
+
+
 interface FormData {
     windowSize: number
     maxToRenderPerBatch: number
     updateCellsBatchingPeriod: number
+    itemVisiblePercentThreshold: number
 }
 
 
 const schema = yup.object().shape({  
     windowSize: yup
         .number()
-        .min(3, `Min 3`)
-        .max(32, `Max 32 pixels`)
+        .integer('Must be a integer')
+        .min(3, 'Min 3')
+        .max(32, 'Max 32')
         .required('WindowSize is required'),
     maxToRenderPerBatch: yup
         .number()
+        .integer('Must be a integer')
         .min(1, 'Min 1')
         .max(64, 'Max 64')
         .required('MaxToRenderPerBatch is required'),
     updateCellsBatchingPeriod: yup
         .number()
+        .integer('Must be a integer')
         .min(20, 'Min 20')
         .max(6000,'Max 6000')
         .required('UpdateCellsBatchingPeriod is required'),
+    itemVisiblePercentThreshold: yup
+        .number()
+        .integer('Must be a integer')
+        .min(0, 'Min 0')
+        .max(100, 'Max 100')
+        .required('ItemVisiblePercentThreshold is required')
 });
 
 const PerformanceUIForm = () => {
@@ -68,7 +89,8 @@ const PerformanceUIForm = () => {
         defaultValues: {            
             windowSize: settings.windowSize,
             maxToRenderPerBatch: settings.maxToRenderPerBatch,
-            updateCellsBatchingPeriod: settings.updateCellsBatchingPeriod
+            updateCellsBatchingPeriod: settings.updateCellsBatchingPeriod,
+            itemVisiblePercentThreshold: settings.itemVisiblePercentThreshold
         },
     });
 
@@ -79,12 +101,14 @@ const PerformanceUIForm = () => {
                 ...settings, 
                 windowSize: form_data.windowSize, 
                 maxToRenderPerBatch: form_data.maxToRenderPerBatch,
-                updateCellsBatchingPeriod: form_data.updateCellsBatchingPeriod                
+                updateCellsBatchingPeriod: form_data.updateCellsBatchingPeriod,
+                itemVisiblePercentThreshold: form_data.itemVisiblePercentThreshold
             })
             await Promise.all([
                 dbSetNumericInfo(db, 'windowSize', form_data.windowSize),
                 dbSetNumericInfo(db, 'maxToRenderPerBatch', form_data.maxToRenderPerBatch),
-                dbSetNumericInfo(db, 'updateCellsBatchingPeriod', form_data.updateCellsBatchingPeriod)
+                dbSetNumericInfo(db, 'updateCellsBatchingPeriod', form_data.updateCellsBatchingPeriod),
+                dbSetNumericInfo(db, 'itemVisiblePercentThreshold', form_data.itemVisiblePercentThreshold)
             ])            
             Toast.show(ToastMessages.EN.GENERIC_SUCCESS)
         setLoading(false)
@@ -95,14 +119,16 @@ const PerformanceUIForm = () => {
             const defaultValues = {
                 windowSize: AppConstants.DEFAULT_WINDOW_SIZE,
                 maxToRenderPerBatch: AppConstants.DEFAULT_MAX_TO_RENDER_PER_BATCH,
-                updateCellsBatchingPeriod: AppConstants.DEFAULT_UPDATE_CELLS_BATCHING_PERIOD
+                updateCellsBatchingPeriod: AppConstants.DEFAULT_UPDATE_CELLS_BATCHING_PERIOD,
+                itemVisiblePercentThreshold: AppConstants.DEFAULT_ITEM_VISIBLE_PERCENTAGE_THRESHOLD
             }
             Keyboard.dismiss()
             setSettings({ ...settings, ...defaultValues})
             await Promise.all([
                 dbSetNumericInfo(db, 'windowSize', AppConstants.DEFAULT_WINDOW_SIZE),
                 dbSetNumericInfo(db, 'maxToRenderPerBatch', AppConstants.DEFAULT_MAX_TO_RENDER_PER_BATCH),
-                dbSetNumericInfo(db, 'updateCellsBatchingPeriod', AppConstants.DEFAULT_UPDATE_CELLS_BATCHING_PERIOD)
+                dbSetNumericInfo(db, 'updateCellsBatchingPeriod', AppConstants.DEFAULT_UPDATE_CELLS_BATCHING_PERIOD),
+                dbSetNumericInfo(db, 'itemVisiblePercentThreshold', AppConstants.DEFAULT_ITEM_VISIBLE_PERCENTAGE_THRESHOLD)
             ])
             Toast.show(ToastMessages.EN.GENERIC_SUCCESS)
             resetForm(defaultValues)
@@ -114,9 +140,6 @@ const PerformanceUIForm = () => {
             <View style={{flex: 1, gap: AppConstants.GAP, paddingHorizontal: wp(1)}} >
                 <Text style={{...Typography.regular, color: Colors.primary}} >
                     This section defines some attributes related to the list that displays the images of a pornhwa chapter.
-                </Text>
-                <Text style={{...Typography.regular, color: Colors.primary}} >
-                    The images are downloaded as the chapter is read, which may cause empty areas on the screen for a moment.
                 </Text>
                 <Text style={{...Typography.regular, color: Colors.red}} >
                     Change only if necessary.
@@ -167,6 +190,23 @@ const PerformanceUIForm = () => {
                 {errors.updateCellsBatchingPeriod && (<Text style={AppStyle.error}>{errors.updateCellsBatchingPeriod.message}</Text>)}
                 <Controller
                     name="updateCellsBatchingPeriod"
+                    control={control}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                        style={AppStyle.input}
+                        keyboardType='numeric'
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value.toString()}/>
+                    )}
+                />
+
+                {/* ItemVisiblePercentThreshold */}
+                <Text style={Typography.semibold}>ItemVisiblePercentThreshold</Text>                
+                <Text style={Typography.regular}>{ItemVisiblePercentThresholdDescr}</Text>
+                {errors.itemVisiblePercentThreshold && (<Text style={AppStyle.error}>{errors.itemVisiblePercentThreshold.message}</Text>)}
+                <Controller
+                    name="itemVisiblePercentThreshold"
                     control={control}
                     render={({ field: { onChange, onBlur, value } }) => (
                     <TextInput
