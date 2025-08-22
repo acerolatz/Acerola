@@ -1,6 +1,5 @@
 import UserDataComponent from '../UserActivityComponent';
 import { AppConstants } from '@/constants/AppConstants';
-import PerformanceUIForm from './PerformanceUIForm';
 import { Typography } from '@/constants/typography';
 import { Colors } from '@/constants/Colors';
 import SafeModeForm from './SafeModeForm';
@@ -15,6 +14,7 @@ import {
   Platform,
 } from 'react-native';
 
+
 interface SettingsFormProps {
   currentMaxCacheSize: number;
   currentCacheSize: number;
@@ -22,7 +22,9 @@ interface SettingsFormProps {
   safeModeOn: boolean;
 }
 
+
 const width = wp(92)
+
 
 const SettingsForm = ({
   currentMaxCacheSize,
@@ -31,11 +33,10 @@ const SettingsForm = ({
   safeModeOn,
 }: SettingsFormProps) => {
 
-    const titles = ['Safe Mode', 'Optimization', 'Cache', 'Log']
+    const titles = ['Safe Mode', 'Cache', 'Log']
 
     const forms = [
-      <SafeModeForm key="safe" safeModeOn={safeModeOn} safeModePassword={safeModePassword} />,      
-      <PerformanceUIForm key="perf" />,
+      <SafeModeForm key="safe" safeModeOn={safeModeOn} safeModePassword={safeModePassword} />,
       <CacheForm key="cache" currentCacheSize={currentCacheSize} currentMaxCacheSize={currentMaxCacheSize} />,
       <UserDataComponent/>
     ];

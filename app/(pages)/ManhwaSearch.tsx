@@ -1,7 +1,6 @@
-import CustomActivityIndicator from '@/components/util/CustomActivityIndicator'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { FlatList, SafeAreaView, StyleSheet, View } from 'react-native'
 import ReturnButton from '@/components/buttons/ReturnButton'
-import React, { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { AppConstants } from '@/constants/AppConstants'
 import ManhwaCard from '@/components/ManhwaCard'
 import { dbSearchManhwas } from '@/lib/database'
@@ -79,9 +78,7 @@ const ManhwaSearch = () => {
     fetching.current = false
   }, [db])
 
-  const renderFooter = useCallback(() => {
-    return <Footer/>
-  }, [])
+  const renderFooter = useCallback(() => { return <Footer/> }, [])
 
   const renderItem = useCallback(({item}: {item: Manhwa}) => (
     <ManhwaCard      

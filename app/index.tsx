@@ -32,8 +32,8 @@ const App = () => {
     const db = useSQLiteContext()
     const isInitialized = useRef(false);
 
-    const { setLocalVersion } = useAppVersionState()
-    const { setSettings } = useSettingsState()
+    const setLocalVersion = useAppVersionState(a => a.setLocalVersion)
+    const setSettings = useSettingsState(s => s.setSettings)
 
     let [fontsLoaded] = useFonts({
         LeagueSpartan_200ExtraLight,
@@ -81,12 +81,11 @@ const App = () => {
                     Toast.show(ToastMessages.EN.NO_INTERNET);
                     router.replace("/(pages)/HomePage");
                     return;
-                }                
+                }
                 
                 if (await dbShouldUpdate(db, 'server')) {
                     Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE);
                     await dbUpdateDatabase(db);
-                    await dbSetLastRefresh(db, 'client');
                     Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED);
                 }
 

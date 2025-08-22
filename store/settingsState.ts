@@ -21,7 +21,8 @@ export const useSettingsState = create<SettingsState>(
         settings: {
             windowSize: AppConstants.DEFAULT_WINDOW_SIZE, 
             maxToRenderPerBatch: AppConstants.DEFAULT_MAX_TO_RENDER_PER_BATCH,
-            updateCellsBatchingPeriod: AppConstants.DEFAULT_UPDATE_CELLS_BATCHING_PERIOD            
+            updateCellsBatchingPeriod: AppConstants.DEFAULT_UPDATE_CELLS_BATCHING_PERIOD,
+            itemVisiblePercentThreshold: AppConstants.DEFAULT_ITEM_VISIBLE_PERCENTAGE_THRESHOLD
         },
         setSettings: (settings: Settings) => {
             (set((state) => {return {...state, settings}}))

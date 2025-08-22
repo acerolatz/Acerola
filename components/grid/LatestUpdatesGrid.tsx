@@ -1,15 +1,16 @@
-import React from 'react'
 import ManhwaHorizontalGrid from './ManhwaHorizontalGrid'
-import { router } from 'expo-router'
 import { Manhwa } from '@/helpers/types'
+import { router } from 'expo-router'
+import React from 'react'
 
 
 interface LatestUpdatesGridProps {
     manhwas: Manhwa[]
 }
 
+
 const LatestUpdatesGrid = ({manhwas}: LatestUpdatesGridProps) => {
-    
+  
   return (
     <ManhwaHorizontalGrid
       title='Latest Updates'
@@ -20,4 +21,4 @@ const LatestUpdatesGrid = ({manhwas}: LatestUpdatesGridProps) => {
 
 }
 
-export default LatestUpdatesGrid
+export default React.memo(LatestUpdatesGrid)

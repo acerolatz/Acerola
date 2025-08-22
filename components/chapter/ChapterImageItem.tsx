@@ -1,5 +1,4 @@
 import { ChapterImage } from '@/helpers/types';
-import { View } from 'react-native';
 import { Image } from 'expo-image';
 import React from 'react';
 
@@ -16,7 +15,6 @@ function areEqual(prevProps: ChapterImageItemProps, nextProps: ChapterImageItemP
 
 const ChapterImageItem = React.memo(({ item }: ChapterImageItemProps) => {  
   return (
-
     <Image
       style={{ width: item.width, height: item.height }}
       source={item.image_url}      
@@ -25,7 +23,8 @@ const ChapterImageItem = React.memo(({ item }: ChapterImageItemProps) => {
       decodeFormat='rgb'
       cachePolicy={'disk'}
     />
-  )}, areEqual
+  )
+}, areEqual
 )
 
 

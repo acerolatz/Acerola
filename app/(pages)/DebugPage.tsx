@@ -1,5 +1,5 @@
+import DebugLastestManhwaCards from '@/components/debug/DebugLastestManhwaCards'
 import { 
-    FlatList,
     Keyboard, 
     KeyboardAvoidingView, 
     Platform, 
@@ -13,22 +13,20 @@ import {
 import { 
     spFetchCardAndCover, 
     spFetchCardAndCoverLatest, 
-    spFetchCardAndCoverSearch, 
-    spFetchLatestManhwaCardsDebug 
+    spFetchCardAndCoverSearch    
 } from '@/lib/supabase'
 import BooleanRotatingButton from '@/components/buttons/BooleanRotatingButton'
 import PageActivityIndicator from '@/components/util/PageActivityIndicator'
-import { dbFetchDebugInfo, dbSetDebugInfo } from '@/lib/database'
+import React, { useCallback, useEffect, useState } from 'react'
 import { DebugInfo, DebugManhwaImages } from '@/helpers/types'
-import ManhwaIdComponent from '@/components/ManhwaIdComponent'
-import { hasOnlyDigits, hp, wp } from '@/helpers/util'
 import ReturnButton from '@/components/buttons/ReturnButton'
 import { TextInput } from 'react-native-gesture-handler'
+import { hasOnlyDigits, hp, wp } from '@/helpers/util'
+import { dbFetchDebugInfo } from '@/lib/database'
 import { AppConstants } from '@/constants/AppConstants'
 import { LinearGradient } from 'expo-linear-gradient'
 import { ToastMessages } from '@/constants/Messages'
 import { Typography } from '@/constants/typography'
-import React, { useCallback, useEffect, useState } from 'react'
 import Toast from 'react-native-toast-message'
 import { useSQLiteContext } from 'expo-sqlite'
 import Footer from '@/components/util/Footer'
@@ -37,6 +35,8 @@ import { Colors } from '@/constants/Colors'
 import TopBar from '@/components/TopBar'
 import Row from '@/components/util/Row'
 import { Image } from 'expo-image'
+import DebugForm from '@/components/form/DebugForm'
+import DebugStats from '@/components/debug/DebugStats'
 
 
 interface ManhwaImagesComponentProps {
@@ -67,72 +67,25 @@ const ManhwaImagesComponent = ({image, setCardToShow}: ManhwaImagesComponentProp
     )
 }
 
-
-const LastestManhwaCards = ({setCardToShow}: {setCardToShow: React.Dispatch<React.SetStateAction<string | null>>}) => {
-
-    const [manhwas, setManhwas] = useState<{
-        title: string, manhwa_id: number, image_url: string
-    }[]>([])
-
-    useEffect(() => {
-        const init = async () => {
-            const m = await spFetchLatestManhwaCardsDebug()
-            setManhwas(m)
-        }
-        init()
-    }, [])
-
-    const renderItem = ({item}: {item: {title: string, manhwa_id: number, image_url: string}}) => {
-        return (
-            <Pressable onPress={() => setCardToShow(item.image_url)} >
-                <Image
-                    source={item.image_url} 
-                    style={styles.image} 
-                    contentFit='contain' />
-                <LinearGradient     
-                    colors={['transparent', 'transparent', 'rgba(0, 0, 0, 0.6)']} 
-                    style={StyleSheet.absoluteFill}
-                    pointerEvents='none' />
-                <View style={styles.manhwaTitleContainer} >
-                    <Text style={Typography.semibold}>{item.title}</Text>
-                </View>
-                <ManhwaIdComponent manhwa_id={item.manhwa_id} />
-            </Pressable>
-        )
-    }
-
-    return (
-        <FlatList
-            data={manhwas}
-            keyExtractor={(item) => item.image_url}
-            renderItem={renderItem}
-            ItemSeparatorComponent={() => <View style={{width: AppConstants.MARGIN}} />}
-            horizontal={true}
-        />
-    )
-}
-
 const DebugPage = () => {
 
     const db = useSQLiteContext()
-    const [info, setInfo] = useState<DebugInfo | null>(null)
     const [loading, setLoading] = useState(false)
-    const [firstRun, setFirstRun] = useState<string>('')
-    const [shouldAskForDonation, setShouldAskForDonation] = useState<string>('') 
+    const [debugInfo, setDebugInfo] = useState<DebugInfo | null>(null)    
+
     const [manhwaImage, setManhwaImage] = useState<DebugManhwaImages[]>([])
     const [manhwaId, setManhwaId] = useState<string>('')
     const [cardToShow, setCardToShow] = useState<string | null>(null)
-    const [chapterMilestone, setChapterMilestone] = useState('')
-    
+
     useEffect(
         () => {
             const init = async () => {            
                 if (manhwaImage.length == 0) {
                     setLoading(true)
                         const m = await spFetchCardAndCoverLatest()
-                        setManhwaImage(m)
                         const d = await dbFetchDebugInfo(db)
-                        setInfo(d)
+                        setManhwaImage(m)
+                        setDebugInfo(d)
                     setLoading(false)
                 }
             }
@@ -141,11 +94,6 @@ const DebugPage = () => {
         []
     )
 
-    const reload = async () => {
-        const d = await dbFetchDebugInfo(db)
-        setInfo(d)
-        Toast.show(ToastMessages.EN.GENERIC_SUCCESS)
-    }
 
     const loadManhwaImage = async () => {
         Keyboard.dismiss()
@@ -166,31 +114,6 @@ const DebugPage = () => {
         }
     }
 
-    const save = async (debug: DebugInfo) => {
-        Keyboard.dismiss()
-        await dbSetDebugInfo(db, debug)
-        await reload()
-        Toast.show(ToastMessages.EN.GENERIC_SUCCESS)
-    }
-
-    const saveAskForDonation = async () => {
-        await save({...info!, should_ask_for_donation: shouldAskForDonation === '1' ? 1 : 0})
-    }
-
-    const saveFirstRun = async () => {
-        await save({...info!, first_run: firstRun.trim() === '1' ? 1 : 0})
-    }    
-    
-    const saveMilestone = async () => {
-        await save({
-            ...info!, 
-            current_chapter_milestone: chapterMilestone !== '' ? 
-                parseInt(chapterMilestone) : 
-                info!.current_chapter_milestone
-            }
-        )
-    }
-
     if (loading) {
         return (
             <SafeAreaView style={AppStyle.safeArea} >
@@ -205,27 +128,12 @@ const DebugPage = () => {
     return (
         <SafeAreaView style={AppStyle.safeArea} >
             <TopBar title='Debug' >
-                <Row style={{gap: AppConstants.ICON.SIZE}} >
-                    <BooleanRotatingButton onPress={reload} iconColor={Colors.primary} />
-                    <ReturnButton/>
-                </Row>
+                <ReturnButton/>
             </TopBar>
             <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
                 <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled' >
                     <View style={{flex: 1, gap: AppConstants.GAP}} >
-                        <ScrollView style={{width: '100%'}} horizontal={true} showsHorizontalScrollIndicator={false} >
-                            <Row>                                
-                                <Text style={styles.textItem}>manhwas: {info?.total_manhwas}</Text>
-                                <Text style={styles.textItem}>images: {info?.images}</Text>
-                                <Text style={styles.textItem}>reading_status: {info?.total_reading_status}</Text>
-                                <Text style={styles.textItem}>reading_history: {info?.total_reading_history}</Text>
-                                <Text style={styles.textItem}>authors: {info?.total_authors}</Text>
-                                <Text style={styles.textItem}>manhwa_authors: {info?.total_manhwa_authors}</Text>
-                                <Text style={styles.textItem}>genres: {info?.total_genres}</Text>
-                                <Text style={styles.textItem}>manhwa_genres: {info?.total_manhwa_genres}</Text>
-                                <Text style={styles.textItem}>device: {info?.device}</Text>
-                            </Row>
-                        </ScrollView>
+                        {debugInfo && <DebugStats debugInfo={debugInfo} />}
 
                         {/* Manhwa Images */}
                         <Text style={Typography.semibold} >Images {manhwaImage.length > 0 ? manhwaImage.length : ''}</Text>
@@ -253,63 +161,12 @@ const DebugPage = () => {
                             </ScrollView>
                         }
 
-                        <LastestManhwaCards setCardToShow={setCardToShow} />
+                        <DebugLastestManhwaCards setCardToShow={setCardToShow} />
 
-                        {/* First Run */}
-                        <View style={styles.title} >
-                            <Text style={Typography.semibold} >First Run</Text>
-                            <Text style={AppStyle.textOptional} >{info?.first_run}</Text>
-                        </View>
-                        <Row style={{gap: AppConstants.GAP}} >
-                            <TextInput
-                                style={styles.input}
-                                value={firstRun}
-                                keyboardType='numeric'
-                                maxLength={1}
-                                onChangeText={setFirstRun}
-                            />
-                            <Pressable onPress={saveFirstRun} style={styles.button} >
-                                <Text style={styles.buttonText} >SET</Text>
-                            </Pressable>
-                        </Row>
-
-                        {/* Should Ask for Donation */}
-                        <View style={styles.title} >
-                            <Text style={Typography.semibold} >Should Ask for Donation</Text>
-                            <Text style={AppStyle.textOptional} >{info?.should_ask_for_donation}</Text>
-                        </View>
-                        <Row style={{gap: AppConstants.GAP}} >
-                            <TextInput
-                                style={styles.input}
-                                value={shouldAskForDonation}
-                                keyboardType='numeric'
-                                maxLength={1}
-                                onChangeText={setShouldAskForDonation}
-                            />
-                            <Pressable onPress={saveAskForDonation} style={styles.button} >
-                                <Text style={styles.buttonText} >SET</Text>
-                            </Pressable>
-                        </Row>
-
-                        {/* Chapter Milestone */}
-                        <View style={styles.title} >
-                            <Text style={Typography.semibold} >Chapter Milestone</Text>
-                            <Text style={AppStyle.textOptional} >{info?.current_chapter_milestone}</Text>
-                        </View>
-                        <Row style={{gap: AppConstants.GAP}} >
-                            <TextInput
-                                style={styles.input}
-                                value={chapterMilestone.toString()}
-                                keyboardType='numeric'
-                                onChangeText={setChapterMilestone}
-                            />
-                            <Pressable onPress={saveMilestone} style={styles.button} >
-                                <Text style={styles.buttonText} >SET</Text>
-                            </Pressable>
-                        </Row>
+                        { debugInfo && <DebugForm debugInfo={debugInfo} setDebugInfo={setDebugInfo} /> }
 
                     </View>
-                    <Footer height={120} />
+                    <Footer/>
                 </ScrollView>
             </KeyboardAvoidingView>
             {

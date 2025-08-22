@@ -8,7 +8,8 @@ interface MostPopularGridProps {
     manhwas: Manhwa[]
 }
 
-const MostPopularGrid = ({manhwas}: MostPopularGridProps) => {
+const MostPopularGrid = ({manhwas}: MostPopularGridProps) => {  
+
   return (
     <ManhwaHorizontalGrid
       title='Most Popular'
@@ -18,4 +19,5 @@ const MostPopularGrid = ({manhwas}: MostPopularGridProps) => {
   )
 }
 
-export default MostPopularGrid
+
+export default React.memo(MostPopularGrid)

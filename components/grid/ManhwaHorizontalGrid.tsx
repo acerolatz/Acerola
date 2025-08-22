@@ -1,5 +1,4 @@
 import { FlatList, StyleSheet, View } from 'react-native'
-import { useSettingsState } from '@/store/settingsState'
 import { AppConstants } from '@/constants/AppConstants'
 import ViewAllButton from '../buttons/ViewAllButton'
 import React, { useCallback } from 'react'
@@ -35,16 +34,18 @@ const ManhwaHorizontalGrid = ({
             <Row style={styles.header} >
                 <Title title={title}/>
                 <ViewAllButton onPress={onViewAll} />
-            </Row>
-            <View style={{width: '100%'}} >
-                <FlatList
-                    data={manhwas}
-                    horizontal={true}
-                    initialNumToRender={10}
-                    keyExtractor={keyExtractor}
-                    renderItem={renderItem}
-                />
-            </View>
+            </Row>            
+            <FlatList
+                data={manhwas}
+                horizontal={true}
+                windowSize={5}
+                maxToRenderPerBatch={7}
+                updateCellsBatchingPeriod={50}
+                initialNumToRender={10}
+                keyExtractor={keyExtractor}
+                renderItem={renderItem}
+                showsHorizontalScrollIndicator={false}
+            />
         </View>
     )
 }

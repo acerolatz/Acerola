@@ -1099,11 +1099,7 @@ export async function dbUpdateDatabase(db: SQLite.SQLiteDatabase): Promise<numbe
       'author_id, manhwa_id, role',
       '(?,?,?)',
       3,
-      `
-        ON CONFLICT
-          (author_id, manhwa_id, role)
-        DO NOTHING
-      `
+      'ON CONFLICT (author_id, manhwa_id, role) DO NOTHING'
     ),
     dbUpsertBatch(
       db,

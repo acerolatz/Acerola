@@ -57,7 +57,7 @@ const GenreGrid = ({genres}: {genres: Genre[]}) => {
     )
 }
 
-export default GenreGrid
+export default React.memo(GenreGrid)
 
 const styles = StyleSheet.create({
     container: {

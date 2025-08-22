@@ -3,7 +3,6 @@ import DonationBottomSheet from '@/components/bottomsheet/DonationBottomSheet'
 import RandomManhwaButton from '@/components/buttons/OpenRandomManhwaButton'
 import UpdateDatabaseButton from '@/components/buttons/UpdateDatabaseButton'
 import ContinueReadingGrid from '@/components/grid/ContinueReadingGrid'
-import { normalizeRandomManhwaCardHeight } from '@/helpers/normalize'
 import LatestUpdatesGrid from '@/components/grid/LatestUpdatesGrid'
 import MostPopularGrid from '@/components/grid/MostPopularGrid'
 import RandomCardsGrid from '@/components/grid/RandomCardsGrid'
@@ -52,10 +51,6 @@ import {
 } from 'react-native'
 import { Image } from 'expo-image'
 
-
-const openManhwaSearch = () => {
-    router.navigate("/(pages)/ManhwaSearch")
-}
 
 
 /**
@@ -106,75 +101,79 @@ const HomePage = () => {
     const backgroundAnim = useRef(new Animated.Value(-AppConstants.SCREEN.WIDTH)).current
     const menuVisible = useRef(false)
 
+    const openManhwaSearch = useCallback(() => {
+        router.navigate("/(pages)/ManhwaSearch")
+    }, [])
+
     const reloadCards = async () => {
-        const r = await spFetchRandomManhwaCards(AppConstants.PAGE_LIMIT)
-        setCards(r)
+        const r = await spFetchRandomManhwaCards(AppConstants.PAGE_LIMIT);
+        setCards(r);
     }
-    
+
     const updateCollections = async () => {
         if (collections.length === 0) {
-            const c = await spFetchCollections()
-            setCollections(c)
+            const c = await spFetchCollections();
+            setCollections(c);
         }
-    }
+    }        
 
     const updateTop10 = async () => {
         if (top10manhwas.length === 0) {
-            const t = await spGetTodayTop10()
-            setTop10manhwas(t)
+            const t = await spGetTodayTop10();
+            setTop10manhwas(t);
         }
     }
 
+    const updateRandomCards = async () => {
+        if (cards.length === 0) { await reloadCards(); }
+    }
+        
     const reloadTop10 = async () => {
         const t = await spGetTodayTop10()
         setTop10manhwas(t)
     }
 
-    const updateRandomCards = async () => {
-        if (cards.length == 0) {
-            await reloadCards()
-        }
-    }        
-
     const toggleMenu = () => {
         menuVisible.current ? closeMenu() : openMenu()
     }
-    
-    useEffect(
-        () => {
-            const init = async () => {
-                setLoading(true)
-                    await Promise.all([
-                        dbReadGenres(db),
-                        dbReadManhwasOrderedByUpdateAt(db, 0, AppConstants.PAGE_LIMIT),
-                        dbReadManhwasOrderedByViews(db, 0, AppConstants.PAGE_LIMIT)
-                    ]).then(([g, l, m]) => {
-                        setGenres(g),
-                        setLatestUpdates(l)
-                        setMostView(m)
-                    })
-                setLoading(false)                
+
+    useEffect(() => {
+            let mounted = true;
+            setLoading(true);
+
+            (async () => {
+                const [g, l, m] = await Promise.all([
+                    dbReadGenres(db),
+                    dbReadManhwasOrderedByUpdateAt(db, 0, AppConstants.PAGE_LIMIT),
+                    dbReadManhwasOrderedByViews(db, 0, AppConstants.PAGE_LIMIT),
+                ]);
+
+                if (!mounted) { return }
+                setGenres(g);
+                setLatestUpdates(l);
+                setMostView(m);
 
                 await Promise.all([
                     updateTop10(),
                     updateCollections(),
-                    updateRandomCards()
-                ])
-            }
-            init()
-        },
-        [db]
-    )
+                    updateRandomCards(),
+                ]);
 
-    useFocusEffect(useCallback(
-        () => {
+                if (mounted) setLoading(false);
+            })();
+
+            return () => { mounted = false };
+    }, []);
+
+    useFocusEffect(
+        useCallback(() => {
             const reload = async () => {
-                Image.clearMemoryCache()
-                await dbGetManhwaReadingHistory(db, 0, AppConstants.PAGE_LIMIT)
-                    .then(v => setReadingHistoryManhwas(v))
-            }
-            reload()
-    }, []))
+                Image.clearMemoryCache();
+                const v = await dbGetManhwaReadingHistory(db, 0, AppConstants.PAGE_LIMIT);
+                setReadingHistoryManhwas(v);
+            };
+            reload();
+    }, [db]));
 
     const openMenu = () => {
         Animated.timing(menuAnim, {

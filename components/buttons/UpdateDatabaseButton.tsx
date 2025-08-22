@@ -39,12 +39,12 @@ const UpdateDatabaseButton = ({
 
         try {
             const n = await dbUpdateDatabase(db)
-            if (n > 0) {
-                Toast.show({ text1: 'Sync completed', text2: `Pornhwas: ${n}`, type: 'info' })
-                router.replace('/(pages)/HomePage')
-            } else {
+            if (n === 0) {
                 Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED1)
+                return
             }
+            Toast.show({ text1: 'Sync completed', text2: `Pornhwas: ${n}`, type: 'info' })
+            router.replace('/(pages)/HomePage')
         } catch (error) {
             console.error(error)
         } finally {

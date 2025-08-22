@@ -125,6 +125,16 @@ export const ToastMessages = {
             text1: "Error", 
             text2: "Could not create todo", 
             type: "error"
+        },
+        COULD_NOT_FETCH_CHAPTER_IMAGES: {
+            text1: "Error", 
+            text2: "Could not fetch the chapter images", 
+            type: 'info'
+        },
+        RELOADING_CHAPTER: {
+            text1: "Reloading chapter...", 
+            type: 'info',
+            visibilityTime: 1000
         }
     }
 }

@@ -331,7 +331,7 @@ export async function spFetchRandomManhwaCards(p_limit: number = 30): Promise<Ma
  * @param p_limit - Maximum number of cards to fetch (default 30)
  * @returns Promise resolving to an array of objects containing manhwa_id, title, and image_url
  */
-export async function spFetchLatestManhwaCardsDebug(p_limit: number = 30): Promise<{
+export async function spFetchLatestManhwaCardsDebug(p_offset: number = 0, p_limit: number = 30): Promise<{
     title: string,
     manhwa_id: number,
     image_url: string
@@ -340,7 +340,7 @@ export async function spFetchLatestManhwaCardsDebug(p_limit: number = 30): Promi
         .from("cards")
         .select("manhwas (title, manhwa_id), image_url")
         .order("created_at", {ascending: false})
-        .limit(p_limit)
+        .range(p_offset * p_limit, (p_offset + 1) * p_limit - 1)
 
     if (error) {
         console.log("error spFetchRandomManhwaCards", error)

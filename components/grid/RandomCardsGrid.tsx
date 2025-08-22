@@ -57,6 +57,9 @@ const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
                     <FlatList
                         ref={flatListRef}
                         data={cards}
+                        windowSize={3}
+                        maxToRenderPerBatch={5}
+                        updateCellsBatchingPeriod={100}
                         keyExtractor={keyExtractor}
                         renderItem={renderItem}
                         ItemSeparatorComponent={ItemSeparator}

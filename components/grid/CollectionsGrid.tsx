@@ -55,7 +55,7 @@ const CollectionGrid = ({collections}: {collections: Collection[]}) => {
     )
 }
 
-export default CollectionGrid
+export default React.memo(CollectionGrid)
 
 const styles = StyleSheet.create({
     container: {
