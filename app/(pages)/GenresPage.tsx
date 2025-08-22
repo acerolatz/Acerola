@@ -18,6 +18,7 @@ import {
 } from 'react-native'
 import { dbReadGenres } from '@/lib/database'
 import { useSQLiteContext } from 'expo-sqlite'
+import { FlashList } from '@shopify/flash-list'
 
 
 const NUM_COLUMNS = 2
@@ -72,7 +73,6 @@ const GenresPage = () => {
                 numColumns={2}
                 keyExtractor={(item) => item.genre_id.toString()}
                 showsVerticalScrollIndicator={false}
-                initialNumToRender={30}
                 renderItem={renderItem}
                 ListFooterComponent={<Footer height={hp(12)}/>}
             />

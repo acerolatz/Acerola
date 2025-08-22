@@ -1,3 +1,4 @@
+import React, { useCallback, useMemo, useState } from 'react'
 import { ActivityIndicator, Pressable } from 'react-native'
 import { AppConstants } from '@/constants/AppConstants'
 import { ToastMessages } from '@/constants/Messages'
@@ -6,8 +7,8 @@ import Ionicons from '@expo/vector-icons/Ionicons'
 import Toast from 'react-native-toast-message'
 import { useSQLiteContext } from 'expo-sqlite'
 import { Colors } from '@/constants/Colors'
-import React, { useState } from 'react'
 import { router } from 'expo-router'
+import { debounce } from 'lodash'
 
 
 interface RandomManhwaButtonProps {
@@ -25,17 +26,22 @@ const RandomManhwaButton = ({
     const db = useSQLiteContext()    
     const [loading, setLoading] = useState(false)
 
-    const openRandomManhwa = async () => {
+    const handleOpenManhwa = useCallback(async () => {
+        if (loading) return
         setLoading(true)
-            const manhwa_id: number | null = await dbGetRandomManhwaId(db)
+        try {
+            const manhwa_id = await dbGetRandomManhwaId(db)
             if (manhwa_id === null) {
                 Toast.show(ToastMessages.EN.NO_MANGAS)
-                setLoading(false)
-                return
+            } else {
+                router.navigate({ pathname: '/(pages)/ManhwaPage', params: { manhwa_id } })
             }
-            router.navigate({pathname: '/(pages)/ManhwaPage', params: {manhwa_id}})
-        setLoading(false)
-    }
+        } finally {
+            setLoading(false)
+        }
+    }, [db, loading])
+
+    const debounceSearch = useMemo(() => debounce(handleOpenManhwa, 200), [db])
 
     if (loading) {
         return (
@@ -44,7 +50,7 @@ const RandomManhwaButton = ({
     }
 
     return (        
-        <Pressable onPress={openRandomManhwa} hitSlop={AppConstants.HIT_SLOP.NORMAL}>
+        <Pressable onPress={debounceSearch} hitSlop={AppConstants.HIT_SLOP.NORMAL}>
             <Ionicons name='dice-outline' size={size} color={color}/>
         </Pressable>        
     )

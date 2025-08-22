@@ -1,13 +1,12 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { Pressable, StyleSheet, Text, View } from "react-native"
 import ChapterPageSelector from "../chapter/ChapterPageSelector"
 import ChapterGridItem from "../chapter/ChapterGridItem"
 import { dbGetManhwaReadChapters } from '@/lib/database'
 import { AppConstants } from "@/constants/AppConstants"
 import { useChapterState } from "@/store/chapterState"
+import { useCallback, useMemo, useState } from "react"
 import { router, useFocusEffect } from "expo-router"
 import { Typography } from "@/constants/typography"
-import { spFetchChapterList } from "@/lib/supabase"
 import { useSQLiteContext } from "expo-sqlite"
 import { AppStyle } from "@/styles/AppStyle"
 import { Colors } from "@/constants/Colors"
@@ -27,32 +26,15 @@ const ManhwaChapterGrid = ({ manhwa }: ManhwaChapterGridProps) => {
   
   const db = useSQLiteContext()
   const manhwa_id = manhwa.manhwa_id
-  const { chapters, setChapters, setCurrentChapterIndex } = useChapterState()
 
-  const [loading, setLoading] = useState(false)
+  const setCurrentChapterIndex = useChapterState(c => c.setCurrentChapterIndex)
+  const chapters = useChapterState(c => c.chapters)
+
   const [currentPage, setCurrentPage] = useState(0)
-    
   const [chaptersReadSet, setChaptersReadSet] = useState<Set<number>>(new Set())
 
   const maxChapterPageNum = useMemo(() => Math.floor(chapters.length / PAGE_LIMIT), [chapters.length])
-
-  // Fetch chapters
-  useEffect(() => {
-    let isCancelled = false
-    const init = async () => {
-      setLoading(true)
-      const c = await spFetchChapterList(manhwa_id)
-      if (!isCancelled) {
-        setChapters(c)
-        setCurrentPage(0)
-      }
-      setLoading(false)
-    }
-    init()
-    return () => { isCancelled = true }
-  }, [manhwa_id, setChapters])
-
-  // Fetch read chapters on focus
+  
   useFocusEffect(
     useCallback(() => {
       const reload = async () => {
@@ -91,14 +73,6 @@ const ManhwaChapterGrid = ({ manhwa }: ManhwaChapterGridProps) => {
     () => chapters.slice(currentPage * PAGE_LIMIT, (currentPage + 1) * PAGE_LIMIT),
     [chapters, currentPage]
   )
-
-  if (loading) {
-    return (
-      <View style={{width: '100%', alignItems: "center", justifyContent: "center"}} >
-        <ActivityIndicator size={AppConstants.ICON.SIZE} color={manhwa.color} />
-      </View>
-    )
-  }  
 
   if (!manhwa || chapters.length === 0) { return <></> }
 

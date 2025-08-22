@@ -11,6 +11,8 @@ import { AppStyle } from '@/styles/AppStyle'
 import TopBar from '@/components/TopBar'
 import { Manhwa } from '@/helpers/types'
 import { debounce } from 'lodash'
+import { FlashList, FlashListRef } from '@shopify/flash-list'
+import { hp } from '@/helpers/util'
 
 
 const ManhwaSearch = () => {
@@ -18,7 +20,7 @@ const ManhwaSearch = () => {
   const db = useSQLiteContext()
   
   const [manhwas, setManhwas] = useState<Manhwa[]>([])
-  const flatListRef = useRef<FlatList<Manhwa>>(null) 
+  const flatListRef = useRef<FlashListRef<Manhwa>>(null) 
 
   const searchTerm = useRef('')
   const manhwasRef = useRef<Manhwa[]>([])
@@ -50,7 +52,7 @@ const ManhwaSearch = () => {
       0, 
       AppConstants.PAGE_LIMIT
     )
-    if (isMounted.current && m.length) {
+    if (isMounted.current) {
       manhwasRef.current = m
       setManhwas([...manhwasRef.current])
       hasResults.current = m.length >= AppConstants.PAGE_LIMIT
@@ -98,17 +100,14 @@ const ManhwaSearch = () => {
       </TopBar>
       <View style={styles.container} >
         <SearchBar onChangeText={debounceSearch} placeholder='pornhwa' />
-        <FlatList
+        <FlashList
           keyboardShouldPersistTaps={'handled'}
           ref={flatListRef}
           data={manhwas}
           numColumns={2}
           keyExtractor={keyExtractor}
-          initialNumToRender={12}
-          maxToRenderPerBatch={12}
-          updateCellsBatchingPeriod={100}
           onEndReachedThreshold={2}
-          windowSize={5}
+          drawDistance={hp(250)}
           onEndReached={onEndReached}          
           renderItem={renderItem}
           ListFooterComponent={renderFooter}/>

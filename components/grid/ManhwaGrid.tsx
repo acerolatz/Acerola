@@ -1,10 +1,11 @@
-import CustomActivityIndicator from '../util/CustomActivityIndicator'
-import { FlatList, StyleSheet, View } from 'react-native'
 import { AppConstants } from '@/constants/AppConstants'
+import { StyleSheet, View } from 'react-native'
+import { FlashList } from '@shopify/flash-list'
 import React, { useCallback } from 'react'
 import { Manhwa } from '@/helpers/types'
 import ManhwaCard from '../ManhwaCard'
 import Footer from '../util/Footer'
+import { hp } from '@/helpers/util'
 
 
 interface MangaGridProps {
@@ -42,17 +43,14 @@ const ManhwaGrid = ({
     
     return (
         <View style={styles.container} >
-            <FlatList
+            <FlashList
                 showsVerticalScrollIndicator={showsVerticalScrollIndicator}
                 keyboardShouldPersistTaps={'handled'}
-                data={manhwas}
                 numColumns={numColumns}
+                data={manhwas}
                 keyExtractor={keyExtractor}
-                initialNumToRender={12}
                 onEndReached={onEndReached}
-                maxToRenderPerBatch={12}
-                updateCellsBatchingPeriod={100}
-                windowSize={5}
+                drawDistance={hp(250)}
                 onEndReachedThreshold={2}
                 renderItem={renderItem}
                 ListFooterComponent={renderFooter}/>
@@ -60,7 +58,9 @@ const ManhwaGrid = ({
     )    
 }
 
+
 export default ManhwaGrid
+
 
 const styles = StyleSheet.create({
     container: {
