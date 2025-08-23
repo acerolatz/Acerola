@@ -129,14 +129,6 @@ export type Feedback = {
     created_at: string
 }
 
-
-export type Settings = {
-    windowSize: number
-    maxToRenderPerBatch: number
-    updateCellsBatchingPeriod: number
-    itemVisiblePercentThreshold: number
-}
-
 export type DownloadProgress = {
   current: number
   total: number
@@ -173,4 +165,11 @@ export type Log = {
     title: string
     descr: string | null
     created_at: number
+}
+
+
+export type User = {
+    userCoverImageUrl: string | null
+    username: string | null
+    user_id: string | null
 }

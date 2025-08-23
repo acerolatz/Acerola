@@ -29,7 +29,7 @@ export default ChapterArrowUpButton
 const styles = StyleSheet.create({
   arrowUp: {
     position: 'absolute',
-    bottom: hp(5),
+    bottom: hp(6),
     right: wp(2),
     padding: wp(1),
     borderRadius: AppConstants.ICON.SIZE,

@@ -1,7 +1,6 @@
 import PageActivityIndicator from '@/components/util/PageActivityIndicator';
 import { clearCache, hasInternetAvailable } from '@/helpers/util';
 import { useAppVersionState } from '@/store/appVersionState';
-import { useSettingsState } from '@/store/settingsState';
 import { ToastMessages } from '@/constants/Messages';
 import React, { useEffect, useRef } from 'react';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -13,11 +12,9 @@ import {
     dbFirstRun,
     dbReadAppVersion,
     dbIsSafeModeEnabled,
-    dbLoadSettings,
-    dbSetLastRefresh,
     dbShouldClearCache,
-    dbShouldUpdate,
-    dbUpdateDatabase
+    dbShouldSyncDatabase,
+    dbSyncDatabase    
 } from '@/lib/database';
 import {
     LeagueSpartan_200ExtraLight,
@@ -33,7 +30,6 @@ const App = () => {
     const isInitialized = useRef(false);
 
     const setLocalVersion = useAppVersionState(a => a.setLocalVersion)
-    const setSettings = useSettingsState(s => s.setSettings)
 
     let [fontsLoaded] = useFonts({
         LeagueSpartan_200ExtraLight,
@@ -52,11 +48,6 @@ const App = () => {
         }
     }
 
-    const loadSettings = async () => {
-        const s = await dbLoadSettings(db)   
-        setSettings(s)
-    }
-
     useEffect(
         () => {
             if (isInitialized.current) return;
@@ -66,15 +57,14 @@ const App = () => {
                 await Promise.all([
                     handleCache(),
                     updateLocalVersion(),
-                    loadSettings(),
                     dbFirstRun(db)
-                ])
+                ])                
 
                 if (await dbIsSafeModeEnabled(db)) {
                     router.replace("/(pages)/SafeModeHomePage")
                     return
                 }
-                
+                                
                 const hasInternet = await hasInternetAvailable()
 
                 if (!hasInternet) {
@@ -83,9 +73,9 @@ const App = () => {
                     return;
                 }
                 
-                if (await dbShouldUpdate(db, 'server')) {
+                if (await dbShouldSyncDatabase(db)) {
                     Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE);
-                    await dbUpdateDatabase(db);
+                    await dbSyncDatabase(db);
                     Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED);
                 }
 

@@ -16,16 +16,15 @@ import {
 } from "@/helpers/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image as CompressorImage } from 'react-native-compressor';
-import { decode, getDeviceName, hasInternetAvailable } from "@/helpers/util";
+import { decode, hasInternetAvailable } from "@/helpers/util";
 import { supabaseKey, supabaseUrl } from "./supabaseKey";
 import { createClient } from '@supabase/supabase-js';
 import { ToastMessages } from "@/constants/Messages";
 import * as RNLocalize from 'react-native-localize';
 import * as mime from 'react-native-mime-types';
 import Toast from "react-native-toast-message";
-import RNFS from 'react-native-fs';
-import { normalizeRandomManhwaCardHeight } from "@/helpers/normalize";
 import { PixelRatio } from "react-native";
+import RNFS from 'react-native-fs';
 
 
 export const supabase = createClient(supabaseUrl, supabaseKey as any, {
@@ -38,45 +37,32 @@ export const supabase = createClient(supabaseUrl, supabaseKey as any, {
 });
 
 
-/**
- * Uses the Supabase REST API to fetch the complete list of manhwas via an RPC call.
- *
- * Uses the `get_manhwas` RPC function in the database to check whether the
- * client's data is outdated based on the provided `p_last_sync` timestamp.
- *
- * - If the client provides `null`, it is treated as an initial sync, fetching all data.
- * - If the server determines that the client's data is outdated, it returns the full list of manhwas.
- * - If the client is already up to date, the server returns an empty array.
- *
- * @param p_last_sync - The timestamp (ISO 8601 string) of the client's last successful sync, or `null` for an initial sync.
- * @returns A promise that resolves with an array of `Manhwa` objects. 
- * Returns an empty array if the client is up to date or if an error occurs during the fetch.
- */
-export async function spGetManhwas(p_last_sync: string | null): Promise<Manhwa[]> {
+export async function spUpdateUserLastLogin(user_id: string) {
+    const { error } = await supabase
+        .from("users")
+        .update([{"last_login": "now()"}])
+        .eq("user_id", user_id)
+    
+    if (error) {
+        console.log("error spUpdateUserLastLogin", error)
+    }
+}
+
+
+export async function spGetManhwas(p_last_sync: string | null): Promise<Manhwa[] | null> {
     const { data, error } = await supabase
         .rpc("get_manhwas", { p_last_sync })        
     
     if (error) {
         console.log("error spGetManhwas", error)
-        return []
+        return null
     }
     
     return data
 }
 
 
-
-/**
- * Uses the Supabase REST API to register or update a user record in the `users` table.
- *
- * Collects the device information, user language preferences (up to 5),
- * and timezone from the device, then performs an UPSERT operation on Supabase. 
- *
- * @param user_id - Unique identifier for the user.
- * @param device - Device identifier (example: moto e13, arm64-v8a, armeabi-v7a, armeabi, Android[13])
- * @returns A promise that resolves when the operation completes.
- */
-export async function spNewRun(user_id: string, device: string) {
+export async function spRegisterNewUser(user_id: string, device: string, version: string) {
     const timezone = RNLocalize.getTimeZone()
     const locales = RNLocalize.getLocales()
     const language = locales.length > 0 ? locales.slice(0, 5).map(i => i.languageTag).join(', ') : null
@@ -85,7 +71,7 @@ export async function spNewRun(user_id: string, device: string) {
         const { error } = await supabase
           .from("users")
           .upsert(
-            [{ user_id, device, language, timezone }],
+            [{ user_id, device, version, language, timezone }],
             { onConflict: "user_id" }
           );
         
@@ -98,12 +84,6 @@ export async function spNewRun(user_id: string, device: string) {
 }
 
 
-/**
- * Uses the Supabase REST API to fetch a single manhwa by its unique ID.
- *
- * @param manhwa_id - The unique numeric identifier of the manhwa to fetch.
- * @returns A promise that resolves with a `Manhwa` object if found, or `null` if no record exists or an error occurs.
- */
 export async function spFetchManhwaById(manhwa_id: number): Promise<Manhwa | null> {
     const { data, error } = await supabase
         .from("mv_manhwas")
@@ -120,12 +100,7 @@ export async function spFetchManhwaById(manhwa_id: number): Promise<Manhwa | nul
 }
 
 
-/**
- * Uses the Supabase REST API to fetch chapters for a given manhwa in ascending order.
- * 
- * @param manhwa_id - The unique numeric identifier of the manhwa whose chapters are to be fetched.
- * @returns A promise that resolves with an array of `Chapter` objects, or an empty array if no records are found or an error occurs.
- */
+
 export async function spFetchChapterList(manhwa_id: number): Promise<Chapter[]> {
     const { data, error } = await supabase
         .from("chapters")
@@ -142,13 +117,6 @@ export async function spFetchChapterList(manhwa_id: number): Promise<Chapter[]> 
 }
 
 
-
-/** 
- * Uses the Supabase REST API to update the view count for a specific chapter.
- * 
- * @param p_chapter_id - The unique identifier of the chapter to update
- *
- */
 export async function spUpdateChapterView(p_chapter_id: number) {
     const { error } = await supabase
         .rpc("increment_chapter_view", { p_chapter_id })
@@ -176,11 +144,6 @@ export async function spUpdateManhwaCardView(p_manhwa_id: number) {
 }
 
 
-/**
- * Uses the Supabase REST API to update the total view count for a specific manhwa.
- * 
- * @param p_manhwa_id - The unique identifier of the manhwa to update
- */
 export async function spUpdateManhwaViews(p_manhwa_id: number) {
     const { error } = await supabase
         .rpc('increment_manhwa_views', { p_manhwa_id  });
@@ -191,12 +154,6 @@ export async function spUpdateManhwaViews(p_manhwa_id: number) {
 }
 
 
-/**
- * Uses the Supabase REST API to fetch images for a specific chapter from the database.
- * 
- * @param chapter_id - ID of the chapter to fetch images for
- * @returns Promise resolving to an array of ChapterImage objects. Returns empty array on error
- */
 export async function spFetchChapterImages(chapter_id: number): Promise<ChapterImage[]> {
     const { data, error } = await supabase
         .from("chapter_images")
@@ -222,13 +179,7 @@ export async function spFetchChapterImages(chapter_id: number): Promise<ChapterI
 }
 
 
-/**
- * Uses the Supabase REST API to submit a request to add a new manhwa to the application.
- * 
- * @param manhwa - Title of the manhwa being requested
- * @param message - Optional additional context or message about the request
- */
-export async function spRequestManhwa(manhwa: string, message: string | null) {
+export async function spSendRequestPornhwaForm(manhwa: string, message: string | null) {
     const { error } = await supabase
         .from("manhwa_requests")
         .insert([{manhwa, message}])
@@ -239,19 +190,7 @@ export async function spRequestManhwa(manhwa: string, message: string | null) {
 }
 
 
-/**
- * Uses the Supabase REST API to submit a bug report.
- * 
- * Creates a new bug report record with provided details and returns the generated bug ID.
- * 
- * @param title - Short description of the bug
- * @param bug_type - Category/classification of the bug
- * @param device - Optional device information where bug occurred
- * @param descr - Optional detailed description of the bug
- * @param has_images - Flag indicating if bug report includes screenshots
- * @returns Promise resolving to the generated bug ID or null on failure
- */
-export async function spReportBug(
+export async function spSendBugReportForm(
     title: string, 
     bug_type: string,
     device: string | null,
@@ -273,12 +212,7 @@ export async function spReportBug(
 }
 
 
-/**
- * Uses the Supabase REST API to retrieve the available donation methods from the database.
- * 
- * @returns Promise resolving to an array of donation methods. Returns empty array on error.
- */
-export async function spGetDonationMethods(): Promise<DonateMethod[]> {
+export async function spFetchDonationMethods(): Promise<DonateMethod[]> {
     const { data, error } = await supabase
         .from("app_infos")
         .select("name, value, action, created_at")
@@ -294,16 +228,23 @@ export async function spGetDonationMethods(): Promise<DonateMethod[]> {
 }
 
 
-/**
- * Uses the Supabase REST API to fetch random manhwa cards for display on the HomePage.
- * 
- * Behavior varies based on debug mode:
- *   - In debug: Returns most recently created cards from cards table
- *   - In production: Calls optimized RPC function for random card selection
- * 
- * @param p_limit - Maximum number of cards to retrieve (default: 30)
- * @returns Promise resolving to array of ManhwaCard objects. Returns empty array on error
- */
+function normalizeRandomManhwaCardHeight(width: number, height: number): {
+  normalizedWidth: number, 
+  normalizedHeight: number
+} {
+  const normalizedHeight = height > AppConstants.RANDOM_MANHWAS.MAX_HEIGHT ? 
+    AppConstants.RANDOM_MANHWAS.MAX_HEIGHT :
+    height
+  
+  let normalizedWidth = (normalizedHeight * width) / height
+
+  normalizedWidth = normalizedWidth > AppConstants.RANDOM_MANHWAS.MAX_WIDTH ?
+    AppConstants.RANDOM_MANHWAS.MAX_WIDTH : 
+    normalizedWidth
+  return { normalizedWidth, normalizedHeight}
+}
+
+
 export async function spFetchRandomManhwaCards(p_limit: number = 30): Promise<ManhwaCard[]> {
     const { data, error } = await supabase
         .rpc("get_random_cards", { p_limit })
@@ -323,14 +264,6 @@ export async function spFetchRandomManhwaCards(p_limit: number = 30): Promise<Ma
 }
 
 
-/**
- * Uses the Supabase REST API to fetch the latest manhwa cards.
- * 
- * Retrieves manhwa cards ordered by creation date descending.
- * 
- * @param p_limit - Maximum number of cards to fetch (default 30)
- * @returns Promise resolving to an array of objects containing manhwa_id, title, and image_url
- */
 export async function spFetchLatestManhwaCardsDebug(p_offset: number = 0, p_limit: number = 30): Promise<{
     title: string,
     manhwa_id: number,
@@ -356,11 +289,6 @@ export async function spFetchLatestManhwaCardsDebug(p_offset: number = 0, p_limi
 }
 
 
-/**
- * Uses the Supabase REST API to fetch the list of Scans used by the app (unofficial manhwa translations).
- * 
- * @returns Promise resolving to an array of Scan objects containing name and URL
- */
 export async function spFetchScans(): Promise<Scan[]> {
     const { data, error } = await supabase
         .from("app_infos")
@@ -377,11 +305,6 @@ export async function spFetchScans(): Promise<Scan[]> {
 }
 
 
-/**
- * Uses the Supabase REST API to fetch the EULA and Disclaimer from the database.
- * 
- * @returns Promise resolving to an array of objects containing name and value
- */
 export async function spFetchEulaAndDisclaimer(): Promise<{name: string, value: string}[]> {
     const { data, error } = await supabase
         .from("app_infos")
@@ -397,11 +320,6 @@ export async function spFetchEulaAndDisclaimer(): Promise<{name: string, value: 
 }
 
 
-/**
- * Uses the Supabase REST API to fetch all manhwa collections (e.g., themes like MILF, Threesome).
- * 
- * @returns Promise resolving to an array of Collection objects with collection_id and name
- */
 export async function spFetchCollections(): Promise<Collection[]> {
     const { data, error } = await supabase
         .from("collections")
@@ -417,14 +335,6 @@ export async function spFetchCollections(): Promise<Collection[]> {
 }
 
 
-/**
- * Uses the Supabase REST API to fetch manhwas belonging to a specific collection via RPC call.
- * 
- * @param p_collection_id - ID of the collection to fetch manhwas for
- * @param p_offset - Offset for pagination (default 0)
- * @param p_limit - Number of manhwas to fetch (default 30)
- * @returns Promise resolving to an array of Manhwa objects
- */
 export async function spFetchCollectionItems(
     p_collection_id: number,
     p_offset: number = 0,
@@ -442,16 +352,11 @@ export async function spFetchCollectionItems(
 }
 
 
-/**
- * Uses the Supabase REST API to fetch the top 10 manhwas for today via RPC call.
- * 
- * @returns Promise resolving to an array of Manhwa objects
- */
-export async function spGetTodayTop10(): Promise<Manhwa[]> {
+export async function spFetchTop10(): Promise<Manhwa[]> {
     const { data, error } = await supabase.rpc("get_top_10_manhwas")
 
     if (error) {
-        console.log("error spGetTodayTop10", error)
+        console.log("error spFetchTop10", error)
         return []
     }
 
@@ -459,16 +364,7 @@ export async function spGetTodayTop10(): Promise<Manhwa[]> {
 }
 
 
-/**
- * Uses the Supabase REST API to upload a screenshot image for a bug report.
- * 
- * Compresses and uploads an image to Supabase storage.
- * 
- * @param uri - Local URI of the image to upload
- * @param bug_id - ID of the bug report
- * @param index - Index of the screenshot in the report
- */
-export const uploadBugScreenshot = async (uri: string, bug_id: string, index: number) => {
+export const spSendBugScreenshot = async (uri: string, bug_id: string, index: number) => {
     try {
         const mimeType = mime.lookup(uri) || 'image/jpeg';
         const ext = mime.extension(mimeType) || 'jpg';
@@ -499,11 +395,6 @@ export const uploadBugScreenshot = async (uri: string, bug_id: string, index: nu
 };
 
 
-/**
- * Uses the Supabase REST API to fetch release information and source code links.
- * 
- * @returns Promise resolving to a ReleaseWrapper object containing arrays of releases and source code links
- */
 export async function spFetchReleasesAndSourceCode(): Promise<ReleaseWrapper> {
     const { data, error } = await supabase
         .from("app_infos")
@@ -529,13 +420,6 @@ export async function spFetchReleasesAndSourceCode(): Promise<ReleaseWrapper> {
 
 
 
-/**
- * Uses the Supabase REST API to fetch news posts related to the app or pornhwa.
- * 
- * @param p_offset - Page offset for pagination (default 0)
- * @param p_limit - Number of posts per page (default 30)
- * @returns Promise resolving to an array of Post objects
- */
 export async function spFetchNews(p_offset: number = 0, p_limit: number = 30): Promise<Post[]> {
     const { data, error } = await supabase
         .from("app_infos")
@@ -557,13 +441,6 @@ export async function spFetchNews(p_offset: number = 0, p_limit: number = 30): P
 }
 
 
-/**
- * Uses the Supabase REST API to retrieve the current live version of the application from the database.
- * 
- * Fetches the 'live_version' record from the app_infos table. 
- * 
- * @returns Promise resolving to the version string if found, null on error or if not available
- */
 export async function spFetchLiveVersion(): Promise<string | null> {
     const { data, error } = await supabase
         .from("app_infos")
@@ -616,13 +493,7 @@ export async function spFetchCardImage(manhwa_id: number): Promise<ManhwaCard | 
 }
 
 
-/**
- * Uses the Supabase REST API to fetch the cover image URL for a specific manhwa.
- * 
- * @param manhwa_id - ID of the manhwa
- * @returns Promise resolving to the cover image URL or null on failure
- */
-export async function spFetchCoverImage(manhwa_id: number): Promise<string | null> {
+export async function spFetchManhwaCoverImage(manhwa_id: number): Promise<string | null> {
     const { data, error } = await supabase
         .from("manhwas")
         .select("cover_image_url")
@@ -638,12 +509,7 @@ export async function spFetchCoverImage(manhwa_id: number): Promise<string | nul
 }
 
 
-/**
- * Uses the Supabase REST API to fetch both the cover and card images of a manhwa by its ID.
- * 
- * @param manhwa_id - ID of the manhwa
- * @returns Promise resolving to a DebugManhwaImages object containing title, cover URL, card URL, and manhwa_id
- */
+
 export async function spFetchCardAndCover(manhwa_id: number): Promise<DebugManhwaImages> {
     const { data, error } = await supabase
         .from("manhwas")
@@ -675,11 +541,13 @@ export async function spFetchCardAndCover(manhwa_id: number): Promise<DebugManhw
  * @param p_search_text - Text to search in manhwa titles
  * @returns Promise resolving to an array of DebugManhwaImages
  */
-export async function spFetchCardAndCoverSearch(p_search_text: string): Promise<DebugManhwaImages[]> {
+export async function spFetchCardAndCoverSearch(p_search_text: string, p_offset: number = 0, p_limit: number = 32): Promise<DebugManhwaImages[]> {
     const { data, error } = await supabase
         .from("manhwas")
         .select("manhwa_id, title, cover_image_url, cards(image_url)")
         .ilike("title", `%${p_search_text}%`)
+        .range(p_offset * p_limit, (p_offset + 1) * p_limit - 1)
+        .order("updated_at", {ascending: false})
 
     if (error) {
         console.log("error spFetchCardAndCoverSearch", error)

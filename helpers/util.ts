@@ -10,16 +10,6 @@ import DeviceInfo from 'react-native-device-info';
 import RNFS from 'react-native-fs';
 
 
-/**
- * Pauses execution for the specified number of milliseconds.
- *
- * Useful for delaying operations, throttling requests, or waiting
- * between asynchronous steps without blocking the event loop.
- *
- * @param ms - Number of milliseconds to wait. Must be a non-negative integer.
- * @returns A Promise that resolves after the delay with no value.
- *
- */
 export function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -116,49 +106,26 @@ export function getRelativeWidth(originalWidth: number, originalHeight: number, 
 }
 
 
-/**
- * Formats a timestamp into a human-readable date string.
- * 
- * @param timestamp - ISO date string to format
- * @returns Formatted date string (e.g., "January 1, 2023")
- */
 export function formatTimestamp(timestamp: string): string {      
   const date = new Date(timestamp)
-  const options = { month: 'long', day: 'numeric', year: 'numeric' };
+  const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' };
   return date.toLocaleDateString('en-US', options as any);
 }
 
 
-/**
- * Calculates elapsed time in seconds since a given datetime.
- * 
- * @param dateTimeString - ISO datetime string as starting point
- * @returns Integer representing seconds elapsed since the input datetime
- */
-export function secondsSince(dateTimeString: string): number {
-    const inputDate = new Date(dateTimeString);
-    const now = new Date()
-    const diff = now.getTime() - inputDate.getTime()
-    return Math.floor(diff / 1000)
+export function formatTimestampWithHour(timestamp: string): string {
+  const date = new Date(timestamp)
+  const options: Intl.DateTimeFormatOptions = { hour: 'numeric', minute: 'numeric', month: 'short', day: 'numeric', year: 'numeric' };
+  return date.toLocaleDateString('en-US', options as any);  
 }
 
 
-/**
- * Checks internet connectivity status.
- * 
- * @returns Promise that resolves to true if internet connection is available, false otherwise
- */
 export async function hasInternetAvailable(): Promise<boolean> {
     const state: NetInfoState = await NetInfo.fetch()
     return state.isConnected === true ? true : false
 }
 
 
-/**
- * Clears all files from the application's cache directory.
- * 
- * Note: Does not clear in-memory caches, only persistent storage files
- */
 export async function clearCache() {
   try {
     const cacheDir = RNFS.CachesDirectoryPath;
@@ -175,15 +142,6 @@ export async function clearCache() {
 }
 
 
-/**
- * Recursively calculates the total size of a directory in bytes.
- * 
- * Traverses all files and subdirectories at the given path, summing file sizes.
- * Handles errors by logging and returning 0.
- * 
- * @param path - Filesystem path of the directory to measure
- * @returns Promise resolving to total byte count of directory contents
- */
 export async function getDirectorySizeBytes(path: string): Promise<number> {
   let totalSize = 0;
   try {
@@ -211,13 +169,7 @@ export async function getDirectorySizeBytes(path: string): Promise<number> {
 };
 
 
-/**
- * Formats bytes into human-readable file size string
- * 
- * @param bytes - Size value in bytes
- * @param decimals - Number of decimal places to include (default: 2)
- * @returns Formatted size string with appropriate unit (Bytes, KB, MB, etc.)
- */
+
 export function formatBytes(bytes: number, decimals: number = 2) {
   if (bytes === 0) return '0 Bytes';
 
@@ -231,22 +183,12 @@ export function formatBytes(bytes: number, decimals: number = 2) {
 };
 
 
-/**
- * Calculates total size of cache directory in bytes
- * 
- * @returns Promise resolving to cache size in bytes
- */
 export async function getCacheSizeBytes(): Promise<number> {
   const s = await getDirectorySizeBytes(RNFS.CachesDirectoryPath)
   return s
 }
 
 
-/**
- * Calculates total size of cache directory in kilobytes
- * 
- * @returns Promise resolving to cache size in kilobytes (integer)
- */
 export async function getCacheSizeKB(): Promise<number> {
   const s = await getDirectorySizeBytes(RNFS.CachesDirectoryPath)
   return Math.floor(s / 1024)
@@ -288,25 +230,12 @@ export function formatNumberWithSuffix(num: number): string {
 }
 
 
-/**
- * Checks if a string contains only digit characters
- * 
- * @param str - String to validate
- * @returns True if string consists exclusively of digits (0-9), false otherwise
- */
 export function hasOnlyDigits(str: string): boolean {
   const regex = /^\d+$/;
   return regex.test(str);
 }
 
 
-/**
- * Attempts to open a URL in the device's default browser
- * 
- * Shows error toast if unable to open the URL
- * 
- * @param url - The URL to open
- */
 export async function openUrl(url: string) {
   try {
       await Linking.openURL(url)
@@ -316,11 +245,6 @@ export async function openUrl(url: string) {
 };
 
 
-/**
- * Copies text to device clipboard and shows confirmation toast
- * 
- * @param value - The string value to copy to clipboard
- */
 export async function copyToClipboard(value: string) {
   await Clipboard.setStringAsync(value);
   Toast.show(ToastMessages.EN.COPIED_TO_CLIPBOARD)
@@ -330,11 +254,6 @@ export async function copyToClipboard(value: string) {
 /**
  * Determines optimal number of columns for chapter grid based on screen width
  * 
- * Uses 92% of screen width (via wp(92)) to calculate:
- *   - 9 columns for widths >=440
- *   - 8 columns for widths >=400
- *   - 7 columns for widths >=360
- *   - 6 columns for smaller widths
  * 
  * @returns Number of columns to display in chapter grid
  */

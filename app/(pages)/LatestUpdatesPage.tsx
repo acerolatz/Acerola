@@ -29,8 +29,7 @@ const LatestUpdatesPage = () => {
           const m = await dbReadManhwasOrderedByUpdateAt(db, 0, AppConstants.PAGE_LIMIT)
           if (!isMounted.current) { return }
           setManhwas(m)
-          hasResults.current = m.length >= AppConstants.PAGE_LIMIT
-          manhwasRef.current = m
+          manhwasRef.current = m          
           hasResults.current = m.length >= AppConstants.PAGE_LIMIT
       }
       init()

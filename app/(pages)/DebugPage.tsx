@@ -1,5 +1,6 @@
 import DebugLastestManhwaCards from '@/components/debug/DebugLastestManhwaCards'
 import { 
+    FlatList,
     Keyboard, 
     KeyboardAvoidingView, 
     Platform, 
@@ -18,7 +19,7 @@ import {
 import BooleanRotatingButton from '@/components/buttons/BooleanRotatingButton'
 import PageActivityIndicator from '@/components/util/PageActivityIndicator'
 import React, { useCallback, useEffect, useState } from 'react'
-import { DebugInfo, DebugManhwaImages } from '@/helpers/types'
+import { DebugInfo, DebugManhwaImages, Manhwa } from '@/helpers/types'
 import ReturnButton from '@/components/buttons/ReturnButton'
 import { TextInput } from 'react-native-gesture-handler'
 import { hasOnlyDigits, hp, wp } from '@/helpers/util'
@@ -64,6 +65,29 @@ const ManhwaImagesComponent = ({image, setCardToShow}: ManhwaImagesComponentProp
                 <Text style={styles.debugManhwaImageManhwaTitle} >{image.title}</Text>
             </View>
         </Pressable>
+    )
+}
+
+
+const ManhwaImageGrid = ({manhwas, setCardToShow}: {manhwas: DebugManhwaImages[], setCardToShow: any}) => {
+
+    const keyExtractor = useCallback((item: DebugManhwaImages) => item.manhwa_id.toString(), [])
+
+    const renderItem = ({item}: {item: DebugManhwaImages}) => {
+        return (
+            <ManhwaImagesComponent
+                image={item} 
+                setCardToShow={setCardToShow} />
+        )
+    }
+
+    return (
+        <FlatList
+            data={manhwas}
+            keyExtractor={keyExtractor}
+            horizontal={true}
+            renderItem={renderItem}
+        />
     )
 }
 
@@ -147,19 +171,7 @@ const DebugPage = () => {
                                 <Text style={styles.buttonText} >SET</Text>
                             </Pressable>
                         </Row>
-                        {
-                            manhwaImage.length > 0 &&
-                            <ScrollView style={{width: '100%'}} horizontal={true} showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps='handled' >
-                                { 
-                                    manhwaImage.map((item, index) => 
-                                        <ManhwaImagesComponent 
-                                        key={index} 
-                                        image={item} 
-                                        setCardToShow={setCardToShow} />
-                                    ) 
-                                }
-                            </ScrollView>
-                        }
+                        <ManhwaImageGrid manhwas={manhwaImage} setCardToShow={setCardToShow} />
 
                         <DebugLastestManhwaCards setCardToShow={setCardToShow} />
 

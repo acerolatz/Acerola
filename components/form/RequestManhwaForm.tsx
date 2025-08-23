@@ -3,7 +3,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Controller, useForm } from 'react-hook-form';
 import { ToastMessages } from '@/constants/Messages';
 import { Typography } from '@/constants/typography';
-import { spRequestManhwa } from '@/lib/supabase';
+import { spSendRequestPornhwaForm } from '@/lib/supabase';
 import Toast from 'react-native-toast-message';
 import { AppStyle } from '@/styles/AppStyle';
 import { Colors } from '@/constants/Colors';
@@ -61,7 +61,7 @@ const RequestManhwaForm = () => {
         Keyboard.dismiss()
         setLoading(true)
             const m = form_data.message.trim() == '' ? null : form_data.message.trim()
-            await spRequestManhwa(form_data.pornhwaTitle, m)
+            await spSendRequestPornhwaForm(form_data.pornhwaTitle, m)
             Toast.show(ToastMessages.EN.THANKS)
             router.back()
         setLoading(false)

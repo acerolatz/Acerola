@@ -1,25 +1,27 @@
 import { 
-  Author, 
-  Chapter,  
+  Author,
   DebugInfo,  
-  Genre,  
-  Log,  
+  Genre,    
   Manhwa, 
   ManhwaAuthor, 
-  ManhwaGenre, 
-  Settings, 
+  ManhwaGenre,    
   Todo, 
+  User, 
   UserData 
 } from '@/helpers/types';
-import {dbGetSupportedAbis, formatBytes, getCacheSizeBytes, getDeviceName, secondsSince } from '@/helpers/util';
+import {
+  dbGetSupportedAbis, 
+  formatBytes, 
+  getCacheSizeBytes, 
+  getDeviceName 
+} from '@/helpers/util';
 import { AppConstants } from '@/constants/AppConstants';
 import DeviceInfo from 'react-native-device-info';
-import { spGetManhwas, spNewRun } from './supabase';
+import { spGetManhwas, spRegisterNewUser, spUpdateUserLastLogin } from './supabase';
+import { AuthorSet } from '@/helpers/AuthorSet';
 import { GenreSet } from '@/helpers/GenreSet';
 import * as SQLite from 'expo-sqlite';
 import uuid from 'react-native-uuid';
-import { AuthorSet } from '@/helpers/AuthorSet';
-import { setUrlAsync } from 'expo-clipboard';
 
 
 export async function dbMigrate(db: SQLite.SQLiteDatabase) {
@@ -39,25 +41,19 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
     -- ===============================
     
 
-
     -- ===============================
     ---             DROP
     -- ===============================
     DROP TABLE IF EXISTS chapters;
     DROP TABLE IF EXISTS collections;
+    DROP TABLE IF EXISTS update_history;
+    DROP TABLE IF EXISTS logs;
     -- ===============================
 
 
     -- ===============================
     --            TABLES
     -- ===============================
-
-    CREATE TABLE IF NOT EXISTS logs (
-      log_id INTEGER PRIMARY KEY,
-      title TEXT NOT NULL,
-      descr TEXT NOT NULL,
-      created_at INTEGER NOT NULL
-    );
 
     CREATE TABLE IF NOT EXISTS app_info (
       name TEXT NOT NULL PRIMARY KEY,
@@ -67,12 +63,6 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
     CREATE TABLE IF NOT EXISTS app_numeric_info (
       name TEXT NOT NULL PRIMARY KEY,
       value INTEGER NOT NULL DEFAULT 0
-    );    
-
-    CREATE TABLE IF NOT EXISTS update_history (
-      name TEXT NOT NULL PRIMARY KEY,
-      refresh_cycle INTEGER,
-      last_refreshed_at TIMESTAMP DEFAULT NULL
     );
 
     CREATE TABLE IF NOT EXISTS manhwas (
@@ -175,6 +165,8 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       INSERT INTO 
         app_info (name, value)
       VALUES 
+        ('userCoverImageUrl', ''),
+        ('username', ''),
         ('device', ''),
         ('last_sync_time', ''),
         ('password', '')
@@ -190,24 +182,10 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
         ('should_ask_for_donation', 1),
         ('is_safe_mode_on', 0),
         ('current_chapter_milestone', ${AppConstants.CHAPTER_GOAL_START}),
-        ('windowSize', ${AppConstants.DEFAULT_WINDOW_SIZE}),
-        ('maxToRenderPerBatch', ${AppConstants.DEFAULT_MAX_TO_RENDER_PER_BATCH}),
-        ('updateCellsBatchingPeriod', ${AppConstants.DEFAULT_UPDATE_CELLS_BATCHING_PERIOD}),
-        ('maxCacheSize', ${AppConstants.DATABASE.SIZE.CACHE}),
-        ('itemVisiblePercentThreshold', ${AppConstants.DEFAULT_ITEM_VISIBLE_PERCENTAGE_THRESHOLD})
+        ('last_refreshed_at', 0)
       ON CONFLICT
         (name) 
       DO NOTHING;
-      
-      INSERT INTO 
-        update_history (name, refresh_cycle)
-      VALUES
-        ('server', ${AppConstants.DATABASE.UPDATE_INTERVAL.SERVER}),
-        ('client', ${AppConstants.DATABASE.UPDATE_INTERVAL.CLIENT})
-      ON CONFLICT 
-        (name) 
-      DO UPDATE SET 
-        refresh_cycle = EXCLUDED.refresh_cycle;
 
     COMMIT;
   `
@@ -215,36 +193,6 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
   console.log("[DATABASE MIGRATION END]")
 }
 
-
-export async function dbAddLog(db: SQLite.SQLiteDatabase, title: string, descr: string = '') {
-  await db.runAsync(
-    'INSERT INTO logs (title, descr, created_at) VALUES (?,?,?);',
-    [title, descr, Date.now()]
-  ).catch(error => console.log("error dbAddLog", error))
-}
-
-
-export async function dbReadLogs(
-  db: SQLite.SQLiteDatabase, 
-  p_offset: number = 0, 
-  p_limit: number = 30
-): Promise<Log[]> {
-  const r = await db.getAllAsync<Log>(
-    `
-      SELECT
-        *
-      FROM
-        logs
-      ORDER BY
-        created_at DESC
-      LIMIT ?
-      OFFSET ?;
-    `,
-    [p_limit, p_offset]
-  ).catch(error => console.log("error dbReadLogs", error))
-
-  return r ?? []
-}
 
 /**
  * Reads all rows from a given **local SQLite database** table.
@@ -260,7 +208,6 @@ export async function dbReadAll<T>(db: SQLite.SQLiteDatabase, table: string): Pr
   ).catch(error => console.log(`error dbReadAll ${table}`, error))
   return r ? r : []
 }
-
 
 
 /**
@@ -403,34 +350,8 @@ export async function dbListTable(db: SQLite.SQLiteDatabase, table: string) {
 }
 
 
-/**
- * Retrieves the timestamp of the last database update from the `app_info` table in the **local SQLite database**.
- *
- * @param db - SQLite database instance
- * @returns A promise that resolves to the last update timestamp as a string, or `null` if not found or empty.
- */
-export async function dbGetLastDatabaseUpdateTimestamp(db: SQLite.SQLiteDatabase): Promise<string | null> {
-  const r = await db.getFirstAsync<{value: string}>(
-    'SELECT value FROM app_info WHERE name = ?',
-    'last_sync_time'
-  ).catch(error => console.log("error dbGetLastDatabaseUpdateTimestamp", error))
-
-  return r?.value && r.value.trim() !== '' ? r.value : null
-}
-
-
-/**
- * Updates the timestamp of the last database update in the `app_info` table of the **local SQLite database**.
- *
- * @param db - SQLite database instance
- * @param value - The timestamp string to set as the last update time.
- * @returns A promise that resolves when the update is complete.
- */
-export async function dbSetLastDatabaseUpdateTimestamp(db: SQLite.SQLiteDatabase, value: string) {
-  await db.runAsync(
-    'UPDATE app_info SET value = ? WHERE name = ?;',
-    [value, 'last_sync_time']
-  ).catch(error => console.log("error dbSetLastDatabaseUpdateTimestamp", error))
+export async function dbGetLastDatabaseSync(db: SQLite.SQLiteDatabase): Promise<number> {
+  return await dbReadNumericInfo(db, 'last_refreshed_at', 0)
 }
 
 
@@ -463,9 +384,9 @@ export async function dbCleanTable(db: SQLite.SQLiteDatabase, table: string) {
  * @note This does not reset autoincrement counters or foreign key references.
  */
 export async function dbClearDatabase(db: SQLite.SQLiteDatabase) {
-  await db.runAsync('DELETE FROM manhwas;').catch(error => console.log("error dbClearDatabase manhwas", error))
-  await db.runAsync('DELETE FROM authors;').catch(error => console.log("error dbClearDatabase authors", error))
-  await db.runAsync('DELETE FROM genres;').catch(error => console.log("error dbClearDatabase genres", error))
+  await dbCleanTable(db, 'manhwas')
+  await dbCleanTable(db, 'authors')
+  await dbCleanTable(db, 'genres')
   console.log("[DATABASE CLEAR]")
 }
 
@@ -475,7 +396,7 @@ export async function dbClearDatabase(db: SQLite.SQLiteDatabase) {
  *
  * @param db - SQLite database instance
  * @param name - The name of the info entry to read.
- * @returns A promise that resolves to the value as a string, or `null` if not found.
+ * @returns A promise that resolves to the value as a string, or `defaultValue` if not found.
  */
 export async function dbReadInfo(
   db: SQLite.SQLiteDatabase, 
@@ -555,29 +476,28 @@ export async function dbGetUserUUID(db: SQLite.SQLiteDatabase): Promise<string> 
 
 /**
  * Handles first-run initialization of the app using the **local SQLite database**.
- * - Checks the `first_run` flag in `app_info`.
- * - If it is the first run:
- *   - Stores device information in the **local database**.
- *   - Generates and stores a new user UUID in the **local database**.
- *   - Invokes `spNewRun` to transmit first-run user and device information to Supabase.
- *
+ * 
  * @param db - SQLite database instance
  * @returns A promise that resolves when first-run initialization is complete.
  */
 export async function dbFirstRun(db: SQLite.SQLiteDatabase) {
   const r = await dbReadNumericInfo(db, 'first_run')  
-  if (r === 1) {
-    const supportedAbis = (await DeviceInfo.supportedAbis()).join(', '); 
-    const model = DeviceInfo.getModel()
-    const systemName = DeviceInfo.getSystemName()
-    const systemVersion = DeviceInfo.getSystemVersion()
-    const device = `${model}, ${supportedAbis}, ${systemName}[${systemVersion}]`
-    await dbSetNumericInfo(db, 'first_run', 0)
-    await dbSetInfo(db, 'device', device)
-    const user_id = await dbSetUserUUID(db)
-    spNewRun(user_id, device)
-    dbAddLog(db, "new_user_created", `user_id: ${user_id}, device: ${device}`)
+  if (r !== 1) {
+    const user_id = await dbGetUserUUID(db)
+    spUpdateUserLastLogin(user_id)
+    return
   }
+  
+  const supportedAbis = (await DeviceInfo.supportedAbis()).join(', '); 
+  const model = DeviceInfo.getModel()
+  const systemName = DeviceInfo.getSystemName()
+  const systemVersion = DeviceInfo.getSystemVersion()
+  const device = `${model}, ${supportedAbis}, ${systemName}[${systemVersion}]`
+  await dbSetNumericInfo(db, 'first_run', 0)
+  await dbSetInfo(db, 'device', device)
+  const user_id = await dbSetUserUUID(db)
+  const version: string = await dbReadInfo(db, 'version', AppConstants.APP_VERSION)
+  spRegisterNewUser(user_id, device, version)
 }
 
 
@@ -610,128 +530,17 @@ export async function dbGetManhwaAltNames(
 }
 
 
-/**
- * Calculates the remaining seconds until the next allowed refresh for a given resource using the **local SQLite database**.
- * 
- * @param db - SQLite database instance
- * @param name - The name of the resource in the `update_history` table
- * @returns A promise that resolves to the number of seconds remaining until the next refresh.
- *          Returns a negative value (-1) if the resource is not found
- */
-export async function dbCheckSecondsSinceLastRefresh(
-  db: SQLite.SQLiteDatabase, 
-  name: string
-): Promise<number> {
-    const row = await db.getFirstAsync<{
-      last_refreshed_at: string,
-      refresh_cycle: number
-    }>(
-      `
-        SELECT
-            refresh_cycle,
-            last_refreshed_at
-        FROM
-            update_history
-        WHERE
-            name = ?;
-      `,
-      [name]
-    ).catch(error => console.log(`error dbCheckSecondsSinceLastRefresh ${name}`, error));
-
-    if (!row) { 
-        console.log(`could not read updated_history of ${name}`)
-        return -1
-    }
-
-    const seconds = secondsSince(row.last_refreshed_at)
-    return row.refresh_cycle - seconds
+export async function dbSetLastDatabaseSync(db: SQLite.SQLiteDatabase) {    
+  await dbSetNumericInfo(db, 'last_refreshed_at', Date.now())
 }
 
 
-/**
- * Updates the `last_refreshed_at` timestamp for a given resource in the `update_history` table using the **local SQLite database**.
- * 
- * @param db - SQLite database instance
- * @param name - The name of the resource to update
- * @returns A promise that resolves when the update is complete
- */
-export async function dbSetLastRefresh(db: SQLite.SQLiteDatabase, name: string) {    
-    await db.runAsync(
-      `
-        UPDATE 
-            update_history 
-        SET 
-            last_refreshed_at = ?
-        WHERE name = ?;
-      `,
-      [new Date().toString(), name]
-    ).catch(error => console.log("error dbSetLastRefresh", name, error));
-}
-
-/**
- * Determines whether a resource should be updated based on its refresh cycle and last refreshed timestamp using the **local SQLite database**.
- * If an update is required, the `last_refreshed_at` timestamp is updated to the current time.
- * 
- * @param db - SQLite database instance
- * @param name - The name of the resource in the `update_history` table
- * @returns A promise that resolves to `true` if the resource should be updated, `false` otherwise
- */
-export async function dbShouldUpdate(
-  db: SQLite.SQLiteDatabase, 
-  name: string
-): Promise<boolean> {
-    const row = await db.getFirstAsync<{
-        name: string,
-        refresh_cycle: number,
-        last_refreshed_at: string
-    }>(
-    `
-        SELECT
-            name,
-            refresh_cycle,
-            last_refreshed_at
-        FROM
-            update_history
-        WHERE
-            name = ?;
-    `, [name]
-    ).catch(error => console.log(`error dbShouldUpdate ${name}`, error));
-
-    if (!row) { 
-        console.log(`could not read update_history of ${name}`)
-        return false 
-    }
-    
-    const seconds = row.last_refreshed_at ? secondsSince(row.last_refreshed_at) : -1
-    const shouldUpdate = seconds < 0 || seconds >= row.refresh_cycle
-
-    if (shouldUpdate) {
-        const current_time = new Date().toString()
-        await db.runAsync(
-          `
-            UPDATE 
-                update_history 
-            SET 
-                last_refreshed_at = ?
-            WHERE name = ?;
-          `,
-          [current_time, name]
-        ).catch(error => console.log("error dbShouldUpdate update_history", name, error));
-        return true
-    }
-
-    return false
+export async function dbShouldSyncDatabase(db: SQLite.SQLiteDatabase): Promise<boolean> {
+  const last_refreshed_at = await dbReadNumericInfo(db, 'last_refreshed_at', 0)
+  return last_refreshed_at === 0 || Date.now() - last_refreshed_at >= AppConstants.DATABASE.UPDATE_INTERVAL.SERVER
 }
 
 
-/**
- * Inserts or updates a `Manhwa` record in the **local SQLite database** along with its related data.
- * This includes genres, authors, and alternative titles.
- * 
- * @param db - SQLite database instance
- * @param manhwa - The `Manhwa` object containing all relevant information to upsert
- * @returns A promise that resolves when the manhwa and all related data have been upserted
- */
 export async function dbUpsertManhwa(db: SQLite.SQLiteDatabase, manhwa: Manhwa) {
   await db.runAsync(
     `    
@@ -775,14 +584,6 @@ export async function dbUpsertManhwa(db: SQLite.SQLiteDatabase, manhwa: Manhwa) 
 }
 
 
-/**
- * Inserts or updates alternative titles for a specific manhwa in the `alt_titles` table using the **local SQLite database**.
- * 
- * @param db - SQLite database instance
- * @param manhwa_id - The ID of the manhwa to associate the alternative titles with
- * @param titles - An array of alternative title strings to upsert
- * @returns A promise that resolves when all titles have been inserted or updated
- */
 async function dbUpsertAltTitles(db: SQLite.SQLiteDatabase, manhwa_id: number, titles: string[]) {  
   const placeholders = titles.map(() => `(${manhwa_id},?)`).join(',');
   await db.runAsync(
@@ -798,13 +599,6 @@ async function dbUpsertAltTitles(db: SQLite.SQLiteDatabase, manhwa_id: number, t
 }
 
 
-/**
- * Inserts or updates multiple `Manhwa` records in the `manhwas` table in the **local SQLite database**.
- * 
- * @param db - SQLite database instance
- * @param manhwas - An array of `Manhwa` objects to upsert
- * @returns A promise that resolves when all manhwa records have been inserted or updated
- */
 async function dbUpsertManhwas(db: SQLite.SQLiteDatabase, manhwas: Manhwa[]) {
   const placeholders = manhwas.map(() => '(?,?,?,?,?,?,?,?)').join(',');  
   const params = manhwas.flatMap(i => [
@@ -818,7 +612,7 @@ async function dbUpsertManhwas(db: SQLite.SQLiteDatabase, manhwas: Manhwa[]) {
     i.updated_at,
   ]);  
   await db.runAsync(`    
-    INSERT OR REPLACE INTO manhwas (
+    INSERT INTO manhwas (
         manhwa_id, 
         title,
         descr,
@@ -828,7 +622,16 @@ async function dbUpsertManhwas(db: SQLite.SQLiteDatabase, manhwas: Manhwa[]) {
         views,
         updated_at
     )
-    VALUES ${placeholders};`, 
+    VALUES ${placeholders};
+    ON CONFLICT 
+      (manhwa_id)
+    DO UPDATE SET
+      title = EXCLUDED.title,
+      descr = EXCLUDED.descr,
+      cover_image_url = EXCLUDED.cover_image_url,
+      color = EXCLUDED.color,
+      views = EXCLUDED.views,
+      updated_at = EXCLUDED.updated_at;`, 
     params
   ).catch(error => console.log("error dbUpsertManhwas", error));
 }
@@ -888,14 +691,6 @@ async function dbUpsertBatch(
 }
 
 
-/**
- * Inserts or updates multiple `Genre` records in the `genres` table in the **local SQLite database**.
- * If a genre with the same `genre_id` already exists, its name will be updated.
- * 
- * @param db - SQLite database instance
- * @param genres - An array of `Genre` objects to upsert
- * @returns A promise that resolves when all genre records have been inserted or updated
- */
 async function dbUpsertGenres(db: SQLite.SQLiteDatabase, genres: Genre[]) {
   const placeholders = genres.map(() => '(?,?)').join(',');
   const params = genres.flatMap(i => [ i.genre_id, i.genre ]);
@@ -917,14 +712,6 @@ async function dbUpsertGenres(db: SQLite.SQLiteDatabase, genres: Genre[]) {
 }
 
 
-/**
- * Inserts multiple `ManhwaGenre` relationships into the `manhwa_genres` table in the **local SQLite database**.
- * If a relationship already exists (same `genre_id` and `manhwa_id`), it will be ignored.
- * 
- * @param db - SQLite database instance
- * @param manhwaGenres - An array of `ManhwaGenre` objects to upsert
- * @returns A promise that resolves when all genre relationships have been inserted
- */
 async function dbUpsertManhwaGenres(db: SQLite.SQLiteDatabase, manhwaGenres: ManhwaGenre[]) {
   const placeholders = manhwaGenres.map(() => '(?,?)').join(',');  
   const params = manhwaGenres.flatMap(i => [
@@ -946,14 +733,6 @@ async function dbUpsertManhwaGenres(db: SQLite.SQLiteDatabase, manhwaGenres: Man
 }
 
 
-/**
- * Inserts or updates multiple `Author` records in the `authors` table in the **local SQLite database**.
- * Existing authors with the same `author_id` will be replaced.
- * 
- * @param db - SQLite database instance
- * @param authors - An array of `Author` objects to upsert
- * @returns A promise that resolves when all author records have been inserted or updated
- */
 async function dbUpsertAuthors(db: SQLite.SQLiteDatabase, authors: Author[]) {  
   const placeholders = authors.map(() => '(?,?,?)').join(',');  
   const params = authors.flatMap(i => [
@@ -975,14 +754,6 @@ async function dbUpsertAuthors(db: SQLite.SQLiteDatabase, authors: Author[]) {
 }
 
 
-/**
- * Inserts multiple `ManhwaAuthor` relationships into the `manhwa_authors` table in the **local SQLite database**.
- * If a relationship with the same `author_id`, `manhwa_id`, and `role` already exists, it will be ignored.
- * 
- * @param db - SQLite database instance
- * @param manhwaAuthor - An array of `ManhwaAuthor` objects to upsert
- * @returns A promise that resolves when all author-manhwa relationships have been inserted
- */
 async function dbUpsertManhwaAuthors(db: SQLite.SQLiteDatabase, manhwaAuthor: ManhwaAuthor[]) {
   const placeholders = manhwaAuthor.map(() => '(?,?,?)').join(',');
   const params = manhwaAuthor.flatMap(i => [
@@ -1007,23 +778,21 @@ async function dbUpsertManhwaAuthors(db: SQLite.SQLiteDatabase, manhwaAuthor: Ma
 }
 
 
-/**
- * Updates the **local SQLite database** with the latest manhwa data from Supabase.
- * - Fetches manhwas updated since the last database update.
- * - Clears the current database and upserts the latest manhwas, authors, genres, manhwa-author relationships, manhwa-genre relationships, and alternative titles.
- * - Updates the last database update timestamp.
- * - Logs the duration of the Supabase fetch and SQLite update operations.
- * 
- * @param db - SQLite database instance
- * @returns A promise that resolves to the number of manhwas fetched and updated in the **local database**
- */
-export async function dbUpdateDatabase(db: SQLite.SQLiteDatabase): Promise<number> {
+export async function dbSyncDatabase(db: SQLite.SQLiteDatabase): Promise<number> {
   console.log('[UPDATING DATABASE]')
+  const last_sync: number = await dbGetLastDatabaseSync(db)
+  const last_sync_timestampz = last_sync === 0 ? null : new Date(last_sync).toISOString()
   
   const response_time_start = Date.now()
-  const last_update: string | null = await dbGetLastDatabaseUpdateTimestamp(db)
-  const manhwas: Manhwa[] = await spGetManhwas(last_update)
+  const manhwas: Manhwa[] | null = await spGetManhwas(last_sync_timestampz)
   const response_time_end = Date.now()
+
+  if (manhwas === null) { 
+    console.log("[DATABASE UPDATE ERROR]")
+    return 0 
+  }
+  
+  await dbSetLastDatabaseSync(db)
 
   if (manhwas.length == 0) {
     console.log(
@@ -1034,7 +803,6 @@ export async function dbUpdateDatabase(db: SQLite.SQLiteDatabase): Promise<numbe
     return manhwas.length
   }
 
-  await dbSetLastDatabaseUpdateTimestamp(db, new Date().toISOString())
   await dbClearDatabase(db)
   await dbUpsertManhwas(db, manhwas)
 
@@ -1122,14 +890,9 @@ export async function dbUpdateDatabase(db: SQLite.SQLiteDatabase): Promise<numbe
   return manhwas.length
 }
 
-/**
- * Checks whether the `manhwas` table in the **local SQLite database** contains any entries.
- * 
- * @param db - SQLite database instance
- * @returns A promise that resolves to `true` if there are no manhwas in the table, or `false` otherwise.
- */
+
 export async function dbHasNoManhwas(db: SQLite.SQLiteDatabase): Promise<boolean> {
-  const row = await db.getFirstAsync<{manga_id: number}>(
+  const row = await db.getFirstAsync<{manhwa_id: number}>(
     `
       SELECT
         manhwa_id
@@ -1137,7 +900,7 @@ export async function dbHasNoManhwas(db: SQLite.SQLiteDatabase): Promise<boolean
         manhwas
       LIMIT 1;
     `    
-  ).catch(error => console.log('dbHasManhwas', error)); 
+  ).catch(error => console.log('dbHasNoManhwas', error)); 
   return row == null
 }
 
@@ -1657,15 +1420,6 @@ export async function dbGetManhwaReadingHistory(
 }
 
 
-/**
- * Retrieves a paginated list of manhwas filtered by a specific reading status from the **local SQLite database**, ordered by the most recent status update.
- * 
- * @param db - SQLite database instance
- * @param status - The reading status to filter by (e.g., "Reading", "Plan to Read").
- * @param p_offset - The offset for pagination. Defaults to 0.
- * @param p_limit - The maximum number of manhwas to return. Defaults to 30.
- * @returns A promise that resolves to an array of `Manhwa` objects. Returns an empty array if no manhwas match the status.
- */
 export async function dbReadManhwasByReadingStatus(
   db: SQLite.SQLiteDatabase,
   status: string  
@@ -2039,14 +1793,15 @@ export async function dbCreateTodo(db: SQLite.SQLiteDatabase, title: string, des
     `
       INSERT INTO todos (
         title,
-        descr
+        descr,
+        created_at
       )
       VALUES 
-        (?, ?)
+        (?, ?, ?)
       RETURNING
         todo_id;
     `,
-    [title, descr]
+    [title, descr, new Date().toString()]
   ).catch(error => console.log("error dbCreateTodo", error))
   
   if (r?.todo_id) {
@@ -2101,7 +1856,7 @@ export async function dbUpdateTodo(
       WHERE
         todo_id = ?;
     `,
-    [title, descr, completed, completed === 1 ? 'CURRENT_TIMESTAMP' : null, todo_id]
+    [title, descr, completed, completed === 1 ? new Date().toString() : null, todo_id]
   ).catch(error => {console.log("error dbUpdateTodo", error); return false})
   return r !== false
 }
@@ -2163,48 +1918,6 @@ export async function dbCreateSafeModePassword(db: SQLite.SQLiteDatabase, passwo
 export async function dbCheckPassword(db: SQLite.SQLiteDatabase, password: string): Promise<boolean> {
   const p = await dbReadSafeModePassword(db)
   return p === password
-}
-
-
-
-/**
- * Loads the app's user settings from the **local SQLite database**.
- *  
- * Returns default values if any setting is not found or if an error occurs.
- *
- * @param db - SQLite database instance
- * @returns Settings object containing user preferences
- */
-export async function dbLoadSettings(db: SQLite.SQLiteDatabase): Promise<Settings> {
-  const r: Settings | null = await Promise.all([
-    dbReadNumericInfo(db, 'windowSize', AppConstants.DEFAULT_WINDOW_SIZE),
-    dbReadNumericInfo(db, 'maxToRenderPerBatch', AppConstants.DEFAULT_MAX_TO_RENDER_PER_BATCH),
-    dbReadNumericInfo(db, 'updateCellsBatchingPeriod', AppConstants.DEFAULT_UPDATE_CELLS_BATCHING_PERIOD),
-    dbReadNumericInfo(db, 'itemVisiblePercentThreshold', AppConstants.DEFAULT_ITEM_VISIBLE_PERCENTAGE_THRESHOLD)
-  ]).then(([    
-    windowSize,
-    maxToRenderPerBatch,
-    updateCellsBatchingPeriod,
-    itemVisiblePercentThreshold
-  ]) => {
-    return {
-      windowSize,
-      maxToRenderPerBatch,
-      updateCellsBatchingPeriod,
-      itemVisiblePercentThreshold
-      
-    }
-  }).catch(error => {
-    console.log("error dbLoadSettings", error); 
-    return null
-  })
-
-  return r ? r : {
-    windowSize: AppConstants.DEFAULT_WINDOW_SIZE,
-    maxToRenderPerBatch: AppConstants.DEFAULT_MAX_TO_RENDER_PER_BATCH,
-    updateCellsBatchingPeriod: AppConstants.DEFAULT_UPDATE_CELLS_BATCHING_PERIOD,
-    itemVisiblePercentThreshold: AppConstants.DEFAULT_ITEM_VISIBLE_PERCENTAGE_THRESHOLD
-  }
 }
 
 
@@ -2335,3 +2048,13 @@ export async function dbSetDebugInfo(
   ]).catch(error => console.log("erro dbSetDebugInfo", error))
 }
 
+
+export async function dbLoadUser(db: SQLite.SQLiteDatabase): Promise<User> {
+  const [userCoverImageUrl, username, user_id] = await Promise.all([
+    await dbReadInfo(db, 'userCoverImageUrl'),
+    await dbReadInfo(db, 'username'),
+    await dbGetUserUUID(db)
+  ])
+
+  return { username, userCoverImageUrl, user_id }
+}

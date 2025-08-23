@@ -3,7 +3,7 @@ import { Colors } from '@/constants/Colors';
 import { ToastMessages } from '@/constants/Messages';
 import { hp, requestPermissions } from '@/helpers/util';
 import { dbReadInfo } from '@/lib/database';
-import { spReportBug, uploadBugScreenshot } from '@/lib/supabase';
+import { spSendBugReportForm, spSendBugScreenshot } from '@/lib/supabase';
 import { AppStyle } from '@/styles/AppStyle';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { router } from 'expo-router';
@@ -114,7 +114,7 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
             const device = await dbReadInfo(db, 'device')
 
             // BUG
-            const bug_id: number | null = await spReportBug(
+            const bug_id: number | null = await spSendBugReportForm(
                 form_data.title,
                 form_data.bugType,
                 device,
@@ -135,7 +135,7 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
                 await Promise.all(photos.map((
                     photo: string, 
                     index: number
-                ) => uploadBugScreenshot(photo, bug_id_str, index)));
+                ) => spSendBugScreenshot(photo, bug_id_str, index)));
             }
 
             Toast.show(ToastMessages.EN.THANKS)

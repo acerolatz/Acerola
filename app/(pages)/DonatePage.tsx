@@ -2,7 +2,7 @@ import PageActivityIndicator from '@/components/util/PageActivityIndicator'
 import ReturnButton from '@/components/buttons/ReturnButton'
 import DonateComponent from '@/components/DonateComponent'
 import { getRelativeHeight, wp } from '@/helpers/util'
-import { spGetDonationMethods } from '@/lib/supabase'
+import { spFetchDonationMethods } from '@/lib/supabase'
 import { useDonateState } from '@/store/donateState'
 import React, { useEffect, useState } from 'react'
 import { DonateMethod } from '@/helpers/types'
@@ -46,7 +46,7 @@ const Donate = () => {
         }
 
         setLoading(true)
-          const d = await spGetDonationMethods()
+          const d = await spFetchDonationMethods()
           if (isCancelled) { return }
           setDonates(d)
           const img_url = d.find(i => i.method === 'donation-banner')?.value

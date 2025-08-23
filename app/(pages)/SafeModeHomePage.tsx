@@ -1,4 +1,4 @@
-import { dbCheckPassword, dbReadTodos, dbSetLastRefresh, dbShouldUpdate, dbUpdateDatabase } from '@/lib/database'
+import { dbCheckPassword, dbReadTodos, dbSetLastDatabaseSync, dbShouldSyncDatabase, dbSyncDatabase } from '@/lib/database'
 import PageActivityIndicator from '@/components/util/PageActivityIndicator'
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
@@ -26,39 +26,7 @@ import { Todo } from '@/helpers/types'
 import { router } from 'expo-router'
 
 
-/**
- * SafeModeHomePage component – manages a local todo list with protected settings.
- *
- * Features:
- * - Displays todos fetched from local SQLite database (`dbReadTodos`).
- * - Supports creating, updating, and deleting todos via `CreateTodoComponent` and `TodoComponent`.
- * - Settings require a password check (`dbCheckPassword`) to access.
- * - Syncs local database with server if internet is available and update is needed.
- * - BottomSheet is used for password-protected settings, with show/hide password toggle.
- *
- * State:
- * - `todos` – list of Todo items.
- * - `loading` – boolean to indicate data fetching.
- * - `text` – password input text.
- * - `showPassword` – toggles password visibility.
- *
- * Refs:
- * - `bottomSheetRef` – controls the BottomSheet instance.
- * - `isCheckingPassword` – prevents multiple password check triggers.
- *
- * Methods:
- * - `checkPassword()` – validates password, optionally syncs database, and navigates to HomePage.
- * - `handleOpenBottomSheet()` – opens settings BottomSheet.
- * - `handleCloseBottomSheet()` – closes BottomSheet and clears input.
- * - `handleShowPassword()` – toggles password visibility.
- *
- * Components:
- * - `TopBar` – page header with title and settings button.
- * - `FlatList` – lists todos with create component as header and footer.
- * - `BottomSheet` – password-protected settings area.
- * - `CreateTodoComponent`, `TodoComponent`, `Footer` – manage todos and page layout.
- *
- */
+
 const SafeModeHomePage = () => {
 
     const db = useSQLiteContext()
@@ -95,10 +63,10 @@ const SafeModeHomePage = () => {
                 return
             }
             
-            if (await hasInternetAvailable() && await dbShouldUpdate(db, 'server')) {
+            if (await hasInternetAvailable() && await dbShouldSyncDatabase(db)) {
                 Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE);
-                await dbUpdateDatabase(db);
-                await dbSetLastRefresh(db, 'client');
+                await dbSyncDatabase(db);
+                await dbSetLastDatabaseSync(db);
                 Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED);
             }
         isCheckingPassword.current = false

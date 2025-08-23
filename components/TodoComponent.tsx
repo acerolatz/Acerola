@@ -10,7 +10,7 @@ import { useSQLiteContext } from 'expo-sqlite'
 import { dbDeleteTodo, dbUpdateTodo } from '@/lib/database'
 import Toast from 'react-native-toast-message'
 import { Todo } from '@/helpers/types'
-import { wp } from '@/helpers/util'
+import { formatTimestamp, formatTimestampWithHour, wp } from '@/helpers/util'
 
 
 interface TodoComponentProps {
@@ -25,14 +25,18 @@ const TodoComponent = ({todo, setTodos}: TodoComponentProps) => {
     const [isCompleted, setIsCompleted] = useState(todo.completed === 1)
     const backgroundColor = isCompleted ? Colors.green : Colors.primary
     const checkmarkBackgroundColor = isCompleted ? Colors.green : Colors.backgroundColor
+    const [finishedAt, setFinishedAt] = useState<string | null>(todo.finished_at)
+
 
     const clickCheckbox = async () => {
         const newStatus: boolean = !isCompleted
         const success = await dbUpdateTodo(db, todo.todo_id, todo.title, todo.descr, newStatus ? 1 : 0)
+        const newFinishedAt = newStatus ? new Date().toString() : null
         if (!success) {
             Toast.show({text1: "Error", text2: "Could not update to-do", type: "error"})
         } else {
             setIsCompleted(newStatus)
+            setFinishedAt(newFinishedAt)
         }
     }
 
@@ -46,23 +50,26 @@ const TodoComponent = ({todo, setTodos}: TodoComponentProps) => {
             <Row style={{...styles.todoItemTop, backgroundColor}} >
                 <Text style={{...Typography.regularLg, color: Colors.backgroundColor, flexShrink: 1}}>{todo.title}</Text>
                 <Row style={{gap: AppConstants.GAP * 1.5}} >
-                    {
-                        isCompleted &&
-                        <Pressable onPress={deleteTodo} style={styles.deleteButton} hitSlop={AppConstants.HIT_SLOP.NORMAL} >
-                            <Ionicons name='trash' size={AppConstants.ICON.SIZE} color={Colors.red} />
-                        </Pressable>
-                    }
                     <View style={styles.checkBox} >
                         <Ionicons name='checkmark' size={AppConstants.ICON.SIZE} color={checkmarkBackgroundColor} />
                     </View>
                 </Row>
-            </Row>
-            {
-                todo.descr !== null &&
-                <Column style={[styles.todoItemBottom, {borderColor: backgroundColor}]} >
-                    <Text style={Typography.regular}>{todo.descr} </Text>
-                </Column>
-            }
+            </Row>            
+            <Column style={[styles.todoItemBottom, {borderColor: backgroundColor}]} >
+                {todo.descr !== null && <Text style={Typography.regular}>{todo.descr} </Text>}
+                <Row style={{justifyContent: "space-between"}} >
+                    <Column>
+                        <Text style={Typography.light} >created at: {formatTimestampWithHour(todo.created_at)}</Text>
+                        {finishedAt !== null && <Text style={Typography.light} >finished at: {formatTimestampWithHour(finishedAt)}</Text>}
+                    </Column>
+                    {
+                        isCompleted &&
+                        <Pressable onPress={deleteTodo} hitSlop={AppConstants.HIT_SLOP.NORMAL} >
+                            <Ionicons name='trash' size={AppConstants.ICON.SIZE} color={Colors.red} />
+                        </Pressable>
+                    }
+                </Row>
+            </Column>
         </Pressable>
     )
 }
@@ -81,11 +88,6 @@ const styles = StyleSheet.create({
         justifyContent: "center", 
         padding: wp(1)
     },
-    deleteButton: {
-        padding: wp(1), 
-        backgroundColor: Colors.backgroundColor, 
-        borderRadius: AppConstants.ICON.SIZE
-    },
     todoItemTop: {
         width: '100%', 
         borderTopRightRadius: AppConstants.BORDER_RADIUS, 
@@ -99,6 +101,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10, 
         paddingVertical: 8, 
         borderWidth: 1, 
+        gap: AppConstants.GAP,
         borderTopWidth: 0,
         borderBottomLeftRadius: AppConstants.BORDER_RADIUS, 
         borderBottomRightRadius: AppConstants.BORDER_RADIUS

@@ -3,7 +3,7 @@ import { AppConstants } from '@/constants/AppConstants'
 import { hasInternetAvailable } from '@/helpers/util'
 import { ToastMessages } from '@/constants/Messages'
 import React, { useCallback, useRef } from 'react'
-import { dbUpdateDatabase } from '@/lib/database'
+import { dbSyncDatabase } from '@/lib/database'
 import { useSQLiteContext } from 'expo-sqlite'
 import Toast from 'react-native-toast-message'
 import { Colors } from '@/constants/Colors'
@@ -38,7 +38,7 @@ const UpdateDatabaseButton = ({
         Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE)
 
         try {
-            const n = await dbUpdateDatabase(db)
+            const n = await dbSyncDatabase(db)
             if (n === 0) {
                 Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED1)
                 return

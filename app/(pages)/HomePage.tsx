@@ -27,7 +27,7 @@ import {
 import { 
     spFetchCollections,
     spFetchRandomManhwaCards, 
-    spGetTodayTop10 
+    spFetchTop10 
 } from '@/lib/supabase'
 import { useCollectionState } from '@/store/collectionsState'
 import { useManhwaCardsState } from '@/store/randomManhwaState'
@@ -119,7 +119,7 @@ const HomePage = () => {
 
     const updateTop10 = async () => {
         if (top10manhwas.length === 0) {
-            const t = await spGetTodayTop10();
+            const t = await spFetchTop10();
             setTop10manhwas(t);
         }
     }
@@ -129,7 +129,7 @@ const HomePage = () => {
     }
         
     const reloadTop10 = async () => {
-        const t = await spGetTodayTop10()
+        const t = await spFetchTop10()
         setTop10manhwas(t)
     }
 
@@ -283,5 +283,5 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
         elevation: 4,        
         zIndex: 90
-    }    
+    }
 })
