@@ -24,7 +24,15 @@ The Bug Report feature allows users to attach images. Only the images you choose
 
 # APK
 
-To use the Acerola app, download and install the latest APK from the "Releases" tab on GitHub. You can verify the APK with online analysis tools such as https://www.androidfreeware.net/apk-check or https://sisik.eu/apk-tool. Alternatively, use an Android emulator to safely test the app.
+You can verify the APK with online analysis tools such as https://www.androidfreeware.net/apk-check or https://sisik.eu/apk-tool. Alternatively, use an Android emulator to safely test the app.
+
+| Architecture   | Description                                                                 | Who Should Install                                      |
+|---------------|-----------------------------------------------------------------------------|-------------------------------------------------------|
+| [arm64-v8a](https://github.com/acerolatz/Acerola/releases/download/v1.1.0/ougi.com.acerola-v1.1.0-arm64-v8a.apk) | 64-bit architecture for modern ARM-based devices. Offers better performance and efficiency. | Most modern Android devices (2017 and newer)          |
+| [armeabi-v7a](https://github.com/acerolatz/Acerola/releases/download/v1.1.0/ougi.com.acerola-v1.1.0-armeabi-v7a.apk) | 32-bit architecture for older ARM-based devices. Compatible with many legacy models. | Older smartphones and tablets (pre-2017)              |
+| [x86](https://github.com/acerolatz/Acerola/releases/download/v1.1.0/ougi.com.acerola-v1.1.0-x86.apk)       | 32-bit architecture for Intel-based Android devices. Rare in recent years.  | Android emulators or older Intel-powered Android devices                   |
+| [x86_64](https://github.com/acerolatz/Acerola/releases/download/v1.1.0/ougi.com.acerola-v1.1.0-x86_64.apk)   | 64-bit architecture for Intel-based Android devices. Less common nowadays.  | Android emulators or newer Intel-powered Android devices                   |
+| [universal](https://github.com/acerolatz/Acerola/releases/download/v1.1.0/ougi.com.acerola-v1.1.0-universal.apk) | Contains binaries for **all** supported architectures, so it runs everywhere but has a larger file size. | Recommended if you're unsure about your device's CPU  |
 
 # Safe Mode
 
