@@ -47,17 +47,29 @@ If you’d like to help cover server costs, donations are welcome. Details are a
 
 The interface is in English and designed for intuitive navigation. Screenshots are included below for a preview.
 
-<img src="github/images/home.webp" style='max-width: 720px' />
 
 <div style="display: flex; flex-wrap: wrap; gap: 2%;">
-  <img style='max-width: 720px' src="github/images/academy.webp" width="49%" alt="Academy Image 1" />
-  <img style='max-width: 720px' src="github/images/academy2.webp" width="49%" alt="Academy Image 2" />
+  <img style='max-width: 720px' src="github/images/home.webp" width="49%" alt="Academy Image 1" />
+  <img style='max-width: 720px' src="github/images/random.webp" width="49%" alt="Academy Image 2" />
 </div>
 
-<img src="github/images/library.webp" style='max-width: 720px' />
+---
 
-<img src="github/images/chapter.webp" style='max-width: 720px' />
+<div style="display: flex; flex-wrap: wrap; gap: 2%;">
+  <img style='max-width: 720px' src="github/images/manhwa-page1.webp" width="49%" alt="Academy Image 1" />
+  <img style='max-width: 720px' src="github/images/manhwa-page2.webp" width="49%" alt="Academy Image 2" />
+</div>
 
-<img src="github/images/menu.webp" style='max-width: 720px' />
+---
 
-<img src="github/images/random.webp" style='max-width: 720px' />
+<div style="display: flex; flex-wrap: wrap; gap: 2%;">
+  <img style='max-width: 720px' src="github/images/library-1.webp" width="49%" alt="Academy Image 1" />
+  <img style='max-width: 720px' src="github/images/library-2.webp" width="49%" alt="Academy Image 2" />
+</div>
+
+---
+
+<div style="display: flex; flex-wrap: wrap; gap: 2%;">
+  <img style='max-width: 720px' src="github/images/menu.webp" width="49%" alt="Academy Image 2" />
+  <img style='max-width: 720px' src="github/images/chapter.webp" width="49%" alt="Academy Image 1" />
+</div>
