@@ -8,7 +8,7 @@ Acerola is a React Native mobile app for reading adult Manhwa (Pornhwa). Current
 
 - Database: Uses a free Supabase instance (may be upgraded as the project grows).
 
-- Local First: A local database with over 570 manhwas is stored on the device to ensure fast performance.
+- Local First: A local database with over 610 manhwas is stored on the device to ensure fast performance.
 
 - Sync: Tap the sync button on the home page to fetch the latest data from the cloud.
 
@@ -49,27 +49,34 @@ The interface is in English and designed for intuitive navigation. Screenshots a
 
 
 <div style="display: flex; flex-wrap: wrap; gap: 2%;">
-  <img style='max-width: 720px' src="github/images/home.webp" width="49%" alt="Academy Image 1" />
-  <img style='max-width: 720px' src="github/images/random.webp" width="49%" alt="Academy Image 2" />
+  <img style='max-width: 720px' src="github/images/home.webp" width="49%" alt="Home Page" />
+  <img style='max-width: 720px' src="github/images/random.webp" width="49%" alt="Random Manhwas" />
 </div>
 
 ---
 
 <div style="display: flex; flex-wrap: wrap; gap: 2%;">
-  <img style='max-width: 720px' src="github/images/manhwa-page1.webp" width="49%" alt="Academy Image 1" />
-  <img style='max-width: 720px' src="github/images/manhwa-page2.webp" width="49%" alt="Academy Image 2" />
+  <img style='max-width: 720px' src="github/images/manhwa-page1.webp" width="49%" alt="Manhwa Page Image 1" />
+  <img style='max-width: 720px' src="github/images/manhwa-page2.webp" width="49%" alt="Manhwa Page Image 2" />
 </div>
 
 ---
 
 <div style="display: flex; flex-wrap: wrap; gap: 2%;">
-  <img style='max-width: 720px' src="github/images/library-1.webp" width="49%" alt="Academy Image 1" />
-  <img style='max-width: 720px' src="github/images/library-2.webp" width="49%" alt="Academy Image 2" />
+  <img style='max-width: 720px' src="github/images/manhwa-page3.webp" width="49%" alt="Manhwa Page Image 3" />
+  <img style='max-width: 720px' src="github/images/manhwa-page4.webp" width="49%" alt="Manhwa Page Image 4" />
 </div>
 
 ---
 
 <div style="display: flex; flex-wrap: wrap; gap: 2%;">
-  <img style='max-width: 720px' src="github/images/menu.webp" width="49%" alt="Academy Image 2" />
-  <img style='max-width: 720px' src="github/images/chapter.webp" width="49%" alt="Academy Image 1" />
+  <img style='max-width: 720px' src="github/images/library-1.webp" width="49%" alt="Library Page Image 1" />
+  <img style='max-width: 720px' src="github/images/library-2.webp" width="49%" alt="Library Page Image 2" />
+</div>
+
+---
+
+<div style="display: flex; flex-wrap: wrap; gap: 2%;">
+  <img style='max-width: 720px' src="github/images/menu.webp" width="49%" alt="Menu" />
+  <img style='max-width: 720px' src="github/images/chapter.webp" width="49%" alt="Chapter Reader" />
 </div>
