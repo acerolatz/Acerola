@@ -22,6 +22,7 @@ import {
     LeagueSpartan_600SemiBold,
     useFonts
 } from '@expo-google-fonts/league-spartan';
+import { initDocumentsDir } from '@/helpers/storage';
 
 
 const App = () => {
@@ -62,7 +63,8 @@ const App = () => {
                     hasInternetAvailable(),
                     handleCache(),
                     updateLocalVersion(),
-                    dbFirstRun(db)
+                    dbFirstRun(db),
+                    initDocumentsDir()
                 ])                
 
                 if (isSafeModeEnable) {

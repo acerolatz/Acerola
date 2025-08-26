@@ -326,116 +326,6 @@ export function getPastDate(delta: number = 1): Date {
 }
 
 
-/**
- * Prepares a directory for file operations by ensuring a clean state
- * 
- * This helper function:
- *  1. Checks if the target folder exists
- *  2. Deletes the folder and all contents if it exists
- *  3. Creates a new empty directory at the specified path
- *  4. Sets iOS-specific flag to exclude from iCloud backups
- * 
- * @param folderPath - Full filesystem path of the directory to prepare
- * 
- * @note 
- *   - Uses synchronous filesystem operations
- *   - Implements data protection by excluding from backups on iOS
- *   - Ensures clean state for subsequent file operations
- */
-const prepareFolder = async (folderPath: string) => {
-  const exists = await RNFS.exists(folderPath);
-  if (exists) {
-    await RNFS.unlink(folderPath);
-  }
-  await RNFS.mkdir(folderPath, { NSURLIsExcludedFromBackupKey: true });
-};
-
-
-/**
- * Downloads all images for a manhwa chapter with parallel execution control
- * 
- * This function:
- *  1. Prepares a clean cache folder for the chapter
- *  2. Downloads images concurrently with configurable parallelism
- *  3. Provides progress updates through callback
- *  4. Ensures proper file naming and sorting
- * 
- * @param urls - Array of image URLs to download
- * @param chapter_id - Unique chapter identifier for folder naming
- * @param maxParallel - Maximum concurrent downloads (default: 8)
- * @param onProgress - Optional progress callback providing download metrics
- * 
- * @returns Promise resolving to sorted array of local file paths for downloaded images
- * 
- * @note
- *   - Automatically determines file extensions from URLs
- *   - Progress reporting includes both per-file and overall completion
- */
-export const downloadManhwaChapter = async (
-  urls: string[],
-  chapter_id: number,
-  maxParallel: number = 8,
-  onProgress?: (progress: DownloadProgress) => void
-): Promise<string[]> => {
-
-  const basePath = `${RNFS.CachesDirectoryPath}/${chapter_id}`;
-  await prepareFolder(basePath);
-
-  let completed = 0;
-  const total = urls.length;
-  const downloadedPaths: string[] = new Array(total);
-
-  const downloadImage = async (url: string, index: number) => {
-    const fileExt = url.split('.').pop()?.split('?')[0] || 'jpg';
-    const filePath = `${basePath}/image_${index + 1}.${fileExt}`;
-
-    await RNFS.downloadFile({
-      fromUrl: url,
-      toFile: filePath,
-      progress: (res) => {
-        if (onProgress) {
-          const percentage = Math.floor(
-            ((completed + res.bytesWritten / res.contentLength) / total) * 100
-          );
-          onProgress({
-            current: completed + 1,
-            total,
-            percentage,
-          });
-        }
-      },
-      progressDivider: 5,
-    }).promise;
-
-    downloadedPaths[index] = filePath;
-    completed++;
-    if (onProgress) {
-      onProgress({
-        current: completed,
-        total,
-        percentage: Math.floor((completed / total) * 100),
-      });
-    }
-  };
-
-  // Download pool
-  const pool: Promise<void>[] = [];
-  for (let i = 0; i < urls.length; i++) {
-    const promise = downloadImage(urls[i], i);
-    pool.push(promise);    
-    if (pool.length >= maxParallel) {
-      await Promise.race(pool);
-      for (let j = pool.length - 1; j >= 0; j--) {
-        if ((pool[j] as any).resolved) pool.splice(j, 1);
-      }
-    }
-  }
-
-  await Promise.all(pool);  
-  return downloadedPaths.sort();
-};
-
-
 export async function dbGetSupportedAbis(): Promise<string> {
   return (await DeviceInfo.supportedAbis()).slice(0, 1).join(", "); 
 }
@@ -448,4 +338,15 @@ export async function getDeviceName(): Promise<string> {
   const supportedAbis = await dbGetSupportedAbis()
   const device = `${model}, ${supportedAbis}, ${systemName}[${systemVersion}]`
   return device
+}
+
+
+export function normalizeDocumentName(name: string): string {
+  return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9-_]/g, '_')
+    .replace(/_+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .toLowerCase();
 }

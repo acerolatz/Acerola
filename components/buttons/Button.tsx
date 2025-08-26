@@ -6,18 +6,20 @@ import React from 'react'
 
 
 interface ButtonProps {
-    iconName: string
-    onPress?: () => any
+  iconName: string
+  onPress?: () => any
+  iconColor?: string
 }
 
 
 const Button = ({
   iconName, 
-  onPress  
+  onPress,
+  iconColor = Colors.white
 }: ButtonProps) => {
   return (
     <Pressable onPress={onPress ? onPress : undefined} hitSlop={AppConstants.HIT_SLOP.NORMAL}  >
-        <Ionicons name={iconName as any} size={AppConstants.ICON.SIZE} color={Colors.white} />
+        <Ionicons name={iconName as any} size={AppConstants.ICON.SIZE} color={iconColor} />
     </Pressable>
   )
 }

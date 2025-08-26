@@ -60,6 +60,9 @@ const openNewsPage = () => {
     router.navigate("/(pages)/NewsPage")
 }
 
+const openDocuments = () => {
+    router.navigate("/(pages)/DocumentsPage")
+}
 
 interface LateralMenuProps {
     closeMenu: () => any
@@ -90,6 +93,12 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
                             onPress={libraryPage} 
                             title='Library'
                             iconName='library-outline'
+                        />
+
+                        <MenuButton 
+                            onPress={openDocuments} 
+                            title='Documents'
+                            iconName='folder-outline'
                         />
                         
                         <MenuButton 
