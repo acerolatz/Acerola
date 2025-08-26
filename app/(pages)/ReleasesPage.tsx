@@ -40,43 +40,43 @@ const Releases = () => {
     []
   );
 
+  const renderFooter = useCallback(() => <Footer/>, [])
+
   return (
     <SafeAreaView style={AppStyle.safeArea}>
-        <TopBar title="Releases">
-            <ReturnButton />
-        </TopBar>
+      <TopBar title="Releases">
+          <ReturnButton />
+      </TopBar>
+      {
+        loading ? <PageActivityIndicator />
+        :
+        <View style={styles.container}>
+            {/* Source Code Section */}
+            <View style={{gap: AppConstants.GAP}}>
+                <Text style={Typography.semibold}>Source Code</Text>
+                <FlatList
+                  data={releasesInfo.source}
+                  keyExtractor={(item) => item.url}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  renderItem={renderSourceItem}
+                />
+            </View>
 
-        {
-            loading ? (<PageActivityIndicator />) : 
-            (
-                <View style={styles.container}>
-                    {/* Source Code Section */}
-                    <View style={{gap: AppConstants.GAP}}>
-                        <Text style={Typography.semibold}>Source Code</Text>
-                        <FlatList
-                        data={releasesInfo.source}
-                        keyExtractor={(item) => item.url}
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        renderItem={renderSourceItem}
-                        />
-                    </View>
-
-                    {/* Packages Section */}
-                    <View style={styles.section}>
-                        <Text style={Typography.semibold}>Packages</Text>
-                        <AppVersion />
-                        <FlatList
-                        data={releasesInfo.releases}
-                        keyExtractor={(item, index) => `${item.version}-${index}`}
-                        renderItem={renderReleaseItem}
-                        ListFooterComponent={<Footer />}
-                        showsVerticalScrollIndicator={false}
-                        />
-                    </View>
-                </View>
-            )
-        }
+            {/* Packages Section */}
+            <View style={styles.section}>
+                <Text style={Typography.semibold}>Packages</Text>
+                <AppVersion />
+                <FlatList
+                  data={releasesInfo.releases}
+                  keyExtractor={(item, index) => `${item.version}-${index}`}
+                  renderItem={renderReleaseItem}
+                  ListFooterComponent={renderFooter}
+                  showsVerticalScrollIndicator={false}
+                />
+            </View>
+        </View>
+      }
     </SafeAreaView>
   );
 };

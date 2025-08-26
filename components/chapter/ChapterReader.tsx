@@ -9,8 +9,7 @@ import { hp } from '@/helpers/util'
 
 
 interface ChapterReaderProps {
-    images: ChapterImage[]
-    estimatedItemSize: number
+    images: ChapterImage[]    
     manhwaTitle: string
     loading: boolean
     listHeader: React.ComponentType<any> | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | null | undefined
@@ -18,8 +17,7 @@ interface ChapterReaderProps {
 
 
 const ChapterReader = ({
-    images,
-    estimatedItemSize,
+    images,    
     manhwaTitle,
     loading,
     listHeader,

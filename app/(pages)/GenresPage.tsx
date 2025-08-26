@@ -1,12 +1,12 @@
 import ReturnButton from '@/components/buttons/ReturnButton'
 import { AppConstants } from '@/constants/AppConstants'
 import { Typography } from '@/constants/typography'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import Footer from '@/components/util/Footer'
 import { AppStyle } from '@/styles/AppStyle'
 import { Colors } from '@/constants/Colors'
 import TopBar from '@/components/TopBar'
-import { Genre } from '@/helpers/types'
+import {  Genre } from '@/helpers/types'
 import { hp, wp } from '@/helpers/util'
 import { router } from 'expo-router'
 import { 
@@ -18,13 +18,33 @@ import {
 } from 'react-native'
 import { dbReadGenres } from '@/lib/database'
 import { useSQLiteContext } from 'expo-sqlite'
-import { FlashList } from '@shopify/flash-list'
 
 
 const NUM_COLUMNS = 2
 const ITEM_WIDTH = (wp(92) - AppConstants.MARGIN * (NUM_COLUMNS - 1)) / NUM_COLUMNS
 const ITEM_HEIGHT = hp(8)
 
+
+const Item = ({item, index}: {item: Genre, index: number}) => {
+
+    const onPress = useCallback(() => {
+        router.navigate({
+            pathname: '/(pages)/ManhwaByGenre', 
+            params: {
+                genre: item.genre,
+                genre_id: item.genre_id
+            }
+        })
+    }, [item.genre_id])
+
+    return (
+        <Pressable
+            onPress={onPress}
+            style={[styles.item, {marginRight: index % 2 == 0 ? AppConstants.MARGIN : 0}]} >
+            <Text style={styles.itemText} >{item.genre}</Text>
+        </Pressable>
+    )
+}
 
 const GenresPage = () => {
 
@@ -41,27 +61,14 @@ const GenresPage = () => {
         },
         []
     )
-        
-    const onPress = async (genre: Genre) => {
-        router.navigate({
-            pathname: '/(pages)/ManhwaByGenre', 
-            params: {
-                genre: genre.genre,
-                genre_id: genre.genre_id
-            }
-        })
-    }
     
-    const renderItem = ({item, index}: {item: Genre, index: number}) => {
-        return (
-            <Pressable
-                onPress={() => onPress(item)}
-                style={[styles.item, {marginRight: index % 2 == 0 ? AppConstants.MARGIN : 0}]} >
-                <Text style={styles.itemText} >{item.genre}</Text>
-            </Pressable>
-        )
-    }    
+    const renderItem = useCallback(({item, index}: {item: Genre, index: number}) => (
+        <Item item={item} index={index} />
+    ), [])
 
+    const KeyExtractor = useCallback((item: Genre) => item.genre_id.toString(), [])
+
+    const renderFooter = useCallback(() => <Footer height={hp(12)}/>, [])
 
     return (
         <SafeAreaView style={AppStyle.safeArea}>
@@ -71,10 +78,10 @@ const GenresPage = () => {
             <FlatList
                 data={genres}
                 numColumns={2}
-                keyExtractor={(item) => item.genre_id.toString()}
+                keyExtractor={KeyExtractor}
                 showsVerticalScrollIndicator={false}
                 renderItem={renderItem}
-                ListFooterComponent={<Footer height={hp(12)}/>}
+                ListFooterComponent={renderFooter}
             />
         </SafeAreaView>
     )

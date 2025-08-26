@@ -166,10 +166,3 @@ export type Log = {
     descr: string | null
     created_at: number
 }
-
-
-export type User = {
-    userCoverImageUrl: string | null
-    username: string | null
-    user_id: string | null
-}

@@ -9,7 +9,7 @@ import { Colors } from '@/constants/Colors'
 import TopBar from '@/components/TopBar'
 import { hp, wp } from '@/helpers/util'
 import { router } from 'expo-router'
-import React from 'react'
+import React, { useCallback } from 'react'
 import { 
     FlatList, 
     Pressable, 
@@ -24,29 +24,39 @@ const ITEM_WIDTH = (wp(92) - AppConstants.MARGIN * (NUM_COLUMNS - 1)) / NUM_COLU
 const ITEM_HEIGHT = hp(8)
 
 
-const CollectionsPage = () => {
-        
-    const { collections } = useCollectionState()
+const Item = ({item, index}: {item: Collection, index: number}) => {
 
-    const onCollectionPress = async (collection: Collection) => {
+    const onPress = useCallback(() => {
         router.navigate({
             pathname: '/(pages)/CollectionPage', 
             params: {
-                collection_id: collection.collection_id,
-                collection_name: collection.name                
+                collection_id: item.collection_id,
+                collection_name: item.name                
             }
         })
-    }
-    
-    const renderItem = ({item, index}: {item: Collection, index: number}) => {
-        return (
-            <Pressable
-                onPress={() => onCollectionPress(item)}
-                style={[styles.item, {marginRight: index % 2 == 0 ? AppConstants.MARGIN : 0}]} >
-                <Text style={styles.itemText} >{item.name}</Text>
-            </Pressable>
-        )
-    }    
+    }, [item.collection_id])
+
+    return (
+        <Pressable
+            onPress={onPress}
+            style={[styles.item, {marginRight: index % 2 == 0 ? AppConstants.MARGIN : 0}]} >
+            <Text style={styles.itemText} >{item.name}</Text>
+        </Pressable>
+    )
+}
+
+
+const CollectionsPage = () => {
+        
+    const { collections } = useCollectionState() 
+
+    const renderItem = useCallback(({item, index}: {item: Collection, index: number}) => (
+        <Item item={item} index={index} />
+    ), [])
+
+    const KeyExtractor = useCallback((item: Collection) => item.collection_id.toString(), [])
+
+    const renderFooter = useCallback(() => <Footer/>, [])
 
     return (
         <SafeAreaView style={AppStyle.safeArea}>
@@ -56,11 +66,11 @@ const CollectionsPage = () => {
             <FlatList
                 data={collections}
                 initialNumToRender={20}
-                keyExtractor={(item) => item.collection_id.toString()}
+                keyExtractor={KeyExtractor}
                 showsVerticalScrollIndicator={false}
                 numColumns={2}
                 renderItem={renderItem}
-                ListFooterComponent={<Footer/>}
+                ListFooterComponent={renderFooter}
             />
         </SafeAreaView>
     )

@@ -3,7 +3,7 @@ import { hp, wp } from "@/helpers/util";
 
 export const AppConstants = {
     APP_NAME: "Acerola",
-    APP_VERSION: "v1.1.0",
+    APP_VERSION: "v1.1.1",
     DEBUB: { ENABLED: false },
     MENU_WIDTH: wp(65),
     MENU_ANIMATION_TIME: 300,

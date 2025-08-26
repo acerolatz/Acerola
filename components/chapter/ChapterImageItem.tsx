@@ -16,7 +16,7 @@ function areEqual(prevProps: ChapterImageItemProps, nextProps: ChapterImageItemP
 const ChapterImageItem = React.memo(({ item }: ChapterImageItemProps) => {  
   return (
     <Image
-      style={{ width: item.width, height: item.height }}
+      style={{ width: item.width, height: item.height, alignSelf: "center" }}
       source={item.image_url}      
       contentFit="cover"
       recyclingKey={item.image_url}

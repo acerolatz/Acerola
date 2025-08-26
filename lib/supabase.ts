@@ -169,7 +169,7 @@ export async function spFetchChapterImages(chapter_id: number): Promise<ChapterI
             ToastMessages.EN.UNABLE_TO_LOAD_IMAGES
         )
         return []
-    }
+    }    
     
     return data.map(i => {
         const width = Math.min(i.width, AppConstants.SCREEN.WIDTH)

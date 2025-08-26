@@ -5,8 +5,7 @@ import {
   Manhwa, 
   ManhwaAuthor, 
   ManhwaGenre,    
-  Todo, 
-  User, 
+  Todo,  
   UserData 
 } from '@/helpers/types';
 import {
@@ -164,9 +163,7 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       
       INSERT INTO 
         app_info (name, value)
-      VALUES 
-        ('userCoverImageUrl', ''),
-        ('username', ''),
+      VALUES
         ('device', ''),
         ('last_sync_time', ''),
         ('password', '')
@@ -301,20 +298,6 @@ async function dbGetTotalSizeMiB(db: SQLite.SQLiteDatabase): Promise<number | nu
 }
 
 
-/**
- * Logs detailed information about the current state of the **local SQLite database** and
- * the device image cache to the console.
- *
- * Includes:
- * - Total number of tables
- * - Database size in MiB
- * - Row counts for key tables (manhwas, genres, etc.)
- * - Maximum allowed image cache size
- * - Current image cache size
- *
- * @param db - SQLite database instance
- * @returns A promise that resolves once all information has been logged.
- */
 export async function dbLog(db: SQLite.SQLiteDatabase) {  
   console.log("==========================")
   console.log("=====ACEROLA DATABASE=====")
@@ -335,13 +318,6 @@ export async function dbLog(db: SQLite.SQLiteDatabase) {
 }
 
 
-/**
- * Retrieves and logs all rows from a specified table in the **local SQLite database**.
- *
- * @param db - SQLite database instance
- * @param table - The name of the table to list rows from.
- * @returns A promise that resolves when the operation is complete. Each row is logged to the console.
- */
 export async function dbListTable(db: SQLite.SQLiteDatabase, table: string) {
   const r = await db.getAllAsync(
     `SELECT * FROM ${table};`
@@ -355,14 +331,6 @@ export async function dbGetLastDatabaseSync(db: SQLite.SQLiteDatabase): Promise<
 }
 
 
-/**
- * Deletes all rows from a specific table in the **local SQLite database**.
- *
- * @param db - SQLite database instance
- * @param table - The name of the table to clear.
- * @returns A promise that resolves once the table has been cleared.
- *          Logs an error to the console if the operation fails.
- */
 export async function dbCleanTable(db: SQLite.SQLiteDatabase, table: string) {
   await db.runAsync(`DELETE FROM ${table};`).catch(error => console.log(`error dbCleanTable ${table}`, error))
 }
@@ -501,14 +469,6 @@ export async function dbFirstRun(db: SQLite.SQLiteDatabase) {
 }
 
 
-/**
- * Retrieves all alternative titles for a specific manhwa, excluding the main title, from the **local SQLite database**.
- * 
- * @param db - SQLite database instance
- * @param manhwa_id - The unique ID of the manhwa
- * @param manhwa_title - The main title of the manhwa to exclude from results
- * @returns A promise that resolves to an array of alternative titles
- */
 export async function dbGetManhwaAltNames(
   db: SQLite.SQLiteDatabase, 
   manhwa_id: number, 
@@ -905,13 +865,6 @@ export async function dbHasNoManhwas(db: SQLite.SQLiteDatabase): Promise<boolean
 }
 
 
-/**
- * Checks whether a manhwa with a given ID exists in the `manhwas` table in the **local SQLite database**.
- * 
- * @param db - SQLite database instance
- * @param manhwa_id - The ID of the manhwa to check.
- * @returns A promise that resolves to `true` if the manhwa exists, `false` otherwise.
- */
 export async function dbHasManhwa(db: SQLite.SQLiteDatabase, manhwa_id: number): Promise<boolean> {
   const row = await db.getFirstAsync<{manga_id: number}>(
     `
@@ -928,11 +881,6 @@ export async function dbHasManhwa(db: SQLite.SQLiteDatabase, manhwa_id: number):
 }
 
 
-/**
- * Retrieves a random manhwa ID from the `manhwas` table.
- * @param db - An instance of `SQLiteDatabase`.
- * @returns A promise that resolves to a random manhwa ID, or `null` if the table is empty.
- */
 export async function dbGetRandomManhwaId(db: SQLite.SQLiteDatabase): Promise<number | null> {
   const row = await db.getFirstAsync<{manhwa_id: number}>(
     'SELECT manhwa_id FROM manhwas ORDER BY RANDOM() LIMIT 1;'
@@ -942,24 +890,12 @@ export async function dbGetRandomManhwaId(db: SQLite.SQLiteDatabase): Promise<nu
 }
 
 
-/**
- * Retrieves the current app version from the `app_info` table in the **local SQLite database**.
- * 
- * @param db - SQLite database instance
- * @returns A promise that resolves to the app version string.
- */
 export async function dbReadAppVersion(db: SQLite.SQLiteDatabase): Promise<string> {
   const r = await dbReadInfo(db, 'version')
   return r!
 }
 
 
-/**
- * Retrieves all genres from the `genres` table in the **local SQLite database**, ordered alphabetically by genre name.
- * 
- * @param db - SQLite database instance
- * @returns A promise that resolves to an array of `Genre` objects. Returns an empty array if no genres are found.
- */
 export async function dbReadGenres(db: SQLite.SQLiteDatabase): Promise<Genre[]> {
   const rows = await db.getAllAsync(
     `
@@ -975,13 +911,6 @@ export async function dbReadGenres(db: SQLite.SQLiteDatabase): Promise<Genre[]> 
 }
 
 
-/**
- * Retrieves a manhwa record by its ID from the `manhwas` table in the **local SQLite database**.
- * 
- * @param db - SQLite database instance
- * @param manhwa_id - The ID of the manhwa to fetch.
- * @returns A promise that resolves to a `Manhwa` object if found, or `null` if no matching record exists.
- */
 export async function dbReadManhwaById(
   db: SQLite.SQLiteDatabase,
   manhwa_id: number
@@ -995,14 +924,6 @@ export async function dbReadManhwaById(
 }
 
 
-/**
- * Retrieves a paginated list of manhwas ordered by their `updated_at` timestamp in descending order from the **local SQLite database**.
- * 
- * @param db - SQLite database instance
- * @param p_offset - The offset for pagination. Defaults to 0.
- * @param p_limit - The maximum number of manhwas to return. Defaults to 30.
- * @returns A promise that resolves to an array of `Manhwa` objects. Returns an empty array if no manhwas are found.
- */
 export async function dbReadManhwasOrderedByUpdateAt(
   db: SQLite.SQLiteDatabase,
   p_offset: number = 0, 
@@ -1028,14 +949,6 @@ export async function dbReadManhwasOrderedByUpdateAt(
 }
 
 
-/**
- * Retrieves a paginated list of manhwas ordered by their view count in descending order from the **local SQLite database**.
- * 
- * @param db - SQLite database instance
- * @param p_offset - The offset for pagination. Defaults to 0.
- * @param p_limit - The maximum number of manhwas to return. Defaults to 30.
- * @returns A promise that resolves to an array of `Manhwa` objects. Returns an empty array if no manhwas are found.
- */
 export async function dbReadManhwasOrderedByViews(
   db: SQLite.SQLiteDatabase,
   p_offset: number = 0, 
@@ -1129,13 +1042,6 @@ export async function dbUpdateManhwaViews(
 }
 
 
-/**
- * Retrieves all genres associated with a specific manhwa from the **local SQLite database**, ordered alphabetically by genre name.
- * 
- * @param db - SQLite database instance
- * @param manhwa_id - The ID of the manhwa to fetch genres for.
- * @returns A promise that resolves to an array of `Genre` objects. Returns an empty array if no genres are found.
- */
 export async function dbReadManhwaGenres(
   db: SQLite.SQLiteDatabase,
   manhwa_id: number
@@ -1160,13 +1066,6 @@ export async function dbReadManhwaGenres(
 }
 
 
-/**
- * Retrieves all authors associated with a specific manhwa from the **local SQLite database**.
- * 
- * @param db - SQLite database instance
- * @param manhwa_id - The ID of the manhwa to fetch authors for.
- * @returns A promise that resolves to an array of `ManhwaAuthor` objects. Returns an empty array if no authors are found.
- */
 export async function dbReadManhwaAuthors(
   db: SQLite.SQLiteDatabase,
   manhwa_id: number
@@ -1273,13 +1172,6 @@ export async function dbUpdateManhwaReadingStatus(
 }
 
 
-/**
- * Retrieves all manhwas associated with a specific author from the **local SQLite database**, ordered by view count in descending order.
- * 
- * @param db - SQLite database instance
- * @param author_id - The ID of the author to fetch manhwas for.
- * @returns A promise that resolves to an array of `Manhwa` objects. Returns an empty array if no manhwas are found for the author.
- */
 export async function dbReadManhwasByAuthorId(
   db: SQLite.SQLiteDatabase,
   author_id: number
@@ -1307,15 +1199,6 @@ export async function dbReadManhwasByAuthorId(
 }
 
 
-/**
- * Retrieves a paginated list of manhwas associated with a specific genre from the **local SQLite database**, ordered by view count descending and then by manhwa ID ascending.
- * 
- * @param db - SQLite database instance
- * @param genre_id - The ID of the genre to fetch manhwas for.
- * @param p_offset - The offset for pagination. Defaults to 0.
- * @param p_limit - The maximum number of manhwas to return. Defaults to 30.
- * @returns A promise that resolves to an array of `Manhwa` objects. Returns an empty array if no manhwas are found for the genre.
- */
 export async function dbReadManhwasByGenreId(
   db: SQLite.SQLiteDatabase,
   genre_id: number,
@@ -2048,13 +1931,3 @@ export async function dbSetDebugInfo(
   ]).catch(error => console.log("erro dbSetDebugInfo", error))
 }
 
-
-export async function dbLoadUser(db: SQLite.SQLiteDatabase): Promise<User> {
-  const [userCoverImageUrl, username, user_id] = await Promise.all([
-    await dbReadInfo(db, 'userCoverImageUrl'),
-    await dbReadInfo(db, 'username'),
-    await dbGetUserUUID(db)
-  ])
-
-  return { username, userCoverImageUrl, user_id }
-}

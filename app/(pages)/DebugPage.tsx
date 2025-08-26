@@ -16,17 +16,15 @@ import {
     spFetchCardAndCoverLatest, 
     spFetchCardAndCoverSearch    
 } from '@/lib/supabase'
-import BooleanRotatingButton from '@/components/buttons/BooleanRotatingButton'
 import PageActivityIndicator from '@/components/util/PageActivityIndicator'
 import React, { useCallback, useEffect, useState } from 'react'
-import { DebugInfo, DebugManhwaImages, Manhwa } from '@/helpers/types'
+import { DebugInfo, DebugManhwaImages } from '@/helpers/types'
 import ReturnButton from '@/components/buttons/ReturnButton'
 import { TextInput } from 'react-native-gesture-handler'
 import { hasOnlyDigits, hp, wp } from '@/helpers/util'
 import { dbFetchDebugInfo } from '@/lib/database'
 import { AppConstants } from '@/constants/AppConstants'
 import { LinearGradient } from 'expo-linear-gradient'
-import { ToastMessages } from '@/constants/Messages'
 import { Typography } from '@/constants/typography'
 import Toast from 'react-native-toast-message'
 import { useSQLiteContext } from 'expo-sqlite'

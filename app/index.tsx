@@ -54,18 +54,21 @@ const App = () => {
             isInitialized.current = true;
             const init = async () => {
                 
-                await Promise.all([
+                const [
+                    isSafeModeEnable,
+                    hasInternet,
+                ]= await Promise.all([
+                    dbIsSafeModeEnabled(db),
+                    hasInternetAvailable(),
                     handleCache(),
                     updateLocalVersion(),
                     dbFirstRun(db)
                 ])                
 
-                if (await dbIsSafeModeEnabled(db)) {
+                if (isSafeModeEnable) {
                     router.replace("/(pages)/SafeModeHomePage")
                     return
                 }
-                                
-                const hasInternet = await hasInternetAvailable()
 
                 if (!hasInternet) {
                     Toast.show(ToastMessages.EN.NO_INTERNET);

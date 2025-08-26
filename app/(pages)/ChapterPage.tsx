@@ -109,8 +109,7 @@ const ChapterPage = () => {
           loading={loading}
         />  :
         <ChapterReader 
-          images={data}
-          estimatedItemSize={hp(40)}
+          images={data}          
           manhwaTitle={manhwaTitle}
           listHeader={listHeader}
           loading={loading}

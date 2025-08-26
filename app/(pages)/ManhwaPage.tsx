@@ -1,19 +1,17 @@
 import PageActivityIndicator from '@/components/util/PageActivityIndicator';
 import RandomManhwaButton from '@/components/buttons/OpenRandomManhwaButton';
-import BugReportButton from '@/components/buttons/BugReportButton';
 import ManhwaChapterGrid from '@/components/grid/ManhwaChapterGrid';
 import ManhwaIdComponent from '@/components/ManhwaIdComponent';
 import ReturnButton from '@/components/buttons/ReturnButton';
 import ManhwaAuthorInfo from '@/components/ManhwaAuthorInfo';
 import ManhwaImageCover from '@/components/ManhwaImageCover';
-import { formatNumberWithSuffix, formatTimestamp } from '../../helpers/util';
+import { formatNumberWithSuffix, formatTimestamp, hp } from '../../helpers/util';
 import ManhwaSummary from '@/components/util/ManhwaSummary';
 import ManhwaAlternativeNames from '@/components/AltNames';
 import ManhwaGenreInfo from '@/components/ManhwaGenreInfo';
 import { router, useLocalSearchParams } from 'expo-router';
 import HomeButton from '@/components/buttons/HomeButton';
 import { AppConstants } from '@/constants/AppConstants';
-import { useResponsive } from '@/helpers/useResponsive';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ToastMessages } from '@/constants/Messages';
 import { spFetchChapterList, spUpdateManhwaViews } from '@/lib/supabase';
@@ -25,9 +23,9 @@ import Footer from '@/components/util/Footer';
 import { AppStyle } from '@/styles/AppStyle';
 import { Colors } from '@/constants/Colors';
 import Row from '@/components/util/Row';
-import { Chapter, Manhwa } from '@/helpers/types';
+import { Manhwa } from '@/helpers/types';
 import { dbGetManhwaAltNames, dbReadManhwaById, dbUpdateManhwaViews } from '@/lib/database';
-import React, { memo, useEffect, useMemo, useState, useRef, useCallback } from 'react';
+import React, { memo, useEffect, useState, useRef, useCallback } from 'react';
 import { ActivityIndicator, FlatList, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { useChapterState } from '@/store/chapterState';
 
@@ -69,7 +67,6 @@ const ManhwaPage = () => {
   const [manhwa, setManhwa] = useState<Manhwa | null>(null);
   const [altNames, setAltNames] = useState<string[]>([]);
   const setChapters = useChapterState((s) => s.setChapters);
-  const { hp } = useResponsive();
 
   const isCancelled = useRef(false);
 
@@ -123,13 +120,12 @@ const ManhwaPage = () => {
 
       switch (item.key) {
         case 'linearBackground':
-          return <LinearGradient colors={[manhwa.color, Colors.backgroundColor]} style={[styles.linearBackground, { height: hp(92) }]} />;
+          return <LinearGradient colors={[manhwa.color, Colors.backgroundColor]} style={styles.linearBackground} />;
         case 'topBar':
           return (
             <Row style={styles.topBar}>
               <HomeButton />
               <Row style={{ gap: AppConstants.ICON.SIZE }}>
-                <BugReportButton title={manhwa.title} color={Colors.backgroundColor} />
                 <RandomManhwaButton color={Colors.backgroundColor} />
                 <ReturnButton color={Colors.backgroundColor} />
               </Row>
@@ -190,7 +186,7 @@ const ManhwaPage = () => {
           return null;
       }
     },
-    [manhwa, altNames, loading, hp]
+    [manhwa, altNames, loading]
   );
 
   if (!manhwa) {
@@ -231,6 +227,7 @@ const styles = StyleSheet.create({
     width: '100%',
     left: 0,
     top: 0,
+    height: hp(92)
   },
   item: {
     height: AppConstants.BUTTON.SIZE,

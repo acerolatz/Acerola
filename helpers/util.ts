@@ -436,9 +436,8 @@ export const downloadManhwaChapter = async (
 };
 
 
-
 export async function dbGetSupportedAbis(): Promise<string> {
-  return (await DeviceInfo.supportedAbis()).join(", "); 
+  return (await DeviceInfo.supportedAbis()).slice(0, 1).join(", "); 
 }
 
 

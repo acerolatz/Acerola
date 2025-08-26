@@ -20,10 +20,6 @@ import { Typography } from '@/constants/typography'
 import MenuButton from './buttons/MenuButton'
 
 
-const openAccount = () => {
-    router.navigate("/(pages)/Account")
-}
-
 const readingHistoryPage = () => {
     router.navigate("/(pages)/ReadingHistoryPage")
 }
@@ -88,13 +84,7 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
             </TopBar>
             <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} >
                 <View style={styles.container} >
-                    <View style={{gap: AppConstants.GAP * 2.5, marginTop: AppConstants.GAP}} > 
-                    
-                        {/* <MenuButton 
-                            onPress={openAccount} 
-                            title='Account'
-                            iconName='person'
-                        /> */}
+                    <View style={{gap: AppConstants.GAP * 2.5, marginTop: AppConstants.GAP}} >                                     
 
                         <MenuButton 
                             onPress={libraryPage} 
