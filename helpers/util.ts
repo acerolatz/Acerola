@@ -3,7 +3,6 @@ import { Dimensions, PermissionsAndroid } from "react-native";
 import { ToastMessages } from '@/constants/Messages';
 import Toast from 'react-native-toast-message';
 import * as Clipboard from 'expo-clipboard'
-import { DownloadProgress } from './types';
 import { Platform } from 'react-native';
 import { Linking } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
@@ -340,13 +339,3 @@ export async function getDeviceName(): Promise<string> {
   return device
 }
 
-
-export function normalizeDocumentName(name: string): string {
-  return name
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-zA-Z0-9-_]/g, '_')
-    .replace(/_+/g, '_')
-    .replace(/^_+|_+$/g, '')
-    .toLowerCase();
-}

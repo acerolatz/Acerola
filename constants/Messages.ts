@@ -135,6 +135,10 @@ export const ToastMessages = {
             text1: "Reloading chapter...", 
             type: 'info',
             visibilityTime: 1000
+        },
+        DOCUMENT_NOT_FOUND: {
+            text1: "Document not Found", 
+            type: "error"
         }
     }
 }

@@ -13,8 +13,7 @@ import {
   dbGetSupportedAbis, 
   formatBytes, 
   getCacheSizeBytes, 
-  getDeviceName, 
-  normalizeDocumentName
+  getDeviceName
 } from '@/helpers/util';
 import { AppConstants } from '@/constants/AppConstants';
 import DeviceInfo from 'react-native-device-info';
@@ -23,13 +22,15 @@ import { AuthorSet } from '@/helpers/AuthorSet';
 import { GenreSet } from '@/helpers/GenreSet';
 import * as SQLite from 'expo-sqlite';
 import uuid from 'react-native-uuid';
-import { DatabaseError, FileNotFoundError } from '@/helpers/errors';
-import { createDocumentDir, deleteDocumentDir } from '@/helpers/storage';
+import { DatabaseError } from '@/helpers/errors';
+import { createDocumentDir, createDocumentPath, deleteDocumentDir, normalizeDocumentName } from '@/helpers/storage';
 import Toast from 'react-native-toast-message';
+import { ToastMessages } from '@/constants/Messages';
 
 
 export async function dbMigrate(db: SQLite.SQLiteDatabase) {
   console.log("[DATABASE MIGRATION START]")
+  const date = new Date().toString()
   await db.execAsync(`
     
     -- ===============================
@@ -125,16 +126,15 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       readed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       PRIMARY KEY (manhwa_id, chapter_id)          
     );
-
+        
     CREATE TABLE IF NOT EXISTS documents (
-      document_id INTEGER NOT NULL PRIMARY KEY,
-      name TEXT UNIQUE NOT NULL,
-      normalized_name TEXT UNIQUE NOT NULL,
-      parent_document_id INTEGER DEFAULT NULL,
+      path TEXT NOT NULL PRIMARY KEY,
+      name TEXT NOT NULL,
+      parent_document_path TEXT DEFAULT NULL,
       descr TEXT DEFAULT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      CONSTRAINT documents_fkey FOREIGN KEY (parent_document_id) REFERENCES documents (document_id) ON UPDATE CASCADE ON DELETE CASCADE
+      CONSTRAINT documents_fkey FOREIGN KEY (parent_document_path) REFERENCES documents (path) ON UPDATE CASCADE ON DELETE CASCADE
     );
 
     CREATE TABLE IF NOT EXISTS todos (
@@ -171,6 +171,20 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
     --             INSERT
     -- ===============================
     BEGIN TRANSACTION;
+
+      INSERT INTO 
+        documents (path, name, descr, created_at, updated_at)
+      VALUES 
+        (
+          '${AppConstants.PORNHWAS_DOCUMENT_PATH}',
+          'Pornhwas', 
+          'Contains the downloaded chapters of each pornhwa.',
+          '${date}',
+          '${date}'
+        )
+      ON CONFLICT
+        (path)
+      DO NOTHING;
       
       INSERT OR REPLACE INTO 
         app_info (name, value)
@@ -1949,72 +1963,108 @@ export async function dbSetDebugInfo(
 
 
 export async function dbReadDocuments(
-  db: SQLite.SQLiteDatabase, 
-  p_offset: number = 0, 
+  db: SQLite.SQLiteDatabase,
+  parent_document_path: string | null = null,
+  p_offset: number = 0,
   p_limit: number = AppConstants.PAGE_LIMIT
-): Promise<Document[]> {
+) {
   const r = await db.getAllAsync<Document>(
-    'SELECT * FROM documents ORDER BY updated_at DESC LIMIT ? OFFSET ?;',
-    [p_limit, p_offset]
+    `
+      SELECT 
+        * 
+      FROM 
+        documents 
+      WHERE 
+        parent_document_path = ?
+      ORDER BY 
+        updated_at 
+      DESC 
+        LIMIT ? 
+        OFFSET ?;
+      `,
+    [parent_document_path, p_limit, p_offset]
   ).catch(error => console.log("error dbReadDocuments", error))
 
-  return r ? r : []
+  return r ?? []  
 }
 
 
-export async function dbReadDocument(
-  db: SQLite.SQLiteDatabase,
-  document_id: number
-): Promise<Document | null> {
-  try {
-    const r = await db.getFirstAsync<Document>(
-      'SELECT * FROM documents WHERE document_id = ?;',
-      [document_id]
-    );
-    return r ?? null;
-  } catch (error) {
-    throw new DatabaseError(`Failed to read document: ${error}`);
-  }
+export async function dbReadSubDocuments(
+  db: SQLite.SQLiteDatabase, 
+  parent_document_path: string,
+  p_offset: number = 0,
+  p_limit: number = AppConstants.PAGE_LIMIT
+): Promise<Document[]> {
+  const r = await db.getAllAsync<Document>(
+    `
+      SELECT 
+        * 
+      FROM 
+        documents 
+      WHERE 
+        parent_document_path = ? 
+      ORDER BY 
+        updated_at DESC 
+      LIMIT ? 
+      OFFSET ?;
+    `,
+    [parent_document_path, p_limit, p_offset]
+  ).catch(error => console.log("error dbReadSubDocuments", error))
+
+  return r ?? []
+}
+
+
+export async function dbReadDocument(db: SQLite.SQLiteDatabase, path: string): Promise<Document | null> {
+  const r = await db.getFirstAsync<Document>(
+    'SELECT * FROM documents WHERE path = ?;',
+    [path]
+  ).catch(error => console.log("error dbReadDocument", error))
+  return r ?? null;
 }
 
 export async function dbCreateDocument(
   db: SQLite.SQLiteDatabase,
-  document: Document
+  name: string,
+  descr: string | null,
+  parent_document_path: string | null = null
 ): Promise<Document | null> {
 
-  const normalizedName = normalizeDocumentName(document.name);
-  try {    
-    await createDocumentDir(normalizedName);
+  const path = parent_document_path === null ? createDocumentPath(name) : `${parent_document_path}/${normalizeDocumentName(name)}`
+  const date = new Date().toString()
 
-    const r = await db.getFirstAsync<{ document_id: number }>(
+  try {    
+    await createDocumentDir(path);
+    await db.runAsync(
       `
         INSERT INTO documents (
+          path,
           name,
-          normalized_name,
-          parent_document_id,
           descr,
+          parent_document_path,
           created_at,
           updated_at
         )
         VALUES 
           (?,?,?,?,?,?)
-        RETURNING 
-          document_id;
+        ON CONFLICT
+          (path)
+        DO NOTHING;
       `,
       [
-        document.name,
-        normalizedName,
-        document.parent_document_id,
-        document.descr,
-        document.created_at,
-        document.updated_at,
+        path,
+        name,
+        descr,
+        parent_document_path,
+        date,
+        date
       ]
     );
 
-    return r ? await dbReadDocument(db, r.document_id) : null;
+    return await dbReadDocument(db, path)
   } catch (error: any) {
     try {
-      await deleteDocumentDir(normalizedName);
+      await deleteDocumentDir(path);
     } catch { }
     Toast.show({text1: 'Error', text2: 'Document already exists!', type: 'error1'})
     return null
@@ -2023,61 +2073,57 @@ export async function dbCreateDocument(
 
 export async function dbUpdateDocument(
   db: SQLite.SQLiteDatabase,
-  document: Document
-): Promise<{ error: string | null }> {
-  const normalizedName = normalizeDocumentName(document.name);
-
-  try {
-    const oldDoc = await dbReadDocument(db, document.document_id);
-    if (oldDoc && oldDoc.normalized_name !== normalizedName) {
-      await deleteDocumentDir(oldDoc.normalized_name);
-      await createDocumentDir(normalizedName);
-    }
-
-    await db.runAsync(
-      `
-        UPDATE documents
-        SET
-          name = ?,
-          normalized_name = ?,
-          descr = ?,
-          parent_document_id = ?,
-          created_at = ?,
-          updated_at = ?
-        WHERE document_id = ?;
-      `,
-      [
-        document.name,
-        normalizedName,
-        document.descr,
-        document.parent_document_id,
-        document.created_at,
-        document.updated_at,
-        document.document_id,
-      ]
-    );
-
-    return { error: null };
-  } catch (error) {
-    throw new DatabaseError(`Failed to update document: ${error}`);
-  }
+  path: string,
+  name: string,
+  descr: string | null  
+): Promise<boolean> {  
+  const r = await db.runAsync(
+    `
+      UPDATE documents
+      SET          
+        name = ?,
+        descr = ?,
+        updated_at = ?
+      WHERE 
+        path = ?;
+    `,
+    [
+      name,
+      descr,
+      new Date().toString(),
+      path
+    ]
+  ).catch(error => {console.log("error dbUpdateDocument", error); return false});
+  return r !== false
 }
 
-export async function dbDeleteDocument(
-  db: SQLite.SQLiteDatabase,
-  document_id: number
-): Promise<boolean> {
-  try {
-    const doc = await dbReadDocument(db, document_id);
-    if (!doc) throw new FileNotFoundError(`Document ${document_id} not found`);
-    
-    await db.runAsync('DELETE FROM documents WHERE document_id = ?;', [document_id]);
-    
-    await deleteDocumentDir(doc.normalized_name);
 
-    return true;
-  } catch (error) {
-    if (error instanceof FileNotFoundError) throw error;
-    throw new DatabaseError(`Failed to delete document: ${error}`);
+export async function dbDeleteDocument(db: SQLite.SQLiteDatabase, path: string): Promise<boolean> {
+  const doc = await dbReadDocument(db, path);
+
+  if (!doc) {
+    Toast.show(ToastMessages.EN.DOCUMENT_NOT_FOUND)
+    return false
   }
+
+  await deleteDocumentDir(doc.path)  
+
+  const r = await db.runAsync(
+    'DELETE FROM documents WHERE path = ?;', 
+    [path]
+  ).catch(error => {console.log("error dbDeleteDocument", error); return false})
+
+  return r !== false
+}
+
+
+export async function dbCreateChapterDocument(
+  db: SQLite.SQLiteDatabase, 
+  pornhwaName: string, 
+  chapterNum: number
+): Promise<Document | null> {
+  const chapterName = 'Chapter ' + chapterNum.toString()
+  const d = await dbCreateDocument(db, pornhwaName, null, AppConstants.PORNHWAS_DOCUMENT_PATH)
+  if (d) { return await dbCreateDocument(db, chapterName, '', d.path) }
+  return null
 }

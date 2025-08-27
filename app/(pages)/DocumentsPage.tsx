@@ -1,5 +1,5 @@
-import { FlatList, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { SafeAreaView, StyleSheet } from 'react-native'
 import { AppStyle } from '@/styles/AppStyle'
 import TopBar from '@/components/TopBar'
 import ReturnButton from '@/components/buttons/ReturnButton'
@@ -12,62 +12,76 @@ import CloseBtn from '@/components/buttons/CloseButton'
 import { Typography } from '@/constants/typography'
 import Footer from '@/components/util/Footer'
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
-import { hp, normalizeDocumentName } from '@/helpers/util'
+import { hp } from '@/helpers/util'
 import CreateDocumentForm from '@/components/form/CreateDocumentForm'
-import { dbCreateDocument, dbDeleteDocument, dbReadDocuments } from '@/lib/database'
+import { dbCreateDocument, dbDeleteDocument, dbReadDocuments, dbUpdateDocument } from '@/lib/database'
 import { Document } from '@/helpers/types'
-import Ionicons from '@expo/vector-icons/Ionicons'
-import Column from '@/components/util/Column'
+import DocumentsGrid from '@/components/grid/DocumentsGrid'
+import { useFocusEffect } from 'expo-router'
+import UpdateDocumentForm from '@/components/form/UpdateDocumentForm'
 
-
-interface DocumentItemProps {
-  item: Document
-  deleteItem: (item: Document) => any
-  updateItem: (item: Document) => any
-}
-
-
-const DocumentItem = ({item, deleteItem}: {item: Document, deleteItem: (item: Document) => any}) => {
-
-  return (
-    <Pressable style={styles.item} >
-      <Row style={{gap: AppConstants.GAP * 2, justifyContent: "space-between"}} >
-        <Column>
-          <Text style={{...Typography.semibold, color: Colors.backgroundColor, flexShrink: 1}}>{item.name}</Text>
-          <Text style={{...Typography.regular, color: Colors.backgroundColor}}>{item.descr}</Text>
-        </Column>
-        
-        <Column style={{gap: AppConstants.GAP * 2}} >
-          <Pressable onPress={() => deleteItem(item)} >
-            <Ionicons name='trash-outline' color={Colors.backgroundColor} size={AppConstants.ICON.SIZE} />
-          </Pressable>
-          <Pressable onPress={() => deleteItem(item)} >
-            <Ionicons name='create-outline' color={Colors.backgroundColor} size={AppConstants.ICON.SIZE} />
-          </Pressable>
-        </Column>
-      </Row>
-    </Pressable>
-  )
-}
 
 
 const DocumentsPage = () => {
 
   const db = useSQLiteContext()
   const [documents, setDocuments] = useState<Document[]>([])
+  const [documentToUpdate, setDocumentToUpdate] = useState<Document | null>(null)
+
+  const bottomSheetRef = useRef<BottomSheet>(null)
+  const updateDocumentBottomSheetRef = useRef<BottomSheet>(null)
+
+  const documentsRef = useRef<Document[]>([])
+  const fetching = useRef(false)
+  const hasResults = useRef(true)
+  const isMounted = useRef(true)
+  const page = useRef(0)
 
   useEffect(
     () => {
+      isMounted.current = true
       const init = async () => {
-        const d = await dbReadDocuments(db)
+        const d = await dbReadDocuments(db, null, 0, AppConstants.PAGE_LIMIT)
+        if (!isMounted.current) { return }
         setDocuments(d)
+        documentsRef.current = d
+        hasResults.current = d.length >= AppConstants.PAGE_LIMIT
       }
       init()
+      return () => { isMounted.current = false }
     },
     [db]
   )
 
-  const bottomSheetRef = useRef<BottomSheet>(null)
+  const reload = async () => {
+    page.current = 0
+    const d = await dbReadDocuments(db, null, 0, AppConstants.PAGE_LIMIT)
+    setDocuments(d)
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      reload()
+    }, [])
+  )
+
+  const onEndReached = useCallback(async () => {
+    if (fetching.current || !hasResults.current) { return }
+    fetching.current = true    
+    page.current += 1
+    const d: Document[] = await dbReadDocuments(
+      db,
+      null,
+      page.current * AppConstants.PAGE_LIMIT, 
+      AppConstants.PAGE_LIMIT
+    )
+    if (isMounted.current && d.length) {
+      documentsRef.current.push(...d)
+      setDocuments([...documentsRef.current])
+      hasResults.current = d.length >= AppConstants.PAGE_LIMIT
+    }
+    fetching.current = false
+  }, [db])  
 
   const handleOpenBottomSheet = useCallback(() => {
       bottomSheetRef.current?.expand();        
@@ -77,18 +91,20 @@ const DocumentsPage = () => {
       bottomSheetRef.current?.close();        
   }, []);
 
+  const handleOpenUpdateDocumentBottomSheet = useCallback(() => {
+    updateDocumentBottomSheetRef.current?.expand()
+  }, [])
+  
+  const handleCloseUpdateDocumentBottomSheet = useCallback(() => {
+    updateDocumentBottomSheetRef.current?.close()
+  }, [])
+
   const createDocument = async (name: string, descr: string) => {
-    const date = new Date().toString()
-    const tmpDocument: Document = {
-      document_id: 0,
-      parent_document_id: null,
-      normalized_name: '',
-      name: name.trim(),
-      descr: descr.trim() === '' ? null : descr.trim(),
-      created_at: date,
-      updated_at: date
-    }
-    const newDocument: Document | null = await dbCreateDocument(db, tmpDocument)
+    const newDocument: Document | null = await dbCreateDocument(
+      db, 
+      name.trim(),
+      descr.trim() === '' ? null : descr.trim()      
+    )
     if (newDocument) {
       setDocuments(prev => [...[newDocument], ...prev])
       handleCloseBottomSheet()
@@ -96,8 +112,38 @@ const DocumentsPage = () => {
   }
 
   const deleteItem = async (item: Document) => {
-    const success = await dbDeleteDocument(db, item.document_id)
-    setDocuments(prev => prev.filter(i => i.document_id != item.document_id))
+    const success = await dbDeleteDocument(db, item.path)
+    if (success) {
+      setDocuments(prev => prev.filter(i => i.path != item.path))
+    }
+  }
+
+  const updateItem = async (item: Document) => {
+    setDocumentToUpdate(item)
+    handleOpenUpdateDocumentBottomSheet()
+  }
+
+  const updateDocument = async (name: string, descr: string) => {
+    if (documentToUpdate === null) {
+        return
+    }
+    const newName = name.trim()
+    const newDescr = descr.trim() === '' ? null : descr.trim()
+    const success = await dbUpdateDocument(
+        db, 
+        documentToUpdate.path,
+        newName,
+        newDescr        
+    )
+    const newDocument: Document = {...documentToUpdate, name: newName, descr: newDescr}
+    if (success) {
+        setDocuments(prev => [
+            ...[newDocument], 
+            ...prev.filter(i => i.path != documentToUpdate.path)
+        ])
+    }
+    setDocumentToUpdate(null)
+    handleCloseUpdateDocumentBottomSheet()
   }
 
   return (
@@ -109,28 +155,47 @@ const DocumentsPage = () => {
         </Row>
       </TopBar>
 
-      <FlatList
-        data={documents}
-        keyExtractor={(item) => item.document_id.toString()}
-        renderItem={({item}) => <DocumentItem item={item} deleteItem={deleteItem} />}
-        ListFooterComponent={<Footer/>}
+      <DocumentsGrid 
+        documents={documents}
+        updateItem={updateItem}
+        deleteItem={deleteItem}
+        onEndReached={onEndReached}
       />
       
       <BottomSheet
-            ref={bottomSheetRef}
-            index={-1}
-            handleIndicatorStyle={styles.handleIndicatorStyle}
-            handleStyle={styles.handleStyle}
-            backgroundStyle={styles.bottomSheetBackgroundStyle}
-            enablePanDownToClose={true}>
-            <BottomSheetView style={styles.bottomSheetContainer} >
-                <TopBar title='Create Document'>
-                    <CloseBtn onPress={handleCloseBottomSheet}/>
-                </TopBar>
-                <CreateDocumentForm onPress={createDocument} />
-                <Footer />
-            </BottomSheetView>
-        </BottomSheet>
+          ref={bottomSheetRef}
+          index={-1}
+          handleIndicatorStyle={styles.handleIndicatorStyle}
+          handleStyle={styles.handleStyle}
+          backgroundStyle={styles.bottomSheetBackgroundStyle}
+          enablePanDownToClose={true}>
+          <BottomSheetView style={styles.bottomSheetContainer} >
+              <TopBar title='Create Document'>
+                  <CloseBtn onPress={handleCloseBottomSheet}/>
+              </TopBar>
+              <CreateDocumentForm onPress={createDocument} />
+              <Footer />
+          </BottomSheetView>
+      </BottomSheet>
+
+      <BottomSheet
+        ref={updateDocumentBottomSheetRef}
+        index={-1}
+        handleIndicatorStyle={styles.handleIndicatorStyle}
+        handleStyle={styles.handleStyle}
+        backgroundStyle={styles.bottomSheetBackgroundStyle}
+        enablePanDownToClose={true}>
+        <BottomSheetView style={styles.bottomSheetContainer} >
+            <TopBar title='Edit'>
+                <CloseBtn onPress={handleCloseUpdateDocumentBottomSheet}/>
+            </TopBar>
+            <UpdateDocumentForm 
+                name={documentToUpdate ? documentToUpdate.name : ''} 
+                descr={documentToUpdate ? documentToUpdate.descr : ''}
+                onPress={updateDocument} />
+            <Footer />
+        </BottomSheetView>
+      </BottomSheet>
 
     </SafeAreaView>
   )

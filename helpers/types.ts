@@ -168,11 +168,10 @@ export type Log = {
 }
 
 
-export type Document = {
-    document_id: number
+export type Document = {    
+    path: string
     name: string
-    normalized_name: string
-    parent_document_id: number | null
+    parent_document_path: string | null
     descr: string | null
     created_at: string
     updated_at: string

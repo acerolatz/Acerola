@@ -8,6 +8,22 @@ export const baseDir = FileSystem.documentDirectory;
 export const documentsDir = `${baseDir}documents`;
 
 
+export function normalizeDocumentName(name: string): string {
+  return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9-_]/g, '_')
+    .replace(/_+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .toLowerCase();
+}
+
+
+export function createDocumentPath(name: string): string {
+  return `${documentsDir}/${normalizeDocumentName(name)}`
+}
+
+
 export async function initDocumentsDir() {
   const dirInfo = await FileSystem.getInfoAsync(documentsDir);
 
@@ -17,9 +33,7 @@ export async function initDocumentsDir() {
 }
 
 
-export async function createDocumentDir(normalizedName: string, existsOk: boolean = true) {
-  const path = `${documentsDir}/${normalizedName}`;
-
+export async function createDocumentDir(path: string, existsOk: boolean = true) {
   const dirInfo = await FileSystem.getInfoAsync(path);
   if (dirInfo.exists && !existsOk) {
     throw new DirectoryAlreadyExistsError(`Directory already exists: ${path}`);
@@ -30,9 +44,7 @@ export async function createDocumentDir(normalizedName: string, existsOk: boolea
 }
 
 
-export async function deleteDocumentDir(normalizedName: string) {
-  const path = `${documentsDir}/${normalizedName}`;
-
+export async function deleteDocumentDir(path: string) {
   const dirInfo = await FileSystem.getInfoAsync(path);
   if (dirInfo.exists) {
     await FileSystem.deleteAsync(path, { idempotent: true });

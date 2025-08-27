@@ -6,7 +6,7 @@ import {
     TextInput, 
     View 
 } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Typography } from '@/constants/typography'
 import { AppStyle } from '@/styles/AppStyle'
 import { Colors } from '@/constants/Colors'
@@ -33,12 +33,14 @@ const schema = yup.object().shape({
 });
 
 
-interface CreateDocumentFormProps {
+interface UpdateDocumentFormProps {
+    name: string
+    descr: string | null
     onPress: (name: string, descr: string) => any
 }
 
 
-const CreateDocumentForm = ({onPress}: CreateDocumentFormProps) => {
+const UpdateDocumentForm = ({name, descr, onPress}: UpdateDocumentFormProps) => {
     
     const [isLoading, setLoading] = useState(false)
 
@@ -50,10 +52,20 @@ const CreateDocumentForm = ({onPress}: CreateDocumentFormProps) => {
     } = useForm<FormData>({
         resolver: yupResolver(schema as any),
         defaultValues: {            
-            name: '',
-            descr: ''
+            name: name,
+            descr: descr ? descr : ''
         },
     });
+
+    useEffect(
+        () => {
+            const init = async () => {
+                resetForm({name, descr: descr ? descr : ''})
+            }
+            init()
+        },
+        [name, descr]
+    )
     
     const onSubmit = async (form_data: FormData) => {
         Keyboard.dismiss()
@@ -102,11 +114,11 @@ const CreateDocumentForm = ({onPress}: CreateDocumentFormProps) => {
             {
                 isLoading ?
                 <View style={AppStyle.formButton} >
-                    <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Create</Text>
+                    <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Edit</Text>
                 </View>
                 :
                 <Pressable onPress={handleSubmit(onSubmit)} style={AppStyle.formButton} >
-                    <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Create</Text>
+                    <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Edit</Text>
                 </Pressable>
             }
 
@@ -115,7 +127,7 @@ const CreateDocumentForm = ({onPress}: CreateDocumentFormProps) => {
 }
 
 
-export default CreateDocumentForm
+export default UpdateDocumentForm
 
 
 const styles = StyleSheet.create({

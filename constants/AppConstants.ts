@@ -1,3 +1,4 @@
+import { createDocumentPath } from "@/helpers/storage";
 import { hp, wp } from "@/helpers/util";
 
 
@@ -7,7 +8,7 @@ export const AppConstants = {
     DEBUB: { ENABLED: false },
     MENU_WIDTH: wp(65),
     MENU_ANIMATION_TIME: 300,
-
+    PORNHWAS_DOCUMENT_PATH: createDocumentPath('pornhwas'),
     BUG_REPORT: {
         DEVICE_MIN_LENGHT: 3,
         DEVICE_MAX_LENGHT: 256,

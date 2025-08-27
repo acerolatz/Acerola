@@ -20,6 +20,12 @@ export const Typography = StyleSheet.create({
     fontSize: FontSizes.xs,
     color: Colors.white
   },
+  lightBlack: {
+    fontFamily: "LeagueSpartan_200ExtraLight",
+    fontWeight: "200",
+    fontSize: FontSizes.xs,
+    color: Colors.backgroundColor
+  },
   lightUnderline: {
     fontFamily: "LeagueSpartan_200ExtraLight",
     fontWeight: "200",
@@ -33,12 +39,24 @@ export const Typography = StyleSheet.create({
     fontSize: FontSizes.sm,
     color: Colors.white
   },
+  regularBlack: {
+    fontFamily: "LeagueSpartan_400Regular",
+    fontWeight: "400",
+    fontSize: FontSizes.sm,
+    color: Colors.backgroundColor
+  },
   semibold: {
     fontFamily: "LeagueSpartan_600SemiBold",
     fontWeight: "600",
     fontSize: FontSizes.lg,
     color: Colors.white
   },  
+  semiboldBlack: {
+    fontFamily: "LeagueSpartan_600SemiBold",
+    fontWeight: "600",
+    fontSize: FontSizes.lg,
+    color: Colors.backgroundColor
+  },
   lightSm: {
     fontFamily: "LeagueSpartan_200ExtraLight",
     color: Colors.white,
