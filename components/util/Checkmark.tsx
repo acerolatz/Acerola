@@ -29,7 +29,7 @@ const Checkmark = ({title, value, check}: CheckmarkProps) => {
             <Row style={styles.container} >
                 <Text style={styles.text} >{title}</Text>
                 <View style={{alignItems: "center", justifyContent: "center"}} >
-                    <CustomActivityIndicator size={AppConstants.ICON.SIZE * 0.8} />
+                    <CustomActivityIndicator size={AppConstants.UI.ICON.SIZE * 0.8} />
                 </View>
             </Row>
         )
@@ -39,10 +39,10 @@ const Checkmark = ({title, value, check}: CheckmarkProps) => {
         return (
             <Row style={styles.container} >
                 <Text style={styles.text} >{title}</Text>
-                <Pressable onPress={onPress} style={styles.buttonMarked} hitSlop={AppConstants.HIT_SLOP.LARGE}>
+                <Pressable onPress={onPress} style={styles.buttonMarked} hitSlop={AppConstants.UI.HIT_SLOP.LARGE}>
                     <Ionicons 
                         name='checkmark-outline' 
-                        size={AppConstants.ICON.SIZE} 
+                        size={AppConstants.UI.ICON.SIZE} 
                         color={Colors.backgroundColor} />
                 </Pressable>
             </Row>
@@ -55,7 +55,7 @@ const Checkmark = ({title, value, check}: CheckmarkProps) => {
             <Pressable 
                 style={styles.button}
                 onPress={onPress}
-                hitSlop={AppConstants.HIT_SLOP.LARGE} />
+                hitSlop={AppConstants.UI.HIT_SLOP.LARGE} />
         </Row>
     )
 }
@@ -64,26 +64,26 @@ export default Checkmark
 
 const styles = StyleSheet.create({
     container: {
-        gap: AppConstants.GAP,
+        gap: AppConstants.UI.GAP,
         justifyContent: "space-between"
     },
     button: {
         alignItems: "center",
         justifyContent: "center",
-        width: AppConstants.ICON.SIZE,
-        height: AppConstants.ICON.SIZE,
+        width: AppConstants.UI.ICON.SIZE,
+        height: AppConstants.UI.ICON.SIZE,
         borderWidth: 2,
         borderColor: Colors.primary,
-        borderRadius: AppConstants.BORDER_RADIUS
+        borderRadius: AppConstants.UI.BORDER_RADIUS
     },
     buttonMarked: {
         alignItems: "center",
         justifyContent: "center",
-        width: AppConstants.ICON.SIZE,
-        height: AppConstants.ICON.SIZE,
+        width: AppConstants.UI.ICON.SIZE,
+        height: AppConstants.UI.ICON.SIZE,
         borderWidth: 2,
         borderColor: Colors.primary,
-        borderRadius: AppConstants.BORDER_RADIUS,
+        borderRadius: AppConstants.UI.BORDER_RADIUS,
         backgroundColor: Colors.primary
     },
     text: {

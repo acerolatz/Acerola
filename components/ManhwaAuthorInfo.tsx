@@ -45,7 +45,7 @@ const ManhwaAuthorInfo = ({manhwa}: ManhwaAuthorInfoProps) => {
 
   const renderItem = ({item}: {item: ManhwaAuthor}) => {
     return (
-      <Pressable style={styles.container} onPress={() => openAuthorPage(item)}>
+      <Pressable style={styles.item} onPress={() => openAuthorPage(item)}>
         <Text style={Typography.regular} >
           {item.role == "Author" ? "Story" : "Art"}: {item.name}
         </Text>
@@ -54,7 +54,7 @@ const ManhwaAuthorInfo = ({manhwa}: ManhwaAuthorInfoProps) => {
   }
 
   return (
-    <Row style={{width: '100%'}} >
+    <Row style={styles.container} >
       <FlatList
         ref={flatListRef}
         data={authors}
@@ -73,6 +73,9 @@ export default ManhwaAuthorInfo;
 
 const styles = StyleSheet.create({
   container: {
+    width: '100%'
+  },
+  item: {
     ...AppStyle.defaultGridItem,
     backgroundColor: Colors.backgroundSecondary
   }

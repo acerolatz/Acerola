@@ -1,18 +1,5 @@
 
 
-/**
- * Centralized color palette for the app.
- *
- * Provides semantic and raw color values for UI components.
- * Includes primary, feedback, and background colors. Should be
- * used consistently to maintain visual coherence.
- *
- * @remarks
- * - Semantic colors: `primary`, `success`, `error`, `warning`, `info`.
- * - Background colors: `backgroundColor`, `backgroundSecondary`.
- * - Raw colors: `red`, `yellow`, `green`, `white`, `black`, `orange`.
- *
- */
 export const Colors = {
   red: "#ef4069",
   yellow: "#FFF7A6",

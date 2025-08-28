@@ -34,8 +34,8 @@ const ReturnButton = ({onPress, color = Colors.primary}: ReturnButtonProps) => {
   return (
     <Pressable
       onPress={o} 
-      hitSlop={AppConstants.HIT_SLOP.NORMAL} >
-        <Ionicons name='return-down-back-outline' size={AppConstants.ICON.SIZE} color={color} />
+      hitSlop={AppConstants.UI.HIT_SLOP.NORMAL} >
+        <Ionicons name='return-down-back-outline' size={AppConstants.UI.ICON.SIZE} color={color} />
     </Pressable>
   )
 }

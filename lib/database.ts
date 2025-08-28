@@ -22,7 +22,6 @@ import { AuthorSet } from '@/helpers/AuthorSet';
 import { GenreSet } from '@/helpers/GenreSet';
 import * as SQLite from 'expo-sqlite';
 import uuid from 'react-native-uuid';
-import { DatabaseError } from '@/helpers/errors';
 import { createDocumentDir, createDocumentPath, deleteDocumentDir, normalizeDocumentName } from '@/helpers/storage';
 import Toast from 'react-native-toast-message';
 import { ToastMessages } from '@/constants/Messages';
@@ -176,7 +175,7 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
         documents (path, name, descr, created_at, updated_at)
       VALUES 
         (
-          '${AppConstants.PORNHWAS_DOCUMENT_PATH}',
+          '${AppConstants.PATHS.PORNHWAS_DOCUMENT}',
           'Pornhwas', 
           'Contains the downloaded chapters of each pornhwa.',
           '${date}',
@@ -189,7 +188,7 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       INSERT OR REPLACE INTO 
         app_info (name, value)
       VALUES 
-        ('version', '${AppConstants.APP_VERSION}');
+        ('version', '${AppConstants.APP.VERSION}');
       
       INSERT INTO 
         app_info (name, value)
@@ -208,7 +207,7 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
         ('first_run', 1),
         ('should_ask_for_donation', 1),
         ('is_safe_mode_on', 0),
-        ('current_chapter_milestone', ${AppConstants.CHAPTER_GOAL_START}),
+        ('current_chapter_milestone', ${AppConstants.CHAPTER.GOAL_START}),
         ('last_refreshed_at', 0)
       ON CONFLICT
         (name) 
@@ -494,7 +493,7 @@ export async function dbFirstRun(db: SQLite.SQLiteDatabase) {
   await dbSetNumericInfo(db, 'first_run', 0)
   await dbSetInfo(db, 'device', device)
   const user_id = await dbSetUserUUID(db)
-  const version: string = await dbReadInfo(db, 'version', AppConstants.APP_VERSION)
+  const version: string = await dbReadInfo(db, 'version', AppConstants.APP.VERSION)
   spRegisterNewUser(user_id, device, version)
 }
 
@@ -1588,15 +1587,15 @@ export async function dbIsChapterMilestoneReached(db: SQLite.SQLiteDatabase): Pr
   
   let currentMilestone = await dbReadNumericInfo(db, 'current_chapter_milestone')
   if (!currentMilestone) {
-    await dbCreateNumericInfo(db, 'current_chapter_milestone', AppConstants.CHAPTER_GOAL_START)
-    currentMilestone = AppConstants.CHAPTER_GOAL_START
+    await dbCreateNumericInfo(db, 'current_chapter_milestone', AppConstants.CHAPTER.GOAL_START)
+    currentMilestone = AppConstants.CHAPTER.GOAL_START
   }  
   
   if (readChaptersCount >= currentMilestone) {
     await dbSetNumericInfo(
       db, 
       'current_chapter_milestone', 
-      readChaptersCount + AppConstants.CHAPTER_GOAL_INCREMENT
+      readChaptersCount + AppConstants.CHAPTER.GOAL_INCREMENT
     )
     return true
   }  
@@ -1912,7 +1911,7 @@ export async function dbFetchDebugInfo(db: SQLite.SQLiteDatabase): Promise<Debug
     dbReadInfo(db, 'last_sync_time'),
     dbReadNumericInfo(db, 'should_ask_for_donation', 1),
     dbReadNumericInfo(db, 'images'),
-    dbReadNumericInfo(db, 'current_chapter_milestone', AppConstants.CHAPTER_GOAL_START),
+    dbReadNumericInfo(db, 'current_chapter_milestone', AppConstants.CHAPTER.GOAL_START),
     dbReadChaptersCount(db)
   ]).then(([
     device,
@@ -1966,8 +1965,29 @@ export async function dbReadDocuments(
   db: SQLite.SQLiteDatabase,
   parent_document_path: string | null = null,
   p_offset: number = 0,
-  p_limit: number = AppConstants.PAGE_LIMIT
+  p_limit: number = AppConstants.VALIDATION.PAGE_LIMIT
 ) {
+  if (parent_document_path === null) {
+    const r = await db.getAllAsync<Document>(
+      `
+        SELECT 
+          * 
+        FROM 
+          documents 
+        WHERE 
+          parent_document_path IS NULL
+        ORDER BY 
+          updated_at 
+        DESC 
+          LIMIT ? 
+          OFFSET ?;
+        `,
+      [p_limit, p_offset]
+    ).catch(error => console.log("error dbReadDocuments", error))
+  
+    return r ?? []  
+  }
+
   const r = await db.getAllAsync<Document>(
     `
       SELECT 
@@ -1984,8 +2004,8 @@ export async function dbReadDocuments(
       `,
     [parent_document_path, p_limit, p_offset]
   ).catch(error => console.log("error dbReadDocuments", error))
-
-  return r ?? []  
+  
+  return r ?? []
 }
 
 
@@ -1993,7 +2013,7 @@ export async function dbReadSubDocuments(
   db: SQLite.SQLiteDatabase, 
   parent_document_path: string,
   p_offset: number = 0,
-  p_limit: number = AppConstants.PAGE_LIMIT
+  p_limit: number = AppConstants.VALIDATION.PAGE_LIMIT
 ): Promise<Document[]> {
   const r = await db.getAllAsync<Document>(
     `
@@ -2123,7 +2143,7 @@ export async function dbCreateChapterDocument(
   chapterNum: number
 ): Promise<Document | null> {
   const chapterName = 'Chapter ' + chapterNum.toString()
-  const d = await dbCreateDocument(db, pornhwaName, null, AppConstants.PORNHWAS_DOCUMENT_PATH)
+  const d = await dbCreateDocument(db, pornhwaName, null, AppConstants.PATHS.PORNHWAS_DOCUMENT)
   if (d) { return await dbCreateDocument(db, chapterName, '', d.path) }
   return null
 }

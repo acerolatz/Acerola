@@ -25,12 +25,12 @@ const ChapterPageSelector = ({
   numChapters
 }: ChapterPageSelectorProps) => {
   return (
-    <Row style={{width: '100%', gap: AppConstants.MARGIN}} >
+    <Row style={styles.container} >
       <View style={{...AppStyle.button, backgroundColor, flex: 1}} >
-          <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Chapters: {numChapters}</Text>
+          <Text style={Typography.regularBlack} >Chapters: {numChapters}</Text>
       </View>
 
-      <Row style={{gap: AppConstants.MARGIN, flex: 1}} >
+      <Row style={{gap: AppConstants.UI.MARGIN, flex: 1}} >
         <CButton 
           style={{...AppStyle.button, backgroundColor}}
           iconColor={Colors.backgroundColor}
@@ -38,7 +38,7 @@ const ChapterPageSelector = ({
           onPress={moveToPreviousChapterPage}
         />
         <View style={{...styles.numberContainer, borderColor: backgroundColor}}>
-          <Text style={{...Typography.regular, color: backgroundColor}}>{currentPage + 1}</Text>
+          <Text style={Typography.regularBlack}>{currentPage + 1}</Text>
         </View>
         <CButton 
           style={{...AppStyle.button, backgroundColor}}
@@ -55,9 +55,13 @@ const ChapterPageSelector = ({
 export default ChapterPageSelector
 
 const styles = StyleSheet.create({
-    numberContainer: {
-        ...AppStyle.button,
-        borderWidth: 1,    
-        backgroundColor: 'transparent'
-    }
+  container: {
+    width: '100%', 
+    gap: AppConstants.UI.MARGIN
+  },
+  numberContainer: {
+      ...AppStyle.button,
+      borderWidth: 1,    
+      backgroundColor: 'transparent'
+  }
 })

@@ -64,7 +64,7 @@ const CreateDocumentForm = ({onPress}: CreateDocumentFormProps) => {
     };
 
     return (
-        <View style={{flex: 1, gap: AppConstants.GAP}} >
+        <View style={styles.container} >
 
             {/* Name */}
             <Text style={Typography.semibold}>Name</Text>
@@ -119,6 +119,10 @@ export default CreateDocumentForm
 
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1, 
+        gap: AppConstants.UI.GAP
+    },
     input: {
         ...AppStyle.input,
         backgroundColor: Colors.backgroundColor

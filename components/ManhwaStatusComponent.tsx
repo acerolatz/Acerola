@@ -30,6 +30,6 @@ const styles = StyleSheet.create({
         top: 6,
         paddingHorizontal: 4,
         paddingVertical: 4,
-        borderRadius: AppConstants.BORDER_RADIUS
+        borderRadius: AppConstants.UI.BORDER_RADIUS
     }
 })

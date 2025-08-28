@@ -26,12 +26,12 @@ const Item = ({manhwa_id, image_url} : ItemProps) => {
     }, [manhwa_id]);
 
     return (
-        <Pressable onPress={onPress} style={{marginRight: AppConstants.MARGIN}} >
+        <Pressable onPress={onPress} style={{marginRight: AppConstants.UI.MARGIN}} >
             <Image 
                 style={styles.image} 
                 source={image_url} 
                 contentFit='cover' 
-                transition={AppConstants.DEFAULT_IMAGE_TRANSITION} />
+                transition={AppConstants.UI.ANIMATION_TIME} />
         </Pressable>
     )   
 }
@@ -73,11 +73,11 @@ export default ContinueReadingGrid
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        gap: AppConstants.GAP
+        gap: AppConstants.UI.GAP
     },
     image: {
         width: wp(18),
         height: hp(14),
-        borderRadius: AppConstants.BORDER_RADIUS
+        borderRadius: AppConstants.UI.BORDER_RADIUS
     }
 })

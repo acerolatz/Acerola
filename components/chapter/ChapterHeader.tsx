@@ -12,7 +12,14 @@ import Column from '../util/Column'
 import { Image } from 'expo-image'
 import TopBar from '../TopBar'
 import Row from '../util/Row'
-import React from 'react'
+import React, { useState } from 'react'
+import Button from '../buttons/Button'
+import { dbCreateChapterDocument } from '@/lib/database'
+import { useSQLiteContext } from 'expo-sqlite'
+import { downloadImages } from '@/helpers/storage'
+import { spFetchChapterImages } from '@/lib/supabase'
+import { DownloadProgress } from '@/helpers/types'
+import Toast from 'react-native-toast-message'
 
 
 interface ChapterHeaderProps {
@@ -28,7 +35,11 @@ const ChapterHeader = ({
   reloadChapter  
 }: ChapterHeaderProps) => {
 
+  const db = useSQLiteContext()
+
   const { chapters, currentChapterIndex, setCurrentChapterIndex } =  useChapterState()  
+  const [isDownloading, setIsDownloading] = useState(false)
+  const [downloadProgress, setDownloadProgress] = useState(0)
   const chapterName = currentChapterIndex < chapters.length ? chapters[currentChapterIndex].chapter_name : ''
   const reportTitle = `${mangaTitle}/${chapterName}`
 
@@ -54,38 +65,69 @@ const ChapterHeader = ({
     }
   }
 
+  const downloadChapter = async () => {
+    const currentChapter = chapters[currentChapterIndex]
+    const d = await dbCreateChapterDocument(db, mangaTitle, currentChapter.chapter_num)
+    
+    const onProgress = (progress: DownloadProgress) => {
+      setDownloadProgress(progress.percentage)
+    }
+
+    if (d) {
+      const imgs = await spFetchChapterImages(currentChapter.chapter_id)
+      setIsDownloading(true)
+        Toast.show({text1: "Downloading", type: "info"})
+        await downloadImages(imgs.map(i => i.image_url), d.path, 8, onProgress)
+        Toast.show({
+          text1: "Download Completed!", 
+          text2: `Document: Pornhwas/${mangaTitle}/chapter_${currentChapter.chapter_num}`, 
+          type: "info"
+        })
+      setIsDownloading(false)
+    }
+
+  }
+
   return (
     <Column style={styles.container} >
       <TopBar title={mangaTitle} titleColor={'white'} >
         <ReturnButton onPress={exitChapter} color={'white'}/>
       </TopBar>
+
       <Row style={{justifyContent: "space-between"}} >
-        <Row style={{gap: AppConstants.ICON.SIZE}} >
+        
+        <Row style={{gap: AppConstants.UI.ICON.SIZE}} >
           <BugReportButton title={reportTitle} />
-          <RotatingButton onPress={reloadChapter} />
+          <RotatingButton onPress={reloadChapter} />]
+          {
+            isDownloading ?
+            <View style={{alignItems: "center", justifyContent: "center"}} >
+              <Text style={Typography.regular} >{downloadProgress}%</Text>
+            </View>
+            :
+            <Button onPress={downloadChapter} iconName='download-outline' iconColor={Colors.white} />
+          }
         </Row>
-        <Row style={{gap: AppConstants.GAP, justifyContent: "flex-start"}} >
+
+        <Row style={styles.chapterSelector} >
           <Text style={Typography.regular}>Chapter</Text>
           {
             !isFirstChapter &&
-            <Pressable onPress={goToPreviousChapter} style={{marginTop: 2}} hitSlop={AppConstants.HIT_SLOP.NORMAL} >
-              <Ionicons name='chevron-back' size={AppConstants.ICON.SIZE} color={Colors.white} />
-            </Pressable>
+            <Button iconName='chevron-back' onPress={goToPreviousChapter} iconColor={Colors.white} />
           }
-          <View style={{alignItems: "center", justifyContent: "center"}} >
+          <View style={styles.chapterNum} >
             {
               loading ?
-              <ActivityIndicator size={AppConstants.ICON.SIZE} color={Colors.white} /> :
+              <ActivityIndicator size={AppConstants.UI.ICON.SIZE} color={Colors.white} /> :
               <Text style={Typography.regular}>{chapterName}</Text>
             }
           </View>
           {
             !isLastChapter &&
-            <Pressable onPress={goToNextChapter} style={{marginTop: 2}}  hitSlop={AppConstants.HIT_SLOP.NORMAL}>
-              <Ionicons name='chevron-forward' size={AppConstants.ICON.SIZE} color={Colors.white} />
-            </Pressable>
+            <Button iconName='chevron-forward' onPress={goToNextChapter} iconColor={Colors.white} />
           }
         </Row>
+
       </Row>
     </Column>
   )
@@ -96,9 +138,17 @@ export default ChapterHeader
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    gap: AppConstants.GAP,
-    paddingHorizontal: AppConstants.SCREEN.PADDING_HORIZONTAL, 
-    paddingTop: AppConstants.SCREEN.PADDING_VERTICAL,
-    marginBottom: AppConstants.GAP * 2
-  }  
+    gap: AppConstants.UI.GAP,
+    paddingHorizontal: AppConstants.UI.SCREEN.PADDING_HORIZONTAL, 
+    paddingTop: AppConstants.UI.SCREEN.PADDING_VERTICAL,
+    marginBottom: AppConstants.UI.GAP * 2
+  },
+  chapterSelector: {
+    gap: AppConstants.UI.GAP, 
+    justifyContent: "flex-start"
+  },
+  chapterNum: {
+    alignItems: "center", 
+    justifyContent: "center"
+  }
 })

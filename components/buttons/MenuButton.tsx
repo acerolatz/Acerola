@@ -18,8 +18,8 @@ const MenuButton = ({onPress, title, iconName}: MenuButtonProps) => {
         <Pressable
             onPress={onPress}
             style={styles.container} 
-            hitSlop={AppConstants.HIT_SLOP.LARGE} >
-            <Ionicons name={iconName as any} size={AppConstants.ICON.SIZE} color={Colors.primary} />
+            hitSlop={AppConstants.UI.HIT_SLOP.LARGE} >
+            <Ionicons name={iconName as any} size={AppConstants.UI.ICON.SIZE} color={Colors.primary} />
             <Text style={Typography.regular}>{title}</Text>
         </Pressable>
     )
@@ -30,7 +30,7 @@ export default MenuButton
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        gap: AppConstants.GAP,
+        gap: AppConstants.UI.GAP,
         flexDirection: 'row',
         alignItems: "center",
         justifyContent: "flex-start"

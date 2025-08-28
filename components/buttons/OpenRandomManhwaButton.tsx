@@ -19,7 +19,7 @@ interface RandomManhwaButtonProps {
 
 
 const RandomManhwaButton = ({
-    size = AppConstants.ICON.SIZE, 
+    size = AppConstants.UI.ICON.SIZE, 
     color = Colors.white
 }: RandomManhwaButtonProps) => {
         
@@ -50,7 +50,7 @@ const RandomManhwaButton = ({
     }
 
     return (        
-        <Pressable onPress={debounceSearch} hitSlop={AppConstants.HIT_SLOP.NORMAL}>
+        <Pressable onPress={debounceSearch} hitSlop={AppConstants.UI.HIT_SLOP.NORMAL}>
             <Ionicons name='dice-outline' size={size} color={color}/>
         </Pressable>        
     )

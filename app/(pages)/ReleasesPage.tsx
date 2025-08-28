@@ -52,7 +52,7 @@ const Releases = () => {
         :
         <View style={styles.container}>
             {/* Source Code Section */}
-            <View style={{gap: AppConstants.GAP}}>
+            <View style={{gap: AppConstants.UI.GAP}}>
                 <Text style={Typography.semibold}>Source Code</Text>
                 <FlatList
                   data={releasesInfo.source}
@@ -87,10 +87,10 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     flex: 1,
-    gap: AppConstants.GAP,
+    gap: AppConstants.UI.GAP,
   },
   section: {
     flex: 1,
-    gap: AppConstants.GAP,
+    gap: AppConstants.UI.GAP,
   },
 });

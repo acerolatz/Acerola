@@ -48,16 +48,16 @@ export default UserDataComponent
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        gap: AppConstants.GAP,
-        paddingTop: AppConstants.GAP,
+        gap: AppConstants.UI.GAP,
+        paddingTop: AppConstants.UI.GAP,
         alignItems: "center"
     },
     item: {
         width: '100%',
-        height: AppConstants.BUTTON.SIZE,
+        height: AppConstants.UI.BUTTON.SIZE,
         alignItems: "center",
         justifyContent: "center",
-        borderRadius: AppConstants.BORDER_RADIUS,
+        borderRadius: AppConstants.UI.BORDER_RADIUS,
         backgroundColor: Colors.primary
     },
     text: {

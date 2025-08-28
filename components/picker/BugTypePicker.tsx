@@ -27,7 +27,7 @@ const BugTypePicker = ({value, onChange}: {value: BugType, onChange: (b: BugType
     return (
         <View style={styles.container} >
             <FlatList
-                data={AppConstants.BUG_TYPE_LIST as BugType[]}
+                data={AppConstants.LISTS.BUG_TYPE as BugType[]}
                 horizontal={true}
                 keyExtractor={(item) => item}
                 showsHorizontalScrollIndicator={false}

@@ -32,11 +32,11 @@ const ManhwaSearch = () => {
   useEffect(() => {
     isMounted.current = true
     const init = async () => {
-      const m = await dbSearchManhwas(db, searchTerm.current, 0, AppConstants.PAGE_LIMIT)
+      const m = await dbSearchManhwas(db, searchTerm.current, 0, AppConstants.VALIDATION.PAGE_LIMIT)
       if (!isMounted.current) { return }
       setManhwas(m)
       manhwasRef.current = m
-      hasResults.current = m.length >= AppConstants.PAGE_LIMIT
+      hasResults.current = m.length >= AppConstants.VALIDATION.PAGE_LIMIT
     }
     init()
     return () => { isMounted.current = false }
@@ -50,12 +50,12 @@ const ManhwaSearch = () => {
       db, 
       searchTerm.current, 
       0, 
-      AppConstants.PAGE_LIMIT
+      AppConstants.VALIDATION.PAGE_LIMIT
     )
     if (isMounted.current) {
       manhwasRef.current = m
       setManhwas([...manhwasRef.current])
-      hasResults.current = m.length >= AppConstants.PAGE_LIMIT
+      hasResults.current = m.length >= AppConstants.VALIDATION.PAGE_LIMIT
       flatListRef.current?.scrollToIndex({animated: false, index: 0})
     }
   }, [db])
@@ -69,13 +69,13 @@ const ManhwaSearch = () => {
     const m: Manhwa[] = await dbSearchManhwas(
       db, 
       searchTerm.current, 
-      page.current * AppConstants.PAGE_LIMIT, 
-      AppConstants.PAGE_LIMIT
+      page.current * AppConstants.VALIDATION.PAGE_LIMIT, 
+      AppConstants.VALIDATION.PAGE_LIMIT
     )
     if (isMounted.current && m.length) {
       manhwasRef.current.push(...m)
       setManhwas([...manhwasRef.current])
-      hasResults.current = m.length >= AppConstants.PAGE_LIMIT
+      hasResults.current = m.length >= AppConstants.VALIDATION.PAGE_LIMIT
     }
     fetching.current = false
   }, [db])
@@ -84,9 +84,9 @@ const ManhwaSearch = () => {
 
   const renderItem = useCallback(({item}: {item: Manhwa}) => (
     <ManhwaCard      
-      width={AppConstants.MANHWA_COVER.WIDTH} 
-      height={AppConstants.MANHWA_COVER.HEIGHT}
-      marginBottom={AppConstants.GAP / 2}
+      width={AppConstants.MEDIA.MANHWA_COVER.WIDTH} 
+      height={AppConstants.MEDIA.MANHWA_COVER.HEIGHT}
+      marginBottom={AppConstants.UI.GAP / 2}
       manhwa={item}      
     />
   ), [])
@@ -121,12 +121,12 @@ export default ManhwaSearch
 const styles = StyleSheet.create({
   container: {
     flex: 1, 
-    gap: AppConstants.GAP
+    gap: AppConstants.UI.GAP
   },
   footer: {
     width: '100%', 
     marginBottom: 62, 
-    marginTop: AppConstants.GAP, 
+    marginTop: AppConstants.UI.GAP, 
     alignItems: "center", 
     justifyContent: "center"
   }

@@ -19,13 +19,13 @@ const ReleaseButton = React.memo(({ release }: ReleaseButtonProps) => {
         await openUrl(release.url)
     }, [release.url])
     
-    const border = release.descr !== null ? 0 : AppConstants.BORDER_RADIUS
+    const border = release.descr !== null ? 0 : AppConstants.UI.BORDER_RADIUS
     
     return (
         <Pressable onPress={onPress} style={styles.itemContainer}>
             <View style={{...styles.itemTitleContainer, borderBottomLeftRadius: border, borderBottomRightRadius: border}}>
                 <Text style={[Typography.regular, { color: Colors.backgroundColor }]}>{release.version}</Text>
-                <Ionicons name='download-outline' size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />
+                <Ionicons name='download-outline' size={AppConstants.UI.ICON.SIZE} color={Colors.backgroundColor} />
             </View>
             {
                 release.descr &&
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         padding: 10, 
         backgroundColor: Colors.primary, 
-        borderRadius: AppConstants.BORDER_RADIUS, 
+        borderRadius: AppConstants.UI.BORDER_RADIUS, 
         borderBottomLeftRadius: 0, 
         borderBottomRightRadius: 0
     },
@@ -63,6 +63,6 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 0, 
         borderTopRightRadius: 0, 
         borderColor: Colors.primary, 
-        borderRadius: AppConstants.BORDER_RADIUS
+        borderRadius: AppConstants.UI.BORDER_RADIUS
     }
 })

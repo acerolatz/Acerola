@@ -5,8 +5,7 @@ import {
     ChapterImage, 
     Collection, 
     DebugManhwaImages, 
-    DonateMethod,    
-    Genre,    
+    DonateMethod,
     Manhwa, 
     ManhwaCard, 
     Post, 
@@ -172,7 +171,7 @@ export async function spFetchChapterImages(chapter_id: number): Promise<ChapterI
     }    
     
     return data.map(i => {
-        const width = Math.min(i.width, AppConstants.SCREEN.WIDTH)
+        const width = Math.min(i.width, AppConstants.UI.SCREEN.WIDTH)
         const height = PixelRatio.roundToNearestPixel((width * i.height) / i.width)
         return { image_url: i.image_url, width, height}
     })
@@ -232,14 +231,14 @@ function normalizeRandomManhwaCardHeight(width: number, height: number): {
   normalizedWidth: number, 
   normalizedHeight: number
 } {
-  const normalizedHeight = height > AppConstants.RANDOM_MANHWAS.MAX_HEIGHT ? 
-    AppConstants.RANDOM_MANHWAS.MAX_HEIGHT :
+  const normalizedHeight = height > AppConstants.MEDIA.RANDOM_MANHWAS.MAX_HEIGHT ? 
+    AppConstants.MEDIA.RANDOM_MANHWAS.MAX_HEIGHT :
     height
   
   let normalizedWidth = (normalizedHeight * width) / height
 
-  normalizedWidth = normalizedWidth > AppConstants.RANDOM_MANHWAS.MAX_WIDTH ?
-    AppConstants.RANDOM_MANHWAS.MAX_WIDTH : 
+  normalizedWidth = normalizedWidth > AppConstants.MEDIA.RANDOM_MANHWAS.MAX_WIDTH ?
+    AppConstants.MEDIA.RANDOM_MANHWAS.MAX_WIDTH : 
     normalizedWidth
   return { normalizedWidth, normalizedHeight}
 }

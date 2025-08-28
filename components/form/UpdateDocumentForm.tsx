@@ -76,7 +76,7 @@ const UpdateDocumentForm = ({name, descr, onPress}: UpdateDocumentFormProps) => 
     };
 
     return (
-        <View style={{flex: 1, gap: AppConstants.GAP}} >
+        <View style={{flex: 1, gap: AppConstants.UI.GAP}} >
 
             {/* Name */}
             <Text style={Typography.semibold}>Name</Text>

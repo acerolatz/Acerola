@@ -25,11 +25,11 @@ const ReadingHistory = () => {
   useEffect(() => {
     isMounted.current = true
     const init = async () => {
-      const m = await dbGetManhwaReadingHistory(db, 0, AppConstants.PAGE_LIMIT)        
+      const m = await dbGetManhwaReadingHistory(db, 0, AppConstants.VALIDATION.PAGE_LIMIT)        
       if (!isMounted.current) { return }
       setManhwas(m)
       manhwasRef.current = m
-      hasResults.current = m.length >= AppConstants.PAGE_LIMIT
+      hasResults.current = m.length >= AppConstants.VALIDATION.PAGE_LIMIT
     }
     init()
     return () => { isMounted.current = false }
@@ -41,13 +41,13 @@ const ReadingHistory = () => {
     page.current += 1    
     const m = await dbGetManhwaReadingHistory(
       db, 
-      page.current * AppConstants.PAGE_LIMIT, 
-      AppConstants.PAGE_LIMIT
+      page.current * AppConstants.VALIDATION.PAGE_LIMIT, 
+      AppConstants.VALIDATION.PAGE_LIMIT
     )
     if (isMounted.current && m.length) {
       manhwasRef.current.push(...m)
       setManhwas([...manhwasRef.current])
-      hasResults.current = m.length >= AppConstants.PAGE_LIMIT
+      hasResults.current = m.length >= AppConstants.VALIDATION.PAGE_LIMIT
     }
     fetching.current = true
   }

@@ -44,7 +44,7 @@ const Library = () => {
         <TopBar title='Library'>
           <ReturnButton/>
         </TopBar>
-        <View style={{flex: 1, gap: AppConstants.GAP}} >
+        <View style={{flex: 1, gap: AppConstants.UI.GAP}} >
           <ReadingStatusPicker onChangeValue={onChangeValue} isActive={!loading}/>
           <ManhwaGrid manhwas={manhwas} showManhwaStatus={false} />
         </View>

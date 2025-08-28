@@ -30,7 +30,7 @@ const SourceCodeButton = ({item}: {item: SourceCodeLink}) => {
     if (loading) {
         return (
             <View style={styles.container} >
-                <Ionicons name={iconName as any} size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />
+                <Ionicons name={iconName as any} size={AppConstants.UI.ICON.SIZE} color={Colors.backgroundColor} />
                 <Text style={{...Typography.regular, color: Colors.backgroundColor}}>{item.name}</Text>
             </View>
         )
@@ -38,7 +38,7 @@ const SourceCodeButton = ({item}: {item: SourceCodeLink}) => {
 
     return (
         <Pressable onPress={onPress} style={styles.container} >
-            <Ionicons name={iconName as any} size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />
+            <Ionicons name={iconName as any} size={AppConstants.UI.ICON.SIZE} color={Colors.backgroundColor} />
             <Text style={{...Typography.regular, color: Colors.backgroundColor}}>{item.name}</Text>
         </Pressable>
     )
@@ -49,7 +49,7 @@ export default SourceCodeButton
 const styles = StyleSheet.create({
     container: {
         ...AppStyle.defaultGridItem,
-        gap: AppConstants.GAP,
+        gap: AppConstants.UI.GAP,
         flexDirection: 'row'
     }    
 })

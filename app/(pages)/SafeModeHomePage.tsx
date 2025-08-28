@@ -126,7 +126,7 @@ const SafeModeHomePage = () => {
                     <TopBar title='Settings'>
                         <CloseBtn onPress={handleCloseBottomSheet}/>
                     </TopBar>
-                    <View style={{flex: 1, gap: AppConstants.GAP}} >
+                    <View style={{flex: 1, gap: AppConstants.UI.GAP}} >
                         <Text style={{...Typography.light, color: Colors.red}}>A password is required to access the settings.</Text>
                         <View>
                             <TextInput
@@ -140,12 +140,12 @@ const SafeModeHomePage = () => {
                             />
                             <Pressable
                                 onPress={handleShowPassword}
-                                hitSlop={AppConstants.HIT_SLOP.NORMAL}
+                                hitSlop={AppConstants.UI.HIT_SLOP.NORMAL}
                                 style={AppStyle.iconCenter}>
-                                <Ionicons name={passwordIcon} size={AppConstants.ICON.SIZE} color={Colors.primary} />
+                                <Ionicons name={passwordIcon} size={AppConstants.UI.ICON.SIZE} color={Colors.primary} />
                             </Pressable>
                         </View>
-                        <Row style={{gap: AppConstants.MARGIN}} >
+                        <Row style={{gap: AppConstants.UI.MARGIN}} >
                             <Pressable onPress={handleCloseBottomSheet} style={AppStyle.buttonCancel} >
                                 <Text style={{...Typography.regular, color: Colors.primary}} >Cancel</Text>
                             </Pressable>
@@ -167,12 +167,12 @@ export default SafeModeHomePage
 const styles = StyleSheet.create({    
     bottomSheetContainer: {
         paddingTop: 10,
-        paddingHorizontal: AppConstants.SCREEN.PADDING_HORIZONTAL
+        paddingHorizontal: AppConstants.UI.SCREEN.PADDING_HORIZONTAL
     },
     handleStyle: {
         backgroundColor: Colors.backgroundSecondary, 
-        borderTopLeftRadius: AppConstants.BOTTOMSHEET_HANDLE_RADIUS, 
-        borderTopRightRadius: AppConstants.BOTTOMSHEET_HANDLE_RADIUS
+        borderTopLeftRadius: AppConstants.UI.BOTTOMSHEET_HANDLE_RADIUS, 
+        borderTopRightRadius: AppConstants.UI.BOTTOMSHEET_HANDLE_RADIUS
     },
     handleIndicatorStyle: {
         backgroundColor: Colors.primary
@@ -183,6 +183,6 @@ const styles = StyleSheet.create({
     passwordInput: {
         ...AppStyle.input, 
         backgroundColor: Colors.backgroundColor, 
-        paddingRight: AppConstants.ICON.SIZE * 2
+        paddingRight: AppConstants.UI.ICON.SIZE * 2
     }    
 })

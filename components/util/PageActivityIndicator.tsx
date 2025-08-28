@@ -1,7 +1,7 @@
+import CustomActivityIndicator from './CustomActivityIndicator'
+import { StyleSheet, View } from 'react-native'
 import { Colors } from '@/constants/Colors'
 import React from 'react'
-import { StyleSheet, View } from 'react-native'
-import CustomActivityIndicator from './CustomActivityIndicator'
 
 
 const PageActivityIndicator = ({color = Colors.primary}: {color?: string}) => {
@@ -12,7 +12,9 @@ const PageActivityIndicator = ({color = Colors.primary}: {color?: string}) => {
   )
 }
 
+
 export default PageActivityIndicator
+
 
 const styles = StyleSheet.create({
     container: {

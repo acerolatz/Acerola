@@ -21,7 +21,7 @@ import { useSQLiteContext } from 'expo-sqlite'
 
 
 const NUM_COLUMNS = 2
-const ITEM_WIDTH = (wp(92) - AppConstants.MARGIN * (NUM_COLUMNS - 1)) / NUM_COLUMNS
+const ITEM_WIDTH = (wp(92) - AppConstants.UI.MARGIN * (NUM_COLUMNS - 1)) / NUM_COLUMNS
 const ITEM_HEIGHT = hp(8)
 
 
@@ -40,7 +40,7 @@ const Item = ({item, index}: {item: Genre, index: number}) => {
     return (
         <Pressable
             onPress={onPress}
-            style={[styles.item, {marginRight: index % 2 == 0 ? AppConstants.MARGIN : 0}]} >
+            style={[styles.item, {marginRight: index % 2 == 0 ? AppConstants.UI.MARGIN : 0}]} >
             <Text style={styles.itemText} >{item.genre}</Text>
         </Pressable>
     )
@@ -98,8 +98,8 @@ const styles = StyleSheet.create({
         alignItems: "center", 
         justifyContent: "center",         
         backgroundColor: Colors.primary, 
-        borderRadius: AppConstants.BORDER_RADIUS,
-        marginBottom: AppConstants.MARGIN
+        borderRadius: AppConstants.UI.BORDER_RADIUS,
+        marginBottom: AppConstants.UI.MARGIN
     },
     itemText: {
         ...Typography.regular, 

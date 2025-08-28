@@ -49,9 +49,9 @@ const TodoComponent = ({todo, setTodos}: TodoComponentProps) => {
         <Pressable onPress={clickCheckbox} style={styles.todoItem} >
             <Row style={{...styles.todoItemTop, backgroundColor}} >
                 <Text style={{...Typography.regularLg, color: Colors.backgroundColor, flexShrink: 1}}>{todo.title}</Text>
-                <Row style={{gap: AppConstants.GAP * 1.5}} >
+                <Row style={{gap: AppConstants.UI.GAP * 1.5}} >
                     <View style={styles.checkBox} >
-                        <Ionicons name='checkmark' size={AppConstants.ICON.SIZE} color={checkmarkBackgroundColor} />
+                        <Ionicons name='checkmark' size={AppConstants.UI.ICON.SIZE} color={checkmarkBackgroundColor} />
                     </View>
                 </Row>
             </Row>            
@@ -64,8 +64,8 @@ const TodoComponent = ({todo, setTodos}: TodoComponentProps) => {
                     </Column>
                     {
                         isCompleted &&
-                        <Pressable onPress={deleteTodo} hitSlop={AppConstants.HIT_SLOP.NORMAL} >
-                            <Ionicons name='trash' size={AppConstants.ICON.SIZE} color={Colors.red} />
+                        <Pressable onPress={deleteTodo} hitSlop={AppConstants.UI.HIT_SLOP.NORMAL} >
+                            <Ionicons name='trash' size={AppConstants.UI.ICON.SIZE} color={Colors.red} />
                         </Pressable>
                     }
                 </Row>
@@ -79,31 +79,31 @@ export default TodoComponent
 const styles = StyleSheet.create({
     todoItem: {
         width: '100%',
-        marginBottom: AppConstants.GAP
+        marginBottom: AppConstants.UI.GAP
     },
     checkBox: {
         backgroundColor: Colors.backgroundColor, 
-        borderRadius: AppConstants.ICON.SIZE, 
+        borderRadius: AppConstants.UI.ICON.SIZE, 
         alignItems: "center", 
         justifyContent: "center", 
         padding: wp(1)
     },
     todoItemTop: {
         width: '100%', 
-        borderTopRightRadius: AppConstants.BORDER_RADIUS, 
-        borderTopLeftRadius: AppConstants.BORDER_RADIUS, 
-        paddingHorizontal: AppConstants.ITEM_PADDING_HORIZONTAL,
-        paddingVertical: AppConstants.ITEM_PADDING_VERTICAL,
-        gap: AppConstants.GAP,
+        borderTopRightRadius: AppConstants.UI.BORDER_RADIUS, 
+        borderTopLeftRadius: AppConstants.UI.BORDER_RADIUS, 
+        paddingHorizontal: AppConstants.UI.ITEM_PADDING.HORIZONTAL,
+        paddingVertical: AppConstants.UI.ITEM_PADDING.VERTICAL,
+        gap: AppConstants.UI.GAP,
         justifyContent: "space-between"
     },
     todoItemBottom: {
         paddingHorizontal: 10, 
         paddingVertical: 8, 
         borderWidth: 1, 
-        gap: AppConstants.GAP,
+        gap: AppConstants.UI.GAP,
         borderTopWidth: 0,
-        borderBottomLeftRadius: AppConstants.BORDER_RADIUS, 
-        borderBottomRightRadius: AppConstants.BORDER_RADIUS
+        borderBottomLeftRadius: AppConstants.UI.BORDER_RADIUS, 
+        borderBottomRightRadius: AppConstants.UI.BORDER_RADIUS
     }
 })

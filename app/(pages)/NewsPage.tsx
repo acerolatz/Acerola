@@ -43,14 +43,14 @@ const Item = memo(({ item }: ItemProps) => {
                 <Row style={{ justifyContent: 'space-between', marginTop: 10 }}>
                     <Text style={Typography.light}>{formatTimestamp(item.created_at)}</Text>
                     {item.message.length > TEXT_LENGTH_LIMIT && (
-                        <Pressable onPress={toggleExpand} hitSlop={AppConstants.HIT_SLOP.LARGE}>
+                        <Pressable onPress={toggleExpand} hitSlop={AppConstants.UI.HIT_SLOP.LARGE}>
                             <Row style={{ gap: 4 }}>
                                 <Text style={Typography.light}>{expandText ? 'Collapse' : 'Expand'}</Text>
                                 <Ionicons
                                     name={expandText ? 'chevron-back' : 'chevron-forward'}
                                     color={Colors.white}
                                     style={{ marginTop: 3 }}
-                                    size={AppConstants.ICON.SIZE}
+                                    size={AppConstants.UI.ICON.SIZE}
                                 />
                             </Row>
                         </Pressable>
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     itemTitleContainer: {
         padding: 10, 
         backgroundColor: Colors.primary, 
-        borderRadius: AppConstants.BORDER_RADIUS, 
+        borderRadius: AppConstants.UI.BORDER_RADIUS, 
         borderBottomLeftRadius: 0, 
         borderBottomRightRadius: 0
     },
@@ -148,6 +148,6 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 0, 
         borderTopRightRadius: 0, 
         borderColor: Colors.primary, 
-        borderRadius: AppConstants.BORDER_RADIUS
+        borderRadius: AppConstants.UI.BORDER_RADIUS
     }
 })

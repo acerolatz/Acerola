@@ -96,10 +96,10 @@ const RootLayout = () => {
           <Stack.Screen name='(pages)/DebugPage' options={{headerShown: false}} />
         </Stack>
         <Toast
-          position={AppConstants.TOAST.POSITION as any}
+          position={AppConstants.UI.TOAST.POSITION as any}
           config={TOAST_CONFIG as any} 
-          bottomOffset={AppConstants.TOAST.BOTTOM_OFFSET} 
-          visibilityTime={AppConstants.TOAST.VISIBILITY_TIME}
+          bottomOffset={AppConstants.UI.TOAST.BOTTOM_OFFSET} 
+          visibilityTime={AppConstants.UI.TOAST.VISIBILITY_TIME}
           avoidKeyboard={true}
           swipeable={true}/>
       </GestureHandlerRootView>
@@ -112,14 +112,14 @@ export default RootLayout
 
 const styles = StyleSheet.create({
   toast: {
-    width: AppConstants.TOAST.WIDTH,
-    height: AppConstants.TOAST.HEIGHT,
+    width: AppConstants.UI.TOAST.WIDTH,
+    height: AppConstants.UI.TOAST.HEIGHT,
     maxWidth: 500,
     alignItems: "flex-start",
     justifyContent: "center",
     paddingLeft: 12,
     paddingRight: 4,
-    borderRadius: AppConstants.BORDER_RADIUS,
+    borderRadius: AppConstants.UI.BORDER_RADIUS,
     backgroundColor: Colors.backgroundSecondary
   },
   leftBar: {
@@ -128,8 +128,8 @@ const styles = StyleSheet.create({
     top: 0, 
     width: 6,
     height: '100%', 
-    borderTopLeftRadius: AppConstants.BORDER_RADIUS, 
-    borderBottomLeftRadius: AppConstants.BORDER_RADIUS
+    borderTopLeftRadius: AppConstants.UI.BORDER_RADIUS, 
+    borderBottomLeftRadius: AppConstants.UI.BORDER_RADIUS
   }
 })
 

@@ -1,4 +1,4 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { AppConstants } from '@/constants/AppConstants'
 import { useChapterState } from '@/store/chapterState'
 import { Typography } from '@/constants/typography'
@@ -58,12 +58,12 @@ const ChapterFooter = ({
     <Column style={styles.container} >
       {
         !loading &&
-        <Row style={{gap: AppConstants.GAP}} >
+        <Row style={{gap: AppConstants.UI.GAP}} >
           <Text style={Typography.regular}>Chapter</Text>
           {
             !isFirstChapter &&
-            <Pressable onPress={goToPreviousChapter} style={{marginTop: 2}} hitSlop={AppConstants.HIT_SLOP.NORMAL} >
-              <Ionicons name='chevron-back' size={AppConstants.ICON.SIZE} color={Colors.white} />
+            <Pressable onPress={goToPreviousChapter} style={{marginTop: 2}} hitSlop={AppConstants.UI.HIT_SLOP.NORMAL} >
+              <Ionicons name='chevron-back' size={AppConstants.UI.ICON.SIZE} color={Colors.white} />
             </Pressable>
           }
           <View style={{alignItems: "center", justifyContent: "center"}} >
@@ -71,8 +71,8 @@ const ChapterFooter = ({
           </View>
           {
             !isLastChapter &&
-            <Pressable onPress={goToNextChapter} style={{marginTop: 2}}  hitSlop={AppConstants.HIT_SLOP.NORMAL}>
-              <Ionicons name='chevron-forward' size={AppConstants.ICON.SIZE} color={Colors.white} />
+            <Pressable onPress={goToNextChapter} style={{marginTop: 2}}  hitSlop={AppConstants.UI.HIT_SLOP.NORMAL}>
+              <Ionicons name='chevron-forward' size={AppConstants.UI.ICON.SIZE} color={Colors.white} />
             </Pressable>
           }
         </Row>
@@ -81,7 +81,7 @@ const ChapterFooter = ({
         <Text style={styles.text}>
           If you encounter broken or missing images, please use the bug-report option.
         </Text>
-        <Ionicons name='bug-outline' color={Colors.white} size={AppConstants.ICON.SIZE}/>
+        <Ionicons name='bug-outline' color={Colors.white} size={AppConstants.UI.ICON.SIZE}/>
       </Pressable>
       <Footer height={120} />
     </Column>
@@ -95,18 +95,18 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: "center",
     justifyContent: "center",
-    marginTop: AppConstants.GAP * 2,
-    gap: AppConstants.GAP * 2,
-    paddingHorizontal: AppConstants.SCREEN.PADDING_HORIZONTAL
+    marginTop: AppConstants.UI.GAP * 2,
+    gap: AppConstants.UI.GAP * 2,
+    paddingHorizontal: AppConstants.UI.SCREEN.PADDING_HORIZONTAL
   },
   button: {
     width: '100%',    
-    paddingVertical: AppConstants.ITEM_PADDING_VERTICAL,
-    paddingHorizontal: AppConstants.ITEM_PADDING_HORIZONTAL,
-    gap: AppConstants.GAP * 2,
+    paddingHorizontal: AppConstants.UI.ITEM_PADDING.HORIZONTAL,
+    paddingVertical: AppConstants.UI.ITEM_PADDING.VERTICAL,
+    gap: AppConstants.UI.GAP * 2,
     alignItems: "center",    
     justifyContent: "center",
-    borderRadius: AppConstants.BORDER_RADIUS, 
+    borderRadius: AppConstants.UI.BORDER_RADIUS, 
     backgroundColor: Colors.backgroundSecondary
   },
   text: {

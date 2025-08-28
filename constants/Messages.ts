@@ -1,28 +1,5 @@
 
 
-/**
- * Predefined toast notification messages for the app.
- *
- * Supports multiple types of messages (`info`, `success`, `error`) 
- * with optional secondary text and display options.
- * Currently only English (`EN`) is provided. Can be extended for i18n.
- *
- * @remarks
- * - `text1`: Primary message (required)
- * - `text2`: Secondary message (optional)
- * - `type`: Toast type (`info`, `success`, `error`, etc.)
- * - `visibilityTime`: Duration in milliseconds the toast is visible (optional)
- * - `position`: Optional toast position (`top`, `bottom`)
- *
- * @example
- * import { ToastMessages } from "@/constants/ToastMessages";
- * 
- * showToast(ToastMessages.EN.NO_INTERNET);
- *
- * @example
- * const { text1, type, visibilityTime } = ToastMessages.EN.COPIED_TO_CLIPBOARD;
- * showToast({ text1, type, visibilityTime });
- */
 export const ToastMessages = {
     EN: {
         NO_INTERNET: {

@@ -2,7 +2,6 @@ import React from 'react'
 import { StyleSheet, View, ViewProps } from 'react-native'
 
 
-
 const Row = (props: ViewProps) => {
     const {style, ...rest} = props
     return (
@@ -10,7 +9,9 @@ const Row = (props: ViewProps) => {
     )
 }
 
+
 export default Row
+
 
 const styles = StyleSheet.create({
     container: {

@@ -87,82 +87,79 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
             </TopBar>
             <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} >
                 <View style={styles.container} >
-                    <View style={{gap: AppConstants.GAP * 2.5, marginTop: AppConstants.GAP}} >                                     
+                    <MenuButton 
+                        onPress={libraryPage} 
+                        title='Library'
+                        iconName='library-outline'
+                    />
 
-                        <MenuButton 
-                            onPress={libraryPage} 
-                            title='Library'
-                            iconName='library-outline'
-                        />
+                    <MenuButton 
+                        onPress={openDocuments} 
+                        title='Documents'
+                        iconName='folder-outline'
+                    />
+                    
+                    <MenuButton 
+                        onPress={readingHistoryPage} 
+                        title='Reading History' 
+                        iconName='book-outline'
+                    />
 
-                        <MenuButton 
-                            onPress={openDocuments} 
-                            title='Documents'
-                            iconName='folder-outline'
-                        />
-                        
-                        <MenuButton 
-                            onPress={readingHistoryPage} 
-                            title='Reading History' 
-                            iconName='book-outline'
-                        />
+                    <MenuButton 
+                        onPress={openDonate} 
+                        title='Donate' 
+                        iconName='cash-outline'
+                    />                        
 
-                        <MenuButton 
-                            onPress={openDonate} 
-                            title='Donate' 
-                            iconName='cash-outline'
-                        />                        
+                    <MenuButton 
+                        onPress={openPornhwaRequest} 
+                        title='Request Pornhwa'
+                        iconName='megaphone-outline'
+                    />
 
-                        <MenuButton 
-                            onPress={openPornhwaRequest} 
-                            title='Request Pornhwa'
-                            iconName='megaphone-outline'
-                        />
+                    <MenuButton 
+                        onPress={openBugReport} 
+                        title='Bug Report' 
+                        iconName='bug-outline'
+                    />
 
-                        <MenuButton 
-                            onPress={openBugReport} 
-                            title='Bug Report' 
-                            iconName='bug-outline'
-                        />
+                    <MenuButton 
+                        onPress={openReleases} 
+                        title='Releases' 
+                        iconName='git-branch-outline'
+                    />
 
-                        <MenuButton 
-                            onPress={openReleases} 
-                            title='Releases' 
-                            iconName='git-branch-outline'
-                        />
+                    <MenuButton 
+                        onPress={openNewsPage} 
+                        title='News' 
+                        iconName='newspaper-outline'
+                    />
 
-                        <MenuButton 
-                            onPress={openNewsPage} 
-                            title='News' 
-                            iconName='newspaper-outline'
-                        />
+                    <MenuButton 
+                        onPress={scansPage} 
+                        title='Scans' 
+                        iconName='earth-outline'
+                    />
 
-                        <MenuButton 
-                            onPress={scansPage} 
-                            title='Scans' 
-                            iconName='earth-outline'
-                        />
+                    <MenuButton 
+                        onPress={openReddit} 
+                        title='Pornhwa'
+                        iconName='logo-reddit'
+                    />
 
-                        <MenuButton 
-                            onPress={openReddit} 
-                            title='Pornhwa'
-                            iconName='logo-reddit'
-                        />
+                    <MenuButton
+                        onPress={openSettings} 
+                        title='Settings' 
+                        iconName='settings-outline'
+                    />                              
 
-                        <MenuButton
-                            onPress={openSettings} 
-                            title='Settings' 
-                            iconName='settings-outline'
-                        />                              
-
-                        <Footer height={30} />
-                    </View>
+                    <Footer height={30} />
                 </View>
             </ScrollView>
             <Pressable 
                 onPress={openDisclaimer} 
                 style={styles.disclaimer} 
-                hitSlop={AppConstants.HIT_SLOP.LARGE} >
+                hitSlop={AppConstants.UI.HIT_SLOP.LARGE} >
                 <Text style={Typography.lightUnderline} >eula & disclaimer</Text>
             </Pressable>
         </SafeAreaView>
@@ -175,7 +172,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: "space-between",
-        paddingTop: 10
+        paddingTop: 10,
+        gap: AppConstants.UI.GAP * 2.2
     },
     disclaimer: {
         paddingBottom: 62, 

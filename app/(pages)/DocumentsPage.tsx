@@ -14,7 +14,7 @@ import Footer from '@/components/util/Footer'
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
 import { hp } from '@/helpers/util'
 import CreateDocumentForm from '@/components/form/CreateDocumentForm'
-import { dbCreateDocument, dbDeleteDocument, dbReadDocuments, dbUpdateDocument } from '@/lib/database'
+import { dbCreateDocument, dbDeleteDocument, dbReadAll, dbReadDocuments, dbUpdateDocument } from '@/lib/database'
 import { Document } from '@/helpers/types'
 import DocumentsGrid from '@/components/grid/DocumentsGrid'
 import { useFocusEffect } from 'expo-router'
@@ -41,11 +41,12 @@ const DocumentsPage = () => {
     () => {
       isMounted.current = true
       const init = async () => {
-        const d = await dbReadDocuments(db, null, 0, AppConstants.PAGE_LIMIT)
+        const d = await dbReadDocuments(db, null, 0, AppConstants.VALIDATION.PAGE_LIMIT)
+        console.log(d)
         if (!isMounted.current) { return }
         setDocuments(d)
         documentsRef.current = d
-        hasResults.current = d.length >= AppConstants.PAGE_LIMIT
+        hasResults.current = d.length >= AppConstants.VALIDATION.PAGE_LIMIT
       }
       init()
       return () => { isMounted.current = false }
@@ -55,7 +56,7 @@ const DocumentsPage = () => {
 
   const reload = async () => {
     page.current = 0
-    const d = await dbReadDocuments(db, null, 0, AppConstants.PAGE_LIMIT)
+    const d = await dbReadDocuments(db, null, 0, AppConstants.VALIDATION.PAGE_LIMIT)
     setDocuments(d)
   }
 
@@ -72,13 +73,13 @@ const DocumentsPage = () => {
     const d: Document[] = await dbReadDocuments(
       db,
       null,
-      page.current * AppConstants.PAGE_LIMIT, 
-      AppConstants.PAGE_LIMIT
+      page.current * AppConstants.VALIDATION.PAGE_LIMIT, 
+      AppConstants.VALIDATION.PAGE_LIMIT
     )
     if (isMounted.current && d.length) {
       documentsRef.current.push(...d)
       setDocuments([...documentsRef.current])
-      hasResults.current = d.length >= AppConstants.PAGE_LIMIT
+      hasResults.current = d.length >= AppConstants.VALIDATION.PAGE_LIMIT
     }
     fetching.current = false
   }, [db])  
@@ -149,7 +150,7 @@ const DocumentsPage = () => {
   return (
     <SafeAreaView style={AppStyle.safeArea} >
       <TopBar title='Documents' >
-        <Row style={{gap: AppConstants.GAP * 2}} >
+        <Row style={{gap: AppConstants.UI.GAP * 2}} >
           <Button iconName='add-outline'iconColor={Colors.primary} onPress={handleOpenBottomSheet} />
           <ReturnButton/>
         </Row>
@@ -205,9 +206,9 @@ export default DocumentsPage
 
 const styles = StyleSheet.create({
   bottomSheetContainer: {
-    paddingHorizontal: AppConstants.SCREEN.PADDING_HORIZONTAL, 
+    paddingHorizontal: AppConstants.UI.SCREEN.PADDING_HORIZONTAL, 
     paddingTop: 10,
-    gap: AppConstants.GAP,
+    gap: AppConstants.UI.GAP,
     height: hp(80)
   },
   handleStyle: {
@@ -227,8 +228,8 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline'
   },
   item: {
-    padding: AppConstants.GAP,
+    padding: AppConstants.UI.GAP,
     backgroundColor: Colors.primary,
-    borderRadius: AppConstants.BORDER_RADIUS
+    borderRadius: AppConstants.UI.BORDER_RADIUS
   }
 })

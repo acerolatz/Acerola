@@ -34,10 +34,9 @@ const DocumentItem = ({item, updateItem, deleteItem}: DocumentItemProps) => {
 
   return (
     <Pressable onPress={onPress} style={styles.item} >
-      <Column style={{flex: 1, paddingRight: AppConstants.ICON.SIZE}} >
+      <Column style={{flex: 1, paddingRight: AppConstants.UI.ICON.SIZE}} >
         <Text style={Typography.semiboldBlack}>{item.name}</Text>
-        <Text style={Typography.regularBlack}>{item.descr}</Text>
-        <Text style={Typography.lightBlack}>{formatTimestampWithHour(item.updated_at)}</Text>
+        <Text style={Typography.regularBlack}>{item.descr}</Text>        
       </Column>
       {
         showButtons &&
@@ -69,7 +68,7 @@ const DocumentsGrid = ({documents, updateItem, deleteItem, onEndReached}: Docume
     const renderItem = useCallback(({item}: {item: Document}) => (
         <DocumentItem item={item} updateItem={updateItem} deleteItem={deleteItem}/>
     ), [])
-
+    
     return (
         <FlatList
             data={documents}
@@ -87,15 +86,15 @@ export default DocumentsGrid
 
 const styles = StyleSheet.create({
   item: {
-    padding: AppConstants.GAP,
+    padding: AppConstants.UI.GAP,
     backgroundColor: Colors.primary,
-    borderRadius: AppConstants.BORDER_RADIUS,
-    marginBottom: AppConstants.MARGIN,
+    borderRadius: AppConstants.UI.BORDER_RADIUS,
+    marginBottom: AppConstants.UI.MARGIN,
     flexDirection: 'row',
     justifyContent: "space-between"
   },
   buttonColumn: {
-    gap: AppConstants.GAP * 2, 
+    gap: AppConstants.UI.GAP * 2, 
     alignItems: "center", 
     justifyContent: "center"
   }

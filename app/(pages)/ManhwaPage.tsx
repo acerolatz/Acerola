@@ -16,7 +16,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ToastMessages } from '@/constants/Messages';
 import { spFetchChapterList, spUpdateManhwaViews } from '@/lib/supabase';
 import { Typography } from '@/constants/typography';
-import AddToLibray from '@/components/AddToLibray';
+import AddToLibrary from '@/components/AddToLibray';
 import Toast from 'react-native-toast-message';
 import { useSQLiteContext } from 'expo-sqlite';
 import Footer from '@/components/util/Footer';
@@ -125,7 +125,7 @@ const ManhwaPage = () => {
           return (
             <Row style={styles.topBar}>
               <HomeButton />
-              <Row style={{ gap: AppConstants.ICON.SIZE }}>
+              <Row style={{ gap: AppConstants.UI.ICON.SIZE }}>
                 <RandomManhwaButton color={Colors.backgroundColor} />
                 <ReturnButton color={Colors.backgroundColor} />
               </Row>
@@ -162,19 +162,19 @@ const ManhwaPage = () => {
         case 'library':
           return (
             <View style={styles.padding}>
-              <AddToLibray manhwa={manhwa} backgroundColor={manhwa.color} />
+              <AddToLibrary manhwa={manhwa} backgroundColor={manhwa.color} />
             </View>
           );
         case 'statusViews':
           return (
-            <Row style={{ gap: AppConstants.MARGIN, paddingHorizontal: AppConstants.SCREEN.PADDING_HORIZONTAL }}>
+            <Row style={{ gap: AppConstants.UI.MARGIN, paddingHorizontal: AppConstants.UI.SCREEN.PADDING_HORIZONTAL }}>
               <Item text={manhwa.status} backgroundColor={manhwa.color} />
               <Item text={`Views: ${formatNumberWithSuffix(manhwa.views + 1)}`} backgroundColor={manhwa.color} />
             </Row>
           );
         case 'chapters':
           return loading ? (
-            <ActivityIndicator size={AppConstants.ICON.SIZE} color={manhwa.color} />
+            <ActivityIndicator size={AppConstants.UI.ICON.SIZE} color={manhwa.color} />
           ) : (
             <View style={styles.padding}>
               <ManhwaChapterGrid manhwa={manhwa} />
@@ -202,7 +202,7 @@ const ManhwaPage = () => {
       <FlatList
         data={SECTIONS}
         keyExtractor={(item) => item.key}
-        ItemSeparatorComponent={() => <View style={{ height: AppConstants.MARGIN }} />}
+        ItemSeparatorComponent={() => <View style={{ height: AppConstants.UI.MARGIN }} />}
         renderItem={renderItem}
         scrollEnabled
         showsVerticalScrollIndicator={false}
@@ -230,8 +230,8 @@ const styles = StyleSheet.create({
     height: hp(92)
   },
   item: {
-    height: AppConstants.BUTTON.SIZE,
-    borderRadius: AppConstants.BORDER_RADIUS,
+    height: AppConstants.UI.BUTTON.SIZE,
+    borderRadius: AppConstants.UI.BORDER_RADIUS,
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
@@ -239,11 +239,11 @@ const styles = StyleSheet.create({
   topBar: {
     width: '100%',
     justifyContent: 'space-between',
-    paddingHorizontal: AppConstants.SCREEN.PADDING_HORIZONTAL,
-    paddingTop: AppConstants.SCREEN.PADDING_VERTICAL,
-    paddingBottom: AppConstants.GAP,
+    paddingHorizontal: AppConstants.UI.SCREEN.PADDING_HORIZONTAL,
+    paddingTop: AppConstants.UI.SCREEN.PADDING_VERTICAL,
+    paddingBottom: AppConstants.UI.GAP,
   },
   padding: {
-    paddingHorizontal: AppConstants.SCREEN.PADDING_HORIZONTAL,
+    paddingHorizontal: AppConstants.UI.SCREEN.PADDING_HORIZONTAL,
   },
 });

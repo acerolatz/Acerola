@@ -1,5 +1,4 @@
-import { ScrollView,  StyleSheet, Text, View } from 'react-native'
-import { AppConstants } from '@/constants/AppConstants'
+import { ScrollView,  StyleSheet, Text } from 'react-native'
 import { Typography } from '@/constants/typography'
 import { AppStyle } from '@/styles/AppStyle'
 import { DebugInfo } from '@/helpers/types'
@@ -7,9 +6,10 @@ import { Colors } from '@/constants/Colors'
 import Row from '../util/Row'
 import React from 'react'
 
+
 const DebugStats = ({debugInfo}: {debugInfo: DebugInfo}) => {
     return (
-        <ScrollView style={{width: '100%'}} horizontal={true} showsHorizontalScrollIndicator={false} >
+        <ScrollView style={styles.container} horizontal={true} showsHorizontalScrollIndicator={false} >
             <Row>
                 <Text style={styles.textItem}>manhwas: {debugInfo.total_manhwas}</Text>
                 <Text style={styles.textItem}>images: {debugInfo.images}</Text>
@@ -30,6 +30,9 @@ export default DebugStats
 
 
 const styles = StyleSheet.create({
+    container: {
+        width: '100%'
+    },
     textItem: {
         ...Typography.regular, 
         ...AppStyle.defaultGridItem, 

@@ -12,8 +12,8 @@ interface CloseBtnProps {
 
 const CloseBtn = ({ onPress }: CloseBtnProps) => {
   return (
-    <Pressable onPress={onPress} hitSlop={AppConstants.HIT_SLOP.LARGE}>
-        <Ionicons name='close-outline' size={AppConstants.ICON.SIZE} color={Colors.primary} />
+    <Pressable onPress={onPress} hitSlop={AppConstants.UI.HIT_SLOP.LARGE}>
+        <Ionicons name='close-outline' size={AppConstants.UI.ICON.SIZE} color={Colors.primary} />
     </Pressable>
   )
 }

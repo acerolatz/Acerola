@@ -19,7 +19,7 @@ const ReadingStatusPicker = ({onChangeValue, isActive}: ReadingStatusPickerProps
     const [open, setOpen] = useState(false)
     const [value, setValue] = useState('Reading')
     const [items, setItems] = useState(
-        AppConstants.READING_STATUS.map(i => {return {label: i, value: i}})
+        AppConstants.LISTS.READING_STATUS.map(i => {return {label: i, value: i}})
     )
 
     return (
@@ -30,8 +30,8 @@ const ReadingStatusPicker = ({onChangeValue, isActive}: ReadingStatusPickerProps
             labelStyle={{color: Colors.backgroundColor}}
             textStyle={Typography.regular}
             placeholderStyle={Typography.regular}
-            ArrowUpIconComponent={() => {return <Ionicons name='chevron-up' size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />}}
-            ArrowDownIconComponent={() => {return <Ionicons name='chevron-down' size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />}}
+            ArrowUpIconComponent={() => {return <Ionicons name='chevron-up' size={AppConstants.UI.ICON.SIZE} color={Colors.backgroundColor} />}}
+            ArrowDownIconComponent={() => {return <Ionicons name='chevron-down' size={AppConstants.UI.ICON.SIZE} color={Colors.backgroundColor} />}}
             value={value as any}
             showArrowIcon={true}
             listItemContainerStyle={{height: FontSizes.sm * 2}}
@@ -56,8 +56,8 @@ export default ReadingStatusPicker
 
 const styles = StyleSheet.create({    
     dropDownContainer: {
-        height: AppConstants.BUTTON.SIZE,
-        borderRadius: AppConstants.BORDER_RADIUS,
+        height: AppConstants.UI.BUTTON.SIZE,
+        borderRadius: AppConstants.UI.BORDER_RADIUS,
         backgroundColor: Colors.primary,
         borderWidth: 0
     },

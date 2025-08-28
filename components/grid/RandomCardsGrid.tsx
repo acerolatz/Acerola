@@ -33,7 +33,7 @@ const RandomCardsGrid = ({reloadCards}: RandomCardsGridProps) => {
 
     const keyExtractor = useCallback((item: ManhwaCard) => item.manhwa_id.toString(), [])
 
-    const ItemSeparator = useCallback(() => <View style={{ width: AppConstants.MARGIN }} />, [])
+    const ItemSeparator = useCallback(() => <View style={{ width: AppConstants.UI.MARGIN }} />, [])
 
     if (cards.length === 0) {
         return (
@@ -81,6 +81,6 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
-        gap: AppConstants.GAP
+        gap: AppConstants.UI.GAP
     }    
 })

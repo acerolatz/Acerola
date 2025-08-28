@@ -55,7 +55,7 @@ export default ManhwaHorizontalGrid
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        gap: AppConstants.GAP
+        gap: AppConstants.UI.GAP
     },
     header: {
         width: '100%', 

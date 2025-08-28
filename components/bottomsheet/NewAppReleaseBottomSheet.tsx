@@ -84,9 +84,9 @@ export default NewAppReleaseBottomSheet
 
 const styles = StyleSheet.create({
     bottomSheetContainer: {
-        paddingHorizontal: AppConstants.SCREEN.PADDING_HORIZONTAL, 
+        paddingHorizontal: AppConstants.UI.SCREEN.PADDING_HORIZONTAL, 
         paddingTop: 10,
-        gap: AppConstants.GAP
+        gap: AppConstants.UI.GAP
     },
     handleStyle: {
         backgroundColor: Colors.backgroundSecondary, 

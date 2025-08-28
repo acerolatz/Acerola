@@ -3,6 +3,7 @@ import {
     Keyboard, 
     Pressable, 
     ScrollView,    
+    StyleSheet,    
     Text, 
     TextInput, 
     View 
@@ -14,7 +15,7 @@ import { Colors } from '@/constants/Colors'
 import { AppConstants } from '@/constants/AppConstants'
 import { clearCache, formatBytes, wp } from '@/helpers/util'
 import { useSQLiteContext } from 'expo-sqlite'
-import { dbSetCacheMaxSize, dbSetNumericInfo } from '@/lib/database'
+import { dbSetCacheMaxSize } from '@/lib/database'
 import { ToastMessages } from '@/constants/Messages'
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -33,8 +34,8 @@ interface FormData {
 const schema = yup.object().shape({  
     maxCacheSize: yup
         .number()
-        .min(AppConstants.SETTINGS.MIN_CACHE_SIZE, `Min ${AppConstants.SETTINGS.MIN_CACHE_SIZE} MB`)
-        .max(AppConstants.SETTINGS.MAX_CACHE_SIZE, `Max ${AppConstants.SETTINGS.MAX_CACHE_SIZE} MB`)    
+        .min(AppConstants.VALIDATION.SETTINGS.MIN_CACHE_SIZE, `Min ${AppConstants.VALIDATION.SETTINGS.MIN_CACHE_SIZE} MB`)
+        .max(AppConstants.VALIDATION.SETTINGS.MAX_CACHE_SIZE, `Max ${AppConstants.VALIDATION.SETTINGS.MAX_CACHE_SIZE} MB`)    
 });
 
 
@@ -62,8 +63,8 @@ const CacheForm = ({currentCacheSize, currentMaxCacheSize}: CacheFormProps) => {
     const onSubmit = async (form_data: FormData) => {
         Keyboard.dismiss()
         if (
-            form_data.maxCacheSize < AppConstants.SETTINGS.MIN_CACHE_SIZE ||
-            form_data.maxCacheSize > AppConstants.SETTINGS.MAX_CACHE_SIZE
+            form_data.maxCacheSize < AppConstants.VALIDATION.SETTINGS.MIN_CACHE_SIZE ||
+            form_data.maxCacheSize > AppConstants.VALIDATION.SETTINGS.MAX_CACHE_SIZE
         ) { return }
         setLoading(true)
         await dbSetCacheMaxSize(db, form_data.maxCacheSize * 1024 * 1024)
@@ -79,10 +80,11 @@ const CacheForm = ({currentCacheSize, currentMaxCacheSize}: CacheFormProps) => {
 
     return (
         <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled' >
-            <View style={{flex: 1, gap: AppConstants.GAP, paddingHorizontal: wp(1)}} >
+            <View style={styles.container} >
+
+                {/* Clear Cache */}
                 <Text style={Typography.semibold}>Cache size: {formatBytes(currentCacheSize)}</Text>
                 <Text style={AppStyle.error}>* Restart Required</Text>                    
-                {/* Clear Cache */}
                 <Pressable onPress={clearAppCache} style={AppStyle.formButton} >
                     <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Clear Cache</Text>
                 </Pressable>                
@@ -97,17 +99,18 @@ const CacheForm = ({currentCacheSize, currentMaxCacheSize}: CacheFormProps) => {
                     <TextInput
                         style={AppStyle.input}
                         keyboardType='numeric'
-                        maxLength={AppConstants.SETTINGS.MAX_CACHE_SIZE.toString().length}
+                        maxLength={AppConstants.VALIDATION.SETTINGS.MAX_CACHE_SIZE.toString().length}
                         onBlur={onBlur}
                         onChangeText={onChange}
                         value={value.toString()}/>
                     )}
                 />
+                
                 {/* Save Button */}
                 {
                     isLoading ?
                     <View style={AppStyle.formButton} >
-                        <ActivityIndicator size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />
+                        <ActivityIndicator size={AppConstants.UI.ICON.SIZE} color={Colors.backgroundColor} />
                     </View> 
                     :
                     <Pressable onPress={handleSubmit(onSubmit)} style={AppStyle.formButton} >
@@ -122,3 +125,11 @@ const CacheForm = ({currentCacheSize, currentMaxCacheSize}: CacheFormProps) => {
 
 
 export default CacheForm
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1, 
+        gap: AppConstants.UI.GAP, 
+        paddingHorizontal: wp(1)
+    }
+})

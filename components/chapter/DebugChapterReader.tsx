@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import ChapterArrowUpButton from '../buttons/ChapterArrowUpButton'
 import ChapterImageItem from './ChapterImageItem'
-import { FlashList } from '@shopify/flash-list'
+import { FlashList, FlashListRef } from '@shopify/flash-list'
 import { ChapterImage } from '@/helpers/types'
 import ChapterFooter from './ChapterFooter'
 import { View } from 'react-native'
@@ -27,7 +27,7 @@ const DebugChapterReader = ({
     loading,
     listHeader,
 }: ChapterReaderProps) => {
-    const flashListRef = useRef<FlashList<ChapterImage>>(null)
+    const flashListRef = useRef<FlashListRef<ChapterImage>>(null)
     const scrollOffset = useRef(0)
     const scrollInterval = useRef<number | null>(null)
 
@@ -83,7 +83,6 @@ const DebugChapterReader = ({
                 drawDistance={hp(250)}
                 renderItem={renderItem}
                 keyExtractor={keyExtractor}
-                estimatedItemSize={estimatedItemSize}
                 ListHeaderComponent={listHeader}
                 ListFooterComponent={listFooter}
             />

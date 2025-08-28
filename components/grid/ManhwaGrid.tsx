@@ -34,9 +34,9 @@ const ManhwaGrid = ({
     const renderItem = useCallback(({item}: {item: Manhwa}) => (
         <ManhwaCard
             showManhwaStatus={showManhwaStatus}
-            width={AppConstants.MANHWA_COVER.WIDTH} 
-            height={AppConstants.MANHWA_COVER.HEIGHT}
-            marginBottom={AppConstants.GAP / 2}
+            width={AppConstants.MEDIA.MANHWA_COVER.WIDTH} 
+            height={AppConstants.MEDIA.MANHWA_COVER.HEIGHT}
+            marginBottom={AppConstants.UI.GAP / 2}
             manhwa={item}
         />
       ), [])
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     footer: {
         width: '100%', 
         marginBottom: 62, 
-        marginTop: AppConstants.GAP, 
+        marginTop: AppConstants.UI.GAP, 
         alignItems: "center", 
         justifyContent: "center"
     }

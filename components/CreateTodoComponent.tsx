@@ -50,7 +50,7 @@ const CreateTodoComponent = ({setTodos}: CreateTodoComponentProps) => {
 
     return (
         <Column style={styles.container} >
-            <Column style={{gap: AppConstants.GAP}} >
+            <Column style={{gap: AppConstants.UI.GAP}} >
                 <TextInput
                     ref={inputRef}
                     placeholder='Enter tasks, ideas, notes...'
@@ -82,7 +82,7 @@ export default CreateTodoComponent
 
 const styles = StyleSheet.create({
     container: {
-        gap: AppConstants.GAP, 
-        marginBottom: AppConstants.GAP
+        gap: AppConstants.UI.GAP, 
+        marginBottom: AppConstants.UI.GAP
     },
 })

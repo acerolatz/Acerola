@@ -33,33 +33,13 @@ const Item = ({item}: {item: Scan}) => {
         <Pressable onPress={onPress} style={styles.scanButton} >
             <Row style={{justifyContent: "space-between", width: "100%"}} >
                 <Text style={{...Typography.regular, color: Colors.backgroundColor}}>{item.name}</Text>
-                <Ionicons name='globe-outline' size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />
+                <Ionicons name='globe-outline' size={AppConstants.UI.ICON.SIZE} color={Colors.backgroundColor} />
             </Row>
         </Pressable>
     )
 }
 
 
-/**
- * ScansPage component – displays a list of scan sources.
- *
- * Fetches scans from Supabase and renders them in a scrollable FlatList.
- * Includes a header with the title, a return button, and a footer.
- * Each scan item can be pressed to open its associated URL.
- *
- * @remarks
- * - Uses Zustand `useScanState` for global scan list and title management.
- * - Shows `PageActivityIndicator` while loading.
- * - The first item in the list header displays the `title` scan URL.
- * - Each item uses `Item` sub-component with `Pressable` and `Ionicons`.
- *
- * @components
- * - `TopBar` – shows page title and return button.
- * - `ReturnButton` – navigates back.
- * - `PageActivityIndicator` – shows loading spinner.
- * - `Footer` – optional page footer.
- *
- */
 const ScansPage = () => {
 
     const { scans, setScans, title, setTitle } = useScanState()
@@ -121,6 +101,6 @@ export default ScansPage
 const styles = StyleSheet.create({
     scanButton: {
         ...AppStyle.defaultGridItem,
-        marginBottom: AppConstants.MARGIN
+        marginBottom: AppConstants.UI.MARGIN
     }    
 })

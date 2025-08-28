@@ -15,14 +15,14 @@ interface HomeButtonProps {
 
 
 const HomeButton = ({
-  size = AppConstants.ICON.SIZE, 
+  size = AppConstants.UI.ICON.SIZE, 
   color = Colors.backgroundColor, 
   iconName = 'home-outline'
 }: HomeButtonProps) => {
   return (
     <Pressable 
       onPress={() => router.replace("/(pages)/HomePage")} 
-      hitSlop={AppConstants.HIT_SLOP.LARGE}>
+      hitSlop={AppConstants.UI.HIT_SLOP.LARGE}>
         <Ionicons name={iconName as any} size={size} color={color} />
     </Pressable>
   )

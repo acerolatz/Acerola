@@ -60,10 +60,10 @@ const DebugLastestManhwaCards = ({setCardToShow}: LastestManhwaCardsProps) => {
     useEffect(() => {
         const init = async () => {
             fetching.current = true
-            const m = await spFetchLatestManhwaCardsDebug(0, AppConstants.PAGE_LIMIT)
+            const m = await spFetchLatestManhwaCardsDebug(0, AppConstants.VALIDATION.PAGE_LIMIT)
             setManhwas(m)
             manhwasRef.current = m
-            hasResults.current = m.length >= AppConstants.PAGE_LIMIT
+            hasResults.current = m.length >= AppConstants.VALIDATION.PAGE_LIMIT
             fetching.current = false
         }
         init()
@@ -73,11 +73,11 @@ const DebugLastestManhwaCards = ({setCardToShow}: LastestManhwaCardsProps) => {
         if (fetching.current || !hasResults.current) { return }
         fetching.current = true    
         page.current += 1
-        const m = await spFetchLatestManhwaCardsDebug(page.current, AppConstants.PAGE_LIMIT)
+        const m = await spFetchLatestManhwaCardsDebug(page.current, AppConstants.VALIDATION.PAGE_LIMIT)
         if (m.length) {
           manhwasRef.current.push(...m)
           setManhwas([...manhwasRef.current])
-          hasResults.current = m.length >= AppConstants.PAGE_LIMIT
+          hasResults.current = m.length >= AppConstants.VALIDATION.PAGE_LIMIT
         }
         fetching.current = false
       }, [])
@@ -88,7 +88,7 @@ const DebugLastestManhwaCards = ({setCardToShow}: LastestManhwaCardsProps) => {
 
     const keyExtractor = useCallback((item: DebugManhwaCard) => item.manhwa_id.toString(), [])
 
-    const itemSeparator = useCallback(() => <View style={{width: AppConstants.MARGIN}} />, [])
+    const itemSeparator = useCallback(() => <View style={{width: AppConstants.UI.MARGIN}} />, [])
 
     return (
         <View>
@@ -106,7 +106,7 @@ const DebugLastestManhwaCards = ({setCardToShow}: LastestManhwaCardsProps) => {
                 onEndReached={onEndReached}
             />
             <Pressable onPress={() => flatListRef.current?.scrollToIndex({index: 0, animated: true})} style={styles.arrow} >
-                <Ionicons name="chevron-back-outline" size={AppConstants.ICON.SIZE} color={Colors.white} />
+                <Ionicons name="chevron-back-outline" size={AppConstants.UI.ICON.SIZE} color={Colors.white} />
             </Pressable>
         </View>        
     )
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     image: {
         width: wp(46), 
         height: hp(35), 
-        borderRadius: AppConstants.BORDER_RADIUS
+        borderRadius: AppConstants.UI.BORDER_RADIUS
     },
     manhwaTitleContainer: {
         position: 'absolute',
@@ -131,8 +131,8 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right: 10,
         bottom: 10,
-        padding: AppConstants.GAP,
-        borderRadius: AppConstants.BORDER_RADIUS,
+        padding: AppConstants.UI.GAP,
+        borderRadius: AppConstants.UI.BORDER_RADIUS,
         backgroundColor: Colors.backgroundColor
     }
 })

@@ -17,14 +17,14 @@ interface AddToLibrayProps {
 }
 
 
-const AddToLibray = ({manhwa, backgroundColor = Colors.primary}: AddToLibrayProps) => {
+const AddToLibrary = ({manhwa, backgroundColor = Colors.primary}: AddToLibrayProps) => {
 
     const db = useSQLiteContext()
 
     const [open, setOpen] = useState(false)
     const [value, setValue] = useState<string>()
     const [items, setItems] = useState(
-        AppConstants.READING_STATUS.map(i => {return {label: i, value: i}})
+        AppConstants.LISTS.READING_STATUS.map(i => {return {label: i, value: i}})
     )
 
     const dbValue = useRef('')
@@ -60,8 +60,8 @@ const AddToLibray = ({manhwa, backgroundColor = Colors.primary}: AddToLibrayProp
                 labelStyle={{color: Colors.backgroundColor}}
                 textStyle={Typography.regular}
                 showArrowIcon={true}
-                ArrowUpIconComponent={() => {return <Ionicons name='chevron-up' size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />}}
-                ArrowDownIconComponent={() => {return <Ionicons name='chevron-down' size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />}}
+                ArrowUpIconComponent={() => {return <Ionicons name='chevron-up' size={AppConstants.UI.ICON.SIZE} color={Colors.backgroundColor} />}}
+                ArrowDownIconComponent={() => {return <Ionicons name='chevron-down' size={AppConstants.UI.ICON.SIZE} color={Colors.backgroundColor} />}}
                 placeholder='Add To Library'
                 placeholderStyle={{...Typography.regular, color: Colors.backgroundColor}}
                 value={value as any}
@@ -82,13 +82,13 @@ const AddToLibray = ({manhwa, backgroundColor = Colors.primary}: AddToLibrayProp
     )
 }
 
-export default AddToLibray
+export default AddToLibrary
 
 const styles = StyleSheet.create({
     dropDownContainer: {
-        height: AppConstants.BUTTON.SIZE,
-        borderRadius: AppConstants.BORDER_RADIUS,
-        gap: AppConstants.GAP,
+        height: AppConstants.UI.BUTTON.SIZE,
+        borderRadius: AppConstants.UI.BORDER_RADIUS,
+        gap: AppConstants.UI.GAP,
         borderWidth: 0
     },
     dropDownContainerStyle: {

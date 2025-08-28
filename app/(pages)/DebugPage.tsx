@@ -154,12 +154,12 @@ const DebugPage = () => {
             </TopBar>
             <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
                 <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled' >
-                    <View style={{flex: 1, gap: AppConstants.GAP}} >
+                    <View style={{flex: 1, gap: AppConstants.UI.GAP}} >
                         {debugInfo && <DebugStats debugInfo={debugInfo} />}
 
                         {/* Manhwa Images */}
                         <Text style={Typography.semibold} >Images {manhwaImage.length > 0 ? manhwaImage.length : ''}</Text>
-                        <Row style={{gap: AppConstants.GAP}} >
+                        <Row style={{gap: AppConstants.UI.GAP}} >
                             <TextInput
                                 style={styles.input}
                                 value={manhwaId.toString()}
@@ -212,10 +212,10 @@ const styles = StyleSheet.create({
     image: {
         width: wp(46), 
         height: hp(35), 
-        borderRadius: AppConstants.BORDER_RADIUS
+        borderRadius: AppConstants.UI.BORDER_RADIUS
     },
     cardPreviewImage: {
-        width: AppConstants.RANDOM_MANHWAS.MAX_WIDTH, 
+        width: AppConstants.MEDIA.RANDOM_MANHWAS.MAX_WIDTH, 
         height: hp(92)
     },
     textItem: {
@@ -227,13 +227,13 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: "center",
         justifyContent: "flex-start",
-        gap: AppConstants.GAP
+        gap: AppConstants.UI.GAP
     },
     debugManhwaImage: {
         flexDirection: 'row',
-        gap: AppConstants.GAP, 
-        borderRadius: AppConstants.BORDER_RADIUS, 
-        marginRight: AppConstants.MARGIN * 2, 
+        gap: AppConstants.UI.GAP, 
+        borderRadius: AppConstants.UI.BORDER_RADIUS, 
+        marginRight: AppConstants.UI.MARGIN * 2, 
         padding: 10, 
         backgroundColor: Colors.white
     },
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
         ...Typography.regular, 
         padding: 10, 
         backgroundColor: Colors.backgroundColor, 
-        borderRadius: AppConstants.BORDER_RADIUS, 
+        borderRadius: AppConstants.UI.BORDER_RADIUS, 
         position: 'absolute', 
         flexShrink: 1, 
         left: 10, 

@@ -43,8 +43,8 @@ const ManhwaSummary = ({summary}: ManhwaSummaryProps) => {
                 <Pressable 
                     onPress={onPress}
                     style={styles.button} 
-                    hitSlop={AppConstants.HIT_SLOP.NORMAL}>
-                    <Ionicons name={iconName as any} size={AppConstants.ICON.SIZE} color={Colors.white} />
+                    hitSlop={AppConstants.UI.HIT_SLOP.NORMAL}>
+                    <Ionicons name={iconName as any} size={AppConstants.UI.ICON.SIZE} color={Colors.white} />
                 </Pressable>                
             </View>
         )
@@ -56,8 +56,8 @@ const ManhwaSummary = ({summary}: ManhwaSummaryProps) => {
             <Pressable 
                 onPress={onPress}
                 style={styles.button} 
-                hitSlop={AppConstants.HIT_SLOP.NORMAL}>
-                <Ionicons name={iconName as any} size={AppConstants.ICON.SIZE} color={Colors.white} />
+                hitSlop={AppConstants.UI.HIT_SLOP.NORMAL}>
+                <Ionicons name={iconName as any} size={AppConstants.UI.ICON.SIZE} color={Colors.white} />
             </Pressable>
         </View>
     )

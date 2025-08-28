@@ -13,13 +13,13 @@ interface ManhwaIdComponentProps {
 
 const ManhwaIdComponent = ({manhwa_id, position = 'l'}: ManhwaIdComponentProps) => {
 
-    if (AppConstants.DEBUB.ENABLED) {
+    if (AppConstants.APP.DEBUG.ENABLED) {
         return position === 'l' ?        
-            <View style={[styles.container, {left: AppConstants.SCREEN.PADDING_HORIZONTAL + hp(1)}]} >
+            <View style={[styles.container, {left: AppConstants.UI.SCREEN.PADDING_HORIZONTAL + hp(1)}]} >
                 <Text style={Typography.regular}>{manhwa_id}</Text>
             </View>
             :
-            <View style={[styles.container, {right: AppConstants.SCREEN.PADDING_HORIZONTAL + hp(1)}]} >
+            <View style={[styles.container, {right: AppConstants.UI.SCREEN.PADDING_HORIZONTAL + hp(1)}]} >
                 <Text style={Typography.regular}>{manhwa_id}</Text>
             </View>
         
@@ -34,9 +34,9 @@ const styles = StyleSheet.create({
     container: {
         position: 'absolute',
         top: hp(1),
-        borderRadius: AppConstants.BORDER_RADIUS,
-        paddingHorizontal: AppConstants.ITEM_PADDING_HORIZONTAL,
-        paddingVertical: AppConstants.ITEM_PADDING_VERTICAL,
+        borderRadius: AppConstants.UI.BORDER_RADIUS,
+        paddingHorizontal: AppConstants.UI.ITEM_PADDING.HORIZONTAL,
+        paddingVertical: AppConstants.UI.ITEM_PADDING.VERTICAL,
         backgroundColor: Colors.backgroundSecondary, 
         alignItems: "center", 
         justifyContent: "center"

@@ -93,16 +93,16 @@ const DebugForm = ({debugInfo, setDebugInfo}: DebugFormProps) => {
         const newDebugInfo: DebugInfo = {
             ...debugInfo, 
             first_run: 1, 
-            current_chapter_milestone: AppConstants.CHAPTER_GOAL_START,
+            current_chapter_milestone: AppConstants.CHAPTER.GOAL_START,
             should_ask_for_donation: 1
         }
-        resetForm({firstRun: 1, chapterMilestone: AppConstants.CHAPTER_GOAL_START, shouldAskForDonation: 1})
+        resetForm({firstRun: 1, chapterMilestone: AppConstants.CHAPTER.GOAL_START, shouldAskForDonation: 1})
         setDebugInfo(newDebugInfo)
         Toast.show(ToastMessages.EN.GENERIC_SUCCESS)
     }
 
     return (
-        <View style={{flex: 1, gap: AppConstants.GAP}} >
+        <View style={{flex: 1, gap: AppConstants.UI.GAP}} >
 
             {/* First Run */}
             <Text style={Typography.semibold}>FirstRun {debugInfo.first_run}</Text>            
@@ -155,7 +155,7 @@ const DebugForm = ({debugInfo, setDebugInfo}: DebugFormProps) => {
             {/* Save Button */}
             {
                 isLoading ?
-                <Row style={{gap: AppConstants.GAP}} >
+                <Row style={{gap: AppConstants.UI.GAP}} >
                     <View style={AppStyle.button} >
                         <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Reset</Text>
                     </View>
@@ -164,7 +164,7 @@ const DebugForm = ({debugInfo, setDebugInfo}: DebugFormProps) => {
                     </View>
                 </Row>
                 :
-                <Row style={{gap: AppConstants.GAP}} >
+                <Row style={{gap: AppConstants.UI.GAP}} >
                     <Pressable onPress={reset} style={AppStyle.button} >
                         <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Reset</Text>
                     </Pressable>

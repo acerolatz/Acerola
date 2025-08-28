@@ -31,21 +31,22 @@ import { BugType } from '@/helpers/types';
 import BugTypePicker from '../picker/BugTypePicker';
 import BugImage from '../util/BugImage';
 import { Typography } from '@/constants/typography';
+import Row from '../util/Row';
 
 
 
 const schema = yup.object().shape({  
     title: yup
         .string()
-        .min(AppConstants.BUG_REPORT.TITLE_MIN_LENGTH, `Min ${AppConstants.BUG_REPORT.TITLE_MIN_LENGTH} characters`)
-        .max(AppConstants.BUG_REPORT.TITLE_MAX_LENGTH, `Max ${AppConstants.BUG_REPORT.TITLE_MAX_LENGTH} characters`)
+        .min(AppConstants.VALIDATION.BUG_REPORT.TITLE_MIN_LENGTH, `Min ${AppConstants.VALIDATION.BUG_REPORT.TITLE_MIN_LENGTH} characters`)
+        .max(AppConstants.VALIDATION.BUG_REPORT.TITLE_MAX_LENGTH, `Max ${AppConstants.VALIDATION.BUG_REPORT.TITLE_MAX_LENGTH} characters`)
         .required('Title is required'),
     descr: yup
         .string()
-        .max(AppConstants.BUG_REPORT.DESCR_MAX_LENGTH, `Max ${AppConstants.BUG_REPORT.DESCR_MAX_LENGTH} characters`),
+        .max(AppConstants.VALIDATION.BUG_REPORT.DESCR_MAX_LENGTH, `Max ${AppConstants.VALIDATION.BUG_REPORT.DESCR_MAX_LENGTH} characters`),
     bugType: yup
         .string()
-        .max(AppConstants.BUG_REPORT.BUG_TYPE_MAX_LENGTH, `Max ${AppConstants.BUG_REPORT.BUG_TYPE_MAX_LENGTH} characters`)    
+        .max(AppConstants.VALIDATION.BUG_REPORT.BUG_TYPE_MAX_LENGTH, `Max ${AppConstants.VALIDATION.BUG_REPORT.BUG_TYPE_MAX_LENGTH} characters`)    
 });
 
 
@@ -74,10 +75,10 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
     };
 
     const handlePickPhoto = async () => {
-        if (photos.length >= AppConstants.BUG_REPORT.MAX_IMAGES) {
+        if (photos.length >= AppConstants.VALIDATION.BUG_REPORT.MAX_IMAGES) {
             Toast.show({
                 text1: "Warning",
-                text2: `Max ${AppConstants.BUG_REPORT.MAX_IMAGES} images`,
+                text2: `Max ${AppConstants.VALIDATION.BUG_REPORT.MAX_IMAGES} images`,
                 type: "info"
             })
             return
@@ -146,7 +147,7 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
     return (
         <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
             <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled' >
-                <View style={{gap: AppConstants.GAP}} >
+                <View style={{gap: AppConstants.UI.GAP}} >
                     {/* Title */}
                     <Text style={Typography.semibold}>Title</Text>
                     {errors.title && (<Text style={AppStyle.error}>{errors.title.message}</Text>)}
@@ -174,10 +175,10 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
                     />
                     
                     {/* Description */}
-                    <View style={{flexDirection: 'row', gap: AppConstants.GAP, alignItems: "center", justifyContent: "center", alignSelf: 'flex-start'}} >
+                    <Row style={styles.descrContainer} >
                         <Text style={Typography.semibold}>Description</Text>
                         <Text style={AppStyle.textOptional}>optional</Text>
-                    </View>
+                    </Row>
                     {errors.descr && (<Text style={AppStyle.error}>{errors.descr.message}</Text>)}
                     <Controller
                         name="descr"
@@ -198,7 +199,7 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
                         isLoading ?
                         <>
                             <View style={AppStyle.formButton} >
-                                <ActivityIndicator size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />
+                                <ActivityIndicator size={AppConstants.UI.ICON.SIZE} color={Colors.backgroundColor} />
                             </View>
                             <View style={AppStyle.formButton} >
                                 <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Images (optional)</Text>
@@ -236,3 +237,11 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
 }
 
 export default BugReportForm
+
+
+const styles = StyleSheet.create({
+    descrContainer: {
+        gap: AppConstants.UI.GAP, 
+        alignSelf: 'flex-start'
+    }
+})

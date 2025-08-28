@@ -15,7 +15,7 @@ interface BooleanRotatingButtonProps {
 
 const BooleanRotatingButton = ({
     onPress, 
-    iconSize = AppConstants.ICON.SIZE, 
+    iconSize = AppConstants.UI.ICON.SIZE, 
     iconColor = Colors.white, 
     iconName = 'sync'
 }: BooleanRotatingButtonProps) => {
@@ -69,7 +69,7 @@ const BooleanRotatingButton = ({
     }
 
     return (
-        <Pressable onPress={handlePress} hitSlop={AppConstants.HIT_SLOP.NORMAL}>
+        <Pressable onPress={handlePress} hitSlop={AppConstants.UI.HIT_SLOP.NORMAL}>
             <Animated.View
             style={[
                 styles.box,

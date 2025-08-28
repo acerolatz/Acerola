@@ -18,10 +18,12 @@ import {
     Platform,
     Pressable,
     ScrollView,
+    StyleSheet,
     Text,
     TextInput,
     View
 } from 'react-native';
+import Row from '../util/Row';
 
 
 interface FormData {
@@ -32,12 +34,12 @@ interface FormData {
 const schema = yup.object().shape({  
     pornhwaTitle: yup
         .string()
-        .min(AppConstants.MANHWA_REQUEST.TITLE_MIN_LENGTH, `Min ${AppConstants.MANHWA_REQUEST.TITLE_MIN_LENGTH} characters`)
-        .max(AppConstants.MANHWA_REQUEST.TITLE_MAX_LENGTH, `Max ${AppConstants.MANHWA_REQUEST.TITLE_MAX_LENGTH} characters`)
+        .min(AppConstants.VALIDATION.MANHWA_REQUEST.TITLE_MIN_LENGTH, `Min ${AppConstants.VALIDATION.MANHWA_REQUEST.TITLE_MIN_LENGTH} characters`)
+        .max(AppConstants.VALIDATION.MANHWA_REQUEST.TITLE_MAX_LENGTH, `Max ${AppConstants.VALIDATION.MANHWA_REQUEST.TITLE_MAX_LENGTH} characters`)
         .required('Manga name is required'),
     message: yup
         .string()
-        .max(AppConstants.MANHWA_REQUEST.DESCR_MAX_LENGTH, `Max ${AppConstants.MANHWA_REQUEST.DESCR_MAX_LENGTH} characters`)
+        .max(AppConstants.VALIDATION.MANHWA_REQUEST.DESCR_MAX_LENGTH, `Max ${AppConstants.VALIDATION.MANHWA_REQUEST.DESCR_MAX_LENGTH} characters`)
 });
 
 
@@ -70,7 +72,7 @@ const RequestManhwaForm = () => {
   return (
     <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
         <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled' >
-            <View style={{gap: AppConstants.GAP}} >
+            <View style={{gap: AppConstants.UI.GAP}} >
                 {/* Manga Name */}
                 <Text style={Typography.semibold}>Pornhwa</Text>
                 {errors.pornhwaTitle && (<Text style={AppStyle.error}>{errors.pornhwaTitle.message}</Text>)}
@@ -88,10 +90,10 @@ const RequestManhwaForm = () => {
                 />
 
                 {/* Description */}
-                <View style={{flexDirection: 'row', gap: AppConstants.GAP, alignItems: "center", justifyContent: "center", alignSelf: 'flex-start'}} >
+                <Row style={styles.descrContainer} >
                     <Text style={Typography.semibold}>Message</Text>
                     <Text style={AppStyle.textOptional}>optional</Text>
-                </View>
+                </Row>
                 {errors.message && (<Text style={AppStyle.error}>{errors.message.message}</Text>)}
                 <Controller
                     name="message"
@@ -111,7 +113,7 @@ const RequestManhwaForm = () => {
                 {
                     isLoading ?
                     <View style={AppStyle.formButton} >
-                        <ActivityIndicator size={AppConstants.ICON.SIZE} color={Colors.backgroundColor} />
+                        <ActivityIndicator size={AppConstants.UI.ICON.SIZE} color={Colors.backgroundColor} />
                     </View> 
                     :
                     <Pressable onPress={handleSubmit(onSubmit)} style={AppStyle.formButton} >
@@ -127,3 +129,11 @@ const RequestManhwaForm = () => {
 }
 
 export default RequestManhwaForm
+
+
+const styles = StyleSheet.create({
+    descrContainer: {
+        gap: AppConstants.UI.GAP, 
+        alignSelf: 'flex-start'
+    }
+})

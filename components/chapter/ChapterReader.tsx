@@ -1,7 +1,7 @@
-import React, { useCallback, useMemo, useRef } from 'react'
 import ChapterArrowUpButton from '../buttons/ChapterArrowUpButton'
-import ChapterImageItem from './ChapterImageItem'
 import { FlashList, FlashListRef } from '@shopify/flash-list'
+import React, { useCallback, useMemo, useRef } from 'react'
+import ChapterImageItem from './ChapterImageItem'
 import { ChapterImage } from '@/helpers/types'
 import ChapterFooter from './ChapterFooter'
 import { View } from 'react-native'
@@ -12,7 +12,11 @@ interface ChapterReaderProps {
     images: ChapterImage[]    
     manhwaTitle: string
     loading: boolean
-    listHeader: React.ComponentType<any> | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | null | undefined
+    listHeader: React.ComponentType<any> | 
+        React.ReactElement<unknown, string | 
+        React.JSXElementConstructor<any>> | 
+        null |
+        undefined
 }
 
 

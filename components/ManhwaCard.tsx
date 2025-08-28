@@ -30,7 +30,7 @@ const ManhwaCard = ({
     manhwa,
     width = wp(70),
     height = hp(50),
-    marginRight = AppConstants.MARGIN,
+    marginRight = AppConstants.UI.MARGIN,
     marginBottom = 0,
     showManhwaStatus = true    
 }: ManhwaCardProps) => {        
@@ -43,13 +43,13 @@ const ManhwaCard = ({
     }, [manhwa.manhwa_id]);    
 
     return (
-        <Pressable onPress={onPress} style={{width, height, marginRight, marginBottom, gap: AppConstants.GAP}} >
+        <Pressable onPress={onPress} style={{width, height, marginRight, marginBottom, gap: AppConstants.UI.GAP}} >
             <Image
                 source={manhwa.cover_image_url} 
                 contentFit='cover'                
                 cachePolicy={'disk'}
-                style={[{width, height, borderRadius: AppConstants.BORDER_RADIUS}]}
-                transition={AppConstants.DEFAULT_IMAGE_TRANSITION}
+                style={[{width, height, borderRadius: AppConstants.UI.BORDER_RADIUS}]}
+                transition={AppConstants.UI.ANIMATION_TIME}
             />
             { showManhwaStatus && <ManhwaStatusComponent status={manhwa.status} /> }
             <LinearGradient 
@@ -83,7 +83,7 @@ export default memo(ManhwaCard, areEqual);
 
 const styles = StyleSheet.create({
     container: {
-        gap: AppConstants.GAP
+        gap: AppConstants.UI.GAP
     },
     manhwaTitleContainer: {
         position: 'absolute',
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     },
     chapterLinkContainer: {
         width: '100%', 
-        gap: AppConstants.MARGIN, 
+        gap: AppConstants.UI.MARGIN, 
         paddingRight: 6
     }
 })

@@ -16,7 +16,7 @@ interface RotatingButtonProps {
 
 const RotatingButton = ({
     iconName = 'reload-outline',
-    iconSize = AppConstants.ICON.SIZE,
+    iconSize = AppConstants.UI.ICON.SIZE,
     iconColor = Colors.white,
     duration = 500,
     onPress
@@ -39,7 +39,7 @@ const RotatingButton = ({
     });
 
     return (
-        <Pressable onPress={handlePress} hitSlop={AppConstants.HIT_SLOP.NORMAL}>
+        <Pressable onPress={handlePress} hitSlop={AppConstants.UI.HIT_SLOP.NORMAL}>
             <Animated.View
             style={[
                 styles.box,

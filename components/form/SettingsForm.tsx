@@ -36,8 +36,8 @@ const SettingsForm = ({
     const titles = ['Safe Mode', 'Cache', 'Log']
 
     const forms = [
-      <SafeModeForm key="safe" safeModeOn={safeModeOn} safeModePassword={safeModePassword} />,
-      <CacheForm key="cache" currentCacheSize={currentCacheSize} currentMaxCacheSize={currentMaxCacheSize} />,
+      <SafeModeForm safeModeOn={safeModeOn} safeModePassword={safeModePassword} />,
+      <CacheForm currentCacheSize={currentCacheSize} currentMaxCacheSize={currentMaxCacheSize} />,
       <UserDataComponent/>
     ];
 
@@ -46,7 +46,7 @@ const SettingsForm = ({
     return (
       <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
         <View style={styles.container}>
-            <View style={{width: '100%', alignItems: "center", justifyContent: "center", marginBottom: AppConstants.GAP * 2}} >
+            <View style={{width: '100%', alignItems: "center", justifyContent: "center", marginBottom: AppConstants.UI.GAP * 2}} >
                 {titles.map((t, i) => {
                     const opacity = scrollX.interpolate({
                         inputRange: [(i - 1) * width, i * width, (i + 1) * width],
@@ -119,13 +119,13 @@ const styles = StyleSheet.create({
   dotsContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: AppConstants.MARGIN,
-    marginBottom: AppConstants.MARGIN * 2
+    marginTop: AppConstants.UI.MARGIN,
+    marginBottom: AppConstants.UI.MARGIN * 2
   },
   dot: {
-    height: AppConstants.ICON.SIZE * 0.5,
-    width: AppConstants.ICON.SIZE * 0.5,
-    borderRadius: AppConstants.ICON.SIZE,
+    height: AppConstants.UI.ICON.SIZE * 0.5,
+    width: AppConstants.UI.ICON.SIZE * 0.5,
+    borderRadius: AppConstants.UI.ICON.SIZE,
     backgroundColor: Colors.primary,
     marginHorizontal: 4,
   }

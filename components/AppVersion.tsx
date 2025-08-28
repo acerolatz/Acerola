@@ -5,6 +5,7 @@ import { useSQLiteContext } from 'expo-sqlite'
 import React, { useEffect } from 'react'
 import { Text } from 'react-native'
 
+
 const AppVersion = () => {
     
     const db = useSQLiteContext()
@@ -21,9 +22,7 @@ const AppVersion = () => {
         [db]
     )
 
-    if (!localVersion) {
-        return <></>
-    }
+    if (!localVersion) { return <></> }
 
     return (
         <Text style={Typography.light} >

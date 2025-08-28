@@ -7,7 +7,7 @@ import React from 'react'
 
 
 const NUM_COLUMNS = getChapterGridNumColumns()
-const ITEM_SIZE = Math.floor((wp(92) - AppConstants.MARGIN * (NUM_COLUMNS - 1)) / NUM_COLUMNS)
+const ITEM_SIZE = Math.floor((wp(92) - AppConstants.UI.MARGIN * (NUM_COLUMNS - 1)) / NUM_COLUMNS)
 
 
 interface ChapterGridItemProps {
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
   chapterItem: {    
     width: ITEM_SIZE, 
     height: ITEM_SIZE, 
-    borderRadius: AppConstants.BORDER_RADIUS, 
+    borderRadius: AppConstants.UI.BORDER_RADIUS, 
     alignItems: "center", 
     justifyContent: "center"    
   }

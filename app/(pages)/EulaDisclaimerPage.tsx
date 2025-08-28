@@ -20,7 +20,7 @@ import {
 } from 'react-native'
 
 
-const width = AppConstants.SCREEN.WIDTH - AppConstants.SCREEN.PADDING_HORIZONTAL * 2
+const width = AppConstants.UI.SCREEN.WIDTH - AppConstants.UI.SCREEN.PADDING_HORIZONTAL * 2
 
 
 const EulaAndDisclaimerPage = () => {
@@ -149,13 +149,13 @@ const styles = StyleSheet.create({
     dotsContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
-        marginBottom: AppConstants.GAP
+        marginBottom: AppConstants.UI.GAP
     },
     dot: {
-        height: AppConstants.ICON.SIZE * 0.5,
-        width: AppConstants.ICON.SIZE * 0.5,
-        borderRadius: AppConstants.ICON.SIZE,
+        height: AppConstants.UI.ICON.SIZE * 0.5,
+        width: AppConstants.UI.ICON.SIZE * 0.5,
+        borderRadius: AppConstants.UI.ICON.SIZE,
         backgroundColor: Colors.primary,
-        marginHorizontal: AppConstants.MARGIN
+        marginHorizontal: AppConstants.UI.MARGIN
     }
 })

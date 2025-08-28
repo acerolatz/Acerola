@@ -11,8 +11,8 @@ interface ViewAllButtonProps {
 
 const ViewAllButton = ({onPress}: ViewAllButtonProps) => {
   return (
-    <Pressable onPress={onPress} hitSlop={AppConstants.HIT_SLOP.NORMAL} >
-      <Ionicons name='chevron-forward' size={AppConstants.ICON.SIZE} color={'white'} />
+    <Pressable onPress={onPress} hitSlop={AppConstants.UI.HIT_SLOP.NORMAL} >
+      <Ionicons name='chevron-forward' size={AppConstants.UI.ICON.SIZE} color={'white'} />
     </Pressable>
   )
 }

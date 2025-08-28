@@ -39,13 +39,13 @@ const Top10Item = ({
     }, [manhwa_id]);
 
     return (
-        <Pressable onPress={onPress} style={{marginRight: AppConstants.MARGIN}} >
+        <Pressable onPress={onPress} style={{marginRight: AppConstants.UI.MARGIN}} >
             <View>
                 <Image 
                     source={image_url} 
                     style={styles.image} 
                     contentFit='cover'
-                    transition={AppConstants.DEFAULT_IMAGE_TRANSITION} />
+                    transition={AppConstants.UI.ANIMATION_TIME} />
                 <LinearGradient colors={['transparent', 'transparent', Colors.backgroundColor]} style={styles.linearGradient} >
                     <Text style={styles.number} >{index + 1}</Text>
                     <Text numberOfLines={1} style={styles.manhwaTitle} >{title}</Text>
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     image: {
         width: TOP_1O_ITEM_WIDTH, 
         height: TOP_1O_ITEM_HEIGHT, 
-        borderRadius: AppConstants.BORDER_RADIUS
+        borderRadius: AppConstants.UI.BORDER_RADIUS
     },
     linearGradient: {
         position: 'absolute', 

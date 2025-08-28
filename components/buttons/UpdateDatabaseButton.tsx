@@ -17,7 +17,7 @@ interface UpdateDatabaseProps {
 
 
 const UpdateDatabaseButton = ({ 
-    iconSize = AppConstants.ICON.SIZE, 
+    iconSize = AppConstants.UI.ICON.SIZE, 
     iconColor = Colors.white 
 }: UpdateDatabaseProps) => {
 

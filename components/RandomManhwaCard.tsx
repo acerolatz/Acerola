@@ -71,9 +71,9 @@ const RandomManhwaCard = React.memo(({ card }: RandomManhwaCardProps) => {
                 style={{
                     width: card.normalizedWidth,
                     height: card.normalizedHeight,
-                    borderRadius: AppConstants.BORDER_RADIUS * 2
+                    borderRadius: AppConstants.UI.BORDER_RADIUS * 2
                 }} 
-                transition={AppConstants.DEFAULT_IMAGE_TRANSITION}
+                transition={AppConstants.UI.ANIMATION_TIME}
                 contentFit='cover' />
             <LinearGradient 
                 colors={['transparent', 'transparent', 'rgba(0, 0, 0, 0.6)']} 

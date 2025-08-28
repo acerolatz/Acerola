@@ -22,8 +22,8 @@ import Footer from '@/components/util/Footer'
 
 const WIDTH = wp(92)
 const HEIGHT = getRelativeHeight(
-  AppConstants.DONATION.DONATE_BANNER.WIDTH, 
-  AppConstants.DONATION.DONATE_BANNER.HEIGHT, 
+  AppConstants.UI.DONATION.DONATE_BANNER.WIDTH, 
+  AppConstants.UI.DONATION.DONATE_BANNER.HEIGHT, 
   WIDTH
 )
 
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   item: {
     paddingHorizontal: 20,
     height: 52,
-    borderRadius: AppConstants.BORDER_RADIUS,
+    borderRadius: AppConstants.UI.BORDER_RADIUS,
     backgroundColor: Colors.primary,
     alignItems: "center",
     justifyContent: "center"
@@ -115,8 +115,8 @@ const styles = StyleSheet.create({
   image: {
     width: WIDTH, 
     height: HEIGHT, 
-    marginBottom: AppConstants.MARGIN, 
+    marginBottom: AppConstants.UI.MARGIN, 
     alignSelf: "center", 
-    borderRadius: AppConstants.BORDER_RADIUS
+    borderRadius: AppConstants.UI.BORDER_RADIUS
   }
 })

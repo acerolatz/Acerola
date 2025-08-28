@@ -17,7 +17,7 @@ const CButton = ({
     iconColor, 
     style, 
     onPress, 
-    iconSize = AppConstants.ICON.SIZE
+    iconSize = AppConstants.UI.ICON.SIZE
 }: CButtonProps) => {
 
     const [loading, setLoading] = useState(false)

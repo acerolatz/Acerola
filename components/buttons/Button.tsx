@@ -18,8 +18,8 @@ const Button = ({
   iconColor = Colors.white
 }: ButtonProps) => {
   return (
-    <Pressable onPress={onPress ? onPress : undefined} hitSlop={AppConstants.HIT_SLOP.NORMAL}  >
-        <Ionicons name={iconName as any} size={AppConstants.ICON.SIZE} color={iconColor} />
+    <Pressable onPress={onPress ? onPress : undefined} hitSlop={AppConstants.UI.HIT_SLOP.NORMAL}  >
+        <Ionicons name={iconName as any} size={AppConstants.UI.ICON.SIZE} color={iconColor} />
     </Pressable>
   )
 }

@@ -33,14 +33,10 @@ export async function initDocumentsDir() {
 }
 
 
-export async function createDocumentDir(path: string, existsOk: boolean = true) {
+export async function createDocumentDir(path: string) {
   const dirInfo = await FileSystem.getInfoAsync(path);
-  if (dirInfo.exists && !existsOk) {
-    throw new DirectoryAlreadyExistsError(`Directory already exists: ${path}`);
-  }
-
+  if (dirInfo.exists) { return }
   await FileSystem.makeDirectoryAsync(path, { intermediates: true });
-  return path;
 }
 
 
@@ -82,7 +78,7 @@ export const downloadImages = async (
           });
         }
       },
-      progressDivider: 5,
+      progressDivider: 10,
     }).promise;
 
     downloadedPaths[index] = filePath;

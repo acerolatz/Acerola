@@ -67,8 +67,8 @@ const HomePage = () => {
     const [readingHistoryManhwas, setReadingHistoryManhwas] = useState<Manhwa[]>([])
 
     // Lateral Menu
-    const menuAnim = useRef(new Animated.Value(-AppConstants.MENU_WIDTH)).current 
-    const backgroundAnim = useRef(new Animated.Value(-AppConstants.SCREEN.WIDTH)).current
+    const menuAnim = useRef(new Animated.Value(-AppConstants.UI.MENU.WIDTH)).current 
+    const backgroundAnim = useRef(new Animated.Value(-AppConstants.UI.SCREEN.WIDTH)).current
     const menuVisible = useRef(false)
 
     const openManhwaSearch = useCallback(() => {
@@ -76,7 +76,7 @@ const HomePage = () => {
     }, [])
 
     const reloadCards = async () => {
-        const r = await spFetchRandomManhwaCards(AppConstants.PAGE_LIMIT);
+        const r = await spFetchRandomManhwaCards(AppConstants.VALIDATION.PAGE_LIMIT);
         setCards(r);
     }
 
@@ -114,8 +114,8 @@ const HomePage = () => {
             (async () => {
                 const [g, l, m] = await Promise.all([
                     dbReadGenres(db),
-                    dbReadManhwasOrderedByUpdateAt(db, 0, AppConstants.PAGE_LIMIT),
-                    dbReadManhwasOrderedByViews(db, 0, AppConstants.PAGE_LIMIT),
+                    dbReadManhwasOrderedByUpdateAt(db, 0, AppConstants.VALIDATION.PAGE_LIMIT),
+                    dbReadManhwasOrderedByViews(db, 0, AppConstants.VALIDATION.PAGE_LIMIT),
                 ]);
 
                 if (!mounted) { return }
@@ -139,7 +139,7 @@ const HomePage = () => {
         useCallback(() => {
             const reload = async () => {
                 Image.clearMemoryCache();
-                const v = await dbGetManhwaReadingHistory(db, 0, AppConstants.PAGE_LIMIT);
+                const v = await dbGetManhwaReadingHistory(db, 0, AppConstants.VALIDATION.PAGE_LIMIT);
                 setReadingHistoryManhwas(v);
             };
             reload();
@@ -148,29 +148,29 @@ const HomePage = () => {
     const openMenu = () => {
         Animated.timing(menuAnim, {
             toValue: 0,
-            duration: AppConstants.MENU_ANIMATION_TIME,
+            duration: AppConstants.UI.ANIMATION_TIME,
             useNativeDriver: true
         }).start(() => {
             menuVisible.current = true
         })
         Animated.timing(backgroundAnim, {
             toValue: 0,
-            duration: AppConstants.MENU_ANIMATION_TIME * 1.2,
+            duration: AppConstants.UI.ANIMATION_TIME * 1.2,
             useNativeDriver: true
         }).start()
     }
 
     const closeMenu = () => {
         Animated.timing(menuAnim, {
-            toValue: -AppConstants.MENU_WIDTH,
-            duration: AppConstants.MENU_ANIMATION_TIME,
+            toValue: -AppConstants.UI.MENU.WIDTH,
+            duration: AppConstants.UI.ANIMATION_TIME,
             useNativeDriver: true
         }).start(() => {
             menuVisible.current = false
         })
         Animated.timing(backgroundAnim, {
-            toValue: -AppConstants.SCREEN.WIDTH,
-            duration: AppConstants.MENU_ANIMATION_TIME,
+            toValue: -AppConstants.UI.SCREEN.WIDTH,
+            duration: AppConstants.UI.ANIMATION_TIME,
             useNativeDriver: true
         }).start()
     }
@@ -178,13 +178,13 @@ const HomePage = () => {
     return (
         <SafeAreaView style={{...AppStyle.safeArea, paddingTop: 0}} >
             <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false}>
-                <View style={{height: AppConstants.SCREEN.PADDING_VERTICAL}} />
+                <View style={{height: AppConstants.UI.SCREEN.PADDING_VERTICAL}} />
                 <Row style={styles.header}>
                     <AppLogo />
-                    <Row style={{ gap: AppConstants.ICON.SIZE }}>
+                    <Row style={{ gap: AppConstants.UI.ICON.SIZE }}>
                         {!loading && (
                             <>
-                            {AppConstants.DEBUB.ENABLED && <Button iconName='bug-outline' onPress={() => router.navigate("/(pages)/DebugPage")} />}
+                            {AppConstants.APP.DEBUG.ENABLED && <Button iconName='bug-outline' onPress={() => router.navigate("/(pages)/DebugPage")} />}
                                 <UpdateDatabaseButton />
                                 <Button iconName="search-outline" onPress={openManhwaSearch} />
                                 <RandomManhwaButton />
@@ -193,7 +193,7 @@ const HomePage = () => {
                         <Button iconName="options-outline" onPress={toggleMenu} />
                     </Row>
                 </Row>
-                <Column style={{gap: AppConstants.GAP}} >
+                <Column style={{gap: AppConstants.UI.GAP}} >
                     <GenreGrid genres={genres} />
                     <CollectionGrid collections={collections} />
                     <ContinueReadingGrid manhwas={readingHistoryManhwas} />
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
     header: {
         width: '100%', 
         justifyContent: "space-between",
-        paddingBottom: AppConstants.GAP * 2
+        paddingBottom: AppConstants.UI.GAP * 2
     },
     sideMenu: {
         position: 'absolute',
@@ -240,14 +240,14 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: 0,        
         backgroundColor: Colors.backgroundColor,
-        width: AppConstants.MENU_WIDTH,
+        width: AppConstants.UI.MENU.WIDTH,
         elevation: 5,        
         zIndex: 100
     },
     menuBackground: {
-        width: AppConstants.SCREEN.WIDTH,
+        width: AppConstants.UI.SCREEN.WIDTH,
         position: 'absolute',
-        height: AppConstants.SCREEN.HEIGHT * 1.2,
+        height: AppConstants.UI.SCREEN.HEIGHT * 1.2,
         top: 0,
         left: 0,        
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
