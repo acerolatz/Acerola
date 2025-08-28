@@ -176,3 +176,26 @@ export type Document = {
     created_at: string
     updated_at: string
 }
+
+
+export interface DownloadItem {
+  id: string;
+  manhwaId: string;
+  manhwaTitle: string;
+  chapterId: string;
+  chapterTitle: string;
+  images: string[];
+  progress: number;
+  status: 'pending' | 'downloading' | 'completed' | 'error' | 'paused';
+  createdAt: number;
+  errorMessage?: string;
+}
+
+export interface DownloadStatus {
+  queue: DownloadItem[];
+  currentDownload: DownloadItem | null;
+  isDownloading: boolean;
+  totalDownloaded: number;
+}
+
+export type Listener = (status: DownloadStatus) => void;

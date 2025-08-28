@@ -1,5 +1,4 @@
 import * as FileSystem from 'expo-file-system';
-import { DirectoryAlreadyExistsError } from './errors';
 import { DownloadProgress } from './types';
 import RNFS from 'react-native-fs';
 

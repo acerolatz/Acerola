@@ -52,6 +52,7 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
     DROP TABLE IF EXISTS collections;
     DROP TABLE IF EXISTS update_history;
     DROP TABLE IF EXISTS logs;
+    DROP TABLE IF EXISTS documents;
     -- ===============================
 
 
@@ -124,17 +125,7 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       chapter_id INTEGER NOT NULL,
       readed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       PRIMARY KEY (manhwa_id, chapter_id)          
-    );
-        
-    CREATE TABLE IF NOT EXISTS documents (
-      path TEXT NOT NULL PRIMARY KEY,
-      name TEXT NOT NULL,
-      parent_document_path TEXT DEFAULT NULL,
-      descr TEXT DEFAULT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      CONSTRAINT documents_fkey FOREIGN KEY (parent_document_path) REFERENCES documents (path) ON UPDATE CASCADE ON DELETE CASCADE
-    );
+    );    
 
     CREATE TABLE IF NOT EXISTS todos (
       todo_id INTEGER NOT NULL PRIMARY KEY,
@@ -170,20 +161,6 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
     --             INSERT
     -- ===============================
     BEGIN TRANSACTION;
-
-      INSERT INTO 
-        documents (path, name, descr, created_at, updated_at)
-      VALUES 
-        (
-          '${AppConstants.PATHS.PORNHWAS_DOCUMENT}',
-          'Pornhwas', 
-          'Contains the downloaded chapters of each pornhwa.',
-          '${date}',
-          '${date}'
-        )
-      ON CONFLICT
-        (path)
-      DO NOTHING;
       
       INSERT OR REPLACE INTO 
         app_info (name, value)
@@ -1958,192 +1935,4 @@ export async function dbSetDebugInfo(
     dbSetNumericInfo(db, 'images', debug.images),
     dbSetNumericInfo(db, 'current_chapter_milestone', debug.current_chapter_milestone)
   ]).catch(error => console.log("erro dbSetDebugInfo", error))
-}
-
-
-export async function dbReadDocuments(
-  db: SQLite.SQLiteDatabase,
-  parent_document_path: string | null = null,
-  p_offset: number = 0,
-  p_limit: number = AppConstants.VALIDATION.PAGE_LIMIT
-) {
-  if (parent_document_path === null) {
-    const r = await db.getAllAsync<Document>(
-      `
-        SELECT 
-          * 
-        FROM 
-          documents 
-        WHERE 
-          parent_document_path IS NULL
-        ORDER BY 
-          updated_at 
-        DESC 
-          LIMIT ? 
-          OFFSET ?;
-        `,
-      [p_limit, p_offset]
-    ).catch(error => console.log("error dbReadDocuments", error))
-  
-    return r ?? []  
-  }
-
-  const r = await db.getAllAsync<Document>(
-    `
-      SELECT 
-        * 
-      FROM 
-        documents 
-      WHERE 
-        parent_document_path = ?
-      ORDER BY 
-        updated_at 
-      DESC 
-        LIMIT ? 
-        OFFSET ?;
-      `,
-    [parent_document_path, p_limit, p_offset]
-  ).catch(error => console.log("error dbReadDocuments", error))
-  
-  return r ?? []
-}
-
-
-export async function dbReadSubDocuments(
-  db: SQLite.SQLiteDatabase, 
-  parent_document_path: string,
-  p_offset: number = 0,
-  p_limit: number = AppConstants.VALIDATION.PAGE_LIMIT
-): Promise<Document[]> {
-  const r = await db.getAllAsync<Document>(
-    `
-      SELECT 
-        * 
-      FROM 
-        documents 
-      WHERE 
-        parent_document_path = ? 
-      ORDER BY 
-        updated_at DESC 
-      LIMIT ? 
-      OFFSET ?;
-    `,
-    [parent_document_path, p_limit, p_offset]
-  ).catch(error => console.log("error dbReadSubDocuments", error))
-
-  return r ?? []
-}
-
-
-export async function dbReadDocument(db: SQLite.SQLiteDatabase, path: string): Promise<Document | null> {
-  const r = await db.getFirstAsync<Document>(
-    'SELECT * FROM documents WHERE path = ?;',
-    [path]
-  ).catch(error => console.log("error dbReadDocument", error))
-  return r ?? null;
-}
-
-export async function dbCreateDocument(
-  db: SQLite.SQLiteDatabase,
-  name: string,
-  descr: string | null,
-  parent_document_path: string | null = null
-): Promise<Document | null> {
-
-  const path = parent_document_path === null ? createDocumentPath(name) : `${parent_document_path}/${normalizeDocumentName(name)}`
-  const date = new Date().toString()
-
-  try {    
-    await createDocumentDir(path);
-    await db.runAsync(
-      `
-        INSERT INTO documents (
-          path,
-          name,
-          descr,
-          parent_document_path,
-          created_at,
-          updated_at
-        )
-        VALUES 
-          (?,?,?,?,?,?)
-        ON CONFLICT
-          (path)
-        DO NOTHING;
-      `,
-      [
-        path,
-        name,
-        descr,
-        parent_document_path,
-        date,
-        date
-      ]
-    );
-
-    return await dbReadDocument(db, path)
-  } catch (error: any) {
-    try {
-      await deleteDocumentDir(path);
-    } catch { }
-    Toast.show({text1: 'Error', text2: 'Document already exists!', type: 'error1'})
-    return null
-  }
-}
-
-export async function dbUpdateDocument(
-  db: SQLite.SQLiteDatabase,
-  path: string,
-  name: string,
-  descr: string | null  
-): Promise<boolean> {  
-  const r = await db.runAsync(
-    `
-      UPDATE documents
-      SET          
-        name = ?,
-        descr = ?,
-        updated_at = ?
-      WHERE 
-        path = ?;
-    `,
-    [
-      name,
-      descr,
-      new Date().toString(),
-      path
-    ]
-  ).catch(error => {console.log("error dbUpdateDocument", error); return false});
-  return r !== false
-}
-
-
-export async function dbDeleteDocument(db: SQLite.SQLiteDatabase, path: string): Promise<boolean> {
-  const doc = await dbReadDocument(db, path);
-
-  if (!doc) {
-    Toast.show(ToastMessages.EN.DOCUMENT_NOT_FOUND)
-    return false
-  }
-
-  await deleteDocumentDir(doc.path)  
-
-  const r = await db.runAsync(
-    'DELETE FROM documents WHERE path = ?;', 
-    [path]
-  ).catch(error => {console.log("error dbDeleteDocument", error); return false})
-
-  return r !== false
-}
-
-
-export async function dbCreateChapterDocument(
-  db: SQLite.SQLiteDatabase, 
-  pornhwaName: string, 
-  chapterNum: number
-): Promise<Document | null> {
-  const chapterName = 'Chapter ' + chapterNum.toString()
-  const d = await dbCreateDocument(db, pornhwaName, null, AppConstants.PATHS.PORNHWAS_DOCUMENT)
-  if (d) { return await dbCreateDocument(db, chapterName, '', d.path) }
-  return null
 }
