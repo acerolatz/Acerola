@@ -73,7 +73,8 @@ const RootLayout = () => {
           <Stack.Screen name='(pages)/SafeModeHomePage' options={{headerShown: false}} />
           <Stack.Screen name='(pages)/ManhwaPage' options={{headerShown: false}} />
           <Stack.Screen name='(pages)/ManhwaSearch' options={{headerShown: false}} />
-          <Stack.Screen name='(pages)/ScansPage' options={{headerShown: false}} />          
+          <Stack.Screen name='(pages)/ScansPage' options={{headerShown: false}} />
+          <Stack.Screen name='(pages)/DownloadPage' options={{headerShown: false}} />
           <Stack.Screen name='(pages)/ChapterPage' options={{headerShown: false}} />
           <Stack.Screen name='(pages)/GenresPage' options={{headerShown: false}} />
           <Stack.Screen name='(pages)/CollectionsPage' options={{headerShown: false}} />

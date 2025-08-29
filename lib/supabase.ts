@@ -126,13 +126,6 @@ export async function spUpdateChapterView(p_chapter_id: number) {
 }
 
 
-/**
- * Uses the Supabase REST API to update the view count for a manhwa card displayed on the HomePage.
- * 
- * This function is used for the random manhwa cards that appear on the HomePage.
- * 
- * @param p_manhwa_id - The unique identifier of the manhwa card to update
- */
 export async function spUpdateManhwaCardView(p_manhwa_id: number) {
     const { error } = await supabase
         .rpc("increment_manhwa_card_view", { p_manhwa_id })
@@ -245,6 +238,10 @@ function normalizeRandomManhwaCardHeight(width: number, height: number): {
 
 
 export async function spFetchRandomManhwaCards(p_limit: number = 30): Promise<ManhwaCard[]> {
+    if (AppConstants.APP.DEBUG.ENABLED) {
+        return await spFetchLatestManhwaCardsDebug(0, p_limit)
+    }
+    
     const { data, error } = await supabase
         .rpc("get_random_cards", { p_limit })
 
@@ -263,14 +260,10 @@ export async function spFetchRandomManhwaCards(p_limit: number = 30): Promise<Ma
 }
 
 
-export async function spFetchLatestManhwaCardsDebug(p_offset: number = 0, p_limit: number = 30): Promise<{
-    title: string,
-    manhwa_id: number,
-    image_url: string
-}[]> {
+export async function spFetchLatestManhwaCardsDebug(p_offset: number = 0, p_limit: number = 30): Promise<ManhwaCard[]> {
     const { data, error } = await supabase
         .from("cards")
-        .select("manhwas (title, manhwa_id), image_url")
+        .select("manhwas (title, manhwa_id), image_url, width, height")
         .order("created_at", {ascending: false})
         .range(p_offset * p_limit, (p_offset + 1) * p_limit - 1)
 
@@ -278,9 +271,17 @@ export async function spFetchLatestManhwaCardsDebug(p_offset: number = 0, p_limi
         console.log("error spFetchRandomManhwaCards", error)
         return []
     }
-    
+
     return data.map(i => {
+        const { 
+            normalizedWidth, 
+            normalizedHeight 
+        } = normalizeRandomManhwaCardHeight(i.width, i.height)
         return {
+            width: i.width,
+            height: i.height,
+            normalizedWidth,
+            normalizedHeight,
             manhwa_id: (i.manhwas as any).manhwa_id,
             title: (i.manhwas as any).title,
             image_url: i.image_url

@@ -38,7 +38,7 @@ const ChapterPageSelector = ({
           onPress={moveToPreviousChapterPage}
         />
         <View style={{...styles.numberContainer, borderColor: backgroundColor}}>
-          <Text style={Typography.regularBlack}>{currentPage + 1}</Text>
+          <Text style={{...Typography.regular, color: backgroundColor}}>{currentPage + 1}</Text>
         </View>
         <CButton 
           style={{...AppStyle.button, backgroundColor}}
