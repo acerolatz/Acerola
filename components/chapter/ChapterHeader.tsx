@@ -67,7 +67,7 @@ const ChapterHeader = ({
         <Row style={{gap: AppConstants.UI.ICON.SIZE}} >
           <BugReportButton title={reportTitle} />
           <RotatingButton onPress={reloadChapter} />
-          <DownloadChapterButton chapter={chapter} manhwaTitle={mangaTitle} />
+          <DownloadChapterButton chapter={chapter} />
         </Row>
 
         <Row style={styles.chapterSelector} >

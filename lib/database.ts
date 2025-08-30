@@ -1,7 +1,6 @@
 import { 
   Author,
   DebugInfo,  
-  Document,  
   Genre,    
   Manhwa, 
   ManhwaAuthor, 
@@ -22,14 +21,10 @@ import { AuthorSet } from '@/helpers/AuthorSet';
 import { GenreSet } from '@/helpers/GenreSet';
 import * as SQLite from 'expo-sqlite';
 import uuid from 'react-native-uuid';
-import { createDocumentDir, createDocumentPath, deleteDocumentDir, normalizeDocumentName } from '@/helpers/storage';
-import Toast from 'react-native-toast-message';
-import { ToastMessages } from '@/constants/Messages';
 
 
 export async function dbMigrate(db: SQLite.SQLiteDatabase) {
   console.log("[DATABASE MIGRATION START]")
-  const date = new Date().toString()
   await db.execAsync(`
     
     -- ===============================

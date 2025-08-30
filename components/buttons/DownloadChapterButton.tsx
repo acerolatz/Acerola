@@ -1,6 +1,6 @@
 import CustomActivityIndicator from '../util/CustomActivityIndicator'
 import { spFetchChapterImagesUrls } from '@/lib/supabase'
-import DownloadManager from '@/helpers/DownloadManager'
+import { downloadManager } from '@/helpers/DownloadManager'
 import Toast from 'react-native-toast-message'
 import { Chapter } from '@/helpers/types'
 import { StyleSheet } from 'react-native'
@@ -10,27 +10,24 @@ import { Colors } from '@/constants/Colors'
 
 
 interface DownloadChapterButtonProps {
-    manhwaTitle: string
     chapter: Chapter
     color?: string
 }
 
 
-const DownloadChapterButton = ({manhwaTitle, chapter, color = Colors.white}: DownloadChapterButtonProps) => {
+const DownloadChapterButton = ({chapter, color = Colors.white}: DownloadChapterButtonProps) => {
 
     const [loading, setLoading] = useState(false)
 
     const onPress = async () => {
         setLoading(true)
-        const imgs: string[] = await spFetchChapterImagesUrls(chapter.chapter_id)
-        await DownloadManager.addChapter(
-            chapter.manhwa_id.toString(),
-            manhwaTitle,
-            chapter.chapter_id.toString(),
-            chapter.chapter_num.toString(),
-            imgs
-        )
-        Toast.show({text1: "Added to download queue", type: "info"})
+            const images: string[] = await spFetchChapterImagesUrls(chapter.chapter_id)
+            const success: boolean = await downloadManager.addToQueue({chapter, images})
+            if (success) {
+                Toast.show({text1: "Added to download queue", type: "info"})
+            } else {
+                Toast.show({text1: "Could not add to download queue", type: "error"})   
+            }
         setLoading(false)
     }
 
@@ -42,5 +39,3 @@ const DownloadChapterButton = ({manhwaTitle, chapter, color = Colors.white}: Dow
 }
 
 export default DownloadChapterButton
-
-const styles = StyleSheet.create({})

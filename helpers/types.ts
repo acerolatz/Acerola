@@ -169,34 +169,24 @@ export type Log = {
 }
 
 
-export type Document = {    
+export type DownloadStatus = 'pending' | 'downloading' | 'completed' | 'failed' | "cancelled"
+
+export interface DownloadRecord {
+    manhwa_id: number
+    chapter_id: number
+    chapter_name: string
     path: string
-    name: string
-    parent_document_path: string | null
-    descr: string | null
-    created_at: string
-    updated_at: string
+    status: DownloadStatus
+    created_at: number
+}
+
+export interface DownloadRequest {
+    chapter: Chapter
+    images: string[]
 }
 
 
-export interface DownloadItem {
-  id: string;
-  manhwaId: string;
-  manhwaTitle: string;
-  chapterId: string;
-  chapterTitle: string;
-  images: string[];
-  progress: number;
-  status: 'pending' | 'downloading' | 'completed' | 'error' | 'paused';
-  createdAt: number;
-  errorMessage?: string;
+export interface ActiveDownload {
+    request: DownloadRequest
+    image_url: string
 }
-
-export interface DownloadStatus {
-  queue: DownloadItem[];
-  currentDownload: DownloadItem | null;
-  isDownloading: boolean;
-  totalDownloaded: number;
-}
-
-export type Listener = (status: DownloadStatus) => void;

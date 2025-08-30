@@ -47,30 +47,58 @@ export async function deleteDocumentDir(path: string) {
 }
 
 
+export async function createChapterDir(manhwa_id: number, chapter_id: number): Promise<string> {
+  const path = `${documentsDir}/${manhwa_id}/${chapter_id}`
+  await createDocumentDir(path)
+  return path
+}
+
+
+export async function clearFolder(folderUri: string): Promise<void> {
+  try {
+    const items = await FileSystem.readDirectoryAsync(folderUri);
+    
+    for (const item of items) {
+      const itemUri = folderUri + item;
+      const info = await FileSystem.getInfoAsync(itemUri);
+
+      if (info.isDirectory) {        
+        await FileSystem.deleteAsync(itemUri, { idempotent: true });
+        await FileSystem.makeDirectoryAsync(itemUri, { intermediates: true });
+      } else {
+        await FileSystem.deleteAsync(itemUri, { idempotent: true });
+      }
+    }
+  } catch (error) {
+    console.error("Error clearing folder:", error);
+    throw error;
+  }
+}
+
+
 export const downloadImages = async (
-  urls: string[],
-  basePath: string,  
-  maxParallel: number = 8,
+  urls: string[], 
+  path: string,
   onProgress?: (progress: DownloadProgress) => void
 ): Promise<string[]> => {
   
+  await clearFolder(path)
   let completed = 0;
   const total = urls.length;
   const downloadedPaths: string[] = new Array(total);
 
   const downloadImage = async (url: string, index: number) => {
     const fileExt = url.split('.').pop()?.split('?')[0] || 'jpg';
-    const filePath = `${basePath}/image_${index + 1}.${fileExt}`;
-
+    const filePath = `${path}/image_${index + 1}.${fileExt}`;
     await RNFS.downloadFile({
       fromUrl: url,
       toFile: filePath,
-      progress: (res) => {
+      progress: async (res) => {
         if (onProgress) {
           const percentage = Math.floor(
             ((completed + res.bytesWritten / res.contentLength) / total) * 100
           );
-          onProgress({
+          await onProgress({
             current: completed + 1,
             total,
             percentage,
@@ -79,7 +107,6 @@ export const downloadImages = async (
       },
       progressDivider: 10,
     }).promise;
-
     downloadedPaths[index] = filePath;
     completed++;
     if (onProgress) {
@@ -91,12 +118,11 @@ export const downloadImages = async (
     }
   };
 
-  // Download pool
   const pool: Promise<void>[] = [];
   for (let i = 0; i < urls.length; i++) {
     const promise = downloadImage(urls[i], i);
     pool.push(promise);    
-    if (pool.length >= maxParallel) {
+    if (pool.length >= 8) {
       await Promise.race(pool);
       for (let j = pool.length - 1; j >= 0; j--) {
         if ((pool[j] as any).resolved) pool.splice(j, 1);
