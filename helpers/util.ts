@@ -88,7 +88,7 @@ export function getItemGridDimensions(
  * @returns Height value maintaining original aspect ratio
  */
 export function getRelativeHeight(originalWidth: number, originalHeight: number, width: number): number {
-  return width * (originalHeight / originalWidth)
+  return (originalHeight * width) / originalWidth;
 }
 
 
@@ -101,7 +101,7 @@ export function getRelativeHeight(originalWidth: number, originalHeight: number,
  * @returns Width value maintaining original aspect ratio
  */
 export function getRelativeWidth(originalWidth: number, originalHeight: number, height: number): number {
-  return height * (originalWidth / originalHeight)
+  return (originalWidth / originalHeight) * height;
 }
 
 

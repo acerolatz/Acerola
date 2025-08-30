@@ -6,6 +6,7 @@ import {
     Collection, 
     DebugManhwaImages, 
     DonateMethod,
+    Genre,
     Manhwa, 
     ManhwaCard, 
     Post, 
@@ -126,6 +127,21 @@ export async function spUpdateChapterView(p_chapter_id: number) {
 }
 
 
+export async function spFetchGenres(): Promise<Genre[]> {
+    const { data, error } = await supabase
+        .from("genres")
+        .select("*")
+        .order("genre")
+    
+    if (error) {
+        console.log("error spFetchGenres", error)
+        return []
+    }
+
+    return data
+}
+
+
 export async function spUpdateManhwaCardView(p_manhwa_id: number) {
     const { error } = await supabase
         .rpc("increment_manhwa_card_view", { p_manhwa_id })
@@ -168,6 +184,27 @@ export async function spFetchChapterImages(chapter_id: number): Promise<ChapterI
         const height = PixelRatio.roundToNearestPixel((width * i.height) / i.width)
         return { image_url: i.image_url, width, height}
     })
+}
+
+
+export async function spFetchChapterImagesUrls(chapter_id: number): Promise<string[]> {
+    const { data, error } = await supabase
+        .from("chapter_images")
+        .select("image_url")
+        .eq("chapter_id", chapter_id)
+        .order('index', {ascending: true})
+
+    if (error) {
+        console.log("error spFetchChapterImages", error)
+        const hasInternet = await hasInternetAvailable()
+        Toast.show(!hasInternet ? 
+            ToastMessages.EN.UNABLE_TO_LOAD_IMAGES_INTERNET : 
+            ToastMessages.EN.UNABLE_TO_LOAD_IMAGES
+        )
+        return []
+    }    
+    
+    return data.map(i => i.image_url)
 }
 
 

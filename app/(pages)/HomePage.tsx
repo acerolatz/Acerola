@@ -52,7 +52,6 @@ import {
 import { Image } from 'expo-image'
 
 
-
 const HomePage = () => {
 
     const db = useSQLiteContext()
@@ -119,7 +118,7 @@ const HomePage = () => {
                 ]);
 
                 if (!mounted) { return }
-                setGenres(g);
+                setGenres(g)
                 setLatestUpdates(l);
                 setMostView(m);
 

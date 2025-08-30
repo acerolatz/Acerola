@@ -2,23 +2,10 @@ import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 import { Typography } from '@/constants/typography'
 import { Collection } from '@/helpers/types'
 import { AppStyle } from '@/styles/AppStyle'
-import { Colors } from '@/constants/Colors'
 import React, { useCallback } from 'react'
 import { router } from 'expo-router'
 
 
-const Header = () => {
-
-    const onPress = () => {
-        router.navigate("/(pages)/CollectionsPage")
-    }
-
-    return (
-        <Pressable onPress={onPress} style={AppStyle.defaultGridItem} >
-            <Text style={[Typography.regular, {color: Colors.backgroundColor}]}>Collections</Text>
-        </Pressable>
-    )
-}
 
 const Item = ({item}: {item: Collection}) => {
 
@@ -35,7 +22,7 @@ const Item = ({item}: {item: Collection}) => {
 
     return (
         <Pressable onPress={onPress} style={AppStyle.defaultGridItem} >
-            <Text style={[Typography.regular, {color: Colors.backgroundColor}]}>{item.name}</Text>
+            <Text style={Typography.regularBlack}>{item.name}</Text>
         </Pressable>
     )
 }
@@ -47,9 +34,7 @@ const CollectionGrid = ({collections}: {collections: Collection[]}) => {
         <Item item={item} />
     ), [])
 
-    const KeyExtractor = useCallback((item: Collection) => item.collection_id.toString(), [])
-
-    const renderHeader = useCallback(() => <Header/>, [])
+    const KeyExtractor = useCallback((item: Collection) => item.collection_id.toString(), [])    
 
     if (collections.length === 0) { return <></> }
 
@@ -60,7 +45,6 @@ const CollectionGrid = ({collections}: {collections: Collection[]}) => {
                 horizontal={true}
                 initialNumToRender={10}
                 showsHorizontalScrollIndicator={false}
-                ListHeaderComponent={renderHeader}
                 keyExtractor={KeyExtractor}
                 renderItem={renderItem}
             />

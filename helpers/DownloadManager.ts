@@ -1,9 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DownloadItem, DownloadStatus, Listener } from './types';
 import RNFS from 'react-native-fs';
+import { AppConstants } from "@/constants/AppConstants";
+import Toast from "react-native-toast-message";
 
 
 class DownloadManager {
+
   private queue: DownloadItem[];
   private currentDownload: DownloadItem | null;
   private isDownloading: boolean;
@@ -87,7 +90,8 @@ class DownloadManager {
 
     // Verifica se já existe na fila
     if (this.queue.some(item => item.id === newDownload.id)) {
-      throw new Error('Este capítulo já está na fila de downloads');
+      Toast.show({text1: "Download already in queue", type: "info"})
+      return
     }
 
     this.queue.push(newDownload);
@@ -132,7 +136,7 @@ class DownloadManager {
 
   // Faz o download das imagens de um capítulo
   private async downloadImages(chapter: DownloadItem): Promise<void> {
-    const downloadPath = `${RNFS.DocumentDirectoryPath}/manhwas/${chapter.manhwaId}/${chapter.chapterId}`;
+    const downloadPath = `${AppConstants.APP.MANHWAS_DIR}/${chapter.manhwaId}/${chapter.chapterId}`;
     
     // Cria o diretório se não existir
     try {

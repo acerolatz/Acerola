@@ -3,8 +3,7 @@ import {
   View,
   Text,
   FlatList,
-  StyleSheet,
-  TouchableOpacity,
+  StyleSheet,  
   SafeAreaView,
   Pressable
 } from 'react-native';
@@ -15,10 +14,14 @@ import { Typography } from '@/constants/typography';
 import { AppStyle } from '@/styles/AppStyle';
 import TopBar from '@/components/TopBar';
 import Row from '@/components/util/Row';
+import { useSQLiteContext } from 'expo-sqlite';
 
 
-const DownloadScreen: React.FC = () => {
+const DownloadScreen = () => {
+
   const [downloads, setDownloads] = useState<DownloadStatus>(DownloadManager.getStatus());
+  const isDownloading = downloads.isDownloading
+  const queueIsEmpty = downloads.queue.length === 0  
 
   useEffect(() => {
     const handleUpdate: Listener = (status) => {
@@ -26,9 +29,7 @@ const DownloadScreen: React.FC = () => {
     };
 
     DownloadManager.addListener(handleUpdate);
-    return () => {
-      DownloadManager.removeListener(handleUpdate);
-    };
+    return () => { DownloadManager.removeListener(handleUpdate); };
   }, []);
 
   const renderDownloadItem = ({ item }: { item: DownloadItem }) => (
@@ -67,11 +68,8 @@ const DownloadScreen: React.FC = () => {
         )}
       </View>
       
-      <Pressable
-        style={styles.removeButton}
-        onPress={() => DownloadManager.removeDownload(item.id)}
-      >
-        <Text style={styles.removeButtonText}>Remove</Text>
+      <Pressable style={styles.removeButton} onPress={() => DownloadManager.removeDownload(item.id)}>
+        <Text style={Typography.regular}>Remove</Text>
       </Pressable>
     </View>
   );
@@ -86,7 +84,7 @@ const DownloadScreen: React.FC = () => {
       default: return status;
     }
   };
-
+  
   return (
     <SafeAreaView style={AppStyle.safeArea} >
       <TopBar title='Downloads' >
@@ -95,7 +93,6 @@ const DownloadScreen: React.FC = () => {
       
       <Row style={styles.statsContainer}>
         <Text style={Typography.regular}>Total: {downloads.totalDownloaded}</Text>
-        <Text style={Typography.regular}>In Queue: {downloads.queue.length}</Text>
       </Row>
       
       {downloads.currentDownload && (
@@ -107,61 +104,44 @@ const DownloadScreen: React.FC = () => {
             
             <View style={styles.progressContainer}>
               <View style={styles.progressBar}>
-                <View 
-                  style={[
-                    styles.progressFill, 
-                    { width: `${downloads.currentDownload.progress}%` }
-                  ]} 
-                />
+                <View style={[styles.progressFill, { width: `${downloads.currentDownload.progress}%` }]} />
               </View>
               <Text style={styles.progressText}>{downloads.currentDownload.progress}%</Text>
             </View>
             
             <View style={styles.actions}>
-              {downloads.isDownloading ? (
-                <TouchableOpacity 
-                  style={[styles.actionButton, styles.pauseButton]}
-                  onPress={() => DownloadManager.pauseDownload()}
-                >
+              {
+                isDownloading ?
+                <Pressable style={[styles.actionButton, styles.pauseButton]} onPress={() => DownloadManager.pauseDownload()}>
                   <Text style={styles.actionButtonText}>Pause</Text>
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity 
-                  style={[styles.actionButton, styles.resumeButton]}
-                  onPress={() => DownloadManager.resumeDownload()}
-                >
+                </Pressable>
+              : 
+                <Pressable style={[styles.actionButton, styles.resumeButton]} onPress={() => DownloadManager.resumeDownload()}>
                   <Text style={styles.actionButtonText}>Resume</Text>
-                </TouchableOpacity>
-              )}
+                </Pressable>
+              }
             </View>
           </View>
         </View>
       )}
       
-      <Text style={Typography.semibold}>Queue:</Text>
+      <Text style={Typography.semibold}>Queue: {downloads.queue.length}</Text>
       
       {
-      downloads.queue.length === 0 ? (
-        <View >
-          <Text style={Typography.regular}>Empty</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={downloads.queue.filter(item => item !== downloads.currentDownload)}
-          renderItem={renderDownloadItem}
-          keyExtractor={item => item.id}
-          style={styles.list}
-        />
-      )}
-      
-      {downloads.queue.length > 0 && (
-        <TouchableOpacity 
-          style={styles.clearButton}
-          onPress={() => DownloadManager.clearCompleted()}
-        >
-          <Text style={styles.clearButtonText}>Limpar Concluídos</Text>
-        </TouchableOpacity>
-      )}
+        !queueIsEmpty &&
+        <>
+          <FlatList
+            data={downloads.queue.filter(item => item !== downloads.currentDownload)}
+            renderItem={renderDownloadItem}
+            keyExtractor={item => item.id}
+            style={styles.list}
+          />
+          <Pressable style={styles.clearButton} onPress={() => DownloadManager.clearCompleted()}>
+            <Text style={styles.clearButtonText}>Clear</Text>
+          </Pressable>
+        </>
+      }
+
     </SafeAreaView>
   );
 };

@@ -5,6 +5,9 @@ import { Colors } from '@/constants/Colors'
 import React, { useCallback } from 'react'
 import { Genre } from '@/helpers/types'
 import { router } from 'expo-router'
+import { Image } from 'expo-image'
+import { getRelativeHeight, wp } from '@/helpers/util'
+import { AppConstants } from '@/constants/AppConstants'
 
 
 const Item = ({item}: {item: Genre}) => {
@@ -21,20 +24,7 @@ const Item = ({item}: {item: Genre}) => {
     
     return (
         <Pressable onPress={() => onPress(item)} style={AppStyle.defaultGridItem} >
-            <Text style={[Typography.regular, {color: Colors.backgroundColor}]} >{item.genre}</Text>
-        </Pressable>
-    )
-}
-
-
-const Header = () => {
-    const onPress = () => {
-        router.navigate("/(pages)/GenresPage")
-    }
-
-    return (
-        <Pressable onPress={onPress} style={AppStyle.defaultGridItem} >
-            <Text style={[Typography.regular, {color: Colors.backgroundColor}]} >Genres</Text>
+            <Text style={Typography.regularBlack} >{item.genre}</Text>
         </Pressable>
     )
 }
@@ -46,9 +36,7 @@ const GenreGrid = ({genres}: {genres: Genre[]}) => {
 
     const renderItem = useCallback(({item}: {item: Genre}) => (
         <Item item={item} />
-    ), [])
-
-    const renderHeader = useCallback(() => <Header/>, [])
+    ), [])    
 
     if (genres.length === 0) { return <></> }
 
@@ -60,7 +48,6 @@ const GenreGrid = ({genres}: {genres: Genre[]}) => {
                 initialNumToRender={10}
                 showsHorizontalScrollIndicator={false}
                 keyExtractor={KeyExtractor}
-                ListHeaderComponent={renderHeader}
                 renderItem={renderItem}
             />
         </View>

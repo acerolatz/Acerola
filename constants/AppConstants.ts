@@ -1,5 +1,6 @@
 import { createDocumentPath } from "@/helpers/storage";
 import { hp, wp } from "@/helpers/util";
+import RNFS from 'react-native-fs';
 
 
 export const AppConstants = {
@@ -10,6 +11,7 @@ export const AppConstants = {
     NAME: "Acerola",
     VERSION: "v1.1.1",
     DEBUG: { ENABLED: true },
+    MANHWAS_DIR: `${RNFS.DocumentDirectoryPath}/manhwas`
   },
 
   // =========================================================
@@ -26,7 +28,7 @@ export const AppConstants = {
   // UI CONFIG
   // =========================================================
   UI: {
-    ANIMATION_TIME: 300,
+    ANIMATION_TIME: 200,
     MENU: {
       WIDTH: wp(65),
     },

@@ -13,6 +13,7 @@ import TopBar from '../TopBar'
 import Row from '../util/Row'
 import React from 'react'
 import Button from '../buttons/Button'
+import DownloadChapterButton from '../buttons/DownloadChapterButton'
 
 
 interface ChapterHeaderProps {
@@ -29,8 +30,8 @@ const ChapterHeader = ({
 }: ChapterHeaderProps) => {
 
   const { chapters, currentChapterIndex, setCurrentChapterIndex } =  useChapterState()  
-  const chapterName = currentChapterIndex < chapters.length ? chapters[currentChapterIndex].chapter_name : ''
-  const reportTitle = `${mangaTitle}/${chapterName}`
+  const chapter = chapters[currentChapterIndex]  
+  const reportTitle = `${mangaTitle}/${chapter.chapter_name}`
 
   const exitChapter = async () => {
     Image.clearMemoryCache()
@@ -66,6 +67,7 @@ const ChapterHeader = ({
         <Row style={{gap: AppConstants.UI.ICON.SIZE}} >
           <BugReportButton title={reportTitle} />
           <RotatingButton onPress={reloadChapter} />
+          <DownloadChapterButton chapter={chapter} manhwaTitle={mangaTitle} />
         </Row>
 
         <Row style={styles.chapterSelector} >
@@ -78,7 +80,7 @@ const ChapterHeader = ({
             {
               loading ?
               <ActivityIndicator size={AppConstants.UI.ICON.SIZE} color={Colors.white} /> :
-              <Text style={Typography.regular}>{chapterName}</Text>
+              <Text style={Typography.regular}>{chapter.chapter_name}</Text>
             }
           </View>
           {

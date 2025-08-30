@@ -2,7 +2,8 @@
 
 export type Genre = {
     genre: string
-    genre_id: number    
+    genre_id: number
+    image_url: string
 }
 
 
