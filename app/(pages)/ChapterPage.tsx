@@ -92,7 +92,7 @@ const ChapterPage = () => {
   const listHeader = useMemo(() => (
     <ChapterHeader
       reloadChapter={reloadChapter}
-      mangaTitle={manhwaTitle}
+      manhwaTitle={manhwaTitle}
       loading={loading}
     />
   ), [reloadChapter, manhwaTitle, loading])  

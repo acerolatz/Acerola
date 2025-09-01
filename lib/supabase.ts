@@ -12,6 +12,7 @@ import {
     Post, 
     ReleaseWrapper, 
     Scan, 
+    ServerManhwa, 
     SourceCodeLink 
 } from "@/helpers/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -49,7 +50,7 @@ export async function spUpdateUserLastLogin(user_id: string) {
 }
 
 
-export async function spGetManhwas(p_last_sync: string | null): Promise<Manhwa[] | null> {
+export async function spGetManhwas(p_last_sync: string | null): Promise<ServerManhwa[] | null> {
     const { data, error } = await supabase
         .rpc("get_manhwas", { p_last_sync })        
     
@@ -84,7 +85,7 @@ export async function spRegisterNewUser(user_id: string, device: string, version
 }
 
 
-export async function spFetchManhwaById(manhwa_id: number): Promise<Manhwa | null> {
+export async function spFetchManhwaById(manhwa_id: number): Promise<ServerManhwa | null> {
     const { data, error } = await supabase
         .from("mv_manhwas")
         .select('*')

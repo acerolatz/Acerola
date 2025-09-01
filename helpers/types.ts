@@ -44,6 +44,24 @@ export type Manhwa = {
     alt_titles: string[]
 }
 
+export type ServerManhwa = {
+    manhwa_id: number
+    title: string
+    views: number
+    descr: string
+    cover_image_url: string
+    status: "OnGoing" | "Completed"
+    updated_at: string
+    color: string
+    chapters: Chapter[]
+    genres: Genre[]
+    authors: ManhwaAuthor[]
+    alt_titles: string[]
+    rating: number
+    total_ratings: number
+}
+
+
 export type AppRelease = {
     version: string
     url: string
@@ -171,7 +189,9 @@ export type Log = {
 
 export type DownloadStatus = 'pending' | 'downloading' | 'completed' | 'failed' | "cancelled"
 
+
 export interface DownloadRecord {
+    manhwa_name: string
     manhwa_id: number
     chapter_id: number
     chapter_name: string
@@ -181,12 +201,6 @@ export interface DownloadRecord {
 }
 
 export interface DownloadRequest {
+    manhwa_name: string
     chapter: Chapter
-    images: string[]
-}
-
-
-export interface ActiveDownload {
-    request: DownloadRequest
-    image_url: string
 }

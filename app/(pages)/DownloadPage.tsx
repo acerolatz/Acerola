@@ -1,19 +1,89 @@
-// src/screens/DownloadStatusScreen.tsx
-import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, Button, StyleSheet, SafeAreaView } from "react-native";
-import { ProgressBar } from "@react-native-community/progress-bar-android";
+import React, { useCallback, useEffect, useState } from "react";
+import { Text, FlatList, StyleSheet, View, SafeAreaView } from "react-native";
 import { downloadManager } from "@/helpers/DownloadManager";
 import { databaseManager } from "@/lib/downloadDatabase";
 import { AppStyle } from "@/styles/AppStyle";
 import TopBar from "@/components/TopBar";
 import ReturnButton from "@/components/buttons/ReturnButton";
+import { DownloadRecord, DownloadRequest } from "@/helpers/types";
+import { Typography } from "@/constants/typography";
+import Row from "@/components/util/Row";
+import Column from "@/components/util/Column";
+import Button from "@/components/buttons/Button";
+import { Colors } from "@/constants/Colors";
+import CustomActivityIndicator from "@/components/util/CustomActivityIndicator";
+import { AppConstants } from "@/constants/AppConstants";
+import Footer from "@/components/util/Footer";
+
+
+type DownloadState = {
+  downloads: DownloadRecord[]
+  queueSize: number
+  currentDownload: DownloadRequest | null
+}
+
+
+const CurrentDownloadItem = ({item}: {item: DownloadRequest}) => {
+  return (
+    <Row style={styles.container}>
+      <Column>
+        <Text style={Typography.semiboldBlack}>{item.manhwa_name}</Text>
+        <Text style={Typography.regularBlack}>Chapter {item.chapter.chapter_name} [downloading]</Text>
+      </Column>
+      <CustomActivityIndicator color={Colors.backgroundColor} />
+    </Row>
+  )
+}
+
+
+interface ItemProps {
+  download: DownloadRecord
+  setState: React.Dispatch<React.SetStateAction<DownloadState>>  
+}
+
+
+const Item = ({download, setState}: ItemProps) => {
+
+  const [loading, setLoading] = useState(false)
+
+  const deleteItem = useCallback(async () => {
+    setLoading(true)
+    await databaseManager.deleteDownload(download.manhwa_id, download.chapter_id)
+    setState(prev => {return {
+      ...prev,
+      downloads: prev.downloads.filter(i => i.manhwa_id != download.manhwa_id && i.chapter_id && download.chapter_id)
+    }})    
+    setLoading(false)
+  }, [download.path])
+
+  return (
+    <Row style={styles.container}>
+      <Column>
+        <Text style={Typography.semiboldBlack}>{download.manhwa_name}</Text>
+        <Text style={Typography.regularBlack}>Chapter {download.chapter_name} [{download.status}]</Text>
+      </Column>
+      {
+        loading || download.status == 'downloading' ?
+        <CustomActivityIndicator color={Colors.backgroundColor} /> :
+        <Button onPress={deleteItem} iconName="trash-outline" iconColor={Colors.backgroundColor} />        
+      }
+    </Row>
+  )
+}
+
 
 export default function DownloadStatusScreen() {
-  const [downloads, setDownloads] = useState<any[]>([]);
+
+  const [state, setState] = useState<DownloadState>({downloads: [], queueSize: 0, currentDownload: null})  
 
   const refresh = async () => {
-    const all = await databaseManager.getAllDownloads();
-    setDownloads(all);
+    await Promise.all([
+      databaseManager.getAllCompletedDownloads(),
+      downloadManager.queueSize(),
+      downloadManager.currentDownload()
+    ]).then(([downloads, queueSize, currentDownload]) => {
+      setState({downloads, queueSize, currentDownload})
+    })
   };
 
   useEffect(() => {
@@ -31,36 +101,38 @@ export default function DownloadStatusScreen() {
   }, []);
 
 
+  const renderItem = useCallback(
+    ({item}: {item: DownloadRecord}) => <Item download={item} setState={setState} />, 
+    []
+  )
+
+  const renderFooter = useCallback(() => <Footer/>, [])
+
   return (
     <SafeAreaView style={AppStyle.safeArea} >
       <TopBar title="Downloads" >
         <ReturnButton/>
       </TopBar>
+      <View style={{flex: 1, gap: AppConstants.UI.GAP}} >
+        <Text style={Typography.semibold}>On Queue: {state.queueSize}</Text>
+        {state.currentDownload && <CurrentDownloadItem item={state.currentDownload} />}
+        
+        <FlatList
+          data={state.downloads}
+          keyExtractor={(item) => item.chapter_id.toString()}
+          renderItem={renderItem}
+          ListFooterComponent={renderFooter}
+        />
+      </View>
 
-      <FlatList
-        data={downloads}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.item}>
-            <Text style={styles.text}>{item.manhwaId} - Capítulo {item.chapterId}</Text>
-            <Text>Status: {item.status}</Text>
-            <ProgressBar
-              styleAttr="Horizontal"
-              progress={item.progress || 0}
-              indeterminate={false}
-            />
-          </View>
-        )}
-      />
-      
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: "#fff" },
-  title: { fontSize: 20, fontWeight: "bold", marginBottom: 10 },
-  item: { marginBottom: 15, borderBottomWidth: 1, borderColor: "#ddd", paddingBottom: 8 },
-  text: { fontSize: 16, fontWeight: "500" },
-  actions: { flexDirection: "row", gap: 10, marginTop: 5 },
+  container: {
+    ...AppStyle.defaultGridItem,
+    justifyContent: "space-between",
+    marginBottom: AppConstants.UI.MARGIN
+  }
 });

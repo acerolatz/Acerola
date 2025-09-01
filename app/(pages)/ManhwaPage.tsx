@@ -28,6 +28,7 @@ import { dbGetManhwaAltNames, dbReadManhwaById, dbUpdateManhwaViews } from '@/li
 import React, { memo, useEffect, useState, useRef, useCallback } from 'react';
 import { ActivityIndicator, FlatList, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { useChapterState } from '@/store/chapterState';
+import DownloadManhwaButton from '@/components/buttons/DownloadManhwaButton';
 
 
 interface ItemProps {
@@ -66,6 +67,7 @@ const ManhwaPage = () => {
   const [loading, setLoading] = useState(false);
   const [manhwa, setManhwa] = useState<Manhwa | null>(null);
   const [altNames, setAltNames] = useState<string[]>([]);
+  const chapters = useChapterState((s) => s.chapters)
   const setChapters = useChapterState((s) => s.setChapters);
 
   const isCancelled = useRef(false);
@@ -126,6 +128,7 @@ const ManhwaPage = () => {
             <Row style={styles.topBar}>
               <HomeButton />
               <Row style={{ gap: AppConstants.UI.ICON.SIZE }}>
+                <DownloadManhwaButton manhwa_name={manhwa.title} chapters={chapters} />
                 <RandomManhwaButton color={Colors.backgroundColor} />
                 <ReturnButton color={Colors.backgroundColor} />
               </Row>

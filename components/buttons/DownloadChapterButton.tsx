@@ -10,19 +10,19 @@ import { Colors } from '@/constants/Colors'
 
 
 interface DownloadChapterButtonProps {
+    manhwaTitle: string
     chapter: Chapter
     color?: string
 }
 
 
-const DownloadChapterButton = ({chapter, color = Colors.white}: DownloadChapterButtonProps) => {
+const DownloadChapterButton = ({manhwaTitle, chapter, color = Colors.white}: DownloadChapterButtonProps) => {
 
     const [loading, setLoading] = useState(false)
 
     const onPress = async () => {
         setLoading(true)
-            const images: string[] = await spFetchChapterImagesUrls(chapter.chapter_id)
-            const success: boolean = await downloadManager.addToQueue({chapter, images})
+            const success: boolean = await downloadManager.addToQueue({ manhwa_name: manhwaTitle, chapter })
             if (success) {
                 Toast.show({text1: "Added to download queue", type: "info"})
             } else {

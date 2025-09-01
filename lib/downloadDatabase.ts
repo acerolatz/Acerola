@@ -19,11 +19,12 @@ class DatabaseManager {
         PRAGMA synchronous = NORMAL;
         PRAGMA foreign_keys = ON;
         PRAGMA temp_store = MEMORY;
-        PRAGMA cache_size = -1024;
+        PRAGMA cache_size = -512;
         PRAGMA mmap_size = 268435456;
-        PRAGMA optimize;
+        PRAGMA optimize;        
 
         CREATE TABLE IF NOT EXISTS downloads (
+          manhwa_name TEXT NOT NULL,
           manhwa_id INTEGER NOT NULL,
           chapter_id INTEGER NOT NULL,
           chapter_name TEXT NOT NULL,
@@ -33,6 +34,8 @@ class DatabaseManager {
           created_at INTEGER NOT NULL,
           CONSTRAINT downloads_pkey PRIMARY KEY (manhwa_id, chapter_id)
         );
+
+        DELETE FROM downloads WHERE status != 'completed';
 
         CREATE INDEX IF NOT EXISTS idx_downloads_status ON downloads(status);
         CREATE INDEX IF NOT EXISTS idx_downloads_manhwa_id ON downloads(manhwa_id);
@@ -54,9 +57,10 @@ class DatabaseManager {
     return r !== null
   }
   
-  async createDownload(chapter: Chapter): Promise<DownloadRecord> {
+  async createDownload(manhwa_name: string, chapter: Chapter): Promise<DownloadRecord> {
     const path = await createChapterDir(chapter.manhwa_id, chapter.chapter_id)
     const record: DownloadRecord = {
+      manhwa_name,
       manhwa_id: chapter.manhwa_id,
       chapter_id: chapter.chapter_id,
       chapter_name: chapter.chapter_name,
@@ -67,11 +71,12 @@ class DatabaseManager {
     try {
       await this.db.runAsync(
         `INSERT INTO 
-            downloads (manhwa_id, chapter_id, chapter_name, path, status, created_at) 
+            downloads (manhwa_name, manhwa_id, chapter_id, chapter_name, path, status, created_at) 
          VALUES 
-            (?, ?, ?, ?, ?, ?)
+            (?,?,?,?,?,?,?)
          `,
         [
+          manhwa_name,
           chapter.manhwa_id,
           chapter.chapter_id,
           chapter.chapter_name,
@@ -80,7 +85,7 @@ class DatabaseManager {
           record.created_at
         ]
       );
-      console.log(`Download created for manhwa ${record.manhwa_id}, chapter ${record.chapter_id}`);
+      console.log(`Download created for manhwa ${manhwa_name}/${record.manhwa_id}, chapter ${record.chapter_id}`);
     } catch (error) {
       console.error("Error creating download:", error);
       record.status = 'failed'
@@ -92,6 +97,18 @@ class DatabaseManager {
     try {
       const result = await this.db.getAllAsync<DownloadRecord>(
         "SELECT * FROM downloads ORDER BY created_at DESC"
+      );
+      return result;
+    } catch (error) {
+      console.error("Error fetching downloads:", error);
+      throw error;
+    }
+  }
+
+  async getAllCompletedDownloads(): Promise<DownloadRecord[]> {
+    try {
+      const result = await this.db.getAllAsync<DownloadRecord>(
+        "SELECT * FROM downloads WHERE status = 'completed' ORDER BY created_at DESC"
       );
       return result;
     } catch (error) {

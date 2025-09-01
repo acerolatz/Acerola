@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
-import { Manhwa, ManhwaCard } from '@/helpers/types'
+import { Manhwa, ManhwaCard, ServerManhwa } from '@/helpers/types'
 import { useSQLiteContext } from 'expo-sqlite'
 import { dbHasManhwa, dbUpsertManhwa } from '@/lib/database'
 import { spFetchManhwaById, spUpdateManhwaCardView } from '@/lib/supabase'
@@ -35,7 +35,7 @@ const RandomManhwaCard = React.memo(({ card }: RandomManhwaCardProps) => {
         const hasManhwa = await dbHasManhwa(db, card.manhwa_id)
         if (!hasManhwa) {
             setLoading(true)
-                const m: Manhwa | null = await spFetchManhwaById(card.manhwa_id)
+                const m: ServerManhwa | null = await spFetchManhwaById(card.manhwa_id)
                 if (!m) {
                     Toast.show(ToastMessages.EN.INVALID_MANHWA)
                     return

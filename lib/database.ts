@@ -5,6 +5,7 @@ import {
   Manhwa, 
   ManhwaAuthor, 
   ManhwaGenre,    
+  ServerManhwa,    
   Todo,  
   UserData 
 } from '@/helpers/types';
@@ -74,6 +75,13 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       color TEXT NOT NULL,
       views INTEGER NOT NULL DEFAULT 0,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS manhwa_ratings (
+      manhwa_id INTEGER PRIMARY KEY,
+      user_rating INTEGER NOT NULL DEFAULT 0,
+      rating INTEGER NOT NULL DEFAULT 0,
+      total_rating INTEGER NOT NULL DEFAULT 0      
     );
 
     CREATE TABLE IF NOT EXISTS alt_titles (
@@ -502,7 +510,7 @@ export async function dbShouldSyncDatabase(db: SQLite.SQLiteDatabase): Promise<b
 }
 
 
-export async function dbUpsertManhwa(db: SQLite.SQLiteDatabase, manhwa: Manhwa) {
+export async function dbUpsertManhwa(db: SQLite.SQLiteDatabase, manhwa: ServerManhwa) {
   await db.runAsync(
     `    
       INSERT OR REPLACE INTO manhwas (
@@ -542,6 +550,21 @@ export async function dbUpsertManhwa(db: SQLite.SQLiteDatabase, manhwa: Manhwa) 
     manhwa.manhwa_id, 
     manhwa.alt_titles ? [manhwa.title, ...manhwa.alt_titles] : [manhwa.title]
   )
+
+  await db.runAsync(
+    `
+      INSERT INTO 
+        manhwa_ratings (manhwa_id, rating, total_rating)
+      VALUES (?, ?, ?)
+      ON CONFLICT
+        (manhwa_id)
+      DO UPDATE SET
+        rating = EXCLUDED.rating,
+        total_rating = EXCLUDED.total_rating
+    `,
+    [manhwa.manhwa_id, manhwa.rating, manhwa.total_ratings]
+  ).catch(error => console.log("error INSERT INTO manhwa_ratings", error))
+
 }
 
 
@@ -745,7 +768,7 @@ export async function dbSyncDatabase(db: SQLite.SQLiteDatabase): Promise<number>
   const last_sync_timestampz = last_sync === 0 ? null : new Date(last_sync).toISOString()
   
   const response_time_start = Date.now()
-  const manhwas: Manhwa[] | null = await spGetManhwas(last_sync_timestampz)
+  const manhwas: ServerManhwa[] | null = await spGetManhwas(last_sync_timestampz)
   const response_time_end = Date.now()
 
   if (manhwas === null) { 
@@ -771,6 +794,7 @@ export async function dbSyncDatabase(db: SQLite.SQLiteDatabase): Promise<number>
   const genres: GenreSet = new GenreSet()
   const manhwaAuthors: any[] = []
   const manhwaGenres: any[] = []
+  const ratings: (number | string)[] = []
   const altTitles: (number | string)[] = []
 
   manhwas.forEach(manhwa => {
@@ -796,6 +820,10 @@ export async function dbSyncDatabase(db: SQLite.SQLiteDatabase): Promise<number>
       altTitles.push(manhwa.manhwa_id)
       altTitles.push(title)
     })
+
+    // Ratings
+    ratings.push(manhwa.manhwa_id)
+    ratings.push(manhwa.rating)
   }),
   
   await Promise.all([
@@ -817,8 +845,17 @@ export async function dbSyncDatabase(db: SQLite.SQLiteDatabase): Promise<number>
       '(?,?,?)',
       3,
       'ON CONFLICT (author_id) DO UPDATE SET name = EXCLUDED.name, role = EXCLUDED.role'
+    ),
+    dbUpsertBatch(
+      db,
+      ratings,
+      'manhwa_ratings',
+      'manhwa_id, rating, total_rating',
+      '(?,?,?)',
+      3,
+      'ON CONFLICT (manhwa_id) DO UPDATE SET rating = EXCLUDED.rating, total_rating = EXCLUDED.total_rating'
     )
-  ])  
+  ])
 
   await Promise.all([
     dbUpsertBatch(

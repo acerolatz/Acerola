@@ -2,6 +2,8 @@ import { DownloadRequest, DownloadRecord, DownloadProgress } from "@/helpers/typ
 import { databaseManager } from "@/lib/downloadDatabase";
 import { EventEmitter } from "eventemitter3";
 import { downloadImages } from "./storage";
+import { spFetchChapterImagesUrls } from "@/lib/supabase";
+import Toast from "react-native-toast-message";
 
 
 
@@ -27,9 +29,14 @@ class DownloadManager {
     this.emitter.off(event, listener);
   }
 
-  async addToQueue(request: DownloadRequest): Promise<boolean> {
-    const exists = await this.db.downloadExists(request.chapter.manhwa_id, request.chapter.chapter_id)
-    if (exists) { return false }
+  async addToQueue(request: DownloadRequest, show_warnings: boolean = true): Promise<boolean> {
+    const download: DownloadRecord | null = await this.db.getDownloadById(request.chapter.manhwa_id, request.chapter.chapter_id)
+    if (download !== null) {
+      if (show_warnings) {
+        Toast.show({text1: "Download already exists!", text2: `Status: ${download.status}`, type: "error"})
+      }
+      return false
+    }
     this.queue.push(request);
     this.emitter.emit("queueUpdate", this.queue);
     this.processQueue();
@@ -41,7 +48,7 @@ class DownloadManager {
     this.isDownloading = true;
 
     const request = this.queue.shift()!;
-    this.emitter.emit("queueUpdate", this.queue);
+    this.emitter.emit("queueUpdate", this.queue)
 
     try {
       await this.downloadChapter(request);
@@ -52,19 +59,27 @@ class DownloadManager {
   }
 
   private async downloadChapter(request: DownloadRequest) {
-    const record: DownloadRecord = await this.db.createDownload(request.chapter)
+    const record: DownloadRecord = await this.db.createDownload(request.manhwa_name, request.chapter)
+    const images: string[] = await spFetchChapterImagesUrls(request.chapter.chapter_id)
     this.db.updateDownloadStatus(record.manhwa_id, record.chapter_id, 'downloading')
-
     await downloadImages(
-      request.images, 
+      images,
       record.path,
       async (process: DownloadProgress) => {
         await this.db.updateDownloadProgress(record.manhwa_id, record.chapter_id, process.percentage)
       }
     )
 
-    this.db.updateDownloadStatus(record.manhwa_id, record.chapter_id, 'completed')
-  }  
+    this.db.updateDownloadStatus(record.manhwa_id, record.chapter_id, 'completed')    
+  }
+
+  currentDownload(): DownloadRequest | null {
+    return this.queue.length > 0 ? this.queue[0] : null    
+  }
+
+  queueSize(): number {
+    return this.queue.length
+  }
 
 }
 

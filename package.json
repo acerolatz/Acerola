@@ -59,6 +59,7 @@
     "react-native-restart": "^0.0.27",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
+    "react-native-star-rating-widget": "^1.9.2",
     "react-native-toast-message": "^2.3.3",
     "react-native-uuid": "^2.0.3",
     "react-native-web": "~0.20.0",

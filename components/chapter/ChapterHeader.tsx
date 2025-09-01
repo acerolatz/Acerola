@@ -17,21 +17,21 @@ import DownloadChapterButton from '../buttons/DownloadChapterButton'
 
 
 interface ChapterHeaderProps {
-  mangaTitle: string
+  manhwaTitle: string
   loading: boolean
   reloadChapter: () => any  
 }
 
 
 const ChapterHeader = ({ 
-  mangaTitle,
+  manhwaTitle,
   loading,
   reloadChapter  
 }: ChapterHeaderProps) => {
 
   const { chapters, currentChapterIndex, setCurrentChapterIndex } =  useChapterState()  
   const chapter = chapters[currentChapterIndex]  
-  const reportTitle = `${mangaTitle}/${chapter.chapter_name}`
+  const reportTitle = `${manhwaTitle}/${chapter.chapter_name}`
 
   const exitChapter = async () => {
     Image.clearMemoryCache()
@@ -58,7 +58,7 @@ const ChapterHeader = ({
 
   return (
     <Column style={styles.container} >
-      <TopBar title={mangaTitle} titleColor={'white'} >
+      <TopBar title={manhwaTitle} titleColor={'white'} >
         <ReturnButton onPress={exitChapter} color={'white'}/>
       </TopBar>
 
@@ -67,7 +67,7 @@ const ChapterHeader = ({
         <Row style={{gap: AppConstants.UI.ICON.SIZE}} >
           <BugReportButton title={reportTitle} />
           <RotatingButton onPress={reloadChapter} />
-          <DownloadChapterButton chapter={chapter} />
+          <DownloadChapterButton manhwaTitle={manhwaTitle} chapter={chapter} />
         </Row>
 
         <Row style={styles.chapterSelector} >
