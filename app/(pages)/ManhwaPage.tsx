@@ -91,13 +91,13 @@ const ManhwaPage = () => {
   const handleChange = useCallback(async (value: number) => {
     if (value == rating.user_rating) { return }
     setRatingEnabled(false)
-    sleep(0.2)
+    await sleep(0.2)
     if (userId.current === null) { userId.current = await dbGetUserUUID(db) }
     setRating(prev => ({ ...prev, user_rating: value })) 
     dbUpdateUserRating(db, manhwa_id, value)
     await spUpdateManhwaRating(manhwa_id, value * 10.0, userId.current)
     setRatingEnabled(true)
-  }, [db, manhwa_id])
+  }, [db, manhwa_id, rating.user_rating])
 
   const init = useCallback(async () => {
     if (!manhwa_id) {
@@ -162,7 +162,7 @@ const ManhwaPage = () => {
           <Row style={styles.topBar}>
             <HomeButton />            
             <Row style={{ gap: AppConstants.UI.ICON.SIZE }}>
-              <DownloadManhwaButton manhwa_name={manhwa.title} chapters={chapters} />
+              <DownloadManhwaButton manhwa_name={manhwa.title} manhwa_id={manhwa.manhwa_id} chapters={chapters} />
               <RandomManhwaButton color={Colors.backgroundColor} />
               <ReturnButton color={Colors.backgroundColor} />
             </Row>
@@ -174,12 +174,12 @@ const ManhwaPage = () => {
           </View>
 
           <Text style={Typography.semiboldXl}>{manhwa.title}</Text>                    
+          <ManhwaAlternativeNames names={altNames} />
           <Rating 
             value={rating.user_rating != 0 ? rating.user_rating : rating.rating / 10.0}
             setValue={handleChange} 
             color={manhwa.color}
             readOnly={!ratingEnabled} />
-          <ManhwaAlternativeNames names={altNames} />
           <Text style={Typography.light}>last update: {formatTimestamp(manhwa.updated_at)}</Text>
           <ManhwaSummary summary={manhwa.descr} />
           <ManhwaAuthorInfo manhwa={manhwa} />

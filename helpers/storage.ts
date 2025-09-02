@@ -47,8 +47,8 @@ export async function deleteDocumentDir(path: string) {
 }
 
 
-export async function createChapterDir(manhwa_id: number, chapter_id: number): Promise<string> {
-  const path = `${documentsDir}/${manhwa_id}/${chapter_id}`
+export async function createChapterDir(chapter_id: number): Promise<string> {
+  const path = `${documentsDir}/${chapter_id}`
   await createDocumentDir(path)
   return path
 }

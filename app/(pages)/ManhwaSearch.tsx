@@ -27,7 +27,7 @@ const ManhwaSearch = () => {
   const fetching = useRef(false)
   const hasResults = useRef(true)
   const isMounted = useRef(true)
-  const page = useRef(0)
+  const page = useRef(0)  
   
   useEffect(() => {
     isMounted.current = true
@@ -84,7 +84,7 @@ const ManhwaSearch = () => {
 
   const renderItem = useCallback(({item}: {item: Manhwa}) => (
     <ManhwaCard      
-      width={AppConstants.MEDIA.MANHWA_COVER.WIDTH} 
+      width={AppConstants.MEDIA.MANHWA_COVER.WIDTH}
       height={AppConstants.MEDIA.MANHWA_COVER.HEIGHT}
       marginBottom={AppConstants.UI.GAP / 2}
       manhwa={item}      
@@ -121,6 +121,7 @@ export default ManhwaSearch
 const styles = StyleSheet.create({
   container: {
     flex: 1, 
+    width: '100%',
     gap: AppConstants.UI.GAP
   },
   footer: {

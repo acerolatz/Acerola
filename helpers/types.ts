@@ -191,9 +191,8 @@ export type DownloadStatus = 'pending' | 'downloading' | 'completed' | 'failed' 
 
 
 export interface DownloadRecord {
-    manhwa_name: string
-    manhwa_id: number
     chapter_id: number
+    manhwa_id: number
     chapter_name: string
     path: string
     status: DownloadStatus
@@ -201,8 +200,10 @@ export interface DownloadRecord {
 }
 
 export interface DownloadRequest {
+    chapter_id: number
+    manhwa_id: number
     manhwa_name: string
-    chapter: Chapter
+    chapter_name: string
 }
 
 
@@ -211,4 +212,12 @@ export type ManhwaRating = {
     user_rating: number
     rating: number
     total_rating: number
+}
+
+
+export type DownloadByManhwa = {
+    manhwa_id: number
+    title: string
+    cover_image_url: string
+    completed_downloads: number
 }

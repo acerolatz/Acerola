@@ -1,24 +1,42 @@
-import { DownloadRequest, DownloadRecord, DownloadProgress } from "@/helpers/types";
-import { databaseManager } from "@/lib/downloadDatabase";
-import { EventEmitter } from "eventemitter3";
-import { downloadImages } from "./storage";
+import { 
+  dbCreateDownload, 
+  dbDeleteAllDownloads, 
+  dbReadDownload, 
+  dbReadDownloadsByStatus, 
+  dbReadPendingDownloads, 
+  dbUpdateDownloadProgress, 
+  dbUpdateDownloadStatus 
+} from "@/lib/database";
+import { 
+  DownloadRequest, 
+  DownloadRecord, 
+  DownloadProgress 
+} from "@/helpers/types";
 import { spFetchChapterImagesUrls } from "@/lib/supabase";
 import Toast from "react-native-toast-message";
+import { EventEmitter } from "eventemitter3";
+import { SQLiteDatabase } from "expo-sqlite";
+import { downloadImages } from "./storage";
 
 
 
 class DownloadManager {
+
   private static instance: DownloadManager;
   private queue: DownloadRequest[] = [];
   private isDownloading = false;
   private emitter = new EventEmitter();
-  private db = databaseManager
 
   static getInstance() {
     if (!DownloadManager.instance) {
       DownloadManager.instance = new DownloadManager();
     }
     return DownloadManager.instance;
+  }
+
+  async init(db: SQLiteDatabase) {
+    const records = await dbReadPendingDownloads(db)
+    records.forEach(r => this.addToQueue(db, r,false))
   }
 
   on(event: "progress" | "queueUpdate", listener: (data: any) => void) {
@@ -29,8 +47,8 @@ class DownloadManager {
     this.emitter.off(event, listener);
   }
 
-  async addToQueue(request: DownloadRequest, show_warnings: boolean = true): Promise<boolean> {
-    const download: DownloadRecord | null = await this.db.getDownloadById(request.chapter.manhwa_id, request.chapter.chapter_id)
+  async addToQueue(db: SQLiteDatabase, request: DownloadRequest, show_warnings: boolean = true): Promise<boolean> {
+    const download: DownloadRecord | null = await dbReadDownload(db, request.chapter_id)
     if (download !== null) {
       if (show_warnings) {
         Toast.show({text1: "Download already exists!", text2: `Status: ${download.status}`, type: "error"})
@@ -39,11 +57,11 @@ class DownloadManager {
     }
     this.queue.push(request);
     this.emitter.emit("queueUpdate", this.queue);
-    this.processQueue();
+    this.processQueue(db);
     return true
   }
 
-  private async processQueue() {
+  private async processQueue(db: SQLiteDatabase) {
     if (this.isDownloading || this.queue.length === 0) return;
     this.isDownloading = true;
 
@@ -51,26 +69,30 @@ class DownloadManager {
     this.emitter.emit("queueUpdate", this.queue)
 
     try {
-      await this.downloadChapter(request);
+      await this.downloadChapter(db, request);
     } finally {
       this.isDownloading = false;
-      this.processQueue();
+      this.processQueue(db);
     }
   }
 
-  private async downloadChapter(request: DownloadRequest) {
-    const record: DownloadRecord = await this.db.createDownload(request.manhwa_name, request.chapter)
-    const images: string[] = await spFetchChapterImagesUrls(request.chapter.chapter_id)
-    this.db.updateDownloadStatus(record.manhwa_id, record.chapter_id, 'downloading')
+  private async downloadChapter(db: SQLiteDatabase, request: DownloadRequest) {
+    const record: DownloadRecord = await dbCreateDownload(db, request.manhwa_id, request.chapter_id, request.chapter_name)
+    const images: string[] = await spFetchChapterImagesUrls(request.chapter_id)
+    await dbUpdateDownloadStatus(db, record.chapter_id, 'downloading')
     await downloadImages(
       images,
       record.path,
       async (process: DownloadProgress) => {
-        await this.db.updateDownloadProgress(record.manhwa_id, record.chapter_id, process.percentage)
+        await dbUpdateDownloadProgress(db, record.chapter_id, process.percentage)
       }
     )
+    await dbUpdateDownloadStatus(db, record.chapter_id, 'completed')
+  }
 
-    this.db.updateDownloadStatus(record.manhwa_id, record.chapter_id, 'completed')    
+  async deleteAllDownloads(db: SQLiteDatabase) {
+    await dbDeleteAllDownloads(db)
+    this.queue = []
   }
 
   currentDownload(): DownloadRequest | null {

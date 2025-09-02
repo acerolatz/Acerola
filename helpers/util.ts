@@ -351,3 +351,19 @@ export function closestMultipleOf16RoundUpOnTie(x: number): number {
 export function newArrayFrom(length: number): Array<number> {
   return Array.from({ length }, (_, i) => i)
 }
+
+
+export async function asyncPool<T, R>(poolLimit: number, array: T[], iteratorFn: (item: T) => Promise<R>) {
+  const ret: Promise<R>[] = [];
+  const executing: Promise<any>[] = [];
+  for (const item of array) {
+      const p = Promise.resolve().then(() => iteratorFn(item));
+      ret.push(p);
+      if (poolLimit <= array.length) {
+          const e: Promise<any> = p.then(() => executing.splice(executing.indexOf(e), 1));
+          executing.push(e);
+          if (executing.length >= poolLimit) await Promise.race(executing);
+      }
+  }
+  return Promise.all(ret);
+}

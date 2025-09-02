@@ -1,35 +1,33 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Text, FlatList, StyleSheet, View, SafeAreaView } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Text, StyleSheet, View, SafeAreaView } from "react-native";
 import { downloadManager } from "@/helpers/DownloadManager";
-import { databaseManager } from "@/lib/downloadDatabase";
 import { AppStyle } from "@/styles/AppStyle";
 import TopBar from "@/components/TopBar";
 import ReturnButton from "@/components/buttons/ReturnButton";
-import { DownloadRecord, DownloadRequest } from "@/helpers/types";
+import { DownloadRequest, DownloadByManhwa, Manhwa } from "@/helpers/types";
 import { Typography } from "@/constants/typography";
 import Row from "@/components/util/Row";
-import Column from "@/components/util/Column";
-import Button from "@/components/buttons/Button";
 import { Colors } from "@/constants/Colors";
 import CustomActivityIndicator from "@/components/util/CustomActivityIndicator";
 import { AppConstants } from "@/constants/AppConstants";
-import Footer from "@/components/util/Footer";
+import { dbReadDownloadedManhwas } from "@/lib/database";
+import { useSQLiteContext } from "expo-sqlite";
+import ManhwaGrid from "@/components/grid/ManhwaGrid";
+import Column from "@/components/util/Column";
+import TextButton from "@/components/buttons/TextButton";
 
 
 type DownloadState = {
-  downloads: DownloadRecord[]
+  downloads: Manhwa[]
   queueSize: number
-  currentDownload: DownloadRequest | null
+  currentDownload: DownloadRequest | null  
 }
 
 
 const CurrentDownloadItem = ({item}: {item: DownloadRequest}) => {
   return (
-    <Row style={styles.container}>
-      <Column>
-        <Text style={Typography.semiboldBlack}>{item.manhwa_name}</Text>
-        <Text style={Typography.regularBlack}>Chapter {item.chapter.chapter_name} [downloading]</Text>
-      </Column>
+    <Row style={styles.container} >
+      <Text style={{...Typography.regularBlack, flexShrink: 1}}>{item.manhwa_name}/{item.chapter_name}</Text>
       <CustomActivityIndicator color={Colors.backgroundColor} />
     </Row>
   )
@@ -37,54 +35,43 @@ const CurrentDownloadItem = ({item}: {item: DownloadRequest}) => {
 
 
 interface ItemProps {
-  download: DownloadRecord
-  setState: React.Dispatch<React.SetStateAction<DownloadState>>  
+  download: DownloadByManhwa
 }
 
 
-const Item = ({download, setState}: ItemProps) => {
+const Item = ({download}: ItemProps) => {
 
   const [loading, setLoading] = useState(false)
-
-  const deleteItem = useCallback(async () => {
-    setLoading(true)
-    await databaseManager.deleteDownload(download.manhwa_id, download.chapter_id)
-    setState(prev => {return {
-      ...prev,
-      downloads: prev.downloads.filter(i => i.manhwa_id != download.manhwa_id && i.chapter_id && download.chapter_id)
-    }})    
-    setLoading(false)
-  }, [download.path])
-
+  
   return (
     <Row style={styles.container}>
-      <Column>
-        <Text style={Typography.semiboldBlack}>{download.manhwa_name}</Text>
-        <Text style={Typography.regularBlack}>Chapter {download.chapter_name} [{download.status}]</Text>
-      </Column>
-      {
-        loading || download.status == 'downloading' ?
-        <CustomActivityIndicator color={Colors.backgroundColor} /> :
-        <Button onPress={deleteItem} iconName="trash-outline" iconColor={Colors.backgroundColor} />        
-      }
+      <Text style={{...Typography.regularBlack, flexShrink: 1}} >{download.title}</Text>
+      <Text style={Typography.regularBlack} >{download.completed_downloads}</Text>
     </Row>
   )
 }
 
 
-export default function DownloadStatusScreen() {
+export default function DownloadPage() {
 
-  const [state, setState] = useState<DownloadState>({downloads: [], queueSize: 0, currentDownload: null})  
+  const db = useSQLiteContext()
+  
+  const [state, setState] = useState<DownloadState>({
+    downloads: [], 
+    queueSize: 0, 
+    currentDownload: null    
+  })
 
   const refresh = async () => {
     await Promise.all([
-      databaseManager.getAllCompletedDownloads(),
+      dbReadDownloadedManhwas(db),
       downloadManager.queueSize(),
-      downloadManager.currentDownload()
+      downloadManager.currentDownload()      
     ]).then(([downloads, queueSize, currentDownload]) => {
       setState({downloads, queueSize, currentDownload})
     })
   };
+
 
   useEffect(() => {
     refresh();
@@ -101,28 +88,36 @@ export default function DownloadStatusScreen() {
   }, []);
 
 
-  const renderItem = useCallback(
-    ({item}: {item: DownloadRecord}) => <Item download={item} setState={setState} />, 
-    []
-  )
+  const onPress = (manhwa: Manhwa) => {
 
-  const renderFooter = useCallback(() => <Footer/>, [])
+  }
 
   return (
     <SafeAreaView style={AppStyle.safeArea} >
       <TopBar title="Downloads" >
         <ReturnButton/>
       </TopBar>
-      <View style={{flex: 1, gap: AppConstants.UI.GAP}} >
-        <Text style={Typography.semibold}>On Queue: {state.queueSize}</Text>
-        {state.currentDownload && <CurrentDownloadItem item={state.currentDownload} />}
-        
-        <FlatList
-          data={state.downloads}
-          keyExtractor={(item) => item.chapter_id.toString()}
-          renderItem={renderItem}
-          ListFooterComponent={renderFooter}
+      <View style={{flex: 1, gap: AppConstants.UI.MARGIN}} >
+        <Text style={Typography.semibold}>In Queue: {state.queueSize}</Text>
+        {
+          state.currentDownload &&
+          <>
+          <CurrentDownloadItem item={state.currentDownload} />
+          <Row style={{gap: AppConstants.UI.MARGIN}} >
+            <TextButton text="Pause" />
+            <TextButton text="Clear" />
+          </Row>
+          </>
+        }
+
+
+        <ManhwaGrid
+          onPress={onPress}
+          manhwas={state.downloads}
+          showsVerticalScrollIndicator={false}
+          showManhwaStatus={false}
         />
+
       </View>
 
     </SafeAreaView>
@@ -131,8 +126,10 @@ export default function DownloadStatusScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    ...AppStyle.defaultGridItem,
-    justifyContent: "space-between",
-    marginBottom: AppConstants.UI.MARGIN
+    height: AppConstants.UI.BUTTON.SIZE,
+    backgroundColor: Colors.primary,
+    paddingHorizontal: AppConstants.UI.ITEM_PADDING.HORIZONTAL,
+    borderRadius: AppConstants.UI.BORDER_RADIUS,
+    justifyContent: "space-between"
   }
 });

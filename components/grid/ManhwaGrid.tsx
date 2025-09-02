@@ -5,11 +5,12 @@ import React, { useCallback } from 'react'
 import { Manhwa } from '@/helpers/types'
 import ManhwaCard from '../ManhwaCard'
 import Footer from '../util/Footer'
-import { hp } from '@/helpers/util'
+import { getRelativeHeight, hp, wp } from '@/helpers/util'
 
 
 interface MangaGridProps {
     manhwas: Manhwa[]
+    onPress?: (manhwa: Manhwa) => any
     onEndReached?: () => void
     numColumns?: number
     showsVerticalScrollIndicator?: boolean
@@ -19,6 +20,7 @@ interface MangaGridProps {
 
 const ManhwaGrid = ({
     manhwas, 
+    onPress,
     onEndReached,
     numColumns = 2,    
     showsVerticalScrollIndicator = true,
@@ -32,14 +34,15 @@ const ManhwaGrid = ({
     const keyExtractor = useCallback((item: Manhwa) => item.manhwa_id.toString(), [])
 
     const renderItem = useCallback(({item}: {item: Manhwa}) => (
-        <ManhwaCard
-            showManhwaStatus={showManhwaStatus}
-            width={AppConstants.MEDIA.MANHWA_COVER.WIDTH} 
+        <ManhwaCard        
+            onPress={onPress}            
+            width={AppConstants.MEDIA.MANHWA_COVER.WIDTH}
             height={AppConstants.MEDIA.MANHWA_COVER.HEIGHT}
-            marginBottom={AppConstants.UI.GAP / 2}
+            showManhwaStatus={showManhwaStatus}
+            marginBottom={AppConstants.UI.MARGIN}
             manhwa={item}
         />
-      ), [])
+    ), [])
     
     return (
         <View style={styles.container} >
@@ -47,7 +50,7 @@ const ManhwaGrid = ({
                 showsVerticalScrollIndicator={showsVerticalScrollIndicator}
                 keyboardShouldPersistTaps={'handled'}
                 numColumns={numColumns}
-                data={manhwas}
+                data={manhwas}                
                 keyExtractor={keyExtractor}
                 onEndReached={onEndReached}
                 drawDistance={hp(250)}
@@ -65,12 +68,5 @@ export default ManhwaGrid
 const styles = StyleSheet.create({
     container: {
         flex: 1        
-    },
-    footer: {
-        width: '100%', 
-        marginBottom: 62, 
-        marginTop: AppConstants.UI.GAP, 
-        alignItems: "center", 
-        justifyContent: "center"
-    }
+    }    
 })

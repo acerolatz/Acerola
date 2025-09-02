@@ -18,6 +18,7 @@ import DownloadChapterButton from '../buttons/DownloadChapterButton'
 
 interface ChapterHeaderProps {
   manhwaTitle: string
+  manhwa_id: number,
   loading: boolean
   reloadChapter: () => any  
 }
@@ -25,6 +26,7 @@ interface ChapterHeaderProps {
 
 const ChapterHeader = ({ 
   manhwaTitle,
+  manhwa_id,
   loading,
   reloadChapter  
 }: ChapterHeaderProps) => {
@@ -67,7 +69,7 @@ const ChapterHeader = ({
         <Row style={{gap: AppConstants.UI.ICON.SIZE}} >
           <BugReportButton title={reportTitle} />
           <RotatingButton onPress={reloadChapter} />
-          <DownloadChapterButton manhwaTitle={manhwaTitle} chapter={chapter} />
+          <DownloadChapterButton manhwa_name={manhwaTitle} manhwa_id={manhwa_id} chapter_id={chapter.chapter_id} chapter_name={chapter.chapter_name} />
         </Row>
 
         <Row style={styles.chapterSelector} >

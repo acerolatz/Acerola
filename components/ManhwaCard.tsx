@@ -18,16 +18,18 @@ import { hp, wp } from '@/helpers/util';
 
 interface ManhwaCardProps {
     manhwa: Manhwa
+    onPress?: (manhwa: Manhwa) => any
     width?: number
     height?: number
     marginRight?: number
     marginBottom?: number
-    showManhwaStatus?: boolean    
+    showManhwaStatus?: boolean
 }
 
 
 const ManhwaCard = ({
     manhwa,
+    onPress,
     width = wp(70),
     height = hp(50),
     marginRight = AppConstants.UI.MARGIN,
@@ -35,20 +37,23 @@ const ManhwaCard = ({
     showManhwaStatus = true    
 }: ManhwaCardProps) => {        
 
-    const onPress = useCallback(() => {
+    
+    const defaultOnPress = useCallback(() => {
         router.push({
             pathname: '/(pages)/ManhwaPage',
             params: { manhwa_id: manhwa.manhwa_id }
         });
     }, [manhwa.manhwa_id]);    
 
+    const o = onPress ? onPress : defaultOnPress
+
     return (
-        <Pressable onPress={onPress} style={{width, height, marginRight, marginBottom, gap: AppConstants.UI.GAP}} >
+        <Pressable onPress={() => o(manhwa)} style={{width, height, marginBottom, marginRight}} >
             <Image
                 source={manhwa.cover_image_url} 
                 contentFit='cover'                
                 cachePolicy={'disk'}
-                style={[{width, height, borderRadius: AppConstants.UI.BORDER_RADIUS}]}
+                style={{width, height, borderRadius: AppConstants.UI.BORDER_RADIUS}}
                 transition={AppConstants.UI.ANIMATION_TIME}
             />
             { showManhwaStatus && <ManhwaStatusComponent status={manhwa.status} /> }
@@ -90,10 +95,5 @@ const styles = StyleSheet.create({
         left: wp(1),
         bottom: wp(1),
         paddingRight: wp(1.2)
-    },
-    chapterLinkContainer: {
-        width: '100%', 
-        gap: AppConstants.UI.MARGIN, 
-        paddingRight: 6
-    }
+    }    
 })

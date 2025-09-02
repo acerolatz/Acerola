@@ -81,7 +81,8 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'flex-start',
     alignItems: 'center',
-    gap: AppConstants.UI.MARGIN
+    gap: AppConstants.UI.MARGIN,
+    left: -3
   },
   absolute: {
     position: 'absolute',

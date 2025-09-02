@@ -1,5 +1,5 @@
 import { createDocumentPath } from "@/helpers/storage";
-import { hp, wp } from "@/helpers/util";
+import { getRelativeHeight, hp, wp } from "@/helpers/util";
 import RNFS from 'react-native-fs';
 
 
@@ -76,7 +76,7 @@ export const AppConstants = {
   // MEDIA & LAYOUT
   // =========================================================
   MEDIA: {
-    MANHWA_COVER: {
+    MANHWA_COVER: {      
       WIDTH: wp(46) - hp(1.2) / 2,
       HEIGHT: hp(35),
     },

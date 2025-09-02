@@ -1,6 +1,11 @@
 import { 
   Author,
+  Chapter,
   DebugInfo,  
+  DownloadByManhwa,  
+  DownloadRecord,  
+  DownloadRequest,  
+  DownloadStatus,  
   Genre,    
   Manhwa, 
   ManhwaAuthor, 
@@ -11,6 +16,7 @@ import {
   UserData 
 } from '@/helpers/types';
 import {
+  asyncPool,
   dbGetSupportedAbis, 
   formatBytes, 
   getCacheSizeBytes, 
@@ -23,6 +29,7 @@ import { AuthorSet } from '@/helpers/AuthorSet';
 import { GenreSet } from '@/helpers/GenreSet';
 import * as SQLite from 'expo-sqlite';
 import uuid from 'react-native-uuid';
+import { createChapterDir, deleteDocumentDir } from '@/helpers/storage';
 
 
 export async function dbMigrate(db: SQLite.SQLiteDatabase) {
@@ -139,6 +146,24 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       finished_at TIMESTAMP DEFAULT NULL      
     );
+
+    CREATE TABLE IF NOT EXISTS downloads (
+      chapter_id INTEGER PRIMARY KEY,
+      manhwa_id INTEGER NOT NULL,
+      chapter_name TEXT NOT NULL,
+      path TEXT NOT NULL,
+      status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'downloading', 'completed', 'failed', 'cancelled')),
+      progress INTEGER DEFAULT 0,
+      created_at INTEGER NOT NULL      
+    );
+
+    -- ===============================
+
+
+    -- ===============================
+    --              DELETE
+    -- ===============================
+    DELETE FROM downloads WHERE status NOT IN ('completed', 'pending');
     -- ===============================
 
     -- ===============================
@@ -157,7 +182,10 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
     
     CREATE INDEX IF NOT EXISTS idx_alt_titles ON alt_titles(title, manhwa_id);
     CREATE INDEX IF NOT EXISTS idx_alt_titles_manhwa ON alt_titles(manhwa_id);
-    CREATE INDEX IF NOT EXISTS idx_manhwas_updated_at ON manhwas(updated_at DESC);    
+    CREATE INDEX IF NOT EXISTS idx_manhwas_updated_at ON manhwas(updated_at DESC);
+
+    CREATE INDEX IF NOT EXISTS idx_downloads_status ON downloads(status);
+    CREATE INDEX IF NOT EXISTS idx_downloads_created_at ON downloads(created_at);
     -- ================================
     
 
@@ -1987,4 +2015,151 @@ export async function dbUpdateUserRating(db: SQLite.SQLiteDatabase, manhwa_id: n
     'UPDATE manhwa_ratings SET user_rating = ? WHERE manhwa_id = ?;',
     [Math.floor(rating), manhwa_id]
   ).catch(error => console.log("error dbUpdateUserRating", error))
+}
+
+
+export async function dbReadDownload(db: SQLite.SQLiteDatabase, chapter_id: number): Promise<DownloadRecord | null> {
+  const r = await db.getFirstAsync<DownloadRecord>(
+    'SELECT * FROM downloads WHERE chapter_id = ?;',
+    [chapter_id]
+  ).catch(error => console.log("error dbReadDownload", error))
+  return r ? r : null
+}
+
+
+export async function dbCreateDownload(db: SQLite.SQLiteDatabase, manhwa_id: number, chapter_id: number, chapter_name: string): Promise<DownloadRecord> {
+  const path = await createChapterDir(chapter_id)
+    const record: DownloadRecord = {
+      manhwa_id,
+      chapter_id,
+      chapter_name,
+      path,
+      status: 'pending',
+      created_at: Date.now()
+    }
+    try {
+      await db.runAsync(
+        `INSERT INTO 
+            downloads (chapter_id, manhwa_id, chapter_name, path, status, created_at) 
+          VALUES 
+            (?,?,?,?,?,?)
+          `,
+        [
+          chapter_id,
+          manhwa_id,
+          chapter_name,
+          path,
+          'pending',
+          record.created_at
+        ]
+      );
+      console.log(`Download created for chapter ${record.chapter_id}`);
+    } catch (error) {
+      console.error("Error creating download:", error);
+      record.status = 'failed'
+    }
+    return record
+}
+
+
+export async function dbUpdateDownloadStatus(
+  db: SQLite.SQLiteDatabase, 
+  chapter_id: number, 
+  status: DownloadStatus
+) {
+  await db.runAsync(
+    "UPDATE downloads SET status = ? WHERE chapter_id = ?",
+    [status, chapter_id]
+  ).catch(error => console.log("error dbUpdateDownloadStatus", error))
+}
+
+
+export async function dbUpdateDownloadProgress(
+  db: SQLite.SQLiteDatabase,  
+  chapter_id: number,
+  progress: number
+) {
+  await db.runAsync(
+    "UPDATE downloads SET progress = ? WHERE chapter_id = ?",
+    [Math.floor(progress), chapter_id]
+  );
+}
+
+
+export async function dbDeleteDownload(
+  db: SQLite.SQLiteDatabase,   
+  chapter_id: number
+) {
+ const d: DownloadRecord | null = await dbReadDownload(db, chapter_id)
+  if (d) {
+    await deleteDocumentDir(d.path)
+    await db.runAsync(
+      "DELETE FROM downloads WHERE chapter_id = ?",
+      [chapter_id]
+    );
+    console.log(`[DOWNLOAD DELETED FOR CHAPTER ${chapter_id}]`);
+  } 
+}
+
+
+export async function dbReadDownloadsByStatus(db: SQLite.SQLiteDatabase, status: DownloadStatus): Promise<DownloadRecord[]> {
+  const r = await db.getAllAsync<DownloadRecord>(
+    'SELECT * FROM downloads WHERE status = ? ORDER BY created_at DESC;',
+    [status]
+  ).catch(error => console.log("error dbReadDownloadsByStatus", error))
+  return r ? r : []
+}
+
+
+export async function dbReadPendingDownloads(db: SQLite.SQLiteDatabase): Promise<DownloadRequest[]> {
+  const r = await db.getAllAsync(
+    `
+      SELECT 
+        d.*,
+        m.title
+      FROM
+        downloads d
+      JOIN  
+        manhwas m ON m.manhwa_id = d.manhwa_id
+      WHERE
+        d.status = 'pending';
+    `
+  ).catch(error => console.log("error dbReadPendingDownloads", error))
+
+  return r ? r.map((i: any) => {return {
+    chapter_id: i.chapter_id,
+    chapter_name: i.chapter_name,
+    manhwa_id: i.manhwa_id,
+    manhwa_name: i.title
+  }}) : []
+}
+
+
+
+export async function dbDeleteAllDownloads(db: SQLite.SQLiteDatabase) {
+  const records = (await dbReadAll<DownloadRecord>(db, 'downloads')).map(i => i.path)
+  await asyncPool<string, void>(8, records, deleteDocumentDir)
+  await dbCleanTable(db, 'downloads')
+}
+
+
+export async function dbReadDownloadedManhwas(db: SQLite.SQLiteDatabase): Promise<Manhwa[]> {
+  const r = await db.getAllAsync<Manhwa>(
+    `
+      SELECT 
+        m.*        
+      FROM 
+        manhwas m
+      JOIN 
+        downloads d ON d.manhwa_id = m.manhwa_id
+      WHERE 
+        d.status = 'completed'
+      GROUP 
+        BY m.manhwa_id
+      ORDER BY 
+        m.title ASC;
+    `
+  ).catch(error => console.log("error dbReadDownloadsByManhwas", error))
+
+  return r ? r : []
 }
