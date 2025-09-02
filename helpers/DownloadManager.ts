@@ -51,10 +51,15 @@ class DownloadManager {
     const download: DownloadRecord | null = await dbReadDownload(db, request.chapter_id)
     if (download !== null) {
       if (show_warnings) {
-        Toast.show({text1: "Download already exists!", text2: `Status: ${download.status}`, type: "error"})
+        Toast.show({
+          text1: "Download already exists!", 
+          text2: `Status: ${download.status}`, 
+          type: "error"
+        })
       }
       return false
     }
+    await dbCreateDownload(db, request.manhwa_id, request.chapter_id, request.chapter_name)
     this.queue.push(request);
     this.emitter.emit("queueUpdate", this.queue);
     this.processQueue(db);
@@ -69,24 +74,18 @@ class DownloadManager {
     this.emitter.emit("queueUpdate", this.queue)
 
     try {
-      await this.downloadChapter(db, request);
+      const record = await dbReadDownload(db, request.chapter_id)
+      if (record) { await this.downloadChapter(db, record); }
     } finally {
       this.isDownloading = false;
       this.processQueue(db);
     }
   }
 
-  private async downloadChapter(db: SQLiteDatabase, request: DownloadRequest) {
-    const record: DownloadRecord = await dbCreateDownload(db, request.manhwa_id, request.chapter_id, request.chapter_name)
-    const images: string[] = await spFetchChapterImagesUrls(request.chapter_id)
+  private async downloadChapter(db: SQLiteDatabase, record: DownloadRecord) {    
+    const images: string[] = await spFetchChapterImagesUrls(record.chapter_id)
     await dbUpdateDownloadStatus(db, record.chapter_id, 'downloading')
-    await downloadImages(
-      images,
-      record.path,
-      async (process: DownloadProgress) => {
-        await dbUpdateDownloadProgress(db, record.chapter_id, process.percentage)
-      }
-    )
+    await downloadImages(images, record.path)
     await dbUpdateDownloadStatus(db, record.chapter_id, 'completed')
   }
 

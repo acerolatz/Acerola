@@ -50,6 +50,7 @@ const styles = StyleSheet.create({
     container: {
         ...AppStyle.defaultGridItem,
         gap: AppConstants.UI.GAP,
-        flexDirection: 'row'
+        flexDirection: 'row',
+        marginBottom: AppConstants.UI.MARGIN
     }    
 })

@@ -2027,38 +2027,40 @@ export async function dbReadDownload(db: SQLite.SQLiteDatabase, chapter_id: numb
 }
 
 
-export async function dbCreateDownload(db: SQLite.SQLiteDatabase, manhwa_id: number, chapter_id: number, chapter_name: string): Promise<DownloadRecord> {
+export async function dbCreateDownload(
+  db: SQLite.SQLiteDatabase, 
+  manhwa_id: number, 
+  chapter_id: number, 
+  chapter_name: string
+): Promise<DownloadRecord> {
   const path = await createChapterDir(chapter_id)
-    const record: DownloadRecord = {
-      manhwa_id,
+  const record: DownloadRecord = {
+    manhwa_id,
+    chapter_id,
+    chapter_name,
+    path,
+    status: 'pending',
+    created_at: Date.now()
+  }
+  await db.runAsync(
+    `INSERT INTO 
+        downloads (chapter_id, manhwa_id, chapter_name, path, status, created_at) 
+      VALUES 
+        (?,?,?,?,?,?)
+      ON CONFLICT
+        (chapter_id)
+      DO NOTHING;
+      `,
+    [
       chapter_id,
+      manhwa_id,
       chapter_name,
       path,
-      status: 'pending',
-      created_at: Date.now()
-    }
-    try {
-      await db.runAsync(
-        `INSERT INTO 
-            downloads (chapter_id, manhwa_id, chapter_name, path, status, created_at) 
-          VALUES 
-            (?,?,?,?,?,?)
-          `,
-        [
-          chapter_id,
-          manhwa_id,
-          chapter_name,
-          path,
-          'pending',
-          record.created_at
-        ]
-      );
-      console.log(`Download created for chapter ${record.chapter_id}`);
-    } catch (error) {
-      console.error("Error creating download:", error);
-      record.status = 'failed'
-    }
-    return record
+      'pending',
+      record.created_at
+    ]
+  ).catch(error => {console.log("error dbCreateDownload", error); record.status = 'failed'})
+  return record
 }
 
 
@@ -2082,7 +2084,7 @@ export async function dbUpdateDownloadProgress(
   await db.runAsync(
     "UPDATE downloads SET progress = ? WHERE chapter_id = ?",
     [Math.floor(progress), chapter_id]
-  );
+  ).catch(error => console.log("error dbUpdateDownloadProgress", error))
 }
 
 
@@ -2096,7 +2098,7 @@ export async function dbDeleteDownload(
     await db.runAsync(
       "DELETE FROM downloads WHERE chapter_id = ?",
       [chapter_id]
-    );
+    ).catch(error => console.log("error dbDeleteDownload", error))
     console.log(`[DOWNLOAD DELETED FOR CHAPTER ${chapter_id}]`);
   } 
 }

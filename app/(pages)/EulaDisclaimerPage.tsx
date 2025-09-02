@@ -18,6 +18,7 @@ import {
     Text, 
     View 
 } from 'react-native'
+import Row from '@/components/util/Row'
 
 
 const width = AppConstants.UI.SCREEN.WIDTH - AppConstants.UI.SCREEN.PADDING_HORIZONTAL * 2
@@ -89,23 +90,25 @@ const EulaAndDisclaimerPage = () => {
         return (
             <SafeAreaView style={AppStyle.safeArea} >
                 <TopBar title={title}>
-                    <ReturnButton/>
+                    <Row style={{gap: AppConstants.UI.GAP}} >
+                        <View style={styles.dotsContainer}>
+                            {
+                                texts.map((_, i) => {
+                                    const opacity = scrollX.interpolate({
+                                        inputRange: [(i - 1) * width, i * width, (i + 1) * width, ],
+                                        outputRange: [0.3, 1, 0.3],
+                                        extrapolate: 'clamp',
+                                    });        
+                                    return (
+                                        <Animated.View key={i} style={[styles.dot, { opacity }]}/>
+                                    );
+                                })
+                            }
+                        </View>
+                        <ReturnButton/>
+                    </Row>
                 </TopBar>
                 <View style={styles.container}>
-                    <View style={styles.dotsContainer}>
-                        {
-                            texts.map((_, i) => {
-                                const opacity = scrollX.interpolate({
-                                    inputRange: [(i - 1) * width, i * width, (i + 1) * width, ],
-                                    outputRange: [0.3, 1, 0.3],
-                                    extrapolate: 'clamp',
-                                });        
-                                return (
-                                    <Animated.View key={i} style={[styles.dot, { opacity }]}/>
-                                );
-                            })
-                        }
-                    </View>            
                     <Animated.FlatList
                         data={texts}
                         keyboardShouldPersistTaps='handled'
@@ -148,8 +151,7 @@ const styles = StyleSheet.create({
     },
     dotsContainer: {
         flexDirection: 'row',
-        justifyContent: 'center',
-        marginBottom: AppConstants.UI.GAP
+        justifyContent: 'center'        
     },
     dot: {
         height: AppConstants.UI.ICON.SIZE * 0.5,

@@ -1,13 +1,11 @@
+import CustomActivityIndicator from '../util/CustomActivityIndicator'
+import { downloadManager } from '@/helpers/DownloadManager'
+import Toast from 'react-native-toast-message'
+import { useSQLiteContext } from 'expo-sqlite'
+import { Colors } from '@/constants/Colors'
+import { Chapter } from '@/helpers/types'
 import React, { useState } from 'react'
 import Button from './Button'
-import { Chapter } from '@/helpers/types'
-import { downloadManager } from '@/helpers/DownloadManager'
-import CustomActivityIndicator from '../util/CustomActivityIndicator'
-import { Colors } from '@/constants/Colors'
-import Toast from 'react-native-toast-message'
-import { ToastMessages } from '@/constants/Messages'
-import { useSQLiteContext } from 'expo-sqlite'
-import { sleep } from '@/helpers/util'
 
 
 interface  DownloadManhwaButtonProps {
@@ -30,11 +28,20 @@ const DownloadManhwaButton = ({
 
     const onPress = async () => {
         setLoading(true)
-        chapters.forEach(chapter => 
-            downloadManager.addToQueue(db, {manhwa_name, manhwa_id, chapter_id: chapter.chapter_id, chapter_name: chapter.chapter_name}, false)
-        )
+        for (let i = 0; i < chapters.length; i++) {
+            const chapter = chapters[i]
+            downloadManager.addToQueue(
+                db,
+                {
+                    manhwa_name,
+                    manhwa_id,
+                    chapter_id: chapter.chapter_id,
+                    chapter_name: chapter.chapter_name
+                },
+                false
+            )
+        }
         Toast.show({text1: "Download started!", type: "info"})
-        await sleep(2)
         setLoading(false)
     }
 
