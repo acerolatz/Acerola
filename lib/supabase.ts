@@ -639,3 +639,14 @@ export async function spFetchCardAndCoverLatest(p_limit: number = 32): Promise<D
         }
     })
 }
+
+
+export async function spUpdateManhwaRating(manhwa_id: number, rating: number, user_id: string) {    
+    const { error } = await supabase
+        .from("manhwa_ratings")
+        .upsert([{ manhwa_id, rating, user_id}], { onConflict: "manhwa_id, user_id" })
+
+    if (error) {
+        console.log(error)
+    }
+}

@@ -5,6 +5,7 @@ import {
   Manhwa, 
   ManhwaAuthor, 
   ManhwaGenre,    
+  ManhwaRating,    
   ServerManhwa,    
   Todo,  
   UserData 
@@ -480,8 +481,7 @@ export async function dbFirstRun(db: SQLite.SQLiteDatabase) {
 
 export async function dbGetManhwaAltNames(
   db: SQLite.SQLiteDatabase, 
-  manhwa_id: number, 
-  manhwa_title: string
+  manhwa_id: number  
 ): Promise<string[]> {
   const r = await db.getAllAsync<{title: string}>(
     `
@@ -495,7 +495,7 @@ export async function dbGetManhwaAltNames(
     [manhwa_id]
   ).catch(error => console.log("erro  dbGetManhwaAltNames", error))
 
-  return r ? r.map(i => i.title).filter(i => i != manhwa_title) : []
+  return r ? r.map(i => i.title) : []
 }
 
 
@@ -824,6 +824,7 @@ export async function dbSyncDatabase(db: SQLite.SQLiteDatabase): Promise<number>
     // Ratings
     ratings.push(manhwa.manhwa_id)
     ratings.push(manhwa.rating)
+    ratings.push(manhwa.total_ratings)
   }),
   
   await Promise.all([
@@ -959,6 +960,7 @@ export async function dbReadManhwaById(
   ).catch(error => console.log("error dbReadManhwaById", manhwa_id, error));
 
   return row ? row as Manhwa : null
+
 }
 
 
@@ -1967,4 +1969,22 @@ export async function dbSetDebugInfo(
     dbSetNumericInfo(db, 'images', debug.images),
     dbSetNumericInfo(db, 'current_chapter_milestone', debug.current_chapter_milestone)
   ]).catch(error => console.log("erro dbSetDebugInfo", error))
+}
+
+
+export async function dbReadManhwaRating(db: SQLite.SQLiteDatabase, manhwa_id: number): Promise<ManhwaRating> {
+  const r = await db.getFirstAsync<ManhwaRating>(
+    'SELECT * FROM manhwa_ratings WHERE manhwa_id = ?;',
+    [manhwa_id]
+  ).catch(error => console.log("error dbReadManhwaRating", error))
+
+  return r ? r : {manhwa_id: -1, rating: 0, total_rating: 0, user_rating: 0}
+}
+
+
+export async function dbUpdateUserRating(db: SQLite.SQLiteDatabase, manhwa_id: number, rating: number) {
+  await db.runAsync(
+    'UPDATE manhwa_ratings SET user_rating = ? WHERE manhwa_id = ?;',
+    [Math.floor(rating), manhwa_id]
+  ).catch(error => console.log("error dbUpdateUserRating", error))
 }

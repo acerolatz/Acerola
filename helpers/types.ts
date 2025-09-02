@@ -204,3 +204,11 @@ export interface DownloadRequest {
     manhwa_name: string
     chapter: Chapter
 }
+
+
+export type ManhwaRating = {
+    manhwa_id: number
+    user_rating: number
+    rating: number
+    total_rating: number
+}

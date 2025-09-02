@@ -20,6 +20,7 @@ import { Colors } from '@/constants/Colors'
 import Row from '@/components/util/Row'
 import {
     dbGetManhwaReadingHistory,         
+    dbReadAll,         
     dbReadGenres, 
     dbReadManhwasOrderedByUpdateAt, 
     dbReadManhwasOrderedByViews
@@ -109,7 +110,6 @@ const HomePage = () => {
     useEffect(() => {
             let mounted = true;
             setLoading(true);
-
             (async () => {
                 const [g, l, m] = await Promise.all([
                     dbReadGenres(db),
@@ -175,15 +175,14 @@ const HomePage = () => {
     }
 
     return (
-        <SafeAreaView style={{...AppStyle.safeArea, paddingTop: 0}} >
+        <SafeAreaView style={AppStyle.safeArea} >
             <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false}>
-                <View style={{height: AppConstants.UI.SCREEN.PADDING_VERTICAL}} />
                 <Row style={styles.header}>
                     <AppLogo />
                     <Row style={{ gap: AppConstants.UI.ICON.SIZE }}>
                         {!loading && (
                             <>
-                            {AppConstants.APP.DEBUG.ENABLED && <Button iconName='bug-outline' onPress={() => router.navigate("/(pages)/DebugPage")} />}
+                                {AppConstants.APP.DEBUG.ENABLED && <Button iconName='bug-outline' onPress={() => router.navigate("/(pages)/DebugPage")} />}
                                 <UpdateDatabaseButton />
                                 <Button iconName="search-outline" onPress={openManhwaSearch} />
                                 <RandomManhwaButton />

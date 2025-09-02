@@ -339,3 +339,15 @@ export async function getDeviceName(): Promise<string> {
   return device
 }
 
+
+export function closestMultipleOf16RoundUpOnTie(x: number): number {
+  const lower = Math.floor(x / 16) * 16;
+  const upper = lower + 16;
+  const mid = lower + 8;
+  return x < mid ? lower : upper;
+}
+
+
+export function newArrayFrom(length: number): Array<number> {
+  return Array.from({ length }, (_, i) => i)
+}
