@@ -48,6 +48,6 @@ yarn-error.*
 config
 
 # supabase
-
+lib/supabaseKey.ts
 
 releases/
