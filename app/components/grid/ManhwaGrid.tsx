@@ -1,11 +1,12 @@
 import { AppConstants } from '@/constants/AppConstants'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { FlashList } from '@shopify/flash-list'
 import React, { useCallback } from 'react'
 import { Manhwa } from '@/helpers/types'
 import ManhwaCard from '../ManhwaCard'
 import Footer from '../util/Footer'
 import { hp } from '@/helpers/util'
+import { Typography } from '@/constants/typography'
 
 
 interface MangaGridProps {
@@ -43,6 +44,12 @@ const ManhwaGrid = ({
             manhwa={item}
         />
     ), [])
+
+    if (manhwas.length == 0) {
+        return (
+            <Text style={Typography.regular} >You’ll find your downloads here.</Text>
+        )
+    }
     
     return (
         <View style={styles.container} >

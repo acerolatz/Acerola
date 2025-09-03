@@ -5,6 +5,7 @@ import React, { useState } from 'react'
 import Button from './Button'
 import { Colors } from '@/constants/Colors'
 import { useSQLiteContext } from 'expo-sqlite'
+import { DownloadRequest } from '@/helpers/types'
 
 
 interface DownloadChapterButtonProps {
@@ -29,14 +30,13 @@ const DownloadChapterButton = ({
 
     const onPress = async () => {
         setLoading(true)
-        const success: boolean = await downloadManager.addToQueue(
-            db, {manhwa_name, manhwa_id, chapter_id, chapter_name }
-        )
-        if (success) {
-            Toast.show({text1: "Added to download queue", type: "info"})
-        } else {
-            Toast.show({text1: "Could not add to download queue", type: "error"})   
+        const request: DownloadRequest = {
+            manhwa_name,
+            manhwa_id,
+            chapter_id,
+            chapter_name
         }
+        await downloadManager.addToQueue(db, request)
         setLoading(false)
     }
 

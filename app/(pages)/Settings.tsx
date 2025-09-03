@@ -7,7 +7,7 @@ import {
     View
 } from 'react-native'
 import PageActivityIndicator from '@/app/components/util/PageActivityIndicator'
-import { dbIsSafeModeEnabled, dbReadSafeModePassword } from '@/lib/database'
+import { dbCountRows, dbIsSafeModeEnabled, dbReadSafeModePassword } from '@/lib/database'
 import UserDataComponent from '@/app/components/UserActivityComponent'
 import ReturnButton from '@/app/components/buttons/ReturnButton'
 import SafeModeForm from '@/app/components/form/SafeModeForm'
@@ -19,7 +19,6 @@ import { useLocalSearchParams } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
 import { AppStyle } from '@/styles/AppStyle'
 import TopBar from '@/app/components/TopBar'
-import { Colors } from '@/constants/Colors'
 import Row from '@/app/components/util/Row'
 
 
@@ -44,11 +43,11 @@ const Settings = () => {
                     await Promise.all([
                         dbIsSafeModeEnabled(db),
                         dbReadSafeModePassword(db),
-                        getCacheSizeBytes()
+                        getCacheSizeBytes()                        
                     ]).then(([s, p, c]) => {
                         setSafeModeOn(s),
                         setSafeModePassword(p),
-                        setCurrentCacheSize(c)
+                        setCurrentCacheSize(c)                        
                     })
                 setLoading(false)
             }

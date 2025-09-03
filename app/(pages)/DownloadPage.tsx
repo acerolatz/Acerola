@@ -5,7 +5,7 @@ import {
   KeyboardAvoidingView, 
   Platform 
 } from "react-native";
-import { dbReadDownloadedManhwas, dbReadNumPendingDownloadsByManhwa } from "@/lib/database";
+import { dbReadDownloadedManhwas, dbReadPendingDownloadsByManhwa } from "@/lib/database";
 import ReturnButton from "@/app/components/buttons/ReturnButton";
 import DownloadQueue from "../components/download/DownloadQueue";
 import { downloadManager } from "@/helpers/DownloadManager";
@@ -18,6 +18,7 @@ import { AppStyle } from "@/styles/AppStyle";
 import TopBar from "@/app/components/TopBar";
 import Row from "@/app/components/util/Row";
 import { Manhwa } from "@/helpers/types";
+import { router } from "expo-router";
 
 
 const DownloadPage = () => {
@@ -33,8 +34,13 @@ const DownloadPage = () => {
   const scrollX = useRef(new Animated.Value(0)).current
   
   const onPress = (manhwa: Manhwa) => {
-    
-  }
+    router.navigate({
+      pathname: "/DownloadedManhwaPage",
+      params: {
+        manhwa_id: manhwa.manhwa_id
+      }
+    })
+  } 
 
   const screens = [
     <ManhwaGrid
@@ -49,7 +55,7 @@ const DownloadPage = () => {
   const refresh = async () => {
     await Promise.all([
       dbReadDownloadedManhwas(db),
-      dbReadNumPendingDownloadsByManhwa(db),
+      dbReadPendingDownloadsByManhwa(db),
       downloadManager.queueSize(),
       downloadManager.currentDownload()      
     ]).then(([downloads, pendingDownloads, queueSize, currentDownload]) => {
@@ -60,8 +66,10 @@ const DownloadPage = () => {
   useEffect(() => {
     refresh()
     const onQueueUpdate = () => refresh()
+    downloadManager.on("progress", onQueueUpdate)
     downloadManager.on("queueUpdate", onQueueUpdate)
     return () => {
+      downloadManager.off("progress", onQueueUpdate)
       downloadManager.off("queueUpdate", onQueueUpdate)
     };
   }, []);

@@ -1,8 +1,8 @@
 import { 
-  dbCreateDownload, 
-  dbDeleteAllDownloads, 
-  dbReadDownload, 
-  dbReadPendingDownloads, 
+  dbCreateDownload,  
+  dbDeleteNotCompletedDownloads,
+  dbReadDownload,
+  dbReadNotCompletedDownloads,
   dbUpdateDownloadStatus 
 } from "@/lib/database";
 import { 
@@ -17,6 +17,7 @@ import { SQLiteDatabase } from "expo-sqlite";
 import { downloadImages } from "./storage";
 import { asyncPool } from "./util";
 
+
 class DownloadManager {
 
   private static instance: DownloadManager;
@@ -24,7 +25,7 @@ class DownloadManager {
   private isDownloading = false;
   private isPaused = false;
   private isCancelled = false;
-  private currentDownloadProgress: DownloadProgress = { current: 0, total: 0, percentage: 0 };
+  private currentDownloadProgress: number = 0;
   private emitter = new EventEmitter();
 
   static getInstance() {
@@ -35,14 +36,12 @@ class DownloadManager {
   }
 
   private resetDownloadProgress() {
-    this.currentDownloadProgress.current = 0;
-    this.currentDownloadProgress.percentage = 0;
-    this.currentDownloadProgress.total = 0;
+    this.currentDownloadProgress = 0;
   }
 
   async init(db: SQLiteDatabase) {
-    const records: DownloadRequest[] = await dbReadPendingDownloads(db);
-    await asyncPool(
+    const records: DownloadRequest[] = await dbReadNotCompletedDownloads(db);
+    await asyncPool<DownloadRequest, void>(
       8, 
       records, 
       async (record) => await this.addToQueue(db, record, false, true)
@@ -60,38 +59,39 @@ class DownloadManager {
   async addToQueue(
     db: SQLiteDatabase, 
     request: DownloadRequest,
-    show_warnings: boolean = true,
+    show_toast_message: boolean = true,
     exists_ok: boolean = false
-  ): Promise<boolean> {
+  ) {
     const download: DownloadRecord | null = await dbReadDownload(db, request.chapter_id);
     if (download !== null && !exists_ok) {
-      if (show_warnings) {
-        Toast.show({
-          text1: "Download already exists!",
-          text2: `Status: ${download.status}`,
-          type: "error"
-        });
-      }
-      return false;
+      if (!show_toast_message) { return }
+      Toast.show({
+        text1: "Download already exists!",
+        text2: `Status: ${download.status}`,
+        type: "error"
+      })
+      return
     }
     await dbCreateDownload(db, request.manhwa_id, request.chapter_id, request.chapter_name);
     this.queue.push(request);
     this.emitter.emit("queueUpdate", this.queue);
     this.processQueue(db);
-    return true;
+    if (show_toast_message) {
+      Toast.show({text1: "Added to queue!", type: "success"});
+    }
   }
 
   private async processQueue(db: SQLiteDatabase) {
     if (this.isDownloading || this.queue.length === 0 || this.isPaused) return;
 
     this.isDownloading = true;
-    const request = this.queue.shift()!;
-    this.emitter.emit("queueUpdate", this.queue);
+    const request = this.queue.shift()!;    
 
     try {
       const record = await dbReadDownload(db, request.chapter_id);
       if (record && !this.isCancelled) {
         await this.downloadChapter(db, record);
+        this.emitter.emit("progress", this.queue);
       }
     } finally {
       this.isDownloading = false;
@@ -104,6 +104,8 @@ class DownloadManager {
   private async downloadChapter(db: SQLiteDatabase, record: DownloadRecord) {
     const images: string[] = await spFetchChapterImagesUrls(record.chapter_id);
     await dbUpdateDownloadStatus(db, record.chapter_id, "downloading");
+    
+    this.emitter.emit("progress", this.queue);
     this.resetDownloadProgress();
 
     await downloadImages(
@@ -111,46 +113,47 @@ class DownloadManager {
       record.path,
       (progress: DownloadProgress): boolean => {
         if (this.isPaused || this.isCancelled) return true;
-        this.currentDownloadProgress.current = progress.current;
-        this.currentDownloadProgress.percentage = progress.percentage;
-        this.currentDownloadProgress.total = progress.total;
+        this.currentDownloadProgress = progress.percentage;
         return false
       }      
     );
+    
+    await dbUpdateDownloadStatus(
+      db, 
+      record.chapter_id, 
+      this.isCancelled ? "cancelled" : "completed"
+    );
 
-    if (this.isCancelled) {
-      await dbUpdateDownloadStatus(db, record.chapter_id, "cancelled");
-    } else {
-      await dbUpdateDownloadStatus(db, record.chapter_id, "completed");
-    }
     this.resetDownloadProgress();
   }
-
-  /** Pausar todos os downloads */
+  
   pauseDownloads() {
     this.isPaused = true;
     this.emitter.emit("queueUpdate", this.queue);
   }
 
-  /** Retomar downloads */
-  resumeDownloads(db: SQLiteDatabase) {
+  async resumeDownloads(db: SQLiteDatabase) {
     this.isPaused = false;
-    this.processQueue(db);
+    const requests: DownloadRequest[] = await dbReadNotCompletedDownloads(db)
+    await asyncPool<DownloadRequest, void>(
+      8, 
+      requests, 
+      async (request: DownloadRequest) => { await this.addToQueue(db, request, false, true) }
+    )
   }
-
-  /** Cancelar todos os downloads */
+  
   async cancelAllDownloads(db: SQLiteDatabase) {
     this.isCancelled = true;
     this.isPaused = false;
     this.queue = [];
     this.resetDownloadProgress();
-    await dbDeleteAllDownloads(db);
-    this.emitter.emit("queueUpdate", this.queue);
+    await dbDeleteNotCompletedDownloads(db);
     this.isCancelled = false;
+    this.emitter.emit("queueUpdate", this.queue);
   }
 
   getCurrentDownloadProgressPercentage(): number {
-    return this.currentDownloadProgress.percentage;
+    return this.currentDownloadProgress;
   }
 
   currentDownload(): DownloadRequest | null {
@@ -160,6 +163,11 @@ class DownloadManager {
   queueSize(): number {
     return this.queue.length;
   }
+
+  iPaused() {
+    return this.isPaused
+  }
+
 }
 
 export const downloadManager = DownloadManager.getInstance();

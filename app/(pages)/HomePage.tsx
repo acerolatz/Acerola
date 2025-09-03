@@ -23,7 +23,7 @@ import {
     dbReadGenres, 
     dbReadManhwasOrderedByUpdateAt, 
     dbReadManhwasOrderedByViews,
-    dbReadNumPendingDownloadsByManhwa
+    dbReadPendingDownloadsByManhwa
 } from '@/lib/database'
 import { 
     spFetchCollections,

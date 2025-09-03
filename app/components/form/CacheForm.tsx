@@ -8,20 +8,22 @@ import {
     TextInput, 
     View 
 } from 'react-native'
-import { clearCache, formatBytes, wp } from '@/helpers/util'
+import { dbCountRows, dbDeleteAllDownloads, dbSetCacheMaxSize } from '@/lib/database'
+import { clearCache, formatBytes, getDirectorySizeBytes, wp } from '@/helpers/util'
+import CustomActivityIndicator from '../util/CustomActivityIndicator';
 import { AppConstants } from '@/constants/AppConstants'
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Controller, useForm } from 'react-hook-form';
 import { ToastMessages } from '@/constants/Messages'
 import { Typography } from '@/constants/typography'
-import { dbSetCacheMaxSize } from '@/lib/database'
+import React, { useEffect, useState } from 'react'
 import { useSQLiteContext } from 'expo-sqlite'
 import Toast from 'react-native-toast-message'
 import RNRestart from 'react-native-restart';
 import { AppStyle } from '@/styles/AppStyle'
 import { Colors } from '@/constants/Colors'
-import React, { useState } from 'react'
 import Footer from '../util/Footer'
+import Row from '../util/Row';
 import * as yup from 'yup';
 
 
@@ -41,13 +43,29 @@ const schema = yup.object().shape({
 
 interface CacheFormProps {
     currentCacheSize: number
-    currentMaxCacheSize: number
+    currentMaxCacheSize: number    
 }
 
-const CacheForm = ({currentCacheSize, currentMaxCacheSize}: CacheFormProps) => {
+const CacheForm = ({
+    currentCacheSize,
+    currentMaxCacheSize    
+}: CacheFormProps) => {
 
     const db = useSQLiteContext()
     const [isLoading, setLoading] = useState(false)
+    const [storageLoading, setStorageLoading] = useState(false)
+    const [storageSize, setStorageSize] = useState<string | null>(null)
+    const [downloadedChapters, setDownloadedChapters] = useState(0)
+
+    useEffect(
+        () => {
+            const init = async() => {
+                setDownloadedChapters(await dbCountRows(db, 'downloads'))
+            }
+            init()
+        },
+        []
+    )
 
     const {
         control,
@@ -78,18 +96,32 @@ const CacheForm = ({currentCacheSize, currentMaxCacheSize}: CacheFormProps) => {
         RNRestart.Restart();
     }
 
+    const calculateStorage = async () => {
+        setStorageLoading(true)
+        const s = await getDirectorySizeBytes(AppConstants.APP.MANHWAS_DIR)
+        setStorageSize(formatBytes(s))
+        setStorageLoading(false)
+    }
+
+    const deleteStorageData = async () => {
+        setStorageLoading(true)
+        await dbDeleteAllDownloads(db)
+        setStorageLoading(false)
+        setDownloadedChapters(await dbCountRows(db, 'downloads'))
+    }
+
     return (
         <ScrollView style={AppStyle.flex} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled' >
             <View style={styles.container} >
                 {/* Clear Cache */}
-                <Text style={Typography.semibold}>Cache size: {formatBytes(currentCacheSize)}</Text>
+                <Text style={Typography.semibold}>Cache Size: {formatBytes(currentCacheSize)}</Text>
                 <Text style={AppStyle.error}>* Restart Required</Text>                    
                 <Pressable onPress={clearAppCache} style={AppStyle.formButton} >
                     <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Clear Cache</Text>
-                </Pressable>                
+                </Pressable>
             
                 {/* Cache Size */}
-                <Text style={Typography.semibold}>Max cache size (MB)</Text>
+                <Text style={Typography.semibold}>Max Cache Size (MB)</Text>
                 {errors.maxCacheSize && (<Text style={AppStyle.error}>{errors.maxCacheSize.message}</Text>)}
                 <Controller
                     control={control}
@@ -113,9 +145,31 @@ const CacheForm = ({currentCacheSize, currentMaxCacheSize}: CacheFormProps) => {
                     </View> 
                     :
                     <Pressable onPress={handleSubmit(onSubmit)} style={AppStyle.formButton} >
-                        <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Save</Text>
+                        <Text style={Typography.regularBlack} >Save</Text>
                     </Pressable>
                 }
+
+                {/* Storage */}
+                <Text style={Typography.semibold}>Storage{storageSize !== null ? ': ' + storageSize : ''}</Text>
+                <Text style={Typography.regular} >chapters: {downloadedChapters}</Text>
+                <Row style={AppStyle.margin} >
+                    {
+                        storageLoading ?
+                        <View style={{width: '100%', height: AppConstants.UI.BUTTON.SIZE}} >
+                            <CustomActivityIndicator/>
+                        </View>
+                        :
+                        <>
+                            <Pressable onPress={calculateStorage} style={AppStyle.button} >
+                                <Text style={Typography.regularBlack} >Calculate</Text>
+                            </Pressable>                
+                            <Pressable onPress={deleteStorageData} style={AppStyle.button} >
+                                <Text style={Typography.regularBlack} >Delete</Text>
+                            </Pressable>
+                        </>
+                    }
+                </Row>    
+                
             </View>
             <Footer/>
         </ScrollView>

@@ -90,24 +90,19 @@ export const AppStyle = StyleSheet.create({
         top: "50%",
         transform: [{ translateY: -AppConstants.UI.ICON.SIZE / 2 }]
     },
-    flex: {
-        flex: 1
-    },
-    gap: {
-        gap: AppConstants.UI.GAP
-    },
+    flex: { flex: 1 },
+    gap: { gap: AppConstants.UI.GAP },
+    margin: { gap: AppConstants.UI.MARGIN },
     dotsContainer: {
         flexDirection: 'row',
-        justifyContent: 'center'
+        alignItems: "center",
+        justifyContent: 'center',
+        gap: AppConstants.UI.GAP
     },
     dot: {
-        height: AppConstants.UI.ICON.SIZE * 0.5,
-        width: AppConstants.UI.ICON.SIZE * 0.5,
-        borderRadius: AppConstants.UI.ICON.SIZE,
-        backgroundColor: Colors.primary,
-        marginHorizontal: 4,
+        height: AppConstants.UI.ICON.SIZE,
+        width: AppConstants.UI.ICON.SIZE,
+        borderRadius: AppConstants.UI.BORDER_RADIUS * 2,
+        backgroundColor: Colors.primary        
     },
-    margin: {
-        gap: AppConstants.UI.MARGIN
-    }
 })

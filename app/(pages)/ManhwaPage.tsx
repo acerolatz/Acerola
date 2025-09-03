@@ -174,12 +174,12 @@ const ManhwaPage = () => {
           </View>
 
           <Text style={Typography.semiboldXl}>{manhwa.title}</Text>                    
-          <ManhwaAlternativeNames names={altNames} />
           <Rating 
             value={rating.user_rating != 0 ? rating.user_rating : rating.rating / 10.0}
             setValue={handleChange} 
             color={manhwa.color}
             readOnly={!ratingEnabled} />
+          <ManhwaAlternativeNames names={altNames} />
           <Text style={Typography.light}>last update: {formatTimestamp(manhwa.updated_at)}</Text>
           <ManhwaSummary summary={manhwa.descr} />
           <ManhwaAuthorInfo manhwa={manhwa} />

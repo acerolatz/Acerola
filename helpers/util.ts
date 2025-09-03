@@ -1,23 +1,20 @@
 import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
 import { Dimensions, PermissionsAndroid } from "react-native";
 import { ToastMessages } from '@/constants/Messages';
+import DeviceInfo from 'react-native-device-info';
 import Toast from 'react-native-toast-message';
 import * as Clipboard from 'expo-clipboard'
 import { Platform } from 'react-native';
 import { Linking } from 'react-native';
-import DeviceInfo from 'react-native-device-info';
 import RNFS from 'react-native-fs';
+
+
+const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
 
 
 export function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
-
-
-const {
-    width: deviceWidth, 
-    height: deviceHeight
-} = Dimensions.get('window');
 
 
 /**
@@ -29,9 +26,8 @@ const {
  * @param percentage - The percentage of the device width to calculate (0-100)
  * @returns Calculated pixel value representing the percentage of device width
  */
-export function wp(percentage: number) {
-    const width = deviceWidth;
-    return (percentage * width) / 100;
+export function wp(percentage: number) {    
+  return (percentage * deviceWidth) / 100;
 }
 
 
@@ -45,61 +41,15 @@ export function wp(percentage: number) {
  * @returns Calculated pixel value representing the percentage of device height
  */
 export function hp(percentage: number) {
-    const height = deviceHeight;
-    return (percentage * height) / 100;
+  return (percentage * deviceHeight) / 100;
 }
 
 
-/**
- * Calculates grid item dimensions while maintaining aspect ratio.
- * 
- * Computes display dimensions for grid items based on:
- *   - Current screen width (using initial device dimensions)
- *   - Specified layout configuration
- *   - Original aspect ratio of the item
- * 
- * @param horizontalPadding - Total horizontal padding (left + right) in pixels
- * @param gap - Horizontal gap between columns in pixels
- * @param columns - Number of columns in the grid
- * @param originalWidth - Original width of the item (for aspect ratio calculation)
- * @param originalHeight - Original height of the item (for aspect ratio calculation)
- * 
- * @returns Object containing calculated display width and height
- */
-export function getItemGridDimensions(
-    horizontalPadding: number,
-    gap: number,
-    columns: number,
-    originalWidth: number,
-    originalHeight: number
-): {width: number, height: number} {
-  const width = (wp(100) - (horizontalPadding * 2) - ((columns * gap) - gap)) / columns
-  const height = width * (originalHeight / originalWidth)
-  return { width, height }
-}
-
-
-/**
- * Calculates proportional height while maintaining aspect ratio.
- * 
- * @param originalWidth - Original reference width of the item
- * @param originalHeight - Original reference height of the item
- * @param width - Target width for which to calculate proportional height
- * @returns Height value maintaining original aspect ratio
- */
 export function getRelativeHeight(originalWidth: number, originalHeight: number, width: number): number {
   return (originalHeight * width) / originalWidth;
 }
 
 
-/**
- * Calculates proportional width while maintaining aspect ratio.
- * 
- * @param originalWidth - Original reference width of the item
- * @param originalHeight - Original reference height of the item
- * @param height - Target height for which to calculate proportional width
- * @returns Width value maintaining original aspect ratio
- */
 export function getRelativeWidth(originalWidth: number, originalHeight: number, height: number): number {
   return (originalWidth / originalHeight) * height;
 }
@@ -118,6 +68,7 @@ export function formatTimestampWithHour(timestamp: string): string {
   return date.toLocaleDateString('en-US', options as any);  
 }
 
+
 export function formatTimestampWithHour1(timestamp: string): string {
   const date = new Date(timestamp)
   const options: Intl.DateTimeFormatOptions = { hour: 'numeric', minute: 'numeric', month: 'short', day: 'numeric' };
@@ -135,7 +86,6 @@ export async function clearCache() {
   try {
     const cacheDir = RNFS.CachesDirectoryPath;
     const items = await RNFS.readDir(cacheDir);
-
     if (items.length > 0) {
         const deletePromises = items.map(item => RNFS.unlink(item.path));
         await Promise.all(deletePromises);
@@ -147,31 +97,38 @@ export async function clearCache() {
 }
 
 
-export async function getDirectorySizeBytes(path: string): Promise<number> {
+export async function getDirectorySizeBytes(path: string, maxConcurrency: number = 12): Promise<number> {
+  const queue: string[] = [path];
   let totalSize = 0;
-  try {
-    const items = await RNFS.readDir(path);
-    
-    const sizePromises = items.map(async (item: any) => {
-      if (item.isFile()) {
-        return parseInt(item.size, 10);
-      }
-      if (item.isDirectory()) {
-        return await getDirectorySizeBytes(item.path);
-      }
-      return 0;
-    });
-    
-    const sizes = await Promise.all(sizePromises);
-    
-    totalSize = sizes.reduce((acc, size) => acc + size, 0);
+  let active = 0;
 
-  } catch (error) {
-    console.error(`Erro ao ler o diretório ${path}:`, error);
-  }
+  return new Promise((resolve) => {
+    const processNext = async () => {
+      if (queue.length === 0 && active === 0) {
+        resolve(totalSize);
+        return;
+      }
 
-  return totalSize;
-};
+      while (active < maxConcurrency && queue.length > 0) {
+        const currentPath = queue.pop() as string;
+        active++;
+
+        RNFS.readDir(currentPath)
+          .then((items) => {
+            for (const item of items) {
+              if (item.isFile()) totalSize += Number(item.size);
+              else if (item.isDirectory()) queue.push(item.path);
+            }
+          })
+          .catch((error) => {
+            console.error(`Error while reading ${currentPath}:`, error);
+          }).finally(() => { active--; processNext();});
+      }
+    };
+
+    processNext();
+  });  
+}
 
 
 
@@ -213,24 +170,17 @@ export async function getCacheSizeKB(): Promise<number> {
  */
 export function formatNumberWithSuffix(num: number): string {  
   if (!num) { return '0'; }
-  
+
   const sign = num < 0 ? '-' : '';
   const absNum = Math.abs(num);
 
-  if (absNum < 1000) {
-    return sign + absNum;
-  }
-
+  if (absNum < 1000) { return sign + absNum; }
+  
   const suffixes = ['K', 'M', 'B'];
-
   const tier = Math.floor(Math.log10(absNum) / 3) - 1;
-  
   const suffix = suffixes[Math.min(tier, suffixes.length - 1)];
-    
   const value = (absNum / Math.pow(1000, tier + 1));
-  
   const formattedValue = value.toFixed(1).replace(/\.0$/, '');
-
   return `${sign}${formattedValue}${suffix}`;
 }
 
@@ -343,19 +293,6 @@ export async function getDeviceName(): Promise<string> {
   const supportedAbis = await dbGetSupportedAbis()
   const device = `${model}, ${supportedAbis}, ${systemName}[${systemVersion}]`
   return device
-}
-
-
-export function closestMultipleOf16RoundUpOnTie(x: number): number {
-  const lower = Math.floor(x / 16) * 16;
-  const upper = lower + 16;
-  const mid = lower + 8;
-  return x < mid ? lower : upper;
-}
-
-
-export function newArrayFrom(length: number): Array<number> {
-  return Array.from({ length }, (_, i) => i)
 }
 
 

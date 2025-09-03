@@ -35,224 +35,211 @@ import uuid from 'react-native-uuid';
 export async function dbMigrate(db: SQLite.SQLiteDatabase) {
   console.log("[DATABASE MIGRATION START]")
   await db.execAsync(`
+  -- ===============================
+  --             PRAGMAs
+  -- ===============================
+    PRAGMA journal_mode = WAL;
+    PRAGMA synchronous = NORMAL;
+    PRAGMA foreign_keys = ON;
+    PRAGMA temp_store = MEMORY;
+    PRAGMA cache_size = -1024;
+    PRAGMA mmap_size = 268435456;
+    PRAGMA optimize;
+  -- ===============================
+  
+
+  -- ===============================
+  ---             DROP
+  -- ===============================
+  DROP TABLE IF EXISTS chapters;
+  DROP TABLE IF EXISTS collections;
+  DROP TABLE IF EXISTS update_history;
+  DROP TABLE IF EXISTS logs;
+  DROP TABLE IF EXISTS documents;
+  -- ===============================
+
+
+  -- ===============================
+  --            TABLES
+  -- ===============================
+
+  CREATE TABLE IF NOT EXISTS app_info (
+    name TEXT NOT NULL PRIMARY KEY,
+    value TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS app_numeric_info (
+    name TEXT NOT NULL PRIMARY KEY,
+    value INTEGER NOT NULL DEFAULT 0
+  );
+
+  CREATE TABLE IF NOT EXISTS manhwas (
+    manhwa_id INTEGER PRIMARY KEY,
+    title TEXT NOT NULL,
+    descr TEXT NOT NULL,
+    cover_image_url TEXT NOT NULL,
+    status TEXT NOT NULL,
+    color TEXT NOT NULL,
+    views INTEGER NOT NULL DEFAULT 0,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS manhwa_ratings (
+    manhwa_id INTEGER PRIMARY KEY,
+    user_rating INTEGER NOT NULL DEFAULT 0,
+    rating INTEGER NOT NULL DEFAULT 0,
+    total_rating INTEGER NOT NULL DEFAULT 0      
+  );
+
+  CREATE TABLE IF NOT EXISTS alt_titles (
+    manhwa_id INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    PRIMARY KEY (manhwa_id, title),
+    FOREIGN KEY (manhwa_id) REFERENCES manhwas(manhwa_id) ON DELETE CASCADE ON UPDATE CASCADE
+  );
+
+  CREATE TABLE IF NOT EXISTS genres (
+    genre_id INTEGER PRIMARY KEY,
+    genre TEXT NOT NULL        
+  );
+  
+  CREATE TABLE IF NOT EXISTS manhwa_genres (
+    genre_id INTEGER NOT NULL,
+    manhwa_id INTEGER NOT NULL,
+    CONSTRAINT manhwa_genres_pkey PRIMARY KEY (manhwa_id, genre_id),
+    CONSTRAINT manhwa_genres_manhwa_id_fkey FOREIGN KEY (manhwa_id) REFERENCES manhwas (manhwa_id) ON UPDATE CASCADE ON DELETE CASCADE
+  );
+
+  CREATE TABLE IF NOT EXISTS authors (
+    author_id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    role TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS manhwa_authors (
+    author_id INTEGER NOT NULL,
+    manhwa_id INTEGER NOT NULL,
+    role TEXT NOT NULL,
+    CONSTRAINT manhwa_authors_pkey PRIMARY KEY (manhwa_id, author_id, role),
+    CONSTRAINT manhwa_authors_manhwa_id_fkey FOREIGN KEY (manhwa_id) REFERENCES manhwas (manhwa_id) ON UPDATE CASCADE ON DELETE CASCADE
+  );
+
+  CREATE TABLE IF NOT EXISTS reading_status (
+    manhwa_id INTEGER NOT NULL PRIMARY KEY,
+    status TEXT NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
+  
+  CREATE TABLE IF NOT EXISTS reading_history (
+    manhwa_id INTEGER NOT NULL,      
+    chapter_id INTEGER NOT NULL,
+    readed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (manhwa_id, chapter_id)          
+  );    
+
+  CREATE TABLE IF NOT EXISTS todos (
+    todo_id INTEGER NOT NULL PRIMARY KEY,
+    title TEXT NOT NULL,
+    descr TEXT,
+    completed INTEGER NOT NULL DEFAULT 0 CHECK (completed IN (0, 1)),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    finished_at TIMESTAMP DEFAULT NULL      
+  );
+
+  CREATE TABLE IF NOT EXISTS notes (
+    note_id INTEGER PRIMARY KEY,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    created_at INTEGER NOT NULL DEFAULT 0,
+    updated_at INTEGER NOT NULL DEFAULT 0
+  );
+
+  CREATE TABLE IF NOT EXISTS downloads (
+    chapter_id INTEGER PRIMARY KEY,
+    manhwa_id INTEGER NOT NULL,
+    chapter_name TEXT NOT NULL,
+    path TEXT NOT NULL,
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'downloading', 'completed', 'failed', 'cancelled')),
+    progress INTEGER DEFAULT 0,
+    created_at INTEGER NOT NULL 
+  );
+  -- ===============================
+
+
+  -- ===============================
+  --              INDEX
+  -- ===============================
+  CREATE INDEX IF NOT EXISTS idx_authors_name ON authors(name);
+  CREATE INDEX IF NOT EXISTS idx_ma_author_id ON manhwa_authors(author_id);
+  CREATE INDEX IF NOT EXISTS idx_ma_manhwa_id ON manhwa_authors(manhwa_id);
+  
+  CREATE INDEX IF NOT EXISTS idx_reading_status_manhwa_id_status ON reading_status(manhwa_id, status);
+  CREATE INDEX IF NOT EXISTS idx_reading_history_readed_at ON reading_history(manhwa_id, readed_at DESC);
+
+  CREATE INDEX IF NOT EXISTS idx_manhwa_genres_genre_id ON manhwa_genres(genre_id);
+  
+  CREATE INDEX IF NOT EXISTS idx_manhwas_views ON manhwas(views DESC);
+  
+  CREATE INDEX IF NOT EXISTS idx_alt_titles ON alt_titles(title, manhwa_id);
+  CREATE INDEX IF NOT EXISTS idx_alt_titles_manhwa ON alt_titles(manhwa_id);
+  CREATE INDEX IF NOT EXISTS idx_manhwas_updated_at ON manhwas(updated_at DESC);
+
+  CREATE INDEX IF NOT EXISTS idx_downloads_status ON downloads(status);
+  CREATE INDEX IF NOT EXISTS idx_downloads_created_at ON downloads(created_at);
+  -- ================================
+  
+
+  -- ===============================
+  --         INSERT/UPDATE
+  -- ===============================
+  BEGIN TRANSACTION;
+  
+    UPDATE 
+      downloads 
+    SET 
+      status = 'pending' 
+    WHERE 
+      status IN ('downloading', 'cancelled', 'failed');
     
-    -- ===============================
-    --             PRAGMAs
-    -- ===============================
-      PRAGMA journal_mode = WAL;
-      PRAGMA synchronous = NORMAL;
-      PRAGMA foreign_keys = ON;
-      PRAGMA temp_store = MEMORY;
-      PRAGMA cache_size = -1024;
-      PRAGMA mmap_size = 268435456;
-      PRAGMA optimize;
-    -- ===============================
+    INSERT OR REPLACE INTO 
+      app_info (name, value)
+    VALUES 
+      ('version', '${AppConstants.APP.VERSION}');
     
-
-    -- ===============================
-    ---             DROP
-    -- ===============================
-    DROP TABLE IF EXISTS chapters;
-    DROP TABLE IF EXISTS collections;
-    DROP TABLE IF EXISTS update_history;
-    DROP TABLE IF EXISTS logs;
-    DROP TABLE IF EXISTS documents;
-    -- ===============================
-
-
-    -- ===============================
-    --            TABLES
-    -- ===============================
-
-    CREATE TABLE IF NOT EXISTS app_info (
-      name TEXT NOT NULL PRIMARY KEY,
-      value TEXT NOT NULL
-    );
-
-    CREATE TABLE IF NOT EXISTS app_numeric_info (
-      name TEXT NOT NULL PRIMARY KEY,
-      value INTEGER NOT NULL DEFAULT 0
-    );
-
-    CREATE TABLE IF NOT EXISTS manhwas (
-      manhwa_id INTEGER PRIMARY KEY,
-      title TEXT NOT NULL,
-      descr TEXT NOT NULL,
-      cover_image_url TEXT NOT NULL,
-      status TEXT NOT NULL,
-      color TEXT NOT NULL,
-      views INTEGER NOT NULL DEFAULT 0,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS manhwa_ratings (
-      manhwa_id INTEGER PRIMARY KEY,
-      user_rating INTEGER NOT NULL DEFAULT 0,
-      rating INTEGER NOT NULL DEFAULT 0,
-      total_rating INTEGER NOT NULL DEFAULT 0      
-    );
-
-    CREATE TABLE IF NOT EXISTS alt_titles (
-      manhwa_id INTEGER NOT NULL,
-      title TEXT NOT NULL,
-      PRIMARY KEY (manhwa_id, title),
-      FOREIGN KEY (manhwa_id) REFERENCES manhwas(manhwa_id) ON DELETE CASCADE ON UPDATE CASCADE
-    );
-
-    CREATE TABLE IF NOT EXISTS genres (
-      genre_id INTEGER PRIMARY KEY,
-      genre TEXT NOT NULL        
-    );
+    INSERT INTO 
+      app_info (name, value)
+    VALUES
+      ('device', ''),
+      ('last_sync_time', ''),
+      ('password', '')
+    ON CONFLICT 
+      (name) 
+    DO NOTHING;
     
-    CREATE TABLE IF NOT EXISTS manhwa_genres (
-      genre_id INTEGER NOT NULL,
-      manhwa_id INTEGER NOT NULL,
-      CONSTRAINT manhwa_genres_pkey PRIMARY KEY (manhwa_id, genre_id),
-      CONSTRAINT manhwa_genres_manhwa_id_fkey FOREIGN KEY (manhwa_id) REFERENCES manhwas (manhwa_id) ON UPDATE CASCADE ON DELETE CASCADE
-    );
+    INSERT INTO 
+      app_numeric_info (name, value)
+    VALUES
+      ('images', 0),
+      ('first_run', 1),
+      ('should_ask_for_donation', 1),
+      ('is_safe_mode_on', 0),
+      ('current_chapter_milestone', ${AppConstants.CHAPTER.GOAL_START}),
+      ('last_refreshed_at', 0)
+    ON CONFLICT
+      (name) 
+    DO NOTHING;
 
-    CREATE TABLE IF NOT EXISTS authors (
-      author_id INTEGER PRIMARY KEY,
-      name TEXT NOT NULL,
-      role TEXT NOT NULL
-    );
-
-    CREATE TABLE IF NOT EXISTS manhwa_authors (
-      author_id INTEGER NOT NULL,
-      manhwa_id INTEGER NOT NULL,
-      role TEXT NOT NULL,
-      CONSTRAINT manhwa_authors_pkey PRIMARY KEY (manhwa_id, author_id, role),
-      CONSTRAINT manhwa_authors_manhwa_id_fkey FOREIGN KEY (manhwa_id) REFERENCES manhwas (manhwa_id) ON UPDATE CASCADE ON DELETE CASCADE
-    );
-
-    CREATE TABLE IF NOT EXISTS reading_status (
-      manhwa_id INTEGER NOT NULL PRIMARY KEY,
-      status TEXT NOT NULL,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    CREATE TABLE IF NOT EXISTS reading_history (
-      manhwa_id INTEGER NOT NULL,      
-      chapter_id INTEGER NOT NULL,
-      readed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      PRIMARY KEY (manhwa_id, chapter_id)          
-    );    
-
-    CREATE TABLE IF NOT EXISTS todos (
-      todo_id INTEGER NOT NULL PRIMARY KEY,
-      title TEXT NOT NULL,
-      descr TEXT,
-      completed INTEGER NOT NULL DEFAULT 0 CHECK (completed IN (0, 1)),
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      finished_at TIMESTAMP DEFAULT NULL      
-    );
-
-    CREATE TABLE IF NOT EXISTS notes (
-      note_id INTEGER PRIMARY KEY,
-      title TEXT NOT NULL,
-      content TEXT NOT NULL,
-      created_at INTEGER NOT NULL DEFAULT 0,
-      updated_at INTEGER NOT NULL DEFAULT 0
-    );
-
-    CREATE TABLE IF NOT EXISTS downloads (
-      chapter_id INTEGER PRIMARY KEY,
-      manhwa_id INTEGER NOT NULL,
-      chapter_name TEXT NOT NULL,
-      path TEXT NOT NULL,
-      status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'downloading', 'completed', 'failed', 'cancelled')),
-      progress INTEGER DEFAULT 0,
-      created_at INTEGER NOT NULL 
-    );
-
-    -- ===============================
-
-
-    -- ===============================
-    --              UPDATE
-    -- ===============================
-    UPDATE downloads SET status = 'pending' WHERE status IN ('downloading', 'cancelled', 'failed');
-    -- ===============================
-
-
-    -- ===============================
-
-
-    -- ===============================
-    --              INDEX
-    -- ===============================
-    CREATE INDEX IF NOT EXISTS idx_authors_name ON authors(name);
-    CREATE INDEX IF NOT EXISTS idx_ma_author_id ON manhwa_authors(author_id);
-    CREATE INDEX IF NOT EXISTS idx_ma_manhwa_id ON manhwa_authors(manhwa_id);
-    
-    CREATE INDEX IF NOT EXISTS idx_reading_status_manhwa_id_status ON reading_status(manhwa_id, status);
-    CREATE INDEX IF NOT EXISTS idx_reading_history_readed_at ON reading_history(manhwa_id, readed_at DESC);
-
-    CREATE INDEX IF NOT EXISTS idx_manhwa_genres_genre_id ON manhwa_genres(genre_id);
-    
-    CREATE INDEX IF NOT EXISTS idx_manhwas_views ON manhwas(views DESC);
-    
-    CREATE INDEX IF NOT EXISTS idx_alt_titles ON alt_titles(title, manhwa_id);
-    CREATE INDEX IF NOT EXISTS idx_alt_titles_manhwa ON alt_titles(manhwa_id);
-    CREATE INDEX IF NOT EXISTS idx_manhwas_updated_at ON manhwas(updated_at DESC);
-
-    CREATE INDEX IF NOT EXISTS idx_downloads_status ON downloads(status);
-    CREATE INDEX IF NOT EXISTS idx_downloads_created_at ON downloads(created_at);
-    -- ================================
-    
-
-    -- ===============================
-    --             INSERT
-    -- ===============================
-    BEGIN TRANSACTION;
-      
-      INSERT OR REPLACE INTO 
-        app_info (name, value)
-      VALUES 
-        ('version', '${AppConstants.APP.VERSION}');
-      
-      INSERT INTO 
-        app_info (name, value)
-      VALUES
-        ('device', ''),
-        ('last_sync_time', ''),
-        ('password', '')
-      ON CONFLICT 
-        (name) 
-      DO NOTHING;
-      
-      INSERT INTO 
-        app_numeric_info (name, value)
-      VALUES
-        ('images', 0),
-        ('first_run', 1),
-        ('should_ask_for_donation', 1),
-        ('is_safe_mode_on', 0),
-        ('current_chapter_milestone', ${AppConstants.CHAPTER.GOAL_START}),
-        ('last_refreshed_at', 0)
-      ON CONFLICT
-        (name) 
-      DO NOTHING;
-
-    COMMIT;
+  COMMIT;
   `
   ).catch(error => console.log("DATABASE MIGRATION ERROR", error));
   console.log("[DATABASE MIGRATION END]")
 }
 
 
-/**
- * Reads all rows from a given **local SQLite database** table.
- *
- * @template T - The expected type of each row returned.
- * @param db - SQLite database instance.
- * @param table - The name of the table to query.
- * @returns A promise that resolves to an array of rows of type T. Returns an empty array if the query fails.
- */
 export async function dbReadAll<T>(db: SQLite.SQLiteDatabase, table: string): Promise<T[]> {
-  const r = await db.getAllAsync<T>(
-    `SELECT * FROM ${table};`
-  ).catch(error => console.log(`error dbReadAll ${table}`, error))
+  const r = await db
+    .getAllAsync<T>(`SELECT * FROM ${table};`)
+    .catch(error => console.log(`error dbReadAll ${table}`, error))
   return r ? r : []
 }
 
@@ -308,21 +295,9 @@ export async function dbShouldClearCache(db: SQLite.SQLiteDatabase): Promise<boo
 }
 
 
-/**
- * Counts the number of rows in a specified table from the **local SQLite database**.
- *
- * @param db - SQLite database instance
- * @param table - The name of the table to count rows from.
- * @returns A promise that resolves to the total number of rows in the table.
- */
-export async function dbCount(db: SQLite.SQLiteDatabase, table: string): Promise<number> {
+export async function dbCountRows(db: SQLite.SQLiteDatabase, table: string): Promise<number> {
   const r = await db.getFirstAsync<{total: number}>(
-    `
-      SELECT 
-        count(*) as total 
-      FROM 
-        ${table};
-    `
+    `SELECT count(*) as total FROM  ${table};`
   )
   return r ? r.total : 0
 }
@@ -354,12 +329,12 @@ export async function dbLog(db: SQLite.SQLiteDatabase) {
   const r = [
     'num_tables: ' + (await db.getFirstAsync<{num_tables: number}>(`SELECT count(*) as num_tables FROM sqlite_master WHERE type='table';`))?.num_tables,
     'size_mib: ' + await dbGetTotalSizeMiB(db),
-    'manhwas: ' + await dbCount(db, 'manhwas'),    
-    'genres: ' + await dbCount(db, 'genres'),
-    'manhwa_genres: ' + await dbCount(db, 'manhwa_genres'),
-    'authors: ' + await dbCount(db, 'authors'),
-    'manhwa_authors: ' + await dbCount(db, 'manhwa_authors'),
-    'alt_tiles: ' + await dbCount(db, 'alt_titles'),
+    'manhwas: ' + await dbCountRows(db, 'manhwas'),    
+    'genres: ' + await dbCountRows(db, 'genres'),
+    'manhwa_genres: ' + await dbCountRows(db, 'manhwa_genres'),
+    'authors: ' + await dbCountRows(db, 'authors'),
+    'manhwa_authors: ' + await dbCountRows(db, 'manhwa_authors'),
+    'alt_tiles: ' + await dbCountRows(db, 'alt_titles'),
     'max_cache_size: ' + await dbGetCacheMaxSize(db) / 1024 / 1024 + ' MB',
     'current_cache_size: ' + formatBytes(await getCacheSizeBytes())
   ].forEach(i => console.log(i))
@@ -369,15 +344,10 @@ export async function dbLog(db: SQLite.SQLiteDatabase) {
 
 
 export async function dbListTable(db: SQLite.SQLiteDatabase, table: string) {
-  const r = await db.getAllAsync(
-    `SELECT * FROM ${table};`
-  ).catch(error => console.log("error dbListTable", error))
+  const r = await db
+    .getAllAsync(`SELECT * FROM ${table};`)
+    .catch(error => console.log("error dbListTable", error))
   r ? r.forEach(i => console.log(i)) : null
-}
-
-
-export async function dbGetLastDatabaseSync(db: SQLite.SQLiteDatabase): Promise<number> {
-  return await dbReadNumericInfo(db, 'last_refreshed_at', 0)
 }
 
 
@@ -422,14 +392,7 @@ export async function dbReadInfo(
   defaultValue: string = ''
 ): Promise<string> {
   const r = await db.getFirstAsync<{value: string}>(
-    `
-      SELECT 
-        value 
-      FROM 
-        app_info 
-      WHERE 
-        name = ?;
-    `,
+    'SELECT value FROM app_info WHERE name = ?;',
     [name]
   ).catch(error => console.log("error dbReadInfo", name, defaultValue, error))
 
@@ -463,13 +426,6 @@ export async function dbSetInfo(db: SQLite.SQLiteDatabase, name: string, value: 
 }
 
 
-/**
- * Generates a new UUID for the user and stores it in the `app_info` table under the key `user_id` in the **local SQLite database**.
- * If an entry already exists, it will be replaced.
- *
- * @param db - SQLite database instance
- * @returns A promise that resolves to the newly generated user UUID as a string.
- */
 async function dbSetUserUUID(db: SQLite.SQLiteDatabase): Promise<string> {
   const user_id = uuid.v4()
   await dbSetInfo(db, 'user_id', user_id)
@@ -477,14 +433,6 @@ async function dbSetUserUUID(db: SQLite.SQLiteDatabase): Promise<string> {
 }
 
 
-/**
- * Retrieves the user's UUID from the **local SQLite database**.
- *
- * If the UUID does not exist, it will generate a new one and store it in the database.
- *
- * @param db - SQLite database instance
- * @returns A promise that resolves to the user's UUID as a string.
- */
 export async function dbGetUserUUID(db: SQLite.SQLiteDatabase): Promise<string> {  
   let user_id: string | null = await dbReadInfo(db, 'user_id')    
   if (!user_id) { user_id = await dbSetUserUUID(db) }
@@ -492,13 +440,7 @@ export async function dbGetUserUUID(db: SQLite.SQLiteDatabase): Promise<string> 
 }
 
 
-/**
- * Handles first-run initialization of the app using the **local SQLite database**.
- * 
- * @param db - SQLite database instance
- * @returns A promise that resolves when first-run initialization is complete.
- */
-export async function dbFirstRun(db: SQLite.SQLiteDatabase) {
+export async function dbHandleFirstRun(db: SQLite.SQLiteDatabase) {
   const r = await dbReadNumericInfo(db, 'first_run')  
   if (r !== 1) {
     const user_id = await dbGetUserUUID(db)
@@ -519,19 +461,9 @@ export async function dbFirstRun(db: SQLite.SQLiteDatabase) {
 }
 
 
-export async function dbGetManhwaAltNames(
-  db: SQLite.SQLiteDatabase, 
-  manhwa_id: number  
-): Promise<string[]> {
+export async function dbGetManhwaAltNames(db: SQLite.SQLiteDatabase, manhwa_id: number): Promise<string[]> {
   const r = await db.getAllAsync<{title: string}>(
-    `
-      SELECT 
-        title 
-      FROM 
-        alt_titles 
-      WHERE 
-        manhwa_id = ?;
-    `,
+    'SELECT title FROM alt_titles WHERE manhwa_id = ?;',
     [manhwa_id]
   ).catch(error => console.log("erro  dbGetManhwaAltNames", error))
 
@@ -539,29 +471,18 @@ export async function dbGetManhwaAltNames(
 }
 
 
-export async function dbSetLastDatabaseSync(db: SQLite.SQLiteDatabase) {    
-  await dbSetNumericInfo(db, 'last_refreshed_at', Date.now())
-}
-
-
-export async function dbShouldSyncDatabase(db: SQLite.SQLiteDatabase): Promise<boolean> {
-  const last_refreshed_at = await dbReadNumericInfo(db, 'last_refreshed_at', 0)
-  return last_refreshed_at === 0 || Date.now() - last_refreshed_at >= AppConstants.DATABASE.UPDATE_INTERVAL.SERVER
-}
-
-
 export async function dbUpsertManhwa(db: SQLite.SQLiteDatabase, manhwa: ServerManhwa) {
   await db.runAsync(
     `    
       INSERT OR REPLACE INTO manhwas (
-          manhwa_id, 
-          title,
-          descr,
-          cover_image_url,
-          status,
-          color,
-          views,
-          updated_at
+        manhwa_id, 
+        title,
+        descr,
+        cover_image_url,
+        status,
+        color,
+        views,
+        updated_at
       )
       VALUES 
         (?,?,?,?,?,?,?,?);
@@ -595,7 +516,8 @@ export async function dbUpsertManhwa(db: SQLite.SQLiteDatabase, manhwa: ServerMa
     `
       INSERT INTO 
         manhwa_ratings (manhwa_id, rating, total_rating)
-      VALUES (?, ?, ?)
+      VALUES 
+        (?, ?, ?)
       ON CONFLICT
         (manhwa_id)
       DO UPDATE SET
@@ -802,6 +724,22 @@ async function dbUpsertManhwaAuthors(db: SQLite.SQLiteDatabase, manhwaAuthor: Ma
 }
 
 
+export async function dbSetLastDatabaseSync(db: SQLite.SQLiteDatabase) {    
+  await dbSetNumericInfo(db, 'last_refreshed_at', Date.now())
+}
+
+
+export async function dbGetLastDatabaseSync(db: SQLite.SQLiteDatabase): Promise<number> {
+  return await dbReadNumericInfo(db, 'last_refreshed_at', 0)
+}
+
+
+export async function dbShouldSyncDatabase(db: SQLite.SQLiteDatabase): Promise<boolean> {
+  const last_refreshed_at = await dbReadNumericInfo(db, 'last_refreshed_at', 0)
+  return last_refreshed_at === 0 || Date.now() - last_refreshed_at >= AppConstants.DATABASE.UPDATE_INTERVAL.SERVER
+}
+
+
 export async function dbSyncDatabase(db: SQLite.SQLiteDatabase): Promise<number> {
   console.log('[UPDATING DATABASE]')
   const last_sync: number = await dbGetLastDatabaseSync(db)
@@ -932,13 +870,7 @@ export async function dbSyncDatabase(db: SQLite.SQLiteDatabase): Promise<number>
 
 export async function dbHasNoManhwas(db: SQLite.SQLiteDatabase): Promise<boolean> {
   const row = await db.getFirstAsync<{manhwa_id: number}>(
-    `
-      SELECT
-        manhwa_id
-      FROM
-        manhwas
-      LIMIT 1;
-    `    
+    'SELECT manhwa_id FROM manhwas LIMIT 1;'
   ).catch(error => console.log('dbHasNoManhwas', error)); 
   return row == null
 }
@@ -946,14 +878,7 @@ export async function dbHasNoManhwas(db: SQLite.SQLiteDatabase): Promise<boolean
 
 export async function dbHasManhwa(db: SQLite.SQLiteDatabase, manhwa_id: number): Promise<boolean> {
   const row = await db.getFirstAsync<{manga_id: number}>(
-    `
-      SELECT
-        manhwa_id
-      FROM
-        manhwas
-      WHERE
-        manhwa_id = ?;
-    `,
+    'SELECT manhwa_id FROM manhwas WHERE manhwa_id = ?;',
     [manhwa_id]  
   ).catch(error => {console.log('dbHasManhwa', error); return null});
   return row !== null
@@ -977,23 +902,13 @@ export async function dbReadAppVersion(db: SQLite.SQLiteDatabase): Promise<strin
 
 export async function dbReadGenres(db: SQLite.SQLiteDatabase): Promise<Genre[]> {
   const rows = await db.getAllAsync(
-    `
-      SELECT 
-        *
-      FROM 
-        genres
-      ORDER BY 
-        genre;
-    ` 
+    'SELECT * FROM genres ORDER BY genre;'
   ).catch(error => console.log("error dbReadGenres", error));
   return rows ? rows as Genre[] : []
 }
 
 
-export async function dbReadManhwaById(
-  db: SQLite.SQLiteDatabase,
-  manhwa_id: number
-): Promise<Manhwa | null> {
+export async function dbReadManhwaById(db: SQLite.SQLiteDatabase, manhwa_id: number): Promise<Manhwa | null> {
   const row = await db.getFirstAsync(
     'SELECT * FROM manhwas WHERE manhwa_id = ?;',
     [manhwa_id]
@@ -1054,16 +969,6 @@ export async function dbReadManhwasOrderedByViews(
 }
 
 
-/**
- * Searches for manhwas whose titles or alternative titles match the provided search text (case-insensitive) in the **local SQLite database**.
- * Results are grouped by manhwa and ordered by view count descending, then by manhwa ID.
- * 
- * @param db - SQLite database instance
- * @param p_search_text - The text to search for in manhwa titles and alternative titles.
- * @param p_offset - The offset for pagination. Defaults to 0.
- * @param p_limit - The maximum number of manhwas to return. Defaults to 30.
- * @returns A promise that resolves to an array of `Manhwa` objects matching the search criteria. Returns an empty array if no matches are found.
- */
 export async function dbSearchManhwas(
   db: SQLite.SQLiteDatabase, 
   p_search_text: string,
@@ -1929,13 +1834,13 @@ export async function dbFillReadingStatus(db: SQLite.SQLiteDatabase, status: str
  */
 export async function dbFetchDebugInfo(db: SQLite.SQLiteDatabase): Promise<DebugInfo> {
   const part1 = await Promise.all([
-    dbCount(db, 'manhwas'),
-    dbCount(db, 'authors'),
-    dbCount(db, 'genres'),
-    dbCount(db, 'manhwa_genres'),
-    dbCount(db, 'manhwa_authors'),
-    dbCount(db, 'reading_status'),
-    dbCount(db, 'reading_history')
+    dbCountRows(db, 'manhwas'),
+    dbCountRows(db, 'authors'),
+    dbCountRows(db, 'genres'),
+    dbCountRows(db, 'manhwa_genres'),
+    dbCountRows(db, 'manhwa_authors'),
+    dbCountRows(db, 'reading_status'),
+    dbCountRows(db, 'reading_history')
   ]).then(([
     total_manhwas,
     total_authors,
@@ -2151,6 +2056,30 @@ export async function dbReadPendingDownloads(db: SQLite.SQLiteDatabase): Promise
 }
 
 
+export async function dbReadNotCompletedDownloads(db: SQLite.SQLiteDatabase): Promise<DownloadRequest[]> {
+  const r = await db.getAllAsync<DownloadRequest>(
+    `SELECT 
+        d.*,
+        m.title
+      FROM
+        downloads d
+      JOIN  
+        manhwas m ON m.manhwa_id = d.manhwa_id
+      WHERE
+        d.status != 'completed'
+      ORDER BY 
+        created_at ASC;
+    `
+  ).catch(error => console.log("error dbReadNotCompletedDownloads", error))
+
+  return r ? r.map((i: any) => {return {
+    chapter_id: i.chapter_id,
+    chapter_name: i.chapter_name,
+    manhwa_id: i.manhwa_id,
+    manhwa_name: i.title
+  }}) : []
+}
+
 
 export async function dbDeleteAllDownloads(db: SQLite.SQLiteDatabase) {
   const records = (await dbReadAll<DownloadRecord>(db, 'downloads')).map(i => i.path)
@@ -2158,27 +2087,41 @@ export async function dbDeleteAllDownloads(db: SQLite.SQLiteDatabase) {
   await dbCleanTable(db, 'downloads')
 }
 
+export async function dbDeleteNotCompletedDownloads(db: SQLite.SQLiteDatabase) {
+  const records = await db.getAllAsync<DownloadRecord>(
+    `SELECT * FROM downloads WHERE status != 'completed';`
+  ).catch(error => console.log("error dbDeleteNotCompletedDownloads", error))
+
+  if (!records) { return }
+
+  await asyncPool<string, void>(8, records.map(i => i.path), deleteDocumentDir)
+  await db.runAsync(
+    `DELETE FROM downloads WHERE status != 'completed';`
+  ).catch(error => console.log("error dbDeleteNotCompletedDownloads", error))
+}
+
 
 export async function dbReadDownloadedManhwas(db: SQLite.SQLiteDatabase): Promise<Manhwa[]> {
   const r = await db.getAllAsync<Manhwa>(
     `
-      SELECT 
-        m.*        
-      FROM 
-        manhwas m
-      JOIN 
-        downloads d ON d.manhwa_id = m.manhwa_id
-      WHERE 
-        d.status = 'completed' OR d.status = 'pending'
-      GROUP 
-        BY m.manhwa_id
-      ORDER BY 
-        m.title ASC;
+    SELECT
+      m.*
+    FROM
+      manhwas m
+    JOIN
+      downloads d ON d.manhwa_id = m.manhwa_id
+    WHERE
+      d.status IN ('completed', 'pending')
+    GROUP BY
+      m.manhwa_id
+    ORDER BY
+      MAX(d.created_at) DESC;
     `
   ).catch(error => console.log("error dbReadDownloadsByManhwas", error))
 
   return r ? r : []
 }
+
 
 export async function dbReadNote(db: SQLite.SQLiteDatabase, note_id: number): Promise<Note | null> {
   const r = await db.getFirstAsync<Note>(
@@ -2243,6 +2186,7 @@ export async function dbUpdateNote(db: SQLite.SQLiteDatabase, note: Note) {
   ).catch(error => console.log("error dbUpdateNote", error)) 
 }
 
+
 export async function dbDeleteNote(db: SQLite.SQLiteDatabase, note_id: number) {
   await db.runAsync(
     'DELETE FROM notes WHERE note_id = ?;',
@@ -2251,33 +2195,33 @@ export async function dbDeleteNote(db: SQLite.SQLiteDatabase, note_id: number) {
 }
 
 
-
-export async function dbReadNumPendingDownloadsByManhwa(db: SQLite.SQLiteDatabase): Promise<PendingDownloadByManhwa[]> {
+export async function dbReadPendingDownloadsByManhwa(db: SQLite.SQLiteDatabase): Promise<PendingDownloadByManhwa[]> {
   const r = await db.getAllAsync<PendingDownloadByManhwa>(
     `
-      SELECT 
-        m.manhwa_id,
-        m.title,
-        m.cover_image_url,
-        m.status,
-        m.views,
-        m.updated_at,
-        COUNT(*) AS pending_downloads,
-        MAX(d.created_at) AS last_pending_created_at
-      FROM 
-        manhwas m
-      JOIN 
-        downloads d ON m.manhwa_id = d.manhwa_id AND d.status = 'pending'
-      GROUP BY 
-        m.manhwa_id,
-        m.title,
-        m.cover_image_url,
-        m.status,
-        m.views,
-        m.updated_at
-      HAVING COUNT(*) > 0
-      ORDER BY 
-        last_pending_created_at DESC;
+    SELECT 
+      m.manhwa_id,
+      m.title,
+      m.cover_image_url,
+      m.status,
+      m.views,
+      m.updated_at,
+      COUNT(*) AS pending_downloads,
+      MAX(d.created_at) AS last_pending_created_at
+    FROM 
+      manhwas m
+    JOIN 
+      downloads d ON m.manhwa_id = d.manhwa_id AND d.status = 'pending'
+    GROUP BY 
+      m.manhwa_id,
+      m.title,
+      m.cover_image_url,
+      m.status,
+      m.views,
+      m.updated_at
+    HAVING 
+      COUNT(*) > 0
+    ORDER BY 
+      last_pending_created_at DESC;
     `
   ).catch(error => console.log("error dbReadNumPendingDownloadsByManhwa", error))
   return r ? r.map(i => {return {

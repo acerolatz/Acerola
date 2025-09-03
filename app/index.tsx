@@ -9,7 +9,7 @@ import { AppStyle } from '@/styles/AppStyle';
 import { SafeAreaView } from 'react-native';
 import { router } from 'expo-router';
 import {    
-    dbFirstRun,
+    dbHandleFirstRun,
     dbReadAppVersion,
     dbIsSafeModeEnabled,
     dbShouldClearCache,
@@ -63,7 +63,7 @@ const App = () => {
                     hasInternetAvailable(),
                     handleCache(),
                     updateLocalVersion(),
-                    dbFirstRun(db),
+                    dbHandleFirstRun(db),
                     initManhwasDir(),
                     downloadManager.init(db)
                 ])                

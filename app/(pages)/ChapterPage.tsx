@@ -85,8 +85,7 @@ const ChapterPage = () => {
   }, [db, currentChapterIndex])  
 
   const data = useMemo(() => {
-    if (loading) return []
-    return images
+    if (loading) return []; return images
   }, [loading, images])
 
   const listHeader = useMemo(() => (

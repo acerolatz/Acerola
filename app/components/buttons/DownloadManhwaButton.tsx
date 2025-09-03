@@ -29,8 +29,8 @@ const DownloadManhwaButton = ({
 
     const onPress = async () => {
         setLoading(true)
-        await asyncPool(
-            8, 
+        await asyncPool<Chapter, void>(
+            8,
             chapters, 
             async (chapter: Chapter) => await downloadManager.addToQueue(db, {
                 manhwa_name,
