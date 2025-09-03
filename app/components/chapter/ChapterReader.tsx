@@ -6,6 +6,7 @@ import { ChapterImage } from '@/helpers/types'
 import ChapterFooter from './ChapterFooter'
 import { View } from 'react-native'
 import { hp } from '@/helpers/util'
+import { AppStyle } from '@/styles/AppStyle'
 
 
 interface ChapterReaderProps {
@@ -46,7 +47,7 @@ const ChapterReader = ({
     )
 
     return (
-        <View style={{ flex: 1 }}>
+        <View style={AppStyle.flex}>
             <FlashList
                 data={images}
                 ref={flashListRef}

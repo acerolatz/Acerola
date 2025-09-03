@@ -3,25 +3,28 @@ import {
     Platform, 
     Pressable, 
     ScrollView,
+    StyleSheet,
     Text, 
     TextInput, 
     View 
 } from 'react-native'
-import React, { useState } from 'react'
-import { AppStyle } from '@/styles/AppStyle'
-import { Colors } from '@/constants/Colors'
-import { Typography } from '@/constants/typography'
+import { dbCreateSafeModePassword, dbSetSafeModeState } from '@/lib/database'
 import { AppConstants } from '@/constants/AppConstants'
+import { ToastMessages } from '@/constants/Messages'
+import { Typography } from '@/constants/typography'
 import { hasOnlyDigits, wp } from '@/helpers/util'
 import Toast from 'react-native-toast-message'
 import { useSQLiteContext } from 'expo-sqlite'
-import { dbCreateSafeModePassword, dbSetSafeModeState } from '@/lib/database'
+import { AppStyle } from '@/styles/AppStyle'
+import React, { useState } from 'react'
 import Footer from '../util/Footer'
+
 
 interface SafeModeFormProps {
     safeModePassword: string 
     safeModeOn: boolean
 }
+
 
 const SafeModeForm = ({safeModePassword, safeModeOn}: SafeModeFormProps) => {
 
@@ -32,8 +35,8 @@ const SafeModeForm = ({safeModePassword, safeModeOn}: SafeModeFormProps) => {
     const [loadingSafeModeConfig, setLoadingSafeModeConfig] = useState(false)
 
     const isValidPassword = (p: string): boolean  => {
-            return p.trim().length >= 4 && hasOnlyDigits(p)
-        }
+        return p.trim().length >= 4 && hasOnlyDigits(p)
+    }
     
     const submitPassword = async () => {
         Keyboard.dismiss()
@@ -42,12 +45,7 @@ const SafeModeForm = ({safeModePassword, safeModeOn}: SafeModeFormProps) => {
             const check2 = isValidPassword(confirmPassword)
             const check3 = currentSafeModePassword.trim() === confirmPassword.trim()
             if (!(check1 && check2 && check3)) {
-                Toast.show({
-                    text1: "Invalid Password", 
-                    text2: "Min 4 characters and passwords must match", 
-                    type: 'error', 
-                    visibilityTime: 3500
-                })
+                Toast.show(ToastMessages.EN.INVALID_PASSWORD)
                 setLoadingSafeModeConfig(false)
                 return
             } 
@@ -55,22 +53,22 @@ const SafeModeForm = ({safeModePassword, safeModeOn}: SafeModeFormProps) => {
             if (isSafeModeOn) {
                 setIsSafeModeOn(false)
                 await dbSetSafeModeState(db, false)
-                Toast.show({text1: "Safe Mode Disabled!", type: "success"})
+                Toast.show(ToastMessages.EN.SAFE_MODE_DISABLED)
             } else {
                 setIsSafeModeOn(true)
                 await dbSetSafeModeState(db, true)
-                Toast.show({text1: "Safe Mode Enabled!", type: "success"})
+                Toast.show(ToastMessages.EN.SAFE_MODE_ENABLED)
             }            
         setLoadingSafeModeConfig(false)
     }
 
-    return (        
-        <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled' >
-            <View style={{flex: 1, gap: AppConstants.UI.GAP, paddingHorizontal: wp(1)}} >
+    return (
+        <ScrollView style={AppStyle.flex} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled' >
+            <View style={styles.container} >
                 <Text style={AppStyle.error}>{isSafeModeOn ? 'enabled' : 'disabled'}</Text>
                 <Text style={Typography.regular}>When safe mode is enabled, {AppConstants.APP.NAME} will function as a simple to-do list. To unlock the main content, you will need the numeric password you define below.</Text>
-                <Text style={{...Typography.regular, color: Colors.red}}>If you forget the password, it cannot be reset or recovered. You must delete the app data via {Platform.OS} settings to regain access to the main content.</Text>
-                <Text style={{...Typography.regular, color: Colors.red}}>Changes to Safe Mode settings will be applied when the app restarts.</Text>
+                <Text style={Typography.regularRed}>If you forget the password, it cannot be reset or recovered. You must delete the app data via {Platform.OS} settings to regain access to the main content.</Text>
+                <Text style={Typography.regularRed}>Changes to Safe Mode settings will be applied when the app restarts.</Text>
                 
                 <Text style={Typography.regular} >Password</Text>
                 <TextInput
@@ -89,11 +87,11 @@ const SafeModeForm = ({safeModePassword, safeModeOn}: SafeModeFormProps) => {
                 {
                     loadingSafeModeConfig ?
                     <View style={AppStyle.formButton} >
-                        <Text style={{...Typography.regular, color: Colors.backgroundColor}}>{safeModeOn ? 'Disable' : 'Enable'} Safe Mode</Text>
+                        <Text style={Typography.regularBlack}>{safeModeOn ? 'Disable' : 'Enable'} Safe Mode</Text>
                     </View>
                     :
                     <Pressable onPress={submitPassword} style={AppStyle.formButton} >
-                        <Text style={{...Typography.regular, color: Colors.backgroundColor}}>{isSafeModeOn ? 'Disable' : 'Enable'} Safe Mode</Text>
+                        <Text style={Typography.regularBlack}>{isSafeModeOn ? 'Disable' : 'Enable'} Safe Mode</Text>
                     </Pressable>
                 }
             </View>
@@ -103,3 +101,12 @@ const SafeModeForm = ({safeModePassword, safeModeOn}: SafeModeFormProps) => {
 }
 
 export default SafeModeForm
+
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1, 
+        gap: AppConstants.UI.GAP, 
+        paddingHorizontal: wp(1)
+    }
+})

@@ -6,16 +6,14 @@ import {
     dbShouldSyncDatabase, 
     dbSyncDatabase 
 } from '@/lib/database'
-import PageActivityIndicator from '@/app/components/util/PageActivityIndicator'
 import { Animated, FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
+import PageActivityIndicator from '@/app/components/util/PageActivityIndicator'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
-import CreateTodoComponent from '@/app/components/CreateTodoComponent'
 import { hasInternetAvailable, hp, wp } from '@/helpers/util'
 import { TextInput } from 'react-native-gesture-handler'
 import { AppConstants } from '@/constants/AppConstants'
 import CloseBtn from '@/app/components/buttons/CloseButton'
-import TodoComponent from '@/app/components/TodoComponent'
 import { ToastMessages } from '@/constants/Messages'
 import { Typography } from '@/constants/typography'
 import Ionicons from '@expo/vector-icons/Ionicons'
@@ -33,9 +31,6 @@ import { Note, Todo } from '@/helpers/types'
 import { router, useFocusEffect } from 'expo-router'
 import Tasks from '../Tasks'
 import Notes from '../components/Notes'
-
-
-const width = wp(92)
 
 
 const SafeModeHomePage = () => {
@@ -86,12 +81,11 @@ const SafeModeHomePage = () => {
                 isCheckingPassword.current = false
                 return
             }
-            
             if (await hasInternetAvailable() && await dbShouldSyncDatabase(db)) {
-                Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE);
+                Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_TYP1);
                 await dbSyncDatabase(db);
                 await dbSetLastDatabaseSync(db);
-                Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED);
+                Toast.show(ToastMessages.EN.SYNC_LOCAL_DATABASE_COMPLETED_TYP1);
             }
         isCheckingPassword.current = false
         router.replace("/(pages)/HomePage")
@@ -119,7 +113,7 @@ const SafeModeHomePage = () => {
 
     const handleMomentumScrollEnd = (e: any) => {
         const offsetX = e.nativeEvent.contentOffset.x;
-        const index = Math.round(offsetX / width);
+        const index = Math.round(offsetX / AppConstants.UI.SCREEN.VALID_WIDTH);
         setTitle(titles[index])
     };
 
@@ -138,15 +132,14 @@ const SafeModeHomePage = () => {
         <SafeAreaView style={AppStyle.safeArea} >
             <TopBar title={title} >
                 <Row style={{gap: AppConstants.UI.GAP}} >
-                    <View style={styles.dotsContainer}>
+                    <View style={AppStyle.dotsContainer}>
                         {forms.map((_, i) => {
                             const opacity = scrollX.interpolate({
-                                inputRange: [(i - 1) * width, i * width, (i + 1) * width],
+                                inputRange: [(i - 1) * AppConstants.UI.SCREEN.VALID_WIDTH, i * AppConstants.UI.SCREEN.VALID_WIDTH, (i + 1) * AppConstants.UI.SCREEN.VALID_WIDTH],
                                 outputRange: [0.3, 1, 0.3],
                                 extrapolate: 'clamp',
                             });
-        
-                            return <Animated.View key={i} style={[styles.dot, { opacity }]} />
+                            return <Animated.View key={i} style={[AppStyle.dot, { opacity }]} />
                         })}
                     </View>
                     <Button iconName='settings-outline' onPress={handleOpenBottomSheet} iconColor={Colors.primary} />
@@ -156,12 +149,12 @@ const SafeModeHomePage = () => {
                 <Animated.FlatList
                     data={forms}
                     keyboardShouldPersistTaps='handled'
-                    renderItem={({ item }) => <View style={{ width }}>{item}</View>}
+                    renderItem={({ item }) => <View style={{ width: AppConstants.UI.SCREEN.VALID_WIDTH }}>{item}</View>}
                     keyExtractor={(_, index) => index.toString()}
                     horizontal
                     pagingEnabled
                     showsHorizontalScrollIndicator={false}
-                    snapToInterval={width}
+                    snapToInterval={AppConstants.UI.SCREEN.VALID_WIDTH}
                     decelerationRate='fast'
                     disableIntervalMomentum={true}
                     onMomentumScrollEnd={handleMomentumScrollEnd}
@@ -242,16 +235,5 @@ const styles = StyleSheet.create({
         ...AppStyle.input, 
         backgroundColor: Colors.backgroundColor, 
         paddingRight: AppConstants.UI.ICON.SIZE * 2
-    },
-    dotsContainer: {
-        flexDirection: 'row',
-        justifyContent: 'center'
-    },
-    dot: {
-        height: AppConstants.UI.ICON.SIZE * 0.5,
-        width: AppConstants.UI.ICON.SIZE * 0.5,
-        borderRadius: AppConstants.UI.ICON.SIZE,
-        backgroundColor: Colors.primary,
-        marginHorizontal: 4
-    }
+    }    
 })

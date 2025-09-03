@@ -89,5 +89,25 @@ export const AppStyle = StyleSheet.create({
         right: AppConstants.UI.ICON.SIZE / 2,
         top: "50%",
         transform: [{ translateY: -AppConstants.UI.ICON.SIZE / 2 }]
+    },
+    flex: {
+        flex: 1
+    },
+    gap: {
+        gap: AppConstants.UI.GAP
+    },
+    dotsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center'
+    },
+    dot: {
+        height: AppConstants.UI.ICON.SIZE * 0.5,
+        width: AppConstants.UI.ICON.SIZE * 0.5,
+        borderRadius: AppConstants.UI.ICON.SIZE,
+        backgroundColor: Colors.primary,
+        marginHorizontal: 4,
+    },
+    margin: {
+        gap: AppConstants.UI.MARGIN
     }
 })

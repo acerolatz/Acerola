@@ -3,7 +3,7 @@ import { dbReadManhwaAuthors } from "@/lib/database"
 import { AppStyle } from "@/styles/AppStyle"
 import { useRouter } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { FlatList, Pressable, StyleSheet, Text } from "react-native"
 import Row from "./util/Row"
 import { Colors } from "@/constants/Colors"
@@ -43,22 +43,22 @@ const ManhwaAuthorInfo = ({manhwa}: ManhwaAuthorInfoProps) => {
     }})
   }
 
-  const renderItem = ({item}: {item: ManhwaAuthor}) => {
-    return (
-      <Pressable style={styles.item} onPress={() => openAuthorPage(item)}>
-        <Text style={Typography.regular} >
-          {item.role == "Author" ? "Story" : "Art"}: {item.name}
-        </Text>
-      </Pressable>
-    )
-  }
+  const renderItem = useCallback(({item}: {item: ManhwaAuthor}) => (
+    <Pressable style={styles.item} onPress={() => openAuthorPage(item)}>
+      <Text style={Typography.regular} >
+        {item.role == "Author" ? "Story" : "Art"}: {item.name}
+      </Text>
+    </Pressable>
+  ), [])
+
+  const KeyExtractor = useCallback((item: ManhwaAuthor) => item.author_id.toString(), [])
 
   return (
     <Row style={styles.container} >
       <FlatList
         ref={flatListRef}
         data={authors}
-        keyExtractor={(item) => item.author_id.toString()}
+        keyExtractor={KeyExtractor}
         horizontal={true}
         showsHorizontalScrollIndicator={false}
         renderItem={renderItem}

@@ -15,7 +15,6 @@ import Row from '@/app/components/util/Row'
 import { Post } from '@/helpers/types'
 
 
-const PAGE_LIMIT = 16
 const TEXT_LENGTH_LIMIT = 128
 
 
@@ -76,10 +75,10 @@ const NewsPage = () => {
             isMounted.current = true
             const init = async () => {
                 setLoading(true)
-                    const f = await spFetchNews(0, PAGE_LIMIT)
+                    const f = await spFetchNews(0, AppConstants.VALIDATION.PAGE_LIMIT)
                     if (!isMounted.current) { return }
                     setPosts(f)
-                    hasResults.current = f.length >= PAGE_LIMIT
+                    hasResults.current = f.length >= AppConstants.VALIDATION.PAGE_LIMIT
                 setLoading(false)
             }
             init()
@@ -92,8 +91,8 @@ const NewsPage = () => {
         if (!hasResults.current || fetching.current) return
         fetching.current = true
         page.current += 1
-        const f = await spFetchNews(page.current, PAGE_LIMIT)
-        hasResults.current = f.length >= PAGE_LIMIT
+        const f = await spFetchNews(page.current, AppConstants.VALIDATION.PAGE_LIMIT)
+        hasResults.current = f.length >= AppConstants.VALIDATION.PAGE_LIMIT
         setPosts(prev => [...prev, ...f])
         fetching.current = false
     }, [])

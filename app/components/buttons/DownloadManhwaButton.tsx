@@ -4,6 +4,7 @@ import Toast from 'react-native-toast-message'
 import { useSQLiteContext } from 'expo-sqlite'
 import { Colors } from '@/constants/Colors'
 import { Chapter } from '@/helpers/types'
+import { asyncPool } from '@/helpers/util'
 import React, { useState } from 'react'
 import Button from './Button'
 
@@ -28,19 +29,17 @@ const DownloadManhwaButton = ({
 
     const onPress = async () => {
         setLoading(true)
-        for (let i = 0; i < chapters.length; i++) {
-            const chapter = chapters[i]
-            downloadManager.addToQueue(
-                db,
-                {
-                    manhwa_name,
-                    manhwa_id,
-                    chapter_id: chapter.chapter_id,
-                    chapter_name: chapter.chapter_name
-                },
-                false
-            )
-        }
+        await asyncPool(
+            8, 
+            chapters, 
+            async (chapter: Chapter) => await downloadManager.addToQueue(db, {
+                manhwa_name,
+                manhwa_id,
+                chapter_id: chapter.chapter_id,
+                chapter_name: chapter.chapter_name
+            }, 
+            false)
+        )
         Toast.show({text1: "Download started!", type: "info"})
         setLoading(false)
     }

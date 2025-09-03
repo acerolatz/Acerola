@@ -1,12 +1,13 @@
-import { FlatList, Text, View } from 'react-native'
+import { FlatList, StyleSheet, Text, View } from 'react-native'
 import { Typography } from '@/constants/typography'
 import React, { useCallback } from 'react'
 
 
 const Item = ({item, isLast}: {item: string, isLast: boolean}) => {
+    const t = !isLast ? ',' : ''
     return (
-        <Text key={item} style={{...Typography.light, marginRight: 6}}>
-            {item}{!isLast ? ',' : ''}
+        <Text key={item} style={styles.item}>
+            {item}{t}
         </Text>
     )
 }
@@ -27,7 +28,7 @@ const ManhwaAlternativeNames = ({names}: AltNamesProps) => {
     }    
 
     return (
-        <View style={{width: '100%', alignItems: "flex-start"}} >
+        <View style={styles.container} >
             <FlatList
                 data={names}
                 showsHorizontalScrollIndicator={false}
@@ -40,3 +41,14 @@ const ManhwaAlternativeNames = ({names}: AltNamesProps) => {
 }
 
 export default ManhwaAlternativeNames
+
+const styles = StyleSheet.create({
+    container: {
+        width: '100%', 
+        alignItems: "flex-start"
+    },
+    item: {
+        ...Typography.light, 
+        marginRight: 6
+    }
+})

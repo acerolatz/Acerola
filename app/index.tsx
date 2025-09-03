@@ -23,6 +23,7 @@ import {
     useFonts
 } from '@expo-google-fonts/league-spartan';
 import { downloadManager } from '@/helpers/DownloadManager';
+import { initManhwasDir } from '@/helpers/storage';
 
 
 const App = () => {
@@ -54,7 +55,6 @@ const App = () => {
             if (isInitialized.current) return;
             isInitialized.current = true;
             const init = async () => {
-                
                 const [
                     isSafeModeEnable,
                     hasInternet,
@@ -64,6 +64,7 @@ const App = () => {
                     handleCache(),
                     updateLocalVersion(),
                     dbFirstRun(db),
+                    initManhwasDir(),
                     downloadManager.init(db)
                 ])                
 

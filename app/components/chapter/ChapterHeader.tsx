@@ -1,4 +1,5 @@
 import { StyleSheet, View, Text, ActivityIndicator } from 'react-native'
+import DownloadChapterButton from '../buttons/DownloadChapterButton'
 import BugReportButton from '../buttons/BugReportButton'
 import { AppConstants } from '@/constants/AppConstants'
 import RotatingButton from '../buttons/RotatingButton'
@@ -6,14 +7,14 @@ import { useChapterState } from '@/hooks/chapterState'
 import { Typography } from '@/constants/typography'
 import ReturnButton from '../buttons/ReturnButton'
 import { Colors } from '@/constants/Colors'
+import Button from '../buttons/Button'
 import { router } from 'expo-router'
 import Column from '../util/Column'
 import { Image } from 'expo-image'
 import TopBar from '../TopBar'
 import Row from '../util/Row'
 import React from 'react'
-import Button from '../buttons/Button'
-import DownloadChapterButton from '../buttons/DownloadChapterButton'
+import CustomActivityIndicator from '../util/CustomActivityIndicator'
 
 
 interface ChapterHeaderProps {
@@ -65,7 +66,6 @@ const ChapterHeader = ({
       </TopBar>
 
       <Row style={{justifyContent: "space-between"}} >
-        
         <Row style={{gap: AppConstants.UI.ICON.SIZE}} >
           <BugReportButton title={reportTitle} />
           <RotatingButton onPress={reloadChapter} />
@@ -81,7 +81,7 @@ const ChapterHeader = ({
           <View style={styles.chapterNum} >
             {
               loading ?
-              <ActivityIndicator size={AppConstants.UI.ICON.SIZE} color={Colors.white} /> :
+              <CustomActivityIndicator color={Colors.white} /> :
               <Text style={Typography.regular}>{chapter.chapter_name}</Text>
             }
           </View>

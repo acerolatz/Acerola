@@ -3,10 +3,11 @@ import { AppConstants } from '@/constants/AppConstants'
 import { useChapterState } from '@/hooks/chapterState'
 import { Typography } from '@/constants/typography'
 import Ionicons from '@expo/vector-icons/Ionicons'
+import { AppStyle } from '@/styles/AppStyle'
 import { Colors } from '@/constants/Colors'
 import { router } from 'expo-router'
-import Footer from '../util/Footer'
 import Column from '../util/Column'
+import Footer from '../util/Footer'
 import Row from '../util/Row'
 import React from 'react'
 
@@ -58,7 +59,7 @@ const ChapterFooter = ({
     <Column style={styles.container} >
       {
         !loading &&
-        <Row style={{gap: AppConstants.UI.GAP}} >
+        <Row style={AppStyle.gap} >
           <Text style={Typography.regular}>Chapter</Text>
           {
             !isFirstChapter &&
@@ -66,7 +67,7 @@ const ChapterFooter = ({
               <Ionicons name='chevron-back' size={AppConstants.UI.ICON.SIZE} color={Colors.white} />
             </Pressable>
           }
-          <View style={{alignItems: "center", justifyContent: "center"}} >
+          <View style={styles.center} >
             <Text style={Typography.regular}>{chapterName}</Text>
           </View>
           {
@@ -91,6 +92,10 @@ const ChapterFooter = ({
 export default ChapterFooter
 
 const styles = StyleSheet.create({
+  center: {
+    alignItems: "center",
+    justifyContent: "center"
+  },
   container: {
     width: '100%',
     alignItems: "center",

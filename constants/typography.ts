@@ -45,6 +45,12 @@ export const Typography = StyleSheet.create({
     fontSize: FontSizes.sm,
     color: Colors.backgroundColor
   },
+  regularRed: {
+    fontFamily: "LeagueSpartan_400Regular",
+    fontWeight: "400",
+    fontSize: FontSizes.sm,
+    color: Colors.red
+  },
   semibold: {
     fontFamily: "LeagueSpartan_600SemiBold",
     fontWeight: "600",

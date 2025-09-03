@@ -1,5 +1,5 @@
-import { getChapterGridNumColumns, wp } from '@/helpers/util'
 import { Pressable, StyleSheet, Text } from 'react-native'
+import { getChapterGridNumColumns } from '@/helpers/util'
 import { AppConstants } from '@/constants/AppConstants'
 import { Typography } from '@/constants/typography'
 import { Colors } from '@/constants/Colors'
@@ -7,7 +7,7 @@ import React from 'react'
 
 
 const NUM_COLUMNS = getChapterGridNumColumns()
-const ITEM_SIZE = Math.floor((wp(92) - AppConstants.UI.MARGIN * (NUM_COLUMNS - 1)) / NUM_COLUMNS)
+const ITEM_SIZE = Math.floor((AppConstants.UI.SCREEN.VALID_WIDTH - AppConstants.UI.MARGIN * (NUM_COLUMNS - 1)) / NUM_COLUMNS)
 
 
 interface ChapterGridItemProps {

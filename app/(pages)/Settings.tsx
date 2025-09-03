@@ -6,30 +6,28 @@ import {
     StyleSheet, 
     View
 } from 'react-native'
-import { dbIsSafeModeEnabled, dbReadSafeModePassword } from '@/lib/database'
 import PageActivityIndicator from '@/app/components/util/PageActivityIndicator'
+import { dbIsSafeModeEnabled, dbReadSafeModePassword } from '@/lib/database'
 import UserDataComponent from '@/app/components/UserActivityComponent'
 import ReturnButton from '@/app/components/buttons/ReturnButton'
-import { AppConstants } from '@/constants/AppConstants'
 import SafeModeForm from '@/app/components/form/SafeModeForm'
-import { getCacheSizeBytes, wp } from '@/helpers/util'
 import React, { useEffect, useRef, useState } from 'react'
+import { AppConstants } from '@/constants/AppConstants'
 import CacheForm from '@/app/components/form/CacheForm'
+import { getCacheSizeBytes, wp } from '@/helpers/util'
 import { useLocalSearchParams } from 'expo-router'
-import { AppStyle } from '@/styles/AppStyle'
-import { Colors } from '@/constants/Colors'
 import { useSQLiteContext } from 'expo-sqlite'
+import { AppStyle } from '@/styles/AppStyle'
 import TopBar from '@/app/components/TopBar'
+import { Colors } from '@/constants/Colors'
 import Row from '@/app/components/util/Row'
 
-
-const width = wp(92)
 
 
 const Settings = () => {
 
     const params = useLocalSearchParams()
-    const cache_size = params.cache_size as any
+    const maxCacheSize = params.cache_size as any
 
     const db = useSQLiteContext()
     const [currentCacheSize, setCurrentCacheSize] = useState<number>(0)
@@ -61,7 +59,7 @@ const Settings = () => {
 
     const forms = [
       <SafeModeForm safeModeOn={safeModeOn} safeModePassword={safeModePassword} />,
-      <CacheForm currentCacheSize={currentCacheSize} currentMaxCacheSize={cache_size} />,
+      <CacheForm currentCacheSize={currentCacheSize} currentMaxCacheSize={maxCacheSize} />,
       <UserDataComponent/>
     ];    
 
@@ -80,15 +78,14 @@ const Settings = () => {
         <SafeAreaView style={AppStyle.safeArea} >
             <TopBar title='Settings'>
                 <Row style={{gap: AppConstants.UI.GAP}} >
-                    <View style={styles.dotsContainer}>
+                    <View style={AppStyle.dotsContainer}>
                         {forms.map((_, i) => {
                             const opacity = scrollX.interpolate({
-                                inputRange: [(i - 1) * width, i * width, (i + 1) * width],
+                                inputRange: [(i - 1) * AppConstants.UI.SCREEN.VALID_WIDTH, i * AppConstants.UI.SCREEN.VALID_WIDTH, (i + 1) * AppConstants.UI.SCREEN.VALID_WIDTH],
                                 outputRange: [0.3, 1, 0.3],
                                 extrapolate: 'clamp',
                             });
-        
-                            return <Animated.View key={i} style={[styles.dot, { opacity }]} />
+                            return <Animated.View key={i} style={[AppStyle.dot, { opacity }]} />
                         })}
                     </View>
                     <ReturnButton/>
@@ -99,12 +96,12 @@ const Settings = () => {
                     <Animated.FlatList
                         data={forms}
                         keyboardShouldPersistTaps='handled'
-                        renderItem={({ item }) => <View style={{ width }}>{item}</View>}
+                        renderItem={({ item }) => <View style={{ width: AppConstants.UI.SCREEN.VALID_WIDTH }}>{item}</View>}
                         keyExtractor={(_, index) => index.toString()}
                         horizontal
                         pagingEnabled
                         showsHorizontalScrollIndicator={false}
-                        snapToInterval={width}
+                        snapToInterval={AppConstants.UI.SCREEN.VALID_WIDTH}
                         decelerationRate='fast'
                         disableIntervalMomentum={true}
                         bounces
@@ -121,18 +118,3 @@ const Settings = () => {
 }
 
 export default Settings
-
-
-const styles = StyleSheet.create({  
-  dotsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center'
-  },
-  dot: {
-    height: AppConstants.UI.ICON.SIZE * 0.5,
-    width: AppConstants.UI.ICON.SIZE * 0.5,
-    borderRadius: AppConstants.UI.ICON.SIZE,
-    backgroundColor: Colors.primary,
-    marginHorizontal: 4,
-  }
-});

@@ -70,9 +70,9 @@ const RequestManhwaForm = () => {
     };
 
   return (
-    <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
-        <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled' >
-            <View style={{gap: AppConstants.UI.GAP}} >
+    <KeyboardAvoidingView style={AppStyle.flex} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
+        <ScrollView style={AppStyle.flex} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled' >
+            <View style={styles.container} >
                 {/* Manga Name */}
                 <Text style={Typography.semibold}>Pornhwa</Text>
                 {errors.pornhwaTitle && (<Text style={AppStyle.error}>{errors.pornhwaTitle.message}</Text>)}
@@ -120,7 +120,6 @@ const RequestManhwaForm = () => {
                         <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Send</Text>
                     </Pressable>
                 }
-
                 <Footer/>
             </View>
         </ScrollView>
@@ -132,6 +131,9 @@ export default RequestManhwaForm
 
 
 const styles = StyleSheet.create({
+    container: {
+        gap: AppConstants.UI.GAP
+    },
     descrContainer: {
         gap: AppConstants.UI.GAP, 
         alignSelf: 'flex-start'

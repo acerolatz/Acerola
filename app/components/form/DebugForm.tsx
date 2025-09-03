@@ -1,26 +1,24 @@
 import { 
-    ActivityIndicator, 
     Keyboard, 
-    Pressable, 
-    ScrollView,    
+    Pressable,         
+    StyleSheet,         
     Text, 
     TextInput, 
     View 
 } from 'react-native'
-import React, { useState } from 'react'
-import { Typography } from '@/constants/typography'
-import { AppStyle } from '@/styles/AppStyle'
-import { Colors } from '@/constants/Colors'
 import { AppConstants } from '@/constants/AppConstants'
-import { useSQLiteContext } from 'expo-sqlite'
-import { dbSetDebugInfo } from '@/lib/database'
-import { ToastMessages } from '@/constants/Messages'
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
 import { Controller, useForm } from 'react-hook-form';
+import { ToastMessages } from '@/constants/Messages'
+import { Typography } from '@/constants/typography'
+import { dbSetDebugInfo } from '@/lib/database'
+import { useSQLiteContext } from 'expo-sqlite'
 import Toast from 'react-native-toast-message'
+import { AppStyle } from '@/styles/AppStyle'
 import { DebugInfo } from '@/helpers/types'
+import React, { useState } from 'react'
 import Row from '../util/Row'
+import * as yup from 'yup';
 
 
 interface FormData {
@@ -102,8 +100,7 @@ const DebugForm = ({debugInfo, setDebugInfo}: DebugFormProps) => {
     }
 
     return (
-        <View style={{flex: 1, gap: AppConstants.UI.GAP}} >
-
+        <View style={styles.container} >
             {/* First Run */}
             <Text style={Typography.semibold}>FirstRun {debugInfo.first_run}</Text>            
             {errors.firstRun && (<Text style={AppStyle.error}>{errors.firstRun.message}</Text>)}
@@ -155,21 +152,21 @@ const DebugForm = ({debugInfo, setDebugInfo}: DebugFormProps) => {
             {/* Save Button */}
             {
                 isLoading ?
-                <Row style={{gap: AppConstants.UI.GAP}} >
+                <Row style={styles.gap} >
                     <View style={AppStyle.button} >
-                        <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Reset</Text>
+                        <Text style={Typography.regularBlack} >Reset</Text>
                     </View>
                     <View style={AppStyle.button} >
-                        <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Save</Text>
+                        <Text style={Typography.regularBlack} >Save</Text>
                     </View>
                 </Row>
                 :
-                <Row style={{gap: AppConstants.UI.GAP}} >
+                <Row style={styles.gap} >
                     <Pressable onPress={reset} style={AppStyle.button} >
-                        <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Reset</Text>
+                        <Text style={Typography.regularBlack} >Reset</Text>
                     </Pressable>
                     <Pressable onPress={handleSubmit(onSubmit)} style={AppStyle.button} >
-                        <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Save</Text>
+                        <Text style={Typography.regularBlack} >Save</Text>
                     </Pressable>
                 </Row>
             }
@@ -180,3 +177,13 @@ const DebugForm = ({debugInfo, setDebugInfo}: DebugFormProps) => {
 
 
 export default DebugForm
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        gap: AppConstants.UI.GAP
+    },
+    gap: {
+        gap: AppConstants.UI.GAP
+    }
+})

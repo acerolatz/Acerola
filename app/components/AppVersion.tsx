@@ -25,9 +25,7 @@ const AppVersion = () => {
     if (!localVersion) { return <></> }
 
     return (
-        <Text style={Typography.light} >
-            Your app version is {localVersion}
-        </Text>
+        <Text style={Typography.light} >Your app version is {localVersion}</Text>
     )
 }
 

@@ -13,6 +13,7 @@ interface ManhwaSummaryProps {
     summary: string    
 }
 
+
 const ManhwaSummary = ({summary}: ManhwaSummaryProps) => {
 
     const [isTextExpanded, setIsTextExpanded] = useState(false)

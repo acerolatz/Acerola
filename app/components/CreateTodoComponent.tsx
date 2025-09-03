@@ -50,7 +50,7 @@ const CreateTodoComponent = ({setTodos}: CreateTodoComponentProps) => {
 
     return (
         <Column style={styles.container} >
-            <Column style={{gap: AppConstants.UI.GAP}} >
+            <Column style={AppStyle.gap} >
                 <TextInput
                     ref={inputRef}
                     placeholder='Enter tasks, ideas, notes...'
@@ -71,7 +71,7 @@ const CreateTodoComponent = ({setTodos}: CreateTodoComponentProps) => {
                 />
             </Column>            
             <Pressable onPress={create} style={AppStyle.formButton} >
-                <Text style={[Typography.regular, {color: Colors.backgroundColor}]} >Create</Text>
+                <Text style={Typography.regularBlack} >Create</Text>
             </Pressable>
         </Column>
     )

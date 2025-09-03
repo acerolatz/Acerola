@@ -9,7 +9,6 @@ import { router, useFocusEffect } from "expo-router"
 import { Typography } from "@/constants/typography"
 import { useSQLiteContext } from "expo-sqlite"
 import { AppStyle } from "@/styles/AppStyle"
-import { Colors } from "@/constants/Colors"
 import { Manhwa } from '@/helpers/types'
 import Row from "../util/Row"
 
@@ -80,10 +79,10 @@ const ManhwaChapterGrid = ({ manhwa }: ManhwaChapterGridProps) => {
     <View style={styles.container} >
       <Row style={{gap: AppConstants.UI.MARGIN}} >
         <Pressable onPress={readFirst} style={{...AppStyle.button, backgroundColor: manhwa.color}}>
-          <Text style={{...Typography.regular, color: Colors.backgroundColor}}>Read First</Text>
+          <Text style={Typography.regularBlack}>Read First</Text>
         </Pressable>
         <Pressable onPress={readLast} style={{...AppStyle.button, backgroundColor: manhwa.color}}>
-          <Text style={{...Typography.regular, color: Colors.backgroundColor}}>Read Last</Text>
+          <Text style={Typography.regularBlack}>Read Last</Text>
         </Pressable>
       </Row>
       

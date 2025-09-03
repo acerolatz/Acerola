@@ -4,6 +4,7 @@ import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { memo, useCallback } from 'react';
 import {
+    ColorValue,
     Pressable,    
     StyleSheet,
     Text,
@@ -27,6 +28,9 @@ interface ManhwaCardProps {
 }
 
 
+const LINEAR_COLORS = ['transparent', 'transparent', 'rgba(0, 0, 0, 0.7)']
+
+
 const ManhwaCard = ({
     manhwa,
     onPress,
@@ -36,8 +40,6 @@ const ManhwaCard = ({
     marginBottom = 0,
     showManhwaStatus = true    
 }: ManhwaCardProps) => {        
-
-    
     const defaultOnPress = useCallback(() => {
         router.push({
             pathname: '/(pages)/ManhwaPage',
@@ -58,7 +60,7 @@ const ManhwaCard = ({
             />
             { showManhwaStatus && <ManhwaStatusComponent status={manhwa.status} /> }
             <LinearGradient 
-                colors={['transparent', 'transparent', 'rgba(0, 0, 0, 0.7)']} 
+                colors={LINEAR_COLORS as any} 
                 style={StyleSheet.absoluteFill} />
             <ManhwaIdComponent manhwa_id={manhwa.manhwa_id} position='r' />
             <View style={styles.manhwaTitleContainer} >

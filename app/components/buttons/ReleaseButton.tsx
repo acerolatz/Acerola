@@ -30,7 +30,7 @@ const ReleaseButton = React.memo(({ release }: ReleaseButtonProps) => {
             {
                 release.descr &&
                 <View style={styles.itemBodyContainer}>
-                    <Text style={{...Typography.regular, color: Colors.white}}>{release.descr}</Text>
+                    <Text style={Typography.regular}>{release.descr}</Text>
                 </View>
             }
         </Pressable>

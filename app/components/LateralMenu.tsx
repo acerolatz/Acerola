@@ -85,7 +85,7 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
             <TopBar title='Menu'>
                 <CloseBtn onPress={closeMenu} />
             </TopBar>
-            <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} >
+            <ScrollView style={AppStyle.flex} showsVerticalScrollIndicator={false} >
                 <View style={styles.container} >
                     <MenuButton 
                         onPress={libraryPage} 

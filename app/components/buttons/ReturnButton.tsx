@@ -1,9 +1,11 @@
 import { AppConstants } from '@/constants/AppConstants'
-import { Colors } from '@/constants/Colors'
+import { dbIsSafeModeEnabled } from '@/lib/database'
 import Ionicons from '@expo/vector-icons/Ionicons'
+import { useSQLiteContext } from 'expo-sqlite'
+import { Colors } from '@/constants/Colors'
+import { Pressable } from 'react-native'
 import { useRouter } from 'expo-router'
 import React from 'react'
-import { Pressable } from 'react-native'
 
 
 interface ReturnButtonProps {  
@@ -14,18 +16,25 @@ interface ReturnButtonProps {
 
 const ReturnButton = ({onPress, color = Colors.primary}: ReturnButtonProps) => {
 
+  const db = useSQLiteContext()
   const router = useRouter();
 
-  const tryGoBack = () => {
+  const tryGoBack = async () => {
     if (router.canGoBack()) {
       try {
         router.back()
       } catch (error) {
         console.log("error tryGoBack", error)
-        router.replace("/(pages)/HomePage")
+        const isSafeModeEnabled = await dbIsSafeModeEnabled(db)
+        isSafeModeEnabled ?
+          router.replace("/(pages)/SafeModeHomePage") :
+          router.replace("/(pages)/HomePage")
       }
     } else {
-      router.replace("/(pages)/HomePage")
+      const isSafeModeEnabled = await dbIsSafeModeEnabled(db)
+      isSafeModeEnabled ?
+        router.replace("/(pages)/SafeModeHomePage") :
+        router.replace("/(pages)/HomePage")
     }
   }
 

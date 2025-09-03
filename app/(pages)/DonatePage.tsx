@@ -1,13 +1,12 @@
 import PageActivityIndicator from '@/app/components/util/PageActivityIndicator'
 import ReturnButton from '@/app/components/buttons/ReturnButton'
+import React, { useCallback, useEffect, useState } from 'react'
 import DonateComponent from '@/app/components/DonateComponent'
-import { getRelativeHeight, wp } from '@/helpers/util'
 import { spFetchDonationMethods } from '@/lib/supabase'
 import { useDonateState } from '@/hooks/donateState'
-import React, { useEffect, useState } from 'react'
+import { getRelativeHeight } from '@/helpers/util'
 import { DonateMethod } from '@/helpers/types'
 import { AppStyle } from '@/styles/AppStyle'
-import { Colors } from '@/constants/Colors'
 import TopBar from '@/app/components/TopBar'
 import { Image } from 'expo-image'
 import {
@@ -16,11 +15,11 @@ import {
   StyleSheet
 } from 'react-native'
 import { AppConstants } from '@/constants/AppConstants'
-import { useSQLiteContext } from 'expo-sqlite'
 import Footer from '@/app/components/util/Footer'
+import { useSQLiteContext } from 'expo-sqlite'
 
 
-const WIDTH = wp(92)
+const WIDTH = AppConstants.UI.SCREEN.VALID_WIDTH
 const HEIGHT = getRelativeHeight(
   AppConstants.UI.DONATION.DONATE_BANNER.WIDTH, 
   AppConstants.UI.DONATION.DONATE_BANNER.HEIGHT, 
@@ -34,17 +33,16 @@ const Donate = () => {
   const { donates, setDonates } = useDonateState()
   const [loading, setLoading] = useState(false)
   const [donateImageUrl, setDonateImageUrl] = useState<string | null | undefined>(null)
+  const donatesData = donates.filter(i => i.method !== 'donation-banner')
 
   useEffect(
     () => {
       let isCancelled = false      
       const init = async () => {
-        
         if (donates.length != 0) { 
           setDonateImageUrl(donates.find(i => i.method === 'donation-banner')?.value)
           return 
         }
-
         setLoading(true)
           const d = await spFetchDonationMethods()
           if (isCancelled) { return }
@@ -64,39 +62,50 @@ const Donate = () => {
     [db]
   )  
 
-  const renderItem = ({item}: {item: DonateMethod}) => {
-    return <DonateComponent item={item} />
+  const renderItem = useCallback(
+    ({item}: {item: DonateMethod}) => <DonateComponent item={item} />, 
+    []
+  )
+
+  const renderHeader = useCallback(
+    () => (
+      donateImageUrl ? (
+        <Image 
+          source={donateImageUrl} 
+          style={styles.image} 
+          contentFit="cover" 
+        />
+      ) : null
+    ),
+    [donateImageUrl]
+  )
+
+  const renderFooter = useCallback(() => <Footer/>, [])
+
+  if (loading) {
+    return (
+      <SafeAreaView style={AppStyle.safeArea} >
+        <TopBar title='Donate'>
+          <ReturnButton />
+        </TopBar>
+        <PageActivityIndicator/>
+      </SafeAreaView>
+    )
   }
 
   return (
     <SafeAreaView style={AppStyle.safeArea} >
         <TopBar title='Donate'>
-            <ReturnButton />
+          <ReturnButton />
         </TopBar>
-        {
-          loading ?
-          <PageActivityIndicator/> :
-          (
-            <FlatList
-                data={donates.filter(i => i.method !== 'donation-banner')}
-                keyExtractor={(item) => item.value}
-                showsVerticalScrollIndicator={false}
-                ListHeaderComponent={
-                  <>
-                    {
-                      donateImageUrl && 
-                      <Image 
-                        source={donateImageUrl} 
-                        style={styles.image} 
-                        contentFit='cover' />
-                    }                
-                  </>
-                }
-                ListFooterComponent={<Footer/>}
-                renderItem={renderItem}
-            />
-          )
-        }       
+        <FlatList
+          data={donatesData}
+          keyExtractor={(item) => item.value}
+          showsVerticalScrollIndicator={false}
+          ListHeaderComponent={renderHeader}
+          ListFooterComponent={renderFooter}
+          renderItem={renderItem}
+        />
     </SafeAreaView>
   )
 }
@@ -104,14 +113,6 @@ const Donate = () => {
 export default Donate
 
 const styles = StyleSheet.create({
-  item: {
-    paddingHorizontal: 20,
-    height: 52,
-    borderRadius: AppConstants.UI.BORDER_RADIUS,
-    backgroundColor: Colors.primary,
-    alignItems: "center",
-    justifyContent: "center"
-  },
   image: {
     width: WIDTH, 
     height: HEIGHT, 

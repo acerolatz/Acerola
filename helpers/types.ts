@@ -229,3 +229,16 @@ export type Note = {
     content: string
     created_at: number
 }
+
+
+export type PendingDownloadByManhwa = {
+    manhwa: Manhwa, 
+    pending_downloads: number
+}
+
+export type DownloadState = {
+  downloads: Manhwa[]
+  pendingDownloads: PendingDownloadByManhwa[]
+  queueSize: number
+  currentDownload: DownloadRequest | null  
+}

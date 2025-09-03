@@ -1,6 +1,5 @@
-import { createDocumentPath } from "@/helpers/storage";
+import * as FileSystem from 'expo-file-system';
 import { hp, wp } from "@/helpers/util";
-import RNFS from 'react-native-fs';
 
 
 export const AppConstants = {
@@ -10,16 +9,13 @@ export const AppConstants = {
   APP: {
     NAME: "Acerola",
     VERSION: "v1.1.1",
-    DEBUG: { ENABLED: true },
-    MANHWAS_DIR: `${RNFS.DocumentDirectoryPath}/manhwas`
+    DEBUG: { ENABLED: false },
+    MANHWAS_DIR: `${FileSystem.documentDirectory}manhwas`
   },
 
   // =========================================================
   // PATHS & URLS
-  // =========================================================
-  PATHS: {
-    PORNHWAS_DOCUMENT: createDocumentPath('pornhwas'),
-  },
+  // =========================================================  
   URLS: {
     PORNHWA_REDDIT: "https://www.reddit.com/r/pornhwa/",
   },
@@ -37,6 +33,7 @@ export const AppConstants = {
       HEIGHT: hp(100),
       PADDING_HORIZONTAL: wp(4),
       PADDING_VERTICAL: hp(4),
+      VALID_WIDTH: wp(92)
     },
     ICON: { SIZE: wp(5) },
     BUTTON: { SIZE: hp(6.4) },

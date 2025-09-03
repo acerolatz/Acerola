@@ -28,10 +28,10 @@ const DonateComponent = ({item}: {item: DonateMethod}) => {
     return (
       <Pressable onPress={() => onPress(item)} style={styles.donateButton} >
         <Column style={styles.donateTitleContainer} >
-          <Text style={[Typography.regular, {color: Colors.backgroundColor}]}>{item.method}</Text>
+          <Text style={Typography.regularBlack}>{item.method}</Text>
           <Ionicons name={iconName as any} size={AppConstants.UI.ICON.SIZE} color={Colors.backgroundColor} />
         </Column>
-        <Text style={[Typography.regular, {color: Colors.backgroundColor}]}>{item.value}</Text>
+        <Text style={Typography.regularBlack}>{item.value}</Text>
       </Pressable>
     )
 }

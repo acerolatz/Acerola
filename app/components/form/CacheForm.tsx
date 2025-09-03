@@ -8,21 +8,21 @@ import {
     TextInput, 
     View 
 } from 'react-native'
-import React, { useState } from 'react'
-import { Typography } from '@/constants/typography'
-import { AppStyle } from '@/styles/AppStyle'
-import { Colors } from '@/constants/Colors'
-import { AppConstants } from '@/constants/AppConstants'
 import { clearCache, formatBytes, wp } from '@/helpers/util'
-import { useSQLiteContext } from 'expo-sqlite'
-import { dbSetCacheMaxSize } from '@/lib/database'
-import { ToastMessages } from '@/constants/Messages'
+import { AppConstants } from '@/constants/AppConstants'
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
 import { Controller, useForm } from 'react-hook-form';
+import { ToastMessages } from '@/constants/Messages'
+import { Typography } from '@/constants/typography'
+import { dbSetCacheMaxSize } from '@/lib/database'
+import { useSQLiteContext } from 'expo-sqlite'
 import Toast from 'react-native-toast-message'
 import RNRestart from 'react-native-restart';
+import { AppStyle } from '@/styles/AppStyle'
+import { Colors } from '@/constants/Colors'
+import React, { useState } from 'react'
 import Footer from '../util/Footer'
+import * as yup from 'yup';
 
 
 interface FormData {
@@ -79,9 +79,8 @@ const CacheForm = ({currentCacheSize, currentMaxCacheSize}: CacheFormProps) => {
     }
 
     return (
-        <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled' >
+        <ScrollView style={AppStyle.flex} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled' >
             <View style={styles.container} >
-
                 {/* Clear Cache */}
                 <Text style={Typography.semibold}>Cache size: {formatBytes(currentCacheSize)}</Text>
                 <Text style={AppStyle.error}>* Restart Required</Text>                    

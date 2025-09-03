@@ -1,6 +1,7 @@
 import React from 'react'
 import { View, ViewProps } from 'react-native'
 
+
 const Column = (props: ViewProps) => {
   
     const { style, ...rest } = props
@@ -10,5 +11,6 @@ const Column = (props: ViewProps) => {
     )
 
 }
+
 
 export default Column

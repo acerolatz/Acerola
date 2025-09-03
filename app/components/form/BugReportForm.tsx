@@ -1,15 +1,15 @@
+import { spSendBugReportForm, spSendBugScreenshot } from '@/lib/supabase';
 import { AppConstants } from '@/constants/AppConstants';
-import { Colors } from '@/constants/Colors';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { Controller, useForm } from 'react-hook-form';
 import { ToastMessages } from '@/constants/Messages';
 import { requestPermissions } from '@/helpers/util';
-import { dbReadInfo } from '@/lib/database';
-import { spSendBugReportForm, spSendBugScreenshot } from '@/lib/supabase';
-import { AppStyle } from '@/styles/AppStyle';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { router } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
+import { AppStyle } from '@/styles/AppStyle';
+import { Colors } from '@/constants/Colors';
+import { dbReadInfo } from '@/lib/database';
 import React, { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { router } from 'expo-router';
 import {
     ActivityIndicator,
     FlatList,
@@ -24,15 +24,15 @@ import {
     View
 } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
-import Toast from 'react-native-toast-message';
-import * as yup from 'yup';
-import Footer from '../util/Footer';
-import { BugType } from '@/helpers/types';
 import BugTypePicker from '../picker/BugTypePicker';
-import BugImage from '../util/BugImage';
 import { Typography } from '@/constants/typography';
+import Toast from 'react-native-toast-message';
+import { BugType } from '@/helpers/types';
+import BugImage from '../util/BugImage';
+import Footer from '../util/Footer';
 import Row from '../util/Row';
-
+import * as yup from 'yup';
+import CustomActivityIndicator from '../util/CustomActivityIndicator';
 
 
 const schema = yup.object().shape({  
@@ -145,9 +145,9 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
     };
 
     return (
-        <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
-            <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled' >
-                <View style={{gap: AppConstants.UI.GAP}} >
+        <KeyboardAvoidingView style={AppStyle.flex} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
+            <ScrollView style={AppStyle.flex} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled' >
+                <View style={styles.gap} >
                     {/* Title */}
                     <Text style={Typography.semibold}>Title</Text>
                     {errors.title && (<Text style={AppStyle.error}>{errors.title.message}</Text>)}
@@ -199,19 +199,19 @@ const BugReportForm = ({title}: {title: string | undefined | null}) => {
                         isLoading ?
                         <>
                             <View style={AppStyle.formButton} >
-                                <ActivityIndicator size={AppConstants.UI.ICON.SIZE} color={Colors.backgroundColor} />
+                                <CustomActivityIndicator color={Colors.backgroundColor} />
                             </View>
                             <View style={AppStyle.formButton} >
-                                <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Images (optional)</Text>
+                                <Text style={Typography.regularBlack} >Images (optional)</Text>
                             </View>
                         </>
                         :
                         <>
                             <Pressable onPress={handleSubmit(onSubmit)} style={AppStyle.formButton} >
-                                <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Send</Text>
+                                <Text style={Typography.regularBlack} >Send</Text>
                             </Pressable>
                             <Pressable onPress={handlePickPhoto} style={AppStyle.formButton} >
-                                <Text style={{...Typography.regular, color: Colors.backgroundColor}} >Images (optional)</Text>
+                                <Text style={Typography.regularBlack} >Images (optional)</Text>
                             </Pressable>
                         </>
                     }
@@ -240,6 +240,9 @@ export default BugReportForm
 
 
 const styles = StyleSheet.create({
+    gap: {
+      gap: AppConstants.UI.GAP  
+    },
     descrContainer: {
         gap: AppConstants.UI.GAP, 
         alignSelf: 'flex-start'

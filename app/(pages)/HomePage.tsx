@@ -22,7 +22,8 @@ import {
     dbGetManhwaReadingHistory,
     dbReadGenres, 
     dbReadManhwasOrderedByUpdateAt, 
-    dbReadManhwasOrderedByViews
+    dbReadManhwasOrderedByViews,
+    dbReadNumPendingDownloadsByManhwa
 } from '@/lib/database'
 import { 
     spFetchCollections,
@@ -46,8 +47,7 @@ import {
     Pressable, 
     SafeAreaView, 
     ScrollView, 
-    StyleSheet,
-    View
+    StyleSheet    
 } from 'react-native'
 import { Image } from 'expo-image'
 
@@ -107,14 +107,14 @@ const HomePage = () => {
     }
 
     useEffect(() => {
-            let mounted = true;
+        let mounted = true;
             setLoading(true);
             (async () => {
                 const [g, l, m] = await Promise.all([
                     dbReadGenres(db),
                     dbReadManhwasOrderedByUpdateAt(db, 0, AppConstants.VALIDATION.PAGE_LIMIT),
                     dbReadManhwasOrderedByViews(db, 0, AppConstants.VALIDATION.PAGE_LIMIT),
-                ]);
+                ]);                
 
                 if (!mounted) { return }
                 setGenres(g)
@@ -131,7 +131,7 @@ const HomePage = () => {
             })();
 
             return () => { mounted = false };
-    }, []);
+    }, [db]);
 
     useFocusEffect(
         useCallback(() => {

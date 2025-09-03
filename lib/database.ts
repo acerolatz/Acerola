@@ -10,6 +10,7 @@ import {
   ManhwaGenre,    
   ManhwaRating,    
   Note,    
+  PendingDownloadByManhwa,    
   ServerManhwa,    
   Todo,  
   UserData 
@@ -161,17 +162,21 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       path TEXT NOT NULL,
       status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'downloading', 'completed', 'failed', 'cancelled')),
       progress INTEGER DEFAULT 0,
-      created_at INTEGER NOT NULL   
+      created_at INTEGER NOT NULL 
     );
 
     -- ===============================
 
 
     -- ===============================
-    --              DELETE
+    --              UPDATE
     -- ===============================
-    DELETE FROM downloads WHERE status NOT IN ('completed', 'pending');
+    UPDATE downloads SET status = 'pending' WHERE status IN ('downloading', 'cancelled', 'failed');
     -- ===============================
+
+
+    -- ===============================
+
 
     -- ===============================
     --              INDEX
@@ -2131,7 +2136,9 @@ export async function dbReadPendingDownloads(db: SQLite.SQLiteDatabase): Promise
       JOIN  
         manhwas m ON m.manhwa_id = d.manhwa_id
       WHERE
-        d.status = 'pending';
+        d.status = 'pending'
+      ORDER BY 
+        created_at ASC;
     `
   ).catch(error => console.log("error dbReadPendingDownloads", error))
 
@@ -2162,7 +2169,7 @@ export async function dbReadDownloadedManhwas(db: SQLite.SQLiteDatabase): Promis
       JOIN 
         downloads d ON d.manhwa_id = m.manhwa_id
       WHERE 
-        d.status = 'completed'
+        d.status = 'completed' OR d.status = 'pending'
       GROUP 
         BY m.manhwa_id
       ORDER BY 
@@ -2241,4 +2248,40 @@ export async function dbDeleteNote(db: SQLite.SQLiteDatabase, note_id: number) {
     'DELETE FROM notes WHERE note_id = ?;',
     [note_id]
   ).catch(error => console.log("error dbDeleteNote", error))
+}
+
+
+
+export async function dbReadNumPendingDownloadsByManhwa(db: SQLite.SQLiteDatabase): Promise<PendingDownloadByManhwa[]> {
+  const r = await db.getAllAsync<PendingDownloadByManhwa>(
+    `
+      SELECT 
+        m.manhwa_id,
+        m.title,
+        m.cover_image_url,
+        m.status,
+        m.views,
+        m.updated_at,
+        COUNT(*) AS pending_downloads,
+        MAX(d.created_at) AS last_pending_created_at
+      FROM 
+        manhwas m
+      JOIN 
+        downloads d ON m.manhwa_id = d.manhwa_id AND d.status = 'pending'
+      GROUP BY 
+        m.manhwa_id,
+        m.title,
+        m.cover_image_url,
+        m.status,
+        m.views,
+        m.updated_at
+      HAVING COUNT(*) > 0
+      ORDER BY 
+        last_pending_created_at DESC;
+    `
+  ).catch(error => console.log("error dbReadNumPendingDownloadsByManhwa", error))
+  return r ? r.map(i => {return {
+    manhwa: i as any,
+    pending_downloads: i.pending_downloads
+  }}) : []
 }

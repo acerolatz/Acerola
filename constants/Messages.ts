@@ -23,9 +23,17 @@ export const ToastMessages = {
             text1: "Synchronizing local database...", 
             type: "info"
         },
+        SYNC_LOCAL_DATABASE_TYP1: {
+            text1: "Synchronizing local database...", 
+            type: "info1"
+        },
         SYNC_LOCAL_DATABASE_COMPLETED: {
             text1: "Sync completed", 
             type: "info"
+        },
+        SYNC_LOCAL_DATABASE_COMPLETED_TYP1: {
+            text1: "Sync completed", 
+            type: "info1"
         },
         SYNC_LOCAL_DATABASE_COMPLETED1: {
             text1: "Already synced", 
@@ -66,6 +74,10 @@ export const ToastMessages = {
             text1: "Success!", 
             type: "success"
         },
+        GENERIC_SUCCESS_TYP1: {
+            text1: "Success!", 
+            type: "success1"
+        },
         GENERIC_SERVER_ERROR: {
             text1: "Server error", 
             type: 'error'
@@ -90,9 +102,10 @@ export const ToastMessages = {
             position: 'top'
         },
         INVALID_PASSWORD: {
-            text1: "Error", 
-            text2: "Invalid password", 
-            type: "error1"
+            text1: "Invalid Password", 
+            text2: "Min 4 characters and passwords must match", 
+            type: 'error1',
+            visibilityTime: 3500
         },
         INVALID_TASK: {
             text1: "Invalid Task", 
@@ -116,6 +129,14 @@ export const ToastMessages = {
         DOCUMENT_NOT_FOUND: {
             text1: "Document not Found", 
             type: "error"
+        },
+        SAFE_MODE_DISABLED: {
+            text1: "Safe Mode Disabled!", 
+            type: "success"
+        },
+        SAFE_MODE_ENABLED: {
+            text1: "Safe Mode Enabled!", 
+            type: "success"
         }
     }
 }

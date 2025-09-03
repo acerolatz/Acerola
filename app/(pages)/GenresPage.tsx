@@ -21,7 +21,7 @@ import { useSQLiteContext } from 'expo-sqlite'
 
 
 const NUM_COLUMNS = 2
-const ITEM_WIDTH = (wp(92) - AppConstants.UI.MARGIN * (NUM_COLUMNS - 1)) / NUM_COLUMNS
+const ITEM_WIDTH = (AppConstants.UI.SCREEN.VALID_WIDTH - AppConstants.UI.MARGIN * (NUM_COLUMNS - 1)) / NUM_COLUMNS
 const ITEM_HEIGHT = hp(8)
 
 

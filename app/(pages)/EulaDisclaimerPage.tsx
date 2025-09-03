@@ -7,21 +7,16 @@ import { Typography } from '@/constants/typography'
 import { useTextState } from '@/hooks/appTextState'
 import Footer from '@/app/components/util/Footer'
 import { AppStyle } from '@/styles/AppStyle'
-import { Colors } from '@/constants/Colors'
 import TopBar from '@/app/components/TopBar'
 import { wp } from '@/helpers/util'
 import { 
     Animated, 
     SafeAreaView, 
-    ScrollView, 
-    StyleSheet, 
+    ScrollView,    
     Text, 
     View 
 } from 'react-native'
 import Row from '@/app/components/util/Row'
-
-
-const width = AppConstants.UI.SCREEN.WIDTH - AppConstants.UI.SCREEN.PADDING_HORIZONTAL * 2
 
 
 const EulaAndDisclaimerPage = () => {
@@ -71,7 +66,7 @@ const EulaAndDisclaimerPage = () => {
     const scrollX = useRef(new Animated.Value(0)).current;
     const handleMomentumScrollEnd = (e: any) => {
         const offsetX = e.nativeEvent.contentOffset.x;
-        const index = Math.round(offsetX / width);
+        const index = Math.round(offsetX / AppConstants.UI.SCREEN.VALID_WIDTH);
         setTitle(titles[index])
     };
 
@@ -90,17 +85,17 @@ const EulaAndDisclaimerPage = () => {
         return (
             <SafeAreaView style={AppStyle.safeArea} >
                 <TopBar title={title}>
-                    <Row style={{gap: AppConstants.UI.GAP}} >
-                        <View style={styles.dotsContainer}>
+                    <Row style={AppStyle.gap} >
+                        <View style={AppStyle.dotsContainer}>
                             {
                                 texts.map((_, i) => {
                                     const opacity = scrollX.interpolate({
-                                        inputRange: [(i - 1) * width, i * width, (i + 1) * width, ],
+                                        inputRange: [(i - 1) * AppConstants.UI.SCREEN.VALID_WIDTH, i * AppConstants.UI.SCREEN.VALID_WIDTH, (i + 1) * AppConstants.UI.SCREEN.VALID_WIDTH, ],
                                         outputRange: [0.3, 1, 0.3],
                                         extrapolate: 'clamp',
                                     });        
                                     return (
-                                        <Animated.View key={i} style={[styles.dot, { opacity }]}/>
+                                        <Animated.View key={i} style={[AppStyle.dot, { opacity }]}/>
                                     );
                                 })
                             }
@@ -108,16 +103,16 @@ const EulaAndDisclaimerPage = () => {
                         <ReturnButton/>
                     </Row>
                 </TopBar>
-                <View style={styles.container}>
+                <View style={AppStyle.flex}>
                     <Animated.FlatList
                         data={texts}
                         keyboardShouldPersistTaps='handled'
-                        renderItem={({ item }) => <View style={{ width }}>{item}</View>}
+                        renderItem={({ item }) => <View style={{ width: AppConstants.UI.SCREEN.VALID_WIDTH }}>{item}</View>}
                         keyExtractor={(_, index) => index.toString()}
                         horizontal
                         pagingEnabled
                         showsHorizontalScrollIndicator={false}
-                        snapToInterval={width}
+                        snapToInterval={AppConstants.UI.SCREEN.VALID_WIDTH}
                         decelerationRate="fast"
                         bounces
                         onMomentumScrollEnd={handleMomentumScrollEnd}
@@ -143,21 +138,3 @@ const EulaAndDisclaimerPage = () => {
 
 
 export default EulaAndDisclaimerPage
-
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1
-    },
-    dotsContainer: {
-        flexDirection: 'row',
-        justifyContent: 'center'        
-    },
-    dot: {
-        height: AppConstants.UI.ICON.SIZE * 0.5,
-        width: AppConstants.UI.ICON.SIZE * 0.5,
-        borderRadius: AppConstants.UI.ICON.SIZE,
-        backgroundColor: Colors.primary,
-        marginHorizontal: AppConstants.UI.MARGIN
-    }
-})

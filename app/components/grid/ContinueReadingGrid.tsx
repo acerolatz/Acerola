@@ -53,7 +53,7 @@ const ContinueReadingGrid = ({manhwas}: {manhwas: Manhwa[]}) => {
     
     return (
         <View style={styles.container} >
-            <Row style={{width: '100%', justifyContent: "space-between"}} >
+            <Row style={styles.header} >
                 <Title title='Jump Back In'/>
                 <ViewAllButton onPress={onViewAll} />
             </Row>
@@ -71,6 +71,10 @@ const ContinueReadingGrid = ({manhwas}: {manhwas: Manhwa[]}) => {
 export default ContinueReadingGrid
 
 const styles = StyleSheet.create({
+    header:{
+        width: '100%', 
+        justifyContent: "space-between"
+    },
     container: {
         width: '100%',
         gap: AppConstants.UI.GAP

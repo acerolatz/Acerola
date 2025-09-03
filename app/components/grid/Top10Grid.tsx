@@ -86,8 +86,8 @@ const Top10Grid = ({manhwas, reloadTop10}: Top10GridProps) => {
 
     return (
         <View style={styles.container} >
-            <Row style={{justifyContent: "space-between"}} >
-                <Title title="Today's Top 10"/>                
+            <Row style={styles.header} >
+                <Title title="Today's Top 10"/>
                 <BooleanRotatingButton onPress={reload} iconName='reload-outline' />
             </Row>
             <FlatList
@@ -105,6 +105,9 @@ const Top10Grid = ({manhwas, reloadTop10}: Top10GridProps) => {
 export default Top10Grid
 
 const styles = StyleSheet.create({
+    header: {
+        justifyContent: "space-between"
+    },
     container: {
         width: '100%',
         gap: 10

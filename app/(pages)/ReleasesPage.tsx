@@ -1,4 +1,4 @@
-import { FlatList, SafeAreaView, View, Text, StyleSheet, Animated } from 'react-native';
+import { FlatList, SafeAreaView, View, StyleSheet, Animated } from 'react-native';
 import PageActivityIndicator from '@/app/components/util/PageActivityIndicator';
 import SourceCodeButton from '@/app/components/buttons/SourceCodeButton';
 import { spFetchReleasesAndSourceCode } from '../../lib/supabase';
@@ -12,12 +12,7 @@ import AppVersion from '@/app/components/AppVersion';
 import Footer from '@/app/components/util/Footer';
 import { AppStyle } from '@/styles/AppStyle';
 import TopBar from '@/app/components/TopBar';
-import { Colors } from '@/constants/Colors';
-import { wp } from '@/helpers/util';
 import Row from '@/app/components/util/Row';
-
-
-const width = wp(92)
 
 
 const Releases = () => {
@@ -84,15 +79,14 @@ const Releases = () => {
     <SafeAreaView style={AppStyle.safeArea}>
       <TopBar title="Releases">
         <Row style={{gap: AppConstants.UI.GAP}} >
-          <View style={styles.dotsContainer}>
+          <View style={AppStyle.dotsContainer}>
               {screens.map((_, i) => {
                   const opacity = scrollX.interpolate({
-                      inputRange: [(i - 1) * width, i * width, (i + 1) * width],
+                      inputRange: [(i - 1) * AppConstants.UI.SCREEN.VALID_WIDTH, i * AppConstants.UI.SCREEN.VALID_WIDTH, (i + 1) * AppConstants.UI.SCREEN.VALID_WIDTH],
                       outputRange: [0.3, 1, 0.3],
                       extrapolate: 'clamp',
                   });
-
-                  return <Animated.View key={i} style={[styles.dot, { opacity }]} />
+                  return <Animated.View key={i} style={[AppStyle.dot, { opacity }]} />
               })}
           </View>
           <ReturnButton />
@@ -102,12 +96,12 @@ const Releases = () => {
         <Animated.FlatList
             data={screens}
             keyboardShouldPersistTaps='handled'
-            renderItem={({ item }) => <View style={{ width }}>{item}</View>}
+            renderItem={({ item }) => <View style={{ width: AppConstants.UI.SCREEN.VALID_WIDTH }}>{item}</View>}
             keyExtractor={(_, index) => index.toString()}
             horizontal
             pagingEnabled
             showsHorizontalScrollIndicator={false}
-            snapToInterval={width}
+            snapToInterval={AppConstants.UI.SCREEN.VALID_WIDTH}
             decelerationRate='fast'
             disableIntervalMomentum={true}
             bounces
@@ -133,16 +127,5 @@ const styles = StyleSheet.create({
   section: {
     flex: 1,
     gap: AppConstants.UI.GAP,
-  },
-  dotsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center'    
-  },
-  dot: {
-    height: AppConstants.UI.ICON.SIZE * 0.5,
-    width: AppConstants.UI.ICON.SIZE * 0.5,
-    borderRadius: AppConstants.UI.ICON.SIZE,
-    backgroundColor: Colors.primary,
-    marginHorizontal: 4,
-  }
+  }  
 });
