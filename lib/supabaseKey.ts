@@ -1,3 +1,0 @@
-
-export const supabaseUrl = "https://amqgqpnbtwbnmjuqxiqb.supabase.co"
-export const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtcWdxcG5idHdibm1qdXF4aXFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NzA0OTIsImV4cCI6MjA2NjQ0NjQ5Mn0.zHaLOyRyRPihVYgFoyRCaWYJYpLsTJH3SMWmpk_YqKA"
