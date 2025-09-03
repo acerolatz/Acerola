@@ -1,14 +1,14 @@
-import PageActivityIndicator from '@/components/util/PageActivityIndicator'
-import ReturnButton from '@/components/buttons/ReturnButton'
-import DonateComponent from '@/components/DonateComponent'
+import PageActivityIndicator from '@/app/components/util/PageActivityIndicator'
+import ReturnButton from '@/app/components/buttons/ReturnButton'
+import DonateComponent from '@/app/components/DonateComponent'
 import { getRelativeHeight, wp } from '@/helpers/util'
 import { spFetchDonationMethods } from '@/lib/supabase'
-import { useDonateState } from '@/store/donateState'
+import { useDonateState } from '@/hooks/donateState'
 import React, { useEffect, useState } from 'react'
 import { DonateMethod } from '@/helpers/types'
 import { AppStyle } from '@/styles/AppStyle'
 import { Colors } from '@/constants/Colors'
-import TopBar from '@/components/TopBar'
+import TopBar from '@/app/components/TopBar'
 import { Image } from 'expo-image'
 import {
   FlatList,
@@ -17,7 +17,7 @@ import {
 } from 'react-native'
 import { AppConstants } from '@/constants/AppConstants'
 import { useSQLiteContext } from 'expo-sqlite'
-import Footer from '@/components/util/Footer'
+import Footer from '@/app/components/util/Footer'
 
 
 const WIDTH = wp(92)

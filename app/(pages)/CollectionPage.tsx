@@ -1,12 +1,12 @@
 import { useLocalSearchParams } from 'expo-router/build/hooks'
-import ReturnButton from '@/components/buttons/ReturnButton'
+import ReturnButton from '@/app/components/buttons/ReturnButton'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { AppConstants } from '@/constants/AppConstants'
 import { spFetchCollectionItems } from '@/lib/supabase'
-import ManhwaGrid from '@/components/grid/ManhwaGrid'
+import ManhwaGrid from '@/app/components/grid/ManhwaGrid'
 import { AppStyle } from '@/styles/AppStyle'
 import { SafeAreaView } from 'react-native'
-import TopBar from '@/components/TopBar'
+import TopBar from '@/app/components/TopBar'
 import { Manhwa } from '@/helpers/types'
 
 

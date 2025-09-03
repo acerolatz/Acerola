@@ -1,14 +1,14 @@
-import ReadingStatusPicker from '@/components/picker/ReadingStatusPicker'
-import ReturnButton from '@/components/buttons/ReturnButton'
+import ReadingStatusPicker from '@/app/components/picker/ReadingStatusPicker'
+import ReturnButton from '@/app/components/buttons/ReturnButton'
 import { dbReadManhwasByReadingStatus } from '@/lib/database'
 import React, { useCallback, useRef, useState } from 'react'
 import { AppConstants } from '@/constants/AppConstants'
-import ManhwaGrid from '@/components/grid/ManhwaGrid'
+import ManhwaGrid from '@/app/components/grid/ManhwaGrid'
 import { SafeAreaView, View } from 'react-native'
 import { useSQLiteContext } from 'expo-sqlite'
 import { AppStyle } from '@/styles/AppStyle'
 import { useFocusEffect } from 'expo-router'
-import TopBar from '@/components/TopBar'
+import TopBar from '@/app/components/TopBar'
 import { Manhwa } from '@/helpers/types'
 
 

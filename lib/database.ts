@@ -1,8 +1,6 @@
 import { 
   Author,
-  Chapter,
   DebugInfo,  
-  DownloadByManhwa,  
   DownloadRecord,  
   DownloadRequest,  
   DownloadStatus,  
@@ -11,6 +9,7 @@ import {
   ManhwaAuthor, 
   ManhwaGenre,    
   ManhwaRating,    
+  Note,    
   ServerManhwa,    
   Todo,  
   UserData 
@@ -22,14 +21,14 @@ import {
   getCacheSizeBytes, 
   getDeviceName
 } from '@/helpers/util';
+import { spGetManhwas, spRegisterNewUser, spUpdateUserLastLogin } from './supabase';
+import { createChapterDir, deleteDocumentDir } from '@/helpers/storage';
 import { AppConstants } from '@/constants/AppConstants';
 import DeviceInfo from 'react-native-device-info';
-import { spGetManhwas, spRegisterNewUser, spUpdateUserLastLogin } from './supabase';
 import { AuthorSet } from '@/helpers/AuthorSet';
 import { GenreSet } from '@/helpers/GenreSet';
 import * as SQLite from 'expo-sqlite';
 import uuid from 'react-native-uuid';
-import { createChapterDir, deleteDocumentDir } from '@/helpers/storage';
 
 
 export async function dbMigrate(db: SQLite.SQLiteDatabase) {
@@ -147,6 +146,14 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       finished_at TIMESTAMP DEFAULT NULL      
     );
 
+    CREATE TABLE IF NOT EXISTS notes (
+      note_id INTEGER PRIMARY KEY,
+      title TEXT NOT NULL,
+      content TEXT NOT NULL,
+      created_at INTEGER NOT NULL DEFAULT 0,
+      updated_at INTEGER NOT NULL DEFAULT 0
+    );
+
     CREATE TABLE IF NOT EXISTS downloads (
       chapter_id INTEGER PRIMARY KEY,
       manhwa_id INTEGER NOT NULL,
@@ -154,7 +161,7 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       path TEXT NOT NULL,
       status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'downloading', 'completed', 'failed', 'cancelled')),
       progress INTEGER DEFAULT 0,
-      created_at INTEGER NOT NULL      
+      created_at INTEGER NOT NULL   
     );
 
     -- ===============================
@@ -2164,4 +2171,74 @@ export async function dbReadDownloadedManhwas(db: SQLite.SQLiteDatabase): Promis
   ).catch(error => console.log("error dbReadDownloadsByManhwas", error))
 
   return r ? r : []
+}
+
+export async function dbReadNote(db: SQLite.SQLiteDatabase, note_id: number): Promise<Note | null> {
+  const r = await db.getFirstAsync<Note>(
+    'SELECT * FROM notes WHERE note_id = ?;',
+    [note_id]
+  ).catch(error => console.log("error dbReadNote", error))
+
+  return r ? r : null
+}
+
+
+export async function dbReadNotes(db: SQLite.SQLiteDatabase, p_offset: number = 0, p_limit: number = AppConstants.VALIDATION.PAGE_LIMIT) {
+  const r = await db.getAllAsync<Note>(
+    `
+      SELECT 
+        * 
+      FROM 
+        notes
+      ORDER BY
+        updated_at DESC
+      LIMIT ?
+      OFFSET ?;
+    `,
+    [p_limit, p_offset]
+  ).catch(error => console.log("error dbReadNotes", error))
+
+  return r ? r : []
+}
+
+
+export async function dbInsertNote(
+  db: SQLite.SQLiteDatabase, 
+  title: string, 
+  content: string
+) {
+  const t = Date.now()
+  await db.runAsync(
+    `
+      INSERT INTO 
+        notes (title, content, created_at, updated_at)
+      VALUES 
+        (?,?,?,?);
+    `,
+    [title, content, t, t]
+  ).catch(error => console.log("error dbCreateNote", error))
+}
+
+
+export async function dbUpdateNote(db: SQLite.SQLiteDatabase, note: Note) {
+  await db.runAsync(
+    `
+      UPDATE 
+        notes
+      SET
+        title = ?,
+        content = ?,
+        updated_at = ?
+      WHERE
+        note_id = ?;
+    `,
+    [note.title, note.content, Date.now(), note.note_id]
+  ).catch(error => console.log("error dbUpdateNote", error)) 
+}
+
+export async function dbDeleteNote(db: SQLite.SQLiteDatabase, note_id: number) {
+  await db.runAsync(
+    'DELETE FROM notes WHERE note_id = ?;',
+    [note_id]
+  ).catch(error => console.log("error dbDeleteNote", error))
 }

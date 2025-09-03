@@ -1,26 +1,25 @@
-import NewAppReleaseBottomSheet from '@/components/bottomsheet/NewAppReleaseBottomSheet'
-import DonationBottomSheet from '@/components/bottomsheet/DonationBottomSheet'
-import RandomManhwaButton from '@/components/buttons/OpenRandomManhwaButton'
-import UpdateDatabaseButton from '@/components/buttons/UpdateDatabaseButton'
-import ContinueReadingGrid from '@/components/grid/ContinueReadingGrid'
-import LatestUpdatesGrid from '@/components/grid/LatestUpdatesGrid'
-import MostPopularGrid from '@/components/grid/MostPopularGrid'
-import RandomCardsGrid from '@/components/grid/RandomCardsGrid'
-import CollectionGrid from '@/components/grid/CollectionsGrid'
+import NewAppReleaseBottomSheet from '@/app/components/bottomsheet/NewAppReleaseBottomSheet'
+import DonationBottomSheet from '@/app/components/bottomsheet/DonationBottomSheet'
+import RandomManhwaButton from '@/app/components/buttons/OpenRandomManhwaButton'
+import UpdateDatabaseButton from '@/app/components/buttons/UpdateDatabaseButton'
+import ContinueReadingGrid from '@/app/components/grid/ContinueReadingGrid'
+import LatestUpdatesGrid from '@/app/components/grid/LatestUpdatesGrid'
+import MostPopularGrid from '@/app/components/grid/MostPopularGrid'
+import RandomCardsGrid from '@/app/components/grid/RandomCardsGrid'
+import CollectionGrid from '@/app/components/grid/CollectionsGrid'
 import { AppConstants } from '@/constants/AppConstants'
-import GenreGrid from '@/components/grid/GenreGrid'
-import Top10Grid from '@/components/grid/Top10Grid'
-import LateralMenu from '@/components/LateralMenu'
-import Button from '@/components/buttons/Button'
+import GenreGrid from '@/app/components/grid/GenreGrid'
+import Top10Grid from '@/app/components/grid/Top10Grid'
+import LateralMenu from '@/app/components/LateralMenu'
+import Button from '@/app/components/buttons/Button'
 import { Genre, Manhwa } from '@/helpers/types'
-import Column from '@/components/util/Column'
-import Footer from '@/components/util/Footer'
-import AppLogo from '@/components/util/Logo'
+import Column from '@/app/components/util/Column'
+import Footer from '@/app/components/util/Footer'
+import AppLogo from '@/app/components/util/Logo'
 import { Colors } from '@/constants/Colors'
-import Row from '@/components/util/Row'
+import Row from '@/app/components/util/Row'
 import {
-    dbGetManhwaReadingHistory,         
-    dbReadAll,         
+    dbGetManhwaReadingHistory,
     dbReadGenres, 
     dbReadManhwasOrderedByUpdateAt, 
     dbReadManhwasOrderedByViews
@@ -30,9 +29,9 @@ import {
     spFetchRandomManhwaCards, 
     spFetchTop10 
 } from '@/lib/supabase'
-import { useCollectionState } from '@/store/collectionsState'
-import { useManhwaCardsState } from '@/store/randomManhwaState'
-import { useTop10ManhwasState } from '@/store/top10State'
+import { useCollectionState } from '@/hooks/collectionsState'
+import { useManhwaCardsState } from '@/hooks/randomManhwaState'
+import { useTop10ManhwasState } from '@/hooks/top10State'
 import { router, useFocusEffect } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
 import { AppStyle } from '@/styles/AppStyle'

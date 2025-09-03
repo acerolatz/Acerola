@@ -118,6 +118,12 @@ export function formatTimestampWithHour(timestamp: string): string {
   return date.toLocaleDateString('en-US', options as any);  
 }
 
+export function formatTimestampWithHour1(timestamp: string): string {
+  const date = new Date(timestamp)
+  const options: Intl.DateTimeFormatOptions = { hour: 'numeric', minute: 'numeric', month: 'short', day: 'numeric' };
+  return date.toLocaleDateString('en-US', options as any);  
+}
+
 
 export async function hasInternetAvailable(): Promise<boolean> {
     const state: NetInfoState = await NetInfo.fetch()

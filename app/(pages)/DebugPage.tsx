@@ -1,4 +1,4 @@
-import DebugLastestManhwaCards from '@/components/debug/DebugLastestManhwaCards'
+import DebugLastestManhwaCards from '@/app/components/debug/DebugLastestManhwaCards'
 import { 
     FlatList,
     Keyboard, 
@@ -16,10 +16,10 @@ import {
     spFetchCardAndCoverLatest, 
     spFetchCardAndCoverSearch    
 } from '@/lib/supabase'
-import PageActivityIndicator from '@/components/util/PageActivityIndicator'
+import PageActivityIndicator from '@/app/components/util/PageActivityIndicator'
 import React, { useCallback, useEffect, useState } from 'react'
 import { DebugInfo, DebugManhwaImages } from '@/helpers/types'
-import ReturnButton from '@/components/buttons/ReturnButton'
+import ReturnButton from '@/app/components/buttons/ReturnButton'
 import { TextInput } from 'react-native-gesture-handler'
 import { hasOnlyDigits, hp, wp } from '@/helpers/util'
 import { dbFetchDebugInfo } from '@/lib/database'
@@ -28,14 +28,14 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { Typography } from '@/constants/typography'
 import Toast from 'react-native-toast-message'
 import { useSQLiteContext } from 'expo-sqlite'
-import Footer from '@/components/util/Footer'
+import Footer from '@/app/components/util/Footer'
 import { AppStyle } from '@/styles/AppStyle'
 import { Colors } from '@/constants/Colors'
-import TopBar from '@/components/TopBar'
-import Row from '@/components/util/Row'
+import TopBar from '@/app/components/TopBar'
+import Row from '@/app/components/util/Row'
 import { Image } from 'expo-image'
-import DebugForm from '@/components/form/DebugForm'
-import DebugStats from '@/components/debug/DebugStats'
+import DebugForm from '@/app/components/form/DebugForm'
+import DebugStats from '@/app/components/debug/DebugStats'
 
 
 interface ManhwaImagesComponentProps {

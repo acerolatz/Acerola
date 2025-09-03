@@ -1,12 +1,12 @@
-import ReturnButton from '@/components/buttons/ReturnButton'
+import ReturnButton from '@/app/components/buttons/ReturnButton'
 import React, { useEffect, useRef, useState } from 'react'
 import { AppConstants } from '@/constants/AppConstants'
-import ManhwaGrid from '@/components/grid/ManhwaGrid'
+import ManhwaGrid from '@/app/components/grid/ManhwaGrid'
 import { dbGetManhwaReadingHistory } from '@/lib/database'
 import { useSQLiteContext } from 'expo-sqlite'
 import { AppStyle } from '@/styles/AppStyle'
 import { SafeAreaView } from 'react-native'
-import TopBar from '@/components/TopBar'
+import TopBar from '@/app/components/TopBar'
 import { Manhwa } from '@/helpers/types'
 
 

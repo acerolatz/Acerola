@@ -221,3 +221,11 @@ export type DownloadByManhwa = {
     cover_image_url: string
     completed_downloads: number
 }
+
+
+export type Note = {
+    note_id: number
+    title: string
+    content: string
+    created_at: number
+}

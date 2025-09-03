@@ -1,5 +1,5 @@
 import { createDocumentPath } from "@/helpers/storage";
-import { getRelativeHeight, hp, wp } from "@/helpers/util";
+import { hp, wp } from "@/helpers/util";
 import RNFS from 'react-native-fs';
 
 
@@ -113,6 +113,11 @@ export const AppConstants = {
     SETTINGS: {
       MIN_CACHE_SIZE: 64,    // MiB
       MAX_CACHE_SIZE: 256000 // MiB
+    },
+    NOTE: {
+      TITLE_MIN_LENGTH: 3,
+      TITLE_MAX_LENGTH: 256,
+      CONTENT_MIN_LENGTH: 3
     },
     PAGE_LIMIT: 24,
   },

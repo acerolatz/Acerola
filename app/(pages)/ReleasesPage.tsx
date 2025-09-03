@@ -1,21 +1,20 @@
 import { FlatList, SafeAreaView, View, Text, StyleSheet, Animated } from 'react-native';
-import PageActivityIndicator from '@/components/util/PageActivityIndicator';
-import SourceCodeButton from '@/components/buttons/SourceCodeButton';
+import PageActivityIndicator from '@/app/components/util/PageActivityIndicator';
+import SourceCodeButton from '@/app/components/buttons/SourceCodeButton';
 import { spFetchReleasesAndSourceCode } from '../../lib/supabase';
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import ReleaseButton from '@/components/buttons/ReleaseButton';
-import ReturnButton from '@/components/buttons/ReturnButton';
-import { useAppVersionState } from '@/store/appVersionState';
+import ReleaseButton from '@/app/components/buttons/ReleaseButton';
+import ReturnButton from '@/app/components/buttons/ReturnButton';
+import { useAppVersionState } from '@/hooks/appVersionState';
 import { AppRelease, SourceCodeLink } from '@/helpers/types';
 import { AppConstants } from '@/constants/AppConstants';
-import { Typography } from '@/constants/typography';
-import AppVersion from '@/components/AppVersion';
-import Footer from '@/components/util/Footer';
+import AppVersion from '@/app/components/AppVersion';
+import Footer from '@/app/components/util/Footer';
 import { AppStyle } from '@/styles/AppStyle';
-import TopBar from '@/components/TopBar';
+import TopBar from '@/app/components/TopBar';
 import { Colors } from '@/constants/Colors';
 import { wp } from '@/helpers/util';
-import Row from '@/components/util/Row';
+import Row from '@/app/components/util/Row';
 
 
 const width = wp(92)

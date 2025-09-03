@@ -1,22 +1,30 @@
-import TopBar from '@/components/TopBar'
-import UserDataComponent from '@/components/UserActivityComponent'
-import ReturnButton from '@/components/buttons/ReturnButton'
-import CacheForm from '@/components/form/CacheForm'
-import SafeModeForm from '@/components/form/SafeModeForm'
-import PageActivityIndicator from '@/components/util/PageActivityIndicator'
-import Row from '@/components/util/Row'
-import { AppConstants } from '@/constants/AppConstants'
-import { Colors } from '@/constants/Colors'
-import { getCacheSizeBytes, wp } from '@/helpers/util'
+import { 
+    Animated, 
+    KeyboardAvoidingView, 
+    Platform, 
+    SafeAreaView, 
+    StyleSheet, 
+    View
+} from 'react-native'
 import { dbIsSafeModeEnabled, dbReadSafeModePassword } from '@/lib/database'
-import { AppStyle } from '@/styles/AppStyle'
-import { useLocalSearchParams } from 'expo-router'
-import { useSQLiteContext } from 'expo-sqlite'
+import PageActivityIndicator from '@/app/components/util/PageActivityIndicator'
+import UserDataComponent from '@/app/components/UserActivityComponent'
+import ReturnButton from '@/app/components/buttons/ReturnButton'
+import { AppConstants } from '@/constants/AppConstants'
+import SafeModeForm from '@/app/components/form/SafeModeForm'
+import { getCacheSizeBytes, wp } from '@/helpers/util'
 import React, { useEffect, useRef, useState } from 'react'
-import { Animated, KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, View} from 'react-native'
+import CacheForm from '@/app/components/form/CacheForm'
+import { useLocalSearchParams } from 'expo-router'
+import { AppStyle } from '@/styles/AppStyle'
+import { Colors } from '@/constants/Colors'
+import { useSQLiteContext } from 'expo-sqlite'
+import TopBar from '@/app/components/TopBar'
+import Row from '@/app/components/util/Row'
 
 
 const width = wp(92)
+
 
 const Settings = () => {
 
@@ -27,8 +35,9 @@ const Settings = () => {
     const [currentCacheSize, setCurrentCacheSize] = useState<number>(0)
     const [safeModePassword, setSafeModePassword] = useState<string>('')
     const [safeModeOn, setSafeModeOn] = useState<boolean>(false)
+    const [loading, setLoading] = useState(false)
 
-    const [loading, setLoading] = useState(false)    
+    const scrollX = useRef(new Animated.Value(0)).current;
 
     useEffect(
         () => {
@@ -54,11 +63,9 @@ const Settings = () => {
       <SafeModeForm safeModeOn={safeModeOn} safeModePassword={safeModePassword} />,
       <CacheForm currentCacheSize={currentCacheSize} currentMaxCacheSize={cache_size} />,
       <UserDataComponent/>
-    ];
+    ];    
 
-    const scrollX = useRef(new Animated.Value(0)).current;
-
-    if (loading || safeModePassword === null || safeModeOn === null) {
+    if (loading) {
         return (
             <SafeAreaView style={AppStyle.safeArea} >
                 <TopBar title='Settings'>
@@ -89,26 +96,25 @@ const Settings = () => {
             </TopBar>
             <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
                 <View style={{flex: 1}}>                    
-
-                <Animated.FlatList
-                    data={forms}
-                    keyboardShouldPersistTaps='handled'
-                    renderItem={({ item }) => <View style={{ width }}>{item}</View>}
-                    keyExtractor={(_, index) => index.toString()}
-                    horizontal
-                    pagingEnabled
-                    showsHorizontalScrollIndicator={false}
-                    snapToInterval={width}
-                    decelerationRate='fast'
-                    disableIntervalMomentum={true}
-                    bounces
-                    onScroll={Animated.event(
-                        [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-                        { useNativeDriver: true }
-                    )}
-                    scrollEventThrottle={16}
-                />
-            </View>
+                    <Animated.FlatList
+                        data={forms}
+                        keyboardShouldPersistTaps='handled'
+                        renderItem={({ item }) => <View style={{ width }}>{item}</View>}
+                        keyExtractor={(_, index) => index.toString()}
+                        horizontal
+                        pagingEnabled
+                        showsHorizontalScrollIndicator={false}
+                        snapToInterval={width}
+                        decelerationRate='fast'
+                        disableIntervalMomentum={true}
+                        bounces
+                        onScroll={Animated.event(
+                            [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+                            { useNativeDriver: true }
+                        )}
+                        scrollEventThrottle={16}
+                    />
+                </View>
             </KeyboardAvoidingView>
         </SafeAreaView>
     )

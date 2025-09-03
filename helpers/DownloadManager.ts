@@ -2,16 +2,13 @@ import {
   dbCreateDownload, 
   dbDeleteAllDownloads, 
   dbReadDownload, 
-  dbReadDownloadsByStatus, 
   dbReadPendingDownloads, 
-  dbUpdateDownloadProgress, 
   dbUpdateDownloadStatus 
 } from "@/lib/database";
 import { 
   DownloadRequest, 
-  DownloadRecord, 
-  DownloadProgress 
-} from "@/helpers/types";
+  DownloadRecord  
+} from "./types";
 import { spFetchChapterImagesUrls } from "@/lib/supabase";
 import Toast from "react-native-toast-message";
 import { EventEmitter } from "eventemitter3";

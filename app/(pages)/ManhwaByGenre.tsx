@@ -1,18 +1,14 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import ReturnButton from '@/components/buttons/ReturnButton'
-import { dbReadManhwasByGenreId } from '@/lib/database'
+import ReturnButton from '@/app/components/buttons/ReturnButton'
 import { AppConstants } from '@/constants/AppConstants'
-import ManhwaGrid from '@/components/grid/ManhwaGrid'
+import { dbReadManhwasByGenreId } from '@/lib/database'
+import ManhwaGrid from '@/app/components/grid/ManhwaGrid'
 import { useLocalSearchParams } from 'expo-router'
-import { useSQLiteContext } from 'expo-sqlite'
 import { AppStyle } from '@/styles/AppStyle'
-import { SafeAreaView, StyleSheet, View } from 'react-native'
-import TopBar from '@/components/TopBar'
+import { useSQLiteContext } from 'expo-sqlite'
 import { Manhwa } from '@/helpers/types'
-import { Image } from 'expo-image'
-import { getRelativeHeight, hp, wp } from '@/helpers/util'
-import { Colors } from '@/constants/Colors'
-import { LinearGradient } from 'expo-linear-gradient'
+import { SafeAreaView } from 'react-native'
+import TopBar from '@/app/components/TopBar'
 
 
 const MangaByGenre = () => {
@@ -21,8 +17,6 @@ const MangaByGenre = () => {
     const params = useLocalSearchParams()
     const genre: string = params.genre as any
     const genre_id: number = parseInt(params.genre_id as any)
-
-    const imagePath = require("@/assets/images/UncensoredBanner.png")
 
     const [manhwas, setManhwas] = useState<Manhwa[]>([])
     

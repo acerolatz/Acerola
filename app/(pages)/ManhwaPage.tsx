@@ -1,28 +1,28 @@
 import { spFetchChapterList, spUpdateManhwaRating, spUpdateManhwaViews } from '@/lib/supabase';
-import { formatNumberWithSuffix, formatTimestamp, hp, sleep } from '../../helpers/util';
-import RandomManhwaButton from '@/components/buttons/OpenRandomManhwaButton';
-import PageActivityIndicator from '@/components/util/PageActivityIndicator';
-import ManhwaChapterGrid from '@/components/grid/ManhwaChapterGrid';
-import ManhwaIdComponent from '@/components/ManhwaIdComponent';
-import ReturnButton from '@/components/buttons/ReturnButton';
-import ManhwaAuthorInfo from '@/components/ManhwaAuthorInfo';
-import ManhwaImageCover from '@/components/ManhwaImageCover';
-import ManhwaSummary from '@/components/util/ManhwaSummary';
-import ManhwaAlternativeNames from '@/components/AltNames';
-import ManhwaGenreInfo from '@/components/ManhwaGenreInfo';
+import { formatNumberWithSuffix, formatTimestamp, hp, sleep } from '@/helpers/util';
+import RandomManhwaButton from '@/app/components/buttons/OpenRandomManhwaButton';
+import PageActivityIndicator from '@/app/components/util/PageActivityIndicator';
+import ManhwaChapterGrid from '@/app/components/grid/ManhwaChapterGrid';
+import ManhwaIdComponent from '@/app/components/ManhwaIdComponent';
+import ReturnButton from '@/app/components/buttons/ReturnButton';
+import ManhwaAuthorInfo from '@/app/components/ManhwaAuthorInfo';
+import ManhwaImageCover from '@/app/components/ManhwaImageCover';
+import ManhwaSummary from '@/app/components/util/ManhwaSummary';
+import ManhwaAlternativeNames from '@/app/components/AltNames';
+import ManhwaGenreInfo from '@/app/components/ManhwaGenreInfo';
 import { router, useLocalSearchParams } from 'expo-router';
-import HomeButton from '@/components/buttons/HomeButton';
+import HomeButton from '@/app/components/buttons/HomeButton';
 import { AppConstants } from '@/constants/AppConstants';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ToastMessages } from '@/constants/Messages';
 import { Typography } from '@/constants/typography';
-import AddToLibrary from '@/components/AddToLibray';
+import AddToLibrary from '@/app/components/AddToLibray';
 import Toast from 'react-native-toast-message';
 import { useSQLiteContext } from 'expo-sqlite';
-import Footer from '@/components/util/Footer';
+import Footer from '@/app/components/util/Footer';
 import { AppStyle } from '@/styles/AppStyle';
 import { Colors } from '@/constants/Colors';
-import Row from '@/components/util/Row';
+import Row from '@/app/components/util/Row';
 import { Manhwa, ManhwaRating } from '@/helpers/types';
 import React, { 
   memo, 
@@ -47,9 +47,9 @@ import {
   Text, 
   View 
 } from 'react-native';
-import { useChapterState } from '@/store/chapterState';
-import DownloadManhwaButton from '@/components/buttons/DownloadManhwaButton';
-import Rating from '@/components/Rating';
+import { useChapterState } from '@/hooks/chapterState';
+import DownloadManhwaButton from '@/app/components/buttons/DownloadManhwaButton';
+import Rating from '@/app/components/Rating';
 
 
 
@@ -113,7 +113,7 @@ const ManhwaPage = () => {
         dbUpdateManhwaViews(db, manhwa_id),
         dbReadManhwaById(db, manhwa_id),
         dbReadManhwaRating(db, manhwa_id),
-        dbGetManhwaAltNames(db, manhwa_id),
+        dbGetManhwaAltNames(db, manhwa_id)
       ])
 
       if (!m) {

@@ -1,6 +1,6 @@
-import PageActivityIndicator from '@/components/util/PageActivityIndicator';
+import PageActivityIndicator from '@/app/components/util/PageActivityIndicator';
 import { clearCache, hasInternetAvailable } from '@/helpers/util';
-import { useAppVersionState } from '@/store/appVersionState';
+import { useAppVersionState } from '@/hooks/appVersionState';
 import { ToastMessages } from '@/constants/Messages';
 import React, { useEffect, useRef } from 'react';
 import { useSQLiteContext } from 'expo-sqlite';

@@ -1,8 +1,8 @@
-import RequestManhwaForm from '@/components/form/RequestManhwaForm'
-import ReturnButton from '@/components/buttons/ReturnButton'
+import RequestManhwaForm from '@/app/components/form/RequestManhwaForm'
+import ReturnButton from '@/app/components/buttons/ReturnButton'
 import { AppStyle } from '@/styles/AppStyle'
 import { SafeAreaView } from 'react-native'
-import TopBar from '@/components/TopBar'
+import TopBar from '@/app/components/TopBar'
 import React from 'react'
 
 

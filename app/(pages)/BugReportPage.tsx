@@ -1,9 +1,9 @@
-import ReturnButton from '@/components/buttons/ReturnButton'
-import BugReportForm from '@/components/form/BugReportForm'
+import ReturnButton from '@/app/components/buttons/ReturnButton'
+import BugReportForm from '@/app/components/form/BugReportForm'
 import { useLocalSearchParams } from 'expo-router'
 import { AppStyle } from '@/styles/AppStyle'
 import { SafeAreaView } from 'react-native'
-import TopBar from '@/components/TopBar'
+import TopBar from '@/app/components/TopBar'
 import React from 'react'
 
 

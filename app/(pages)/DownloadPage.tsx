@@ -1,23 +1,24 @@
-import React, { useEffect, useRef, useState } from "react";
 import { Text, StyleSheet, View, SafeAreaView, Animated, KeyboardAvoidingView, Platform } from "react-native";
-import { downloadManager } from "@/helpers/DownloadManager";
-import { AppStyle } from "@/styles/AppStyle";
-import TopBar from "@/components/TopBar";
-import ReturnButton from "@/components/buttons/ReturnButton";
 import { DownloadRequest, DownloadByManhwa, Manhwa } from "@/helpers/types";
-import { Typography } from "@/constants/typography";
-import Row from "@/components/util/Row";
-import { Colors } from "@/constants/Colors";
-import CustomActivityIndicator from "@/components/util/CustomActivityIndicator";
-import { AppConstants } from "@/constants/AppConstants";
+import CustomActivityIndicator from "@/app/components/util/CustomActivityIndicator";
 import { dbReadDownloadedManhwas, dbReadPendingDownloads } from "@/lib/database";
+import { downloadManager } from "@/helpers/DownloadManager";
+import ReturnButton from "@/app/components/buttons/ReturnButton";
+import { AppConstants } from "@/constants/AppConstants";
+import React, { useEffect, useRef, useState } from "react";
+import { Typography } from "@/constants/typography";
+import TextButton from "@/app/components/buttons/TextButton";
+import ManhwaGrid from "@/app/components/grid/ManhwaGrid";
+import { AppStyle } from "@/styles/AppStyle";
+import { Colors } from "@/constants/Colors";
 import { useSQLiteContext } from "expo-sqlite";
-import ManhwaGrid from "@/components/grid/ManhwaGrid";
-import Column from "@/components/util/Column";
-import TextButton from "@/components/buttons/TextButton";
+import TopBar from "@/app/components/TopBar";
+import Row from "@/app/components/util/Row";
 import { wp } from "@/helpers/util";
 
+
 const width = wp(92)
+
 
 type DownloadState = {
   downloads: Manhwa[]

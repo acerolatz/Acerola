@@ -1,56 +1,80 @@
-import { dbCheckPassword, dbReadTodos, dbSetLastDatabaseSync, dbShouldSyncDatabase, dbSyncDatabase } from '@/lib/database'
-import PageActivityIndicator from '@/components/util/PageActivityIndicator'
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
+import { 
+    dbCheckPassword, 
+    dbReadNotes, 
+    dbReadTodos, 
+    dbSetLastDatabaseSync, 
+    dbShouldSyncDatabase, 
+    dbSyncDatabase 
+} from '@/lib/database'
+import PageActivityIndicator from '@/app/components/util/PageActivityIndicator'
+import { Animated, FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
-import CreateTodoComponent from '@/components/CreateTodoComponent'
-import { hasInternetAvailable, hp } from '@/helpers/util'
+import CreateTodoComponent from '@/app/components/CreateTodoComponent'
+import { hasInternetAvailable, hp, wp } from '@/helpers/util'
 import { TextInput } from 'react-native-gesture-handler'
 import { AppConstants } from '@/constants/AppConstants'
-import CloseBtn from '@/components/buttons/CloseButton'
-import TodoComponent from '@/components/TodoComponent'
+import CloseBtn from '@/app/components/buttons/CloseButton'
+import TodoComponent from '@/app/components/TodoComponent'
 import { ToastMessages } from '@/constants/Messages'
 import { Typography } from '@/constants/typography'
 import Ionicons from '@expo/vector-icons/Ionicons'
-import Button from '@/components/buttons/Button'
+import Button from '@/app/components/buttons/Button'
 import { useSQLiteContext } from 'expo-sqlite'
 import Toast from 'react-native-toast-message'
-import Footer from '@/components/util/Footer'
+import Footer from '@/app/components/util/Footer'
 import { AppStyle } from '@/styles/AppStyle'
 import { Colors } from '@/constants/Colors'
 import { SafeAreaView } from 'react-native'
-import TopBar from '@/components/TopBar'
-import Row from '@/components/util/Row'
+import TopBar from '@/app/components/TopBar'
+import Row from '@/app/components/util/Row'
 import { Keyboard } from 'react-native'
-import { Todo } from '@/helpers/types'
-import { router } from 'expo-router'
+import { Note, Todo } from '@/helpers/types'
+import { router, useFocusEffect } from 'expo-router'
+import Tasks from '../Tasks'
+import Notes from '../components/Notes'
 
+
+const width = wp(92)
 
 
 const SafeModeHomePage = () => {
 
     const db = useSQLiteContext()
+    const [title, setTitle] = useState('Tasks')
     const [todos, setTodos] = useState<Todo[]>([])
+    const [notes, setNotes] = useState<Note[]>([])
     const [loading, setLoading] = useState(false)
     const [text, setText] = useState('')
-
-    const bottomSheetRef = useRef<BottomSheet>(null)
     const [showPassword, setShowPassword] = useState(false)
     const passwordIcon = showPassword ? "eye-off-outline" : "eye-outline"
-    
+
+    const bottomSheetRef = useRef<BottomSheet>(null)
+    const scrollX = useRef(new Animated.Value(0)).current;
     const isCheckingPassword = useRef(false)
+    const titles = ['Tasks', 'Notes']
 
     useEffect(
         () => {
             const init = async () => {
                 setLoading(true)
-                    await dbReadTodos(db).then(t => setTodos(t))
+                const t = await dbReadTodos(db)
+                setTodos(t)
                 setLoading(false)
             }
             init()
         },
         [db]
     )
+
+    const reload = async () => {
+        const n = await dbReadNotes(db)
+        setNotes(n)
+    }
+
+    useFocusEffect(useCallback(() => {
+        reload()
+    }, []))
 
     const checkPassword = async () => {
         if (isCheckingPassword.current) { return }
@@ -86,12 +110,23 @@ const SafeModeHomePage = () => {
 
     const handleShowPassword = () => {
         setShowPassword(prev => !prev)
-    }    
+    }
+
+    const forms = [
+      <Tasks todos={todos} setTodos={setTodos} />,
+      <Notes notes={notes} setNotes={setNotes} />
+    ];
+
+    const handleMomentumScrollEnd = (e: any) => {
+        const offsetX = e.nativeEvent.contentOffset.x;
+        const index = Math.round(offsetX / width);
+        setTitle(titles[index])
+    };
 
     if (loading) {
         return (
             <SafeAreaView style={AppStyle.safeArea} >
-                <TopBar title='To do List' >
+                <TopBar title={title} >
                     <Button iconName='settings-outline' />
                 </TopBar>
                 <PageActivityIndicator/>
@@ -101,18 +136,41 @@ const SafeModeHomePage = () => {
 
     return (
         <SafeAreaView style={AppStyle.safeArea} >
-            <TopBar title='To do List' >
-                <Button iconName='settings-outline' onPress={handleOpenBottomSheet} />
+            <TopBar title={title} >
+                <Row style={{gap: AppConstants.UI.GAP}} >
+                    <View style={styles.dotsContainer}>
+                        {forms.map((_, i) => {
+                            const opacity = scrollX.interpolate({
+                                inputRange: [(i - 1) * width, i * width, (i + 1) * width],
+                                outputRange: [0.3, 1, 0.3],
+                                extrapolate: 'clamp',
+                            });
+        
+                            return <Animated.View key={i} style={[styles.dot, { opacity }]} />
+                        })}
+                    </View>
+                    <Button iconName='settings-outline' onPress={handleOpenBottomSheet} iconColor={Colors.primary} />
+                </Row>
             </TopBar>
             <View style={{flex: 1}} >
-                <FlatList
-                    data={todos}
-                    keyExtractor={(item) => item.todo_id.toString()}
-                    renderItem={({item}) => <TodoComponent todo={item} setTodos={setTodos} />}
-                    keyboardShouldPersistTaps='always'
-                    showsVerticalScrollIndicator={false}
-                    ListHeaderComponent={<CreateTodoComponent setTodos={setTodos} />}
-                    ListFooterComponent={<Footer/>}
+                <Animated.FlatList
+                    data={forms}
+                    keyboardShouldPersistTaps='handled'
+                    renderItem={({ item }) => <View style={{ width }}>{item}</View>}
+                    keyExtractor={(_, index) => index.toString()}
+                    horizontal
+                    pagingEnabled
+                    showsHorizontalScrollIndicator={false}
+                    snapToInterval={width}
+                    decelerationRate='fast'
+                    disableIntervalMomentum={true}
+                    onMomentumScrollEnd={handleMomentumScrollEnd}
+                    bounces
+                    onScroll={Animated.event(
+                        [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+                        { useNativeDriver: true }
+                    )}
+                    scrollEventThrottle={16}
                 />
             </View>
             <BottomSheet
@@ -184,5 +242,16 @@ const styles = StyleSheet.create({
         ...AppStyle.input, 
         backgroundColor: Colors.backgroundColor, 
         paddingRight: AppConstants.UI.ICON.SIZE * 2
-    }    
+    },
+    dotsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center'
+    },
+    dot: {
+        height: AppConstants.UI.ICON.SIZE * 0.5,
+        width: AppConstants.UI.ICON.SIZE * 0.5,
+        borderRadius: AppConstants.UI.ICON.SIZE,
+        backgroundColor: Colors.primary,
+        marginHorizontal: 4
+    }
 })

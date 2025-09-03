@@ -1,14 +1,14 @@
-import PageActivityIndicator from '@/components/util/PageActivityIndicator'
-import ReturnButton from '@/components/buttons/ReturnButton'
+import PageActivityIndicator from '@/app/components/util/PageActivityIndicator'
+import ReturnButton from '@/app/components/buttons/ReturnButton'
 import React, { useEffect, useRef, useState } from 'react'
 import { spFetchEulaAndDisclaimer } from '@/lib/supabase'
 import { AppConstants } from '@/constants/AppConstants'
 import { Typography } from '@/constants/typography'
-import { useTextState } from '@/store/appTextState'
-import Footer from '@/components/util/Footer'
+import { useTextState } from '@/hooks/appTextState'
+import Footer from '@/app/components/util/Footer'
 import { AppStyle } from '@/styles/AppStyle'
 import { Colors } from '@/constants/Colors'
-import TopBar from '@/components/TopBar'
+import TopBar from '@/app/components/TopBar'
 import { wp } from '@/helpers/util'
 import { 
     Animated, 
@@ -18,7 +18,7 @@ import {
     Text, 
     View 
 } from 'react-native'
-import Row from '@/components/util/Row'
+import Row from '@/app/components/util/Row'
 
 
 const width = AppConstants.UI.SCREEN.WIDTH - AppConstants.UI.SCREEN.PADDING_HORIZONTAL * 2
