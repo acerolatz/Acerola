@@ -20,6 +20,12 @@ export const Typography = StyleSheet.create({
     fontSize: FontSizes.xs,
     color: Colors.white
   },
+  lightRed: {
+    fontFamily: "LeagueSpartan_200ExtraLight",
+    fontWeight: "200",
+    fontSize: FontSizes.xs,
+    color: Colors.red
+  },
   lightBlack: {
     fontFamily: "LeagueSpartan_200ExtraLight",
     fontWeight: "200",
@@ -44,6 +50,12 @@ export const Typography = StyleSheet.create({
     fontWeight: "400",
     fontSize: FontSizes.sm,
     color: Colors.backgroundColor
+  },
+  regularYellow: {
+    fontFamily: "LeagueSpartan_400Regular",
+    fontWeight: "400",
+    fontSize: FontSizes.sm,
+    color: Colors.primary
   },
   regularRed: {
     fontFamily: "LeagueSpartan_400Regular",

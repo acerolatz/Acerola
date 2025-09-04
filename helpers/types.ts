@@ -186,9 +186,13 @@ export type Log = {
     created_at: number
 }
 
-
-export type DownloadStatus = 'pending' | 'downloading' | 'completed' | 'failed' | "cancelled"
-
+export enum DownloadStatus {
+  Pending,       // 0
+  Downloading,   // 1
+  Completed,     // 2
+  Failed,        // 3
+  Cancelled      // 4
+}
 
 export interface DownloadRecord {
     chapter_id: number

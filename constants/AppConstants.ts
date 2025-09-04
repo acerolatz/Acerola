@@ -1,4 +1,5 @@
 import * as FileSystem from 'expo-file-system';
+import { Platform } from 'react-native';
 import { hp, wp } from "@/helpers/util";
 
 
@@ -10,7 +11,8 @@ export const AppConstants = {
     NAME: "Acerola",
     VERSION: "v1.1.1",
     DEBUG: { ENABLED: false },
-    MANHWAS_DIR: `${FileSystem.documentDirectory}manhwas`
+    MANHWAS_DIR: `${FileSystem.documentDirectory}manhwas`,
+    KEYBOARD_VIEW_BEHAVIOR: Platform.OS === 'ios' ? 'padding' : 'height'
   },
 
   // =========================================================

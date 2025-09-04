@@ -13,6 +13,7 @@ import Footer from '@/app/components/util/Footer';
 import { AppStyle } from '@/styles/AppStyle';
 import TopBar from '@/app/components/TopBar';
 import Row from '@/app/components/util/Row';
+import { wp } from '@/helpers/util';
 
 
 const Releases = () => {
@@ -44,7 +45,7 @@ const Releases = () => {
   const renderFooter = useCallback(() => <Footer/>, [])
 
   const screens = [
-    <View style={styles.section}>
+    <View style={styles.container}>
       <AppVersion />
       <FlatList
         data={releasesInfo.releases}
@@ -54,7 +55,7 @@ const Releases = () => {
         showsVerticalScrollIndicator={false}
       />
     </View>,
-    <View style={{gap: AppConstants.UI.GAP}}>
+    <View style={styles.container}>
       <FlatList        
         data={releasesInfo.source}
         keyExtractor={(item) => item.url}
@@ -120,12 +121,8 @@ export default Releases;
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
     flex: 1,
     gap: AppConstants.UI.GAP,
-  },
-  section: {
-    flex: 1,
-    gap: AppConstants.UI.GAP,
-  }  
+    paddingHorizontal: 2
+  }
 });

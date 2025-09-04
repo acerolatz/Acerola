@@ -49,7 +49,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         gap: AppConstants.UI.GAP,
-        paddingTop: AppConstants.UI.GAP,
         alignItems: "center"
     },
     item: {

@@ -101,6 +101,12 @@ export const ToastMessages = {
             type: "error",
             position: 'top'
         },
+        INVALID_PASSWORD_DEFAULT: {
+            text1: "Invalid Password", 
+            text2: "Min 4 characters and passwords must match", 
+            type: 'error',
+            visibilityTime: 3500
+        },
         INVALID_PASSWORD: {
             text1: "Invalid Password", 
             text2: "Min 4 characters and passwords must match", 

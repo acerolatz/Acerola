@@ -57,10 +57,16 @@ const Settings = () => {
     )
 
     const forms = [
-      <SafeModeForm safeModeOn={safeModeOn} safeModePassword={safeModePassword} />,
-      <CacheForm currentCacheSize={currentCacheSize} currentMaxCacheSize={maxCacheSize} />,
-      <UserDataComponent/>
-    ];    
+        <View style={styles.screenStyle} >
+            <SafeModeForm safeModeOn={safeModeOn} safeModePassword={safeModePassword} />
+        </View>,
+        <View style={styles.screenStyle} >
+            <CacheForm currentCacheSize={currentCacheSize} currentMaxCacheSize={maxCacheSize} />
+        </View>,
+        <View style={styles.screenStyle} >
+            <UserDataComponent/>
+        </View>      
+    ];
 
     if (loading) {
         return (
@@ -90,8 +96,8 @@ const Settings = () => {
                     <ReturnButton/>
                 </Row>
             </TopBar>
-            <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
-                <View style={{flex: 1}}>                    
+            <KeyboardAvoidingView style={AppStyle.flex} behavior={AppConstants.APP.KEYBOARD_VIEW_BEHAVIOR as any} >
+                <View style={AppStyle.flex}>
                     <Animated.FlatList
                         data={forms}
                         keyboardShouldPersistTaps='handled'
@@ -117,3 +123,10 @@ const Settings = () => {
 }
 
 export default Settings
+
+const styles = StyleSheet.create({
+    screenStyle: {
+        flex: 1,
+        paddingHorizontal: 2
+    }
+})

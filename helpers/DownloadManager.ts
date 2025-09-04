@@ -8,6 +8,7 @@ import {
 import { 
   DownloadRequest, 
   DownloadRecord,  
+  DownloadStatus,
   DownloadProgress
 } from "./types";
 import { spFetchChapterImagesUrls } from "@/lib/supabase";
@@ -103,7 +104,7 @@ class DownloadManager {
 
   private async downloadChapter(db: SQLiteDatabase, record: DownloadRecord) {
     const images: string[] = await spFetchChapterImagesUrls(record.chapter_id);
-    await dbUpdateDownloadStatus(db, record.chapter_id, "downloading");
+    await dbUpdateDownloadStatus(db, record.chapter_id, DownloadStatus.Downloading);
     
     this.emitter.emit("progress", this.queue);
     this.resetDownloadProgress();
@@ -121,7 +122,7 @@ class DownloadManager {
     await dbUpdateDownloadStatus(
       db, 
       record.chapter_id, 
-      this.isCancelled ? "cancelled" : "completed"
+      this.isCancelled ? DownloadStatus.Cancelled : DownloadStatus.Completed
     );
 
     this.resetDownloadProgress();

@@ -154,17 +154,17 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
     updated_at INTEGER NOT NULL DEFAULT 0
   );
 
+  -- Status codes: 0=pending, 1=downloading, 2=completed, 3=failed, 4=cancelled
   CREATE TABLE IF NOT EXISTS downloads (
     chapter_id INTEGER PRIMARY KEY,
     manhwa_id INTEGER NOT NULL,
     chapter_name TEXT NOT NULL,
     path TEXT NOT NULL,
-    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'downloading', 'completed', 'failed', 'cancelled')),
+    status INTEGER DEFAULT 0 CHECK (status IN (0,1,2,3,4)),
     progress INTEGER DEFAULT 0,
     created_at INTEGER NOT NULL 
   );
   -- ===============================
-
 
   -- ===============================
   --              INDEX
@@ -184,14 +184,13 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
   CREATE INDEX IF NOT EXISTS idx_alt_titles_manhwa ON alt_titles(manhwa_id);
   CREATE INDEX IF NOT EXISTS idx_manhwas_updated_at ON manhwas(updated_at DESC);
 
-  CREATE INDEX IF NOT EXISTS idx_downloads_status ON downloads(status);
-  CREATE INDEX IF NOT EXISTS idx_downloads_created_at ON downloads(created_at);
-  CREATE INDEX IF NOT EXISTS idx_downloads_manhwa_id ON downloads(manhwa_id);
+  CREATE INDEX IF NOT EXISTS idx_downloads_cover ON downloads(status, created_at, manhwa_id);
+
   -- ================================
   
 
   -- ===============================
-  --         INSERT/UPDATE
+  --       INSERT/UPDATE
   -- ===============================
   BEGIN TRANSACTION;
   
@@ -233,6 +232,7 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
   COMMIT;
   `
   ).catch(error => console.log("DATABASE MIGRATION ERROR", error));
+  await dbDeleteIndexes(db)
   console.log("[DATABASE MIGRATION END]")
 }
 
@@ -242,6 +242,46 @@ export async function dbReadAll<T>(db: SQLite.SQLiteDatabase, table: string): Pr
     .getAllAsync<T>(`SELECT * FROM ${table};`)
     .catch(error => console.log(`error dbReadAll ${table}`, error))
   return r ? r : []
+}
+
+
+export async function dbDeleteIndexes(db: SQLite.SQLiteDatabase) {
+  const r = await db.getAllAsync<{name: string}>(
+    `
+      SELECT 
+        name 
+      FROM 
+        sqlite_master 
+      WHERE 
+        type='index' AND 
+        name NOT IN (
+          'idx_authors_name', 
+          'idx_ma_author_id', 
+          'idx_ma_manhwa_id',
+          'idx_reading_status_manhwa_id_status',
+          'idx_reading_history_readed_at',
+          'idx_manhwa_genres_genre_id',
+          'idx_manhwas_views',
+          'idx_alt_titles',
+          'idx_alt_titles_manhwa',
+          'idx_manhwas_updated_at',
+          'idx_downloads_cover'
+        );
+    `
+  ).catch(error => console.log("error dbDeleteIndexes", error))
+  if (!r) { return }
+  
+  const query = r
+    .filter(i => !i.name.includes("autoindex"))
+    .map(i => `DROP INDEX IF EXISTS ${i.name};`)
+    .join(' ')
+
+  if (query !== '') {
+    console.log(`[DELETE INDEX] ${query}`)
+    await db
+      .runAsync(query)
+      .catch(error => console.log("error dbDeleteIndexes DROP INDEX", error))
+  }
 }
 
 
@@ -1957,7 +1997,7 @@ export async function dbCreateDownload(
     chapter_id,
     chapter_name,
     path,
-    status: 'pending',
+    status: DownloadStatus.Pending,
     created_at: Date.now()
   }
   await db.runAsync(
@@ -1974,10 +2014,10 @@ export async function dbCreateDownload(
       manhwa_id,
       chapter_name,
       path,
-      'pending',
+      DownloadStatus.Pending,
       record.created_at
     ]
-  ).catch(error => {console.log("error dbCreateDownload", error); record.status = 'failed'})
+  ).catch(error => {console.log("error dbCreateDownload", error); record.status = DownloadStatus.Failed})
   return record
 }
 
@@ -2042,7 +2082,7 @@ export async function dbReadPendingDownloads(db: SQLite.SQLiteDatabase): Promise
       JOIN  
         manhwas m ON m.manhwa_id = d.manhwa_id
       WHERE
-        d.status = 'pending'
+        d.status = ${DownloadStatus.Pending}
       ORDER BY 
         created_at ASC;
     `
@@ -2067,9 +2107,9 @@ export async function dbReadNotCompletedDownloads(db: SQLite.SQLiteDatabase): Pr
       JOIN  
         manhwas m ON m.manhwa_id = d.manhwa_id
       WHERE
-        d.status != 'completed'
+        d.status <> ${DownloadStatus.Completed}
       ORDER BY 
-        created_at ASC;
+        d.created_at ASC;
     `
   ).catch(error => console.log("error dbReadNotCompletedDownloads", error))
 
@@ -2088,16 +2128,17 @@ export async function dbDeleteAllDownloads(db: SQLite.SQLiteDatabase) {
   await dbCleanTable(db, 'downloads')
 }
 
+
 export async function dbDeleteNotCompletedDownloads(db: SQLite.SQLiteDatabase) {
   const records = await db.getAllAsync<DownloadRecord>(
-    `SELECT * FROM downloads WHERE status != 'completed';`
+    `SELECT * FROM downloads WHERE status <> ${DownloadStatus.Completed};`
   ).catch(error => console.log("error dbDeleteNotCompletedDownloads", error))
 
   if (!records) { return }
 
   await asyncPool<string, void>(8, records.map(i => i.path), deleteDocumentDir)
   await db.runAsync(
-    `DELETE FROM downloads WHERE status != 'completed';`
+    `DELETE FROM downloads WHERE status <> ${DownloadStatus.Completed};`
   ).catch(error => console.log("error dbDeleteNotCompletedDownloads", error))
 }
 
@@ -2112,7 +2153,7 @@ export async function dbReadDownloadedManhwas(db: SQLite.SQLiteDatabase): Promis
     JOIN
       downloads d ON d.manhwa_id = m.manhwa_id
     WHERE
-      d.status IN ('completed', 'pending')
+      d.status IN (${DownloadStatus.Completed}, ${DownloadStatus.Pending})
     GROUP BY
       m.manhwa_id
     ORDER BY
@@ -2211,7 +2252,7 @@ export async function dbReadPendingDownloadsByManhwa(db: SQLite.SQLiteDatabase):
     FROM 
       manhwas m
     JOIN 
-      downloads d ON m.manhwa_id = d.manhwa_id AND d.status = 'pending'
+      downloads d ON m.manhwa_id = d.manhwa_id AND d.status = ${DownloadStatus.Pending}
     GROUP BY 
       m.manhwa_id,
       m.title,
@@ -2240,7 +2281,7 @@ export async function dbReadCompletedDownloadsByManhwa(db: SQLite.SQLiteDatabase
       FROM 
         downloads 
       WHERE 
-        manhwa_id = ? AND status = 'completed' 
+        manhwa_id = ? AND status = ${DownloadStatus.Completed}
       ORDER BY 
         chapter_id ASC;
     `,

@@ -3,7 +3,8 @@ import {
   SafeAreaView, 
   Animated, 
   KeyboardAvoidingView, 
-  Platform 
+  Platform, 
+  StyleSheet
 } from "react-native";
 import { dbReadDownloadedManhwas, dbReadPendingDownloadsByManhwa } from "@/lib/database";
 import ReturnButton from "@/app/components/buttons/ReturnButton";
@@ -32,8 +33,12 @@ const DownloadPage = () => {
   const scrollX = useRef(new Animated.Value(0)).current
   
   const screens = [
-    <DownloadGrid manhwas={state.downloads} />,
-    <DownloadQueue state={state} />,
+    <View style={styles.container} >
+      <DownloadGrid manhwas={state.downloads} />
+    </View>,
+    <View style={styles.container} >
+      <DownloadQueue state={state} />
+    </View>    
   ];  
 
   const refresh = async () => {
@@ -75,7 +80,7 @@ const DownloadPage = () => {
           <ReturnButton/>
         </Row>
       </TopBar>
-      <KeyboardAvoidingView style={AppStyle.flex} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
+      <KeyboardAvoidingView style={AppStyle.flex} behavior={AppConstants.APP.KEYBOARD_VIEW_BEHAVIOR as any} >
         <View style={AppStyle.flex}>
             <Animated.FlatList
                 data={screens}
@@ -102,3 +107,10 @@ const DownloadPage = () => {
 }
 
 export default DownloadPage
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingHorizontal: 2
+  }
+})

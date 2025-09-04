@@ -6,11 +6,11 @@ import {
     dbShouldSyncDatabase, 
     dbSyncDatabase 
 } from '@/lib/database'
-import { Animated, FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
+import { Animated, Pressable, StyleSheet, Text, View } from 'react-native'
 import PageActivityIndicator from '@/app/components/util/PageActivityIndicator'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
-import { hasInternetAvailable, hp, wp } from '@/helpers/util'
+import { hasInternetAvailable, hp } from '@/helpers/util'
 import { TextInput } from 'react-native-gesture-handler'
 import { AppConstants } from '@/constants/AppConstants'
 import CloseBtn from '@/app/components/buttons/CloseButton'
@@ -106,9 +106,13 @@ const SafeModeHomePage = () => {
         setShowPassword(prev => !prev)
     }
 
-    const forms = [
-      <Tasks todos={todos} setTodos={setTodos} />,
-      <Notes notes={notes} setNotes={setNotes} />
+    const screens = [
+        <View style={styles.container} >
+            <Tasks todos={todos} setTodos={setTodos} />
+        </View>,
+        <View style={styles.container} >
+            <Notes notes={notes} setNotes={setNotes} />
+        </View>      
     ];
 
     const handleMomentumScrollEnd = (e: any) => {
@@ -133,7 +137,7 @@ const SafeModeHomePage = () => {
             <TopBar title={title} >
                 <Row style={{gap: AppConstants.UI.GAP}} >
                     <View style={AppStyle.dotsContainer}>
-                        {forms.map((_, i) => {
+                        {screens.map((_, i) => {
                             const opacity = scrollX.interpolate({
                                 inputRange: [(i - 1) * AppConstants.UI.SCREEN.VALID_WIDTH, i * AppConstants.UI.SCREEN.VALID_WIDTH, (i + 1) * AppConstants.UI.SCREEN.VALID_WIDTH],
                                 outputRange: [0.3, 1, 0.3],
@@ -145,9 +149,9 @@ const SafeModeHomePage = () => {
                     <Button iconName='settings-outline' onPress={handleOpenBottomSheet} iconColor={Colors.primary} />
                 </Row>
             </TopBar>
-            <View style={{flex: 1}} >
+            <View style={AppStyle.flex} >
                 <Animated.FlatList
-                    data={forms}
+                    data={screens}
                     keyboardShouldPersistTaps='handled'
                     renderItem={({ item }) => <View style={{ width: AppConstants.UI.SCREEN.VALID_WIDTH }}>{item}</View>}
                     keyExtractor={(_, index) => index.toString()}
@@ -177,8 +181,8 @@ const SafeModeHomePage = () => {
                     <TopBar title='Settings'>
                         <CloseBtn onPress={handleCloseBottomSheet}/>
                     </TopBar>
-                    <View style={{flex: 1, gap: AppConstants.UI.GAP}} >
-                        <Text style={{...Typography.light, color: Colors.red}}>A password is required to access the settings.</Text>
+                    <View style={AppStyle.gap} >
+                        <Text style={Typography.lightRed}>A password is required to access the settings.</Text>
                         <View>
                             <TextInput
                                 style={styles.passwordInput}
@@ -198,10 +202,10 @@ const SafeModeHomePage = () => {
                         </View>
                         <Row style={{gap: AppConstants.UI.MARGIN}} >
                             <Pressable onPress={handleCloseBottomSheet} style={AppStyle.buttonCancel} >
-                                <Text style={{...Typography.regular, color: Colors.primary}} >Cancel</Text>
+                                <Text style={Typography.regularYellow} >Cancel</Text>
                             </Pressable>
                             <Pressable onPress={checkPassword} style={AppStyle.button} >
-                                <Text style={{...Typography.regular, color: Colors.backgroundColor}} >OK</Text>
+                                <Text style={Typography.regularBlack} >OK</Text>
                             </Pressable>
                         </Row>
                     </View>
@@ -216,6 +220,10 @@ export default SafeModeHomePage
 
 
 const styles = StyleSheet.create({    
+    container: {
+        flex: 1,
+        paddingHorizontal: 2
+    },
     bottomSheetContainer: {
         paddingTop: 10,
         paddingHorizontal: AppConstants.UI.SCREEN.PADDING_HORIZONTAL

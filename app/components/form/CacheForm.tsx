@@ -156,9 +156,10 @@ const CacheForm = ({
                 <Row style={AppStyle.margin} >
                     {
                         storageLoading ?
-                        <View style={{width: '100%', height: AppConstants.UI.BUTTON.SIZE}} >
+                        <Row style={{width: '100%', gap: AppConstants.UI.GAP}} >
+                            <Text style={Typography.regular} >This can take a while</Text>
                             <CustomActivityIndicator/>
-                        </View>
+                        </Row>
                         :
                         <>
                             <Pressable onPress={calculateStorage} style={AppStyle.button} >
@@ -181,9 +182,5 @@ const CacheForm = ({
 export default CacheForm
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1, 
-        gap: AppConstants.UI.GAP, 
-        paddingHorizontal: wp(1)
-    }
+    container: { flex: 1, gap: AppConstants.UI.GAP }
 })

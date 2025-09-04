@@ -17,6 +17,7 @@ import {
     View 
 } from 'react-native'
 import Row from '@/app/components/util/Row'
+import { StyleSheet } from 'react-native'
 
 
 const EulaAndDisclaimerPage = () => {
@@ -24,25 +25,32 @@ const EulaAndDisclaimerPage = () => {
     const { textMap, setTextMap } = useTextState()
     const [loading, setLoading] = useState(false)
     const [title, setTitle] = useState('EULA')
+    const scrollX = useRef(new Animated.Value(0)).current;
+    
     const titles = ['EULA', 'Disclaimer']
-
     const EULA: string | undefined = textMap.get('eula')
     const DISCLAIMER: string | undefined = textMap.get('disclaimer')
 
-    const texts = [
-        <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} >
-            <View style={{flex: 1, paddingHorizontal: wp(1)}} >
+    const screens = [
+        <ScrollView style={AppStyle.flex} showsVerticalScrollIndicator={false} >
+            <View style={styles.container} >
                 <Text style={Typography.regular}>{EULA ? EULA : ''}</Text>
             </View>
             <Footer/>
         </ScrollView>,
-        <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false} >
-            <View style={{flex: 1, paddingHorizontal: wp(1)}} >
+        <ScrollView style={AppStyle.flex} showsVerticalScrollIndicator={false} >
+            <View style={styles.container} >
                 <Text style={Typography.regular}>{DISCLAIMER ? DISCLAIMER : ''}</Text>
             </View>
             <Footer/>
         </ScrollView>      
-    ];    
+    ];
+
+    const handleMomentumScrollEnd = (e: any) => {
+        const offsetX = e.nativeEvent.contentOffset.x;
+        const index = Math.round(offsetX / AppConstants.UI.SCREEN.VALID_WIDTH);
+        setTitle(titles[index])
+    };
 
     useEffect(
         () => {
@@ -61,14 +69,7 @@ const EulaAndDisclaimerPage = () => {
             return () => { isCancelled = true }
         },
         [textMap]
-    )
-
-    const scrollX = useRef(new Animated.Value(0)).current;
-    const handleMomentumScrollEnd = (e: any) => {
-        const offsetX = e.nativeEvent.contentOffset.x;
-        const index = Math.round(offsetX / AppConstants.UI.SCREEN.VALID_WIDTH);
-        setTitle(titles[index])
-    };
+    )    
 
     if (loading) {
         return (
@@ -88,7 +89,7 @@ const EulaAndDisclaimerPage = () => {
                     <Row style={AppStyle.gap} >
                         <View style={AppStyle.dotsContainer}>
                             {
-                                texts.map((_, i) => {
+                                screens.map((_, i) => {
                                     const opacity = scrollX.interpolate({
                                         inputRange: [(i - 1) * AppConstants.UI.SCREEN.VALID_WIDTH, i * AppConstants.UI.SCREEN.VALID_WIDTH, (i + 1) * AppConstants.UI.SCREEN.VALID_WIDTH, ],
                                         outputRange: [0.3, 1, 0.3],
@@ -105,7 +106,7 @@ const EulaAndDisclaimerPage = () => {
                 </TopBar>
                 <View style={AppStyle.flex}>
                     <Animated.FlatList
-                        data={texts}
+                        data={screens}
                         keyboardShouldPersistTaps='handled'
                         renderItem={({ item }) => <View style={{ width: AppConstants.UI.SCREEN.VALID_WIDTH }}>{item}</View>}
                         keyExtractor={(_, index) => index.toString()}
@@ -138,3 +139,11 @@ const EulaAndDisclaimerPage = () => {
 
 
 export default EulaAndDisclaimerPage
+
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        paddingHorizontal: 2
+    }
+})

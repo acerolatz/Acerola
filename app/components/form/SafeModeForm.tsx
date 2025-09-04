@@ -45,7 +45,7 @@ const SafeModeForm = ({safeModePassword, safeModeOn}: SafeModeFormProps) => {
             const check2 = isValidPassword(confirmPassword)
             const check3 = currentSafeModePassword.trim() === confirmPassword.trim()
             if (!(check1 && check2 && check3)) {
-                Toast.show(ToastMessages.EN.INVALID_PASSWORD)
+                Toast.show(ToastMessages.EN.INVALID_PASSWORD_DEFAULT)
                 setLoadingSafeModeConfig(false)
                 return
             } 
@@ -104,9 +104,5 @@ export default SafeModeForm
 
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1, 
-        gap: AppConstants.UI.GAP, 
-        paddingHorizontal: wp(1)
-    }
+    container: { flex: 1, gap: AppConstants.UI.GAP }
 })
