@@ -36,7 +36,7 @@ const DownloadChapterButton = ({
             chapter_id,
             chapter_name
         }
-        await downloadManager.addToQueue(db, request)
+        await downloadManager.addToQueue(db, request, true, true)
         setLoading(false)
     }
 

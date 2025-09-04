@@ -2222,7 +2222,7 @@ export async function dbReadPendingDownloadsByManhwa(db: SQLite.SQLiteDatabase):
     HAVING 
       COUNT(*) > 0
     ORDER BY 
-      last_pending_created_at DESC;
+      last_pending_created_at ASC;
     `
   ).catch(error => console.log("error dbReadNumPendingDownloadsByManhwa", error))
   return r ? r.map(i => {return {
@@ -2234,7 +2234,16 @@ export async function dbReadPendingDownloadsByManhwa(db: SQLite.SQLiteDatabase):
 
 export async function dbReadCompletedDownloadsByManhwa(db: SQLite.SQLiteDatabase, manhwa_id: number): Promise<DownloadRecord[]> {
   const r = await db.getAllAsync<DownloadRecord>(
-    'SELECT * FROM downloads WHERE manhwa_id = ? ORDER BY chapter_id ASC;',
+    `
+      SELECT 
+        * 
+      FROM 
+        downloads 
+      WHERE 
+        manhwa_id = ? AND status = 'completed' 
+      ORDER BY 
+        chapter_id ASC;
+    `,
     [manhwa_id]
   ).catch(error => console.log("error dbReadCompletedDownloadsByManhwa", error))
 

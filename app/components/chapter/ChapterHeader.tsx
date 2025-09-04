@@ -19,9 +19,10 @@ import CustomActivityIndicator from '../util/CustomActivityIndicator'
 
 interface ChapterHeaderProps {
   manhwaTitle: string
-  manhwa_id: number,
+  manhwa_id: number
   loading: boolean
-  reloadChapter: () => any  
+  reloadChapter?: () => any  
+  showDownloadButton?: boolean
 }
 
 
@@ -29,7 +30,8 @@ const ChapterHeader = ({
   manhwaTitle,
   manhwa_id,
   loading,
-  reloadChapter  
+  reloadChapter,
+  showDownloadButton = true
 }: ChapterHeaderProps) => {
 
   const { chapters, currentChapterIndex, setCurrentChapterIndex } =  useChapterState()  
@@ -58,7 +60,6 @@ const ChapterHeader = ({
     }
   }
 
-
   return (
     <Column style={styles.container} >
       <TopBar title={manhwaTitle} titleColor={'white'} >
@@ -68,8 +69,8 @@ const ChapterHeader = ({
       <Row style={{justifyContent: "space-between"}} >
         <Row style={{gap: AppConstants.UI.ICON.SIZE}} >
           <BugReportButton title={reportTitle} />
-          <RotatingButton onPress={reloadChapter} />
-          <DownloadChapterButton manhwa_name={manhwaTitle} manhwa_id={manhwa_id} chapter_id={chapter.chapter_id} chapter_name={chapter.chapter_name} />
+          {reloadChapter && <RotatingButton onPress={reloadChapter} />}
+          {showDownloadButton && <DownloadChapterButton manhwa_name={manhwaTitle} manhwa_id={manhwa_id} chapter_id={chapter.chapter_id} chapter_name={chapter.chapter_name} />}          
         </Row>
 
         <Row style={styles.chapterSelector} >

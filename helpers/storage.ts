@@ -1,7 +1,9 @@
 import { AppConstants } from '@/constants/AppConstants';
 import * as FileSystem from 'expo-file-system';
 import RNFS from 'react-native-fs';
-import { DownloadProgress } from './types';
+import { ChapterImage, DownloadProgress } from './types';
+import { asyncPool, getImageDimensions } from './util';
+import { PixelRatio } from 'react-native';
 
 
 export function normalizeDocumentName(name: string): string {
@@ -47,7 +49,7 @@ export async function createChapterDir(chapter_id: number): Promise<string> {
 
 export async function clearFolder(folderUri: string): Promise<void> {
   try {
-    const items = await FileSystem.readDirectoryAsync(folderUri);    
+    const items = await FileSystem.readDirectoryAsync(folderUri);
     for (const item of items) {
       const itemUri = folderUri + item;
       const info = await FileSystem.getInfoAsync(itemUri);
@@ -124,3 +126,26 @@ export const downloadImages = async (
 
   await Promise.all(pool);
 };
+
+
+export function sortImagePaths(paths: ChapterImage[]): ChapterImage[] {
+  return [...paths].sort((a, b) => {
+    const getNumber = (chapterImage: ChapterImage) => {
+      const match = chapterImage.image_url.match(/image_(\d+)/);
+      return match ? parseInt(match[1], 10) : 0;
+    };
+    return getNumber(a) - getNumber(b);
+  });
+}
+
+
+export async function readDirImages(path: string): Promise<ChapterImage[]> {
+  const items: string[] = await FileSystem.readDirectoryAsync(path);
+  const chapterImages: ChapterImage[] = await asyncPool<string, ChapterImage>(32, items, async (p) => {
+    const image_url = path + '/' + p
+    const { width, height } = await getImageDimensions(image_url)
+    const w = Math.min(width, AppConstants.UI.SCREEN.WIDTH) 
+    return { image_url, width: w, height: PixelRatio.roundToNearestPixel((w * height) / width) }
+  })
+  return sortImagePaths(chapterImages)
+}

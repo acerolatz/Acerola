@@ -44,6 +44,7 @@ const RootLayout = () => {
           
           <Stack.Screen name="(pages)/ManhwaPage" />
           <Stack.Screen name="(pages)/ChapterPage" />
+          <Stack.Screen name="(pages)/DownloadedChapterPage" />
           <Stack.Screen name="(pages)/DownloadedManhwaPage" />
           <Stack.Screen name="(pages)/ManhwaSearch" />
           <Stack.Screen name="(pages)/ManhwaByGenre" />

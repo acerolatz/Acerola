@@ -1,26 +1,21 @@
 import PageActivityIndicator from '@/app/components/util/PageActivityIndicator';
 import ManhwaIdComponent from '@/app/components/ManhwaIdComponent';
 import ReturnButton from '@/app/components/buttons/ReturnButton';
-import ManhwaAuthorInfo from '@/app/components/ManhwaAuthorInfo';
 import ManhwaImageCover from '@/app/components/ManhwaImageCover';
-import ManhwaSummary from '@/app/components/util/ManhwaSummary';
-import ManhwaAlternativeNames from '@/app/components/AltNames';
-import ManhwaGenreInfo from '@/app/components/ManhwaGenreInfo';
 import HomeButton from '@/app/components/buttons/HomeButton';
 import { router, useLocalSearchParams } from 'expo-router';
-import AddToLibrary from '@/app/components/AddToLibray';
 import { AppConstants } from '@/constants/AppConstants';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ToastMessages } from '@/constants/Messages';
 import { Typography } from '@/constants/typography';
-import { formatTimestamp, getRelativeHeight, hp } from '@/helpers/util';
+import { getRelativeHeight } from '@/helpers/util';
 import Footer from '@/app/components/util/Footer';
 import Toast from 'react-native-toast-message';
 import { useSQLiteContext } from 'expo-sqlite';
 import { AppStyle } from '@/styles/AppStyle';
 import { Colors } from '@/constants/Colors';
 import Row from '@/app/components/util/Row';
-import { Chapter, DownloadRecord, Manhwa } from '@/helpers/types';
+import { Manhwa } from '@/helpers/types';
 import React, { 
   useEffect, 
   useState, 
@@ -28,7 +23,6 @@ import React, {
   useCallback 
 } from 'react';
 import { 
-  dbGetManhwaAltNames,  
   dbReadCompletedDownloadsByManhwa,  
   dbReadManhwaById  
 } from '@/lib/database';
@@ -40,6 +34,7 @@ import {
   View 
 } from 'react-native';
 import DownloadedChapterGrid from '../components/grid/DownloadedChapterGrid';
+import { useChapterState } from '@/hooks/chapterState';
 
 
 const DownloadedManhwaPage = () => {
@@ -49,7 +44,7 @@ const DownloadedManhwaPage = () => {
   
   const [loading, setLoading] = useState(false);
   const [manhwa, setManhwa] = useState<Manhwa | null>(null);
-  const [chapters, setChapters] = useState<DownloadRecord[]>([])
+  const setChapters = useChapterState((s) => s.setChapters);
   
   const isCancelled = useRef(false);
 
@@ -75,7 +70,10 @@ const DownloadedManhwaPage = () => {
       }
 
       setManhwa(m)
-      setChapters(d)
+      const date = new Date().toString()
+      setChapters(d.map((chapter, index) => {
+        return {...chapter, chapter_num: index, created_at: date}
+      }))
     } finally {
 
       if (!isCancelled.current) setLoading(false);
@@ -112,7 +110,10 @@ const DownloadedManhwaPage = () => {
           </View>
 
           <Text style={Typography.semiboldXl}>{manhwa.title}</Text>
-          <DownloadedChapterGrid chapters={chapters} manhwa={manhwa} />
+          <View style={{...AppStyle.formButton, backgroundColor: manhwa.color}} >
+            <Text style={Typography.regularBlack}>Downloads</Text>
+          </View>
+          <DownloadedChapterGrid manhwa={manhwa} />
         </View>
         <Footer/>
       </ScrollView>

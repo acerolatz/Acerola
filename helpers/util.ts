@@ -4,7 +4,7 @@ import { ToastMessages } from '@/constants/Messages';
 import DeviceInfo from 'react-native-device-info';
 import Toast from 'react-native-toast-message';
 import * as Clipboard from 'expo-clipboard'
-import { Platform } from 'react-native';
+import { Platform, Image } from 'react-native';
 import { Linking } from 'react-native';
 import RNFS from 'react-native-fs';
 
@@ -309,4 +309,9 @@ export async function asyncPool<T, R>(poolLimit: number, array: T[], iteratorFn:
       }
   }
   return Promise.all(ret);
+}
+
+
+export async function getImageDimensions(uri: string): Promise<{width: number, height: number}> {
+  return await Image.getSize(uri)
 }

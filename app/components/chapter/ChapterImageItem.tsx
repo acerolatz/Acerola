@@ -20,7 +20,6 @@ const ChapterImageItem = React.memo(({ item }: ChapterImageItemProps) => {
       source={item.image_url}      
       contentFit="cover"
       recyclingKey={item.image_url}
-      decodeFormat='rgb'
       cachePolicy={'disk'}
     />
   )
