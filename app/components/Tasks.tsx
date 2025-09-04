@@ -1,9 +1,9 @@
 import { FlatList, StyleSheet } from 'react-native'
 import React from 'react'
 import { Todo } from '@/helpers/types'
-import TodoComponent from './components/TodoComponent'
-import CreateTodoComponent from './components/CreateTodoComponent'
-import Footer from './components/util/Footer'
+import TodoComponent from './TodoComponent'
+import CreateTodoComponent from './CreateTodoComponent'
+import Footer from './util/Footer'
 
 
 interface TasksProps {

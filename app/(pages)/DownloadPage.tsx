@@ -10,15 +10,13 @@ import ReturnButton from "@/app/components/buttons/ReturnButton";
 import DownloadQueue from "../components/download/DownloadQueue";
 import { downloadManager } from "@/helpers/DownloadManager";
 import React, { useEffect, useRef, useState } from "react";
-import ManhwaGrid from "@/app/components/grid/ManhwaGrid";
 import { AppConstants } from "@/constants/AppConstants";
 import { DownloadState } from "@/helpers/types";
 import { useSQLiteContext } from "expo-sqlite";
 import { AppStyle } from "@/styles/AppStyle";
 import TopBar from "@/app/components/TopBar";
 import Row from "@/app/components/util/Row";
-import { Manhwa } from "@/helpers/types";
-import { router } from "expo-router";
+import DownloadGrid from "../components/grid/DownloadGrid";
 
 
 const DownloadPage = () => {
@@ -33,22 +31,8 @@ const DownloadPage = () => {
   
   const scrollX = useRef(new Animated.Value(0)).current
   
-  const onPress = (manhwa: Manhwa) => {
-    router.navigate({
-      pathname: "/DownloadedManhwaPage",
-      params: {
-        manhwa_id: manhwa.manhwa_id
-      }
-    })
-  } 
-
   const screens = [
-    <ManhwaGrid
-      onPress={onPress}
-      manhwas={state.downloads}
-      showsVerticalScrollIndicator={false}
-      showManhwaStatus={false}
-    />,
+    <DownloadGrid manhwas={state.downloads} />,
     <DownloadQueue state={state} />,
   ];  
 

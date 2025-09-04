@@ -2,8 +2,8 @@ import { AppConstants } from '@/constants/AppConstants'
 import { StyleSheet, Text, View } from 'react-native'
 import { Typography } from '@/constants/typography'
 import { Colors } from '@/constants/Colors'
-import React from 'react'
 import { hp } from '@/helpers/util'
+import React from 'react'
 
 
 interface ManhwaIdComponentProps {
@@ -11,24 +11,26 @@ interface ManhwaIdComponentProps {
     position?: 'l' | 'r'
 }
 
+
 const ManhwaIdComponent = ({manhwa_id, position = 'l'}: ManhwaIdComponentProps) => {
 
     if (AppConstants.APP.DEBUG.ENABLED) {
         return position === 'l' ?        
-            <View style={[styles.container, {left: AppConstants.UI.SCREEN.PADDING_HORIZONTAL + hp(1)}]} >
+            <View style={{...styles.container, left: AppConstants.UI.SCREEN.PADDING_HORIZONTAL + hp(1)}} >
                 <Text style={Typography.regular}>{manhwa_id}</Text>
             </View>
             :
-            <View style={[styles.container, {right: AppConstants.UI.SCREEN.PADDING_HORIZONTAL + hp(1)}]} >
+            <View style={{...styles.container, right: AppConstants.UI.SCREEN.PADDING_HORIZONTAL + hp(1)}} >
                 <Text style={Typography.regular}>{manhwa_id}</Text>
             </View>
         
     }
-
     return <></>
 }
 
+
 export default ManhwaIdComponent
+
 
 const styles = StyleSheet.create({
     container: {

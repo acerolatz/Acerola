@@ -6,7 +6,6 @@ import { Manhwa } from '@/helpers/types'
 import ManhwaCard from '../ManhwaCard'
 import Footer from '../util/Footer'
 import { hp } from '@/helpers/util'
-import { Typography } from '@/constants/typography'
 
 
 interface MangaGridProps {
@@ -43,13 +42,7 @@ const ManhwaGrid = ({
             marginBottom={AppConstants.UI.MARGIN}
             manhwa={item}
         />
-    ), [])
-
-    if (manhwas.length == 0) {
-        return (
-            <Text style={Typography.regular} >You’ll find your downloads here.</Text>
-        )
-    }
+    ), [])    
     
     return (
         <View style={styles.container} >

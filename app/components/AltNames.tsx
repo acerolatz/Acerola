@@ -5,11 +5,7 @@ import React, { useCallback } from 'react'
 
 const Item = ({item, isLast}: {item: string, isLast: boolean}) => {
     const t = !isLast ? ',' : ''
-    return (
-        <Text key={item} style={styles.item}>
-            {item}{t}
-        </Text>
-    )
+    return <Text key={item} style={styles.item}> {item}{t} </Text>
 }
 
 
@@ -17,15 +13,14 @@ interface AltNamesProps {
     names: string[]
 }
 
+
 const ManhwaAlternativeNames = ({names}: AltNamesProps) => {
 
     const renderItem = useCallback(({item, index}: {item: string, index: number}) => {
         return <Item item={item} isLast={index >= names.length - 1} />
     }, [])
 
-    if (names.length === 0) {
-        return <></>
-    }    
+    if (names.length === 0) { return <></> }
 
     return (
         <View style={styles.container} >

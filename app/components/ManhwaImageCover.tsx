@@ -1,8 +1,8 @@
-import { StyleSheet } from 'react-native'
-import React from 'react'
 import { AppConstants } from '@/constants/AppConstants'
 import { getRelativeHeight } from '@/helpers/util'
+import { StyleSheet } from 'react-native'
 import { Image } from 'expo-image'
+import React from 'react'
 
 
 interface ManhwaImageCoverProps {
@@ -11,24 +11,24 @@ interface ManhwaImageCoverProps {
 
 
 const ManhwaImageCover = ({ url }: ManhwaImageCoverProps) => {  
-
-  const w = AppConstants.UI.SCREEN.WIDTH * 0.92
-  const h = getRelativeHeight(720, 980, w)
-
   return (
     <Image 
       source={url} 
       contentFit='cover' 
       cachePolicy={'disk'}
-      style={{...styles.image, width: w, height: h}}
+      style={styles.image}
       transition={100} />
   )
 }
 
+
 export default ManhwaImageCover
+
 
 const styles = StyleSheet.create({
   image: {
-    borderRadius: AppConstants.UI.BORDER_RADIUS * 2
+    borderRadius: AppConstants.UI.BORDER_RADIUS * 2,
+    width: AppConstants.UI.SCREEN.VALID_WIDTH,
+    height: getRelativeHeight(720, 980, AppConstants.UI.SCREEN.VALID_WIDTH)
   }
 })

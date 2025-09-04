@@ -107,6 +107,7 @@ const CacheForm = ({
         setStorageLoading(true)
         await dbDeleteAllDownloads(db)
         setStorageLoading(false)
+        await calculateStorage()
         setDownloadedChapters(await dbCountRows(db, 'downloads'))
     }
 

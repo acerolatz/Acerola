@@ -5,7 +5,7 @@ import { dbReadManhwaGenres } from "@/lib/database"
 import { AppStyle } from "@/styles/AppStyle"
 import { useRouter } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native"
 
 
@@ -41,20 +41,22 @@ const ManhwaGenreInfo = ({manhwa}: ManhwaGenreInfoProps) => {
       }})
   }
 
-  const renderItem = ({item}: {item: Genre}) => {
+  const renderItem = useCallback(({item}: {item: Genre}) => {
     return (
       <Pressable style={styles.container} onPress={() => openGenrePage(item)}>
         <Text style={Typography.regular} >{item.genre}</Text>
       </Pressable>
     )
-  }
+  }, [])
+
+  const KeyExtractor = useCallback((item: Genre) => item.genre_id.toString(), [])
 
   return (
     <View style={{width: '100%'}} >
       <FlatList 
-        ref={flatListRef}
         data={genres}
-        keyExtractor={(item) => item.genre_id.toString()}
+        ref={flatListRef}
+        keyExtractor={KeyExtractor}
         horizontal={true}
         showsHorizontalScrollIndicator={false}
         renderItem={renderItem}

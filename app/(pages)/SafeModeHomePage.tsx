@@ -29,7 +29,7 @@ import Row from '@/app/components/util/Row'
 import { Keyboard } from 'react-native'
 import { Note, Todo } from '@/helpers/types'
 import { router, useFocusEffect } from 'expo-router'
-import Tasks from '../Tasks'
+import Tasks from '../components/Tasks'
 import Notes from '../components/Notes'
 
 

@@ -1,13 +1,13 @@
+import { FlatList, Pressable, StyleSheet, Text } from "react-native"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { Manhwa, ManhwaAuthor } from "@/helpers/types"
 import { dbReadManhwaAuthors } from "@/lib/database"
-import { AppStyle } from "@/styles/AppStyle"
-import { useRouter } from "expo-router"
-import { useSQLiteContext } from "expo-sqlite"
-import { useCallback, useEffect, useRef, useState } from "react"
-import { FlatList, Pressable, StyleSheet, Text } from "react-native"
-import Row from "./util/Row"
-import { Colors } from "@/constants/Colors"
 import { Typography } from "@/constants/typography"
+import { useSQLiteContext } from "expo-sqlite"
+import { AppStyle } from "@/styles/AppStyle"
+import { Colors } from "@/constants/Colors"
+import { useRouter } from "expo-router"
+import Row from "./util/Row"
 
 
 interface ManhwaAuthorInfoProps {
@@ -56,8 +56,8 @@ const ManhwaAuthorInfo = ({manhwa}: ManhwaAuthorInfoProps) => {
   return (
     <Row style={styles.container} >
       <FlatList
-        ref={flatListRef}
         data={authors}
+        ref={flatListRef}
         keyExtractor={KeyExtractor}
         horizontal={true}
         showsHorizontalScrollIndicator={false}

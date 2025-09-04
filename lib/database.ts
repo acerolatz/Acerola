@@ -186,6 +186,7 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
 
   CREATE INDEX IF NOT EXISTS idx_downloads_status ON downloads(status);
   CREATE INDEX IF NOT EXISTS idx_downloads_created_at ON downloads(created_at);
+  CREATE INDEX IF NOT EXISTS idx_downloads_manhwa_id ON downloads(manhwa_id);
   -- ================================
   
 
@@ -2228,4 +2229,14 @@ export async function dbReadPendingDownloadsByManhwa(db: SQLite.SQLiteDatabase):
     manhwa: i as any,
     pending_downloads: i.pending_downloads
   }}) : []
+}
+
+
+export async function dbReadCompletedDownloadsByManhwa(db: SQLite.SQLiteDatabase, manhwa_id: number): Promise<DownloadRecord[]> {
+  const r = await db.getAllAsync<DownloadRecord>(
+    'SELECT * FROM downloads WHERE manhwa_id = ? ORDER BY chapter_id ASC;',
+    [manhwa_id]
+  ).catch(error => console.log("error dbReadCompletedDownloadsByManhwa", error))
+
+  return r ? r : []
 }

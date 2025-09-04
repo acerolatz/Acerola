@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     width: '100%',
     left: 0,
     top: 0,
-    height: hp(92)
+    height: hp(100)
   },
   item: {
     height: AppConstants.UI.BUTTON.SIZE,

@@ -43,7 +43,7 @@ const AddToLibrary = ({manhwa, backgroundColor = Colors.primary}: AddToLibrayPro
             }
             init()
         },
-        [db, manhwa]
+        [db, manhwa.manhwa_id]
     )
 
     const onChangeValue = async (value: string | null) => {        

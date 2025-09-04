@@ -13,14 +13,14 @@ import { AppConstants } from '@/constants/AppConstants';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ToastMessages } from '@/constants/Messages';
 import { Typography } from '@/constants/typography';
-import { formatTimestamp, hp } from '@/helpers/util';
+import { formatTimestamp, getRelativeHeight, hp } from '@/helpers/util';
 import Footer from '@/app/components/util/Footer';
 import Toast from 'react-native-toast-message';
 import { useSQLiteContext } from 'expo-sqlite';
 import { AppStyle } from '@/styles/AppStyle';
 import { Colors } from '@/constants/Colors';
 import Row from '@/app/components/util/Row';
-import { Manhwa } from '@/helpers/types';
+import { Chapter, DownloadRecord, Manhwa } from '@/helpers/types';
 import React, { 
   useEffect, 
   useState, 
@@ -29,6 +29,7 @@ import React, {
 } from 'react';
 import { 
   dbGetManhwaAltNames,  
+  dbReadCompletedDownloadsByManhwa,  
   dbReadManhwaById  
 } from '@/lib/database';
 import { 
@@ -38,7 +39,7 @@ import {
   Text, 
   View 
 } from 'react-native';
-
+import DownloadedChapterGrid from '../components/grid/DownloadedChapterGrid';
 
 
 const DownloadedManhwaPage = () => {
@@ -48,7 +49,7 @@ const DownloadedManhwaPage = () => {
   
   const [loading, setLoading] = useState(false);
   const [manhwa, setManhwa] = useState<Manhwa | null>(null);
-  const [altNames, setAltNames] = useState<string[]>([]);
+  const [chapters, setChapters] = useState<DownloadRecord[]>([])
   
   const isCancelled = useRef(false);
 
@@ -62,9 +63,9 @@ const DownloadedManhwaPage = () => {
     setLoading(true);
 
     try {
-      const [m, a] = await Promise.all([
-        dbReadManhwaById(db, manhwa_id),
-        dbGetManhwaAltNames(db, manhwa_id)
+      const [m, d] = await Promise.all([
+        dbReadManhwaById(db, manhwa_id),        
+        dbReadCompletedDownloadsByManhwa(db, manhwa_id)
       ])
 
       if (!m) {
@@ -74,7 +75,7 @@ const DownloadedManhwaPage = () => {
       }
 
       setManhwa(m)
-      setAltNames(a.filter(n => n != m.title))
+      setChapters(d)
     } finally {
 
       if (!isCancelled.current) setLoading(false);
@@ -87,7 +88,7 @@ const DownloadedManhwaPage = () => {
     return () => { isCancelled.current = true; };
   }, [init]);
 
-  if (!manhwa) {
+  if (loading || !manhwa) {
     return (
       <SafeAreaView style={AppStyle.safeArea}>
         <PageActivityIndicator />
@@ -110,8 +111,8 @@ const DownloadedManhwaPage = () => {
             <ManhwaIdComponent manhwa_id={manhwa.manhwa_id} />
           </View>
 
-          <Text style={Typography.semiboldXl}>{manhwa.title}</Text>          
-          
+          <Text style={Typography.semiboldXl}>{manhwa.title}</Text>
+          <DownloadedChapterGrid chapters={chapters} manhwa={manhwa} />
         </View>
         <Footer/>
       </ScrollView>
@@ -140,7 +141,7 @@ const styles = StyleSheet.create({
     width: '100%',
     left: 0,
     top: 0,
-    height: hp(92)
+    height: getRelativeHeight(720, 980, AppConstants.UI.SCREEN.VALID_WIDTH)
   },  
   topBar: {
     width: '100%',

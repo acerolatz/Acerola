@@ -23,10 +23,9 @@ const TodoComponent = ({todo, setTodos}: TodoComponentProps) => {
 
     const db = useSQLiteContext()    
     const [isCompleted, setIsCompleted] = useState(todo.completed === 1)
+    const [finishedAt, setFinishedAt] = useState<string | null>(todo.finished_at)
     const backgroundColor = isCompleted ? Colors.green : Colors.primary
     const checkmarkBackgroundColor = isCompleted ? Colors.green : Colors.backgroundColor
-    const [finishedAt, setFinishedAt] = useState<string | null>(todo.finished_at)
-
 
     const clickCheckbox = async () => {
         const newStatus: boolean = !isCompleted
