@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native"
 import ChapterPageSelector from "../chapter/ChapterPageSelector"
 import ChapterGridItem from "../chapter/ChapterGridItem"
 import { dbGetManhwaReadChapters } from '@/lib/database'
+import { getChapterGridNumColumns } from "@/helpers/util"
 import { AppConstants } from "@/constants/AppConstants"
 import { useChapterState } from "@/hooks/chapterState"
 import { useCallback, useMemo, useState } from "react"
@@ -14,6 +15,8 @@ import Row from "../util/Row"
 
 
 const PAGE_LIMIT = 96
+const NUM_COLUMNS = getChapterGridNumColumns()
+const ITEM_SIZE = Math.floor((AppConstants.UI.SCREEN.VALID_WIDTH - AppConstants.UI.MARGIN * (NUM_COLUMNS - 1)) / NUM_COLUMNS)
 
 
 interface ManhwaChapterGridProps {
@@ -104,6 +107,7 @@ const ManhwaChapterGrid = ({ manhwa }: ManhwaChapterGridProps) => {
               onPress={navigateToChapter}
               chapterName={item.chapter_name}
               isReaded={chaptersReadSet.has(item.chapter_id)}
+              itemSize={ITEM_SIZE}
             />
           )
         }

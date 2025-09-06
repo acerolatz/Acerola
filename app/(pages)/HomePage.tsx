@@ -1,27 +1,27 @@
-import React, { useRef } from "react";
+import NewAppReleaseBottomSheet from "@/app/components/bottomsheet/NewAppReleaseBottomSheet";
 import { Animated, Pressable, SafeAreaView, ScrollView, StyleSheet } from "react-native";
-import { router } from "expo-router";
-import { AppConstants } from "@/constants/AppConstants";
-import { Colors } from "@/constants/Colors";
-import { AppStyle } from "@/styles/AppStyle";
-import { useHomePageData } from "@/hooks/useHomePageData";
-import Row from "@/app/components/util/Row";
-import Column from "@/app/components/util/Column";
-import Footer from "@/app/components/util/Footer";
-import AppLogo from "@/app/components/util/Logo";
-import GenreGrid from "@/app/components/grid/GenreGrid";
-import CollectionGrid from "@/app/components/grid/CollectionsGrid";
+import DonationBottomSheet from "@/app/components/bottomsheet/DonationBottomSheet";
+import UpdateDatabaseButton from "@/app/components/buttons/UpdateDatabaseButton";
+import RandomManhwaButton from "@/app/components/buttons/OpenRandomManhwaButton";
 import ContinueReadingGrid from "@/app/components/grid/ContinueReadingGrid";
-import Top10Grid from "@/app/components/grid/Top10Grid";
 import LatestUpdatesGrid from "@/app/components/grid/LatestUpdatesGrid";
 import MostPopularGrid from "@/app/components/grid/MostPopularGrid";
 import RandomCardsGrid from "@/app/components/grid/RandomCardsGrid";
-import UpdateDatabaseButton from "@/app/components/buttons/UpdateDatabaseButton";
-import RandomManhwaButton from "@/app/components/buttons/OpenRandomManhwaButton";
-import Button from "@/app/components/buttons/Button";
+import CollectionGrid from "@/app/components/grid/CollectionsGrid";
+import { useHomePageData } from "@/hooks/useHomePageData";
+import { AppConstants } from "@/constants/AppConstants";
+import Top10Grid from "@/app/components/grid/Top10Grid";
+import GenreGrid from "@/app/components/grid/GenreGrid";
 import LateralMenu from "@/app/components/LateralMenu";
-import DonationBottomSheet from "@/app/components/bottomsheet/DonationBottomSheet";
-import NewAppReleaseBottomSheet from "@/app/components/bottomsheet/NewAppReleaseBottomSheet";
+import Button from "@/app/components/buttons/Button";
+import React, { useCallback, useRef } from "react";
+import Column from "@/app/components/util/Column";
+import Footer from "@/app/components/util/Footer";
+import AppLogo from "@/app/components/util/Logo";
+import { AppStyle } from "@/styles/AppStyle";
+import Row from "@/app/components/util/Row";
+import { Colors } from "@/constants/Colors";
+import { router } from "expo-router";
 import { hp } from "@/helpers/util";
 
 
@@ -73,6 +73,14 @@ const HomePage = () => {
     ]).start(() => (menuVisible.current = false));
   };
 
+  const openDebugPage = useCallback(() => {
+    router.navigate("/(pages)/DebugPage")
+  }, [])
+
+  const openManhwaSearch = useCallback(() => {
+    router.navigate("/(pages)/ManhwaSearch")
+  }, [])
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={AppStyle.flex} showsVerticalScrollIndicator={false}>
@@ -82,11 +90,12 @@ const HomePage = () => {
           <Row style={{ gap: AppConstants.UI.ICON.SIZE }}>
             {!loading && (
               <>
-                {AppConstants.APP.DEBUG.ENABLED && (
-                  <Button iconName="bug-outline" onPress={() => router.navigate("/(pages)/DebugPage")} />
-                )}
+                {
+                  AppConstants.APP.DEBUG.ENABLED && 
+                  <Button iconName="bug-outline" onPress={openDebugPage} />
+                }
                 <UpdateDatabaseButton />
-                <Button iconName="search-outline" onPress={() => router.navigate("/(pages)/ManhwaSearch")} />
+                <Button iconName="search-outline" onPress={openManhwaSearch} />
                 <RandomManhwaButton />
               </>
             )}
@@ -127,38 +136,38 @@ export default HomePage;
 
 
 const styles = StyleSheet.create({
-    safeArea: {
-        ...AppStyle.safeArea,
-        paddingTop: 0
-    },
-    lateralMenuBackground: {
-        width: "100%",
-        height: "100%",
-    },
-    header: {
-        width: "100%",
-        justifyContent: "space-between",
-        paddingTop: AppConstants.UI.SCREEN.PADDING_VERTICAL,
-        paddingBottom: AppConstants.UI.GAP * 2,
-    },
-    sideMenu: {
-        position: "absolute",
-        top: 0,
-        bottom: 0,
-        left: 0,
-        backgroundColor: Colors.backgroundColor,
-        width: AppConstants.UI.MENU.WIDTH,
-        elevation: 5,
-        zIndex: 100,
-    },
-    menuBackground: {
-        width: AppConstants.UI.SCREEN.WIDTH,
-        position: "absolute",
-        height: AppConstants.UI.SCREEN.HEIGHT * 1.2,
-        top: 0,
-        left: 0,
-        backgroundColor: "rgba(0, 0, 0, 0.8)",
-        elevation: 4,
-        zIndex: 90,
-    },
+  safeArea: {
+    ...AppStyle.safeArea,
+    paddingTop: 0
+  },
+  lateralMenuBackground: {
+    width: "100%",
+    height: "100%",
+  },
+  header: {
+    width: "100%",
+    justifyContent: "space-between",
+    paddingTop: AppConstants.UI.SCREEN.PADDING_VERTICAL,
+    paddingBottom: AppConstants.UI.GAP * 2,
+  },
+  sideMenu: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    backgroundColor: Colors.backgroundColor,
+    width: AppConstants.UI.MENU.WIDTH,
+    elevation: 5,
+    zIndex: 100,
+  },
+  menuBackground: {
+    width: AppConstants.UI.SCREEN.WIDTH,
+    position: "absolute",
+    height: AppConstants.UI.SCREEN.HEIGHT * 1.2,
+    top: 0,
+    left: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    elevation: 4,
+    zIndex: 90,
+  },
 });

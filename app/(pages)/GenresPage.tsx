@@ -7,8 +7,8 @@ import { AppStyle } from '@/styles/AppStyle'
 import { Colors } from '@/constants/Colors'
 import TopBar from '@/app/components/TopBar'
 import {  Genre } from '@/helpers/types'
-import { hp, wp } from '@/helpers/util'
 import { router } from 'expo-router'
+import { hp } from '@/helpers/util'
 import { 
     FlatList, 
     Pressable, 
@@ -16,8 +16,8 @@ import {
     StyleSheet,
     Text
 } from 'react-native'
-import { dbReadGenres } from '@/lib/database'
 import { useSQLiteContext } from 'expo-sqlite'
+import { dbReadGenres } from '@/lib/database'
 
 
 const NUM_COLUMNS = 2

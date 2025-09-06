@@ -2,8 +2,7 @@ import {
   View, 
   SafeAreaView, 
   Animated, 
-  KeyboardAvoidingView, 
-  Platform, 
+  KeyboardAvoidingView,
   StyleSheet
 } from "react-native";
 import { dbReadDownloadedManhwas, dbReadPendingDownloadsByManhwa } from "@/lib/database";

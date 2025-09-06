@@ -1,17 +1,17 @@
 import { spFetchManhwaById, spUpdateManhwaCardView } from '@/lib/supabase'
 import CustomActivityIndicator from './util/CustomActivityIndicator'
-import { dbHasManhwa, dbUpsertManhwa } from '@/lib/database'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { dbHasManhwa, dbUpsertManhwa } from '@/lib/database'
 import { ManhwaCard, ServerManhwa } from '@/helpers/types'
 import { AppConstants } from '@/constants/AppConstants'
+import { LinearGradient } from 'expo-linear-gradient'
+import React, { useCallback, useState } from 'react'
 import { ToastMessages } from '@/constants/Messages'
 import { Typography } from '@/constants/typography'
-import { LinearGradient } from 'expo-linear-gradient'
 import Toast from 'react-native-toast-message'
 import { useSQLiteContext } from 'expo-sqlite'
-import React, { useState } from 'react'
-import { wp } from '@/helpers/util'
 import { router } from 'expo-router'
+import { wp } from '@/helpers/util'
 import { Image } from 'expo-image'
 
 
@@ -31,7 +31,7 @@ const RandomManhwaCard = React.memo(({ card }: RandomManhwaCardProps) => {
     
     const [loading, setLoading] = useState(false)    
 
-    const onPress = async () => {
+    const onPress = useCallback(async () => {
         const hasManhwa = await dbHasManhwa(db, card.manhwa_id)
         if (!hasManhwa) {
             setLoading(true)
@@ -45,11 +45,10 @@ const RandomManhwaCard = React.memo(({ card }: RandomManhwaCardProps) => {
         }
         spUpdateManhwaCardView(card.manhwa_id)
         router.navigate({
-            pathname: '/ManhwaPage', 
-            params: {
-                manhwa_id: card.manhwa_id
-        }})
-    }
+            pathname: '/ManhwaPage',
+            params: { manhwa_id: card.manhwa_id }
+        })
+    }, [card.manhwa_id])
 
     if (loading) {
         return (
@@ -65,7 +64,7 @@ const RandomManhwaCard = React.memo(({ card }: RandomManhwaCardProps) => {
     }
 
     return (
-        <Pressable onPress={() => onPress()} style={{width: card.normalizedWidth, height: card.normalizedHeight}} >
+        <Pressable onPress={onPress} style={{width: card.normalizedWidth, height: card.normalizedHeight}} >
             <Image 
                 source={card.image_url} 
                 style={{

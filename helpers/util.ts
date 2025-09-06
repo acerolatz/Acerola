@@ -315,3 +315,22 @@ export async function asyncPool<T, R>(poolLimit: number, array: T[], iteratorFn:
 export async function getImageDimensions(uri: string): Promise<{width: number, height: number}> {
   return await Image.getSize(uri)
 }
+
+
+export function countChar(str: string, target: string): number {
+  if (target.length !== 1) return 0
+  let count = 0
+
+  for (let i = 0; i < str.length; i++)
+    if (str[i] === target)
+      count++
+
+  return count;
+}
+
+
+export function createRowPlaceholder(columns: string): {rowPlaceholder: string, numColumns: number} {
+  const numColumns: number = countChar(columns, ',') + 1
+  const rowPlaceholder = "(" + Array(numColumns).fill("?").join(",") + ")";
+  return { rowPlaceholder, numColumns }
+}

@@ -1,37 +1,56 @@
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
+import { formatTimestampWithHour, hp, wp } from '@/helpers/util'
+import { AppConstants } from '@/constants/AppConstants'
+import { Typography } from '@/constants/typography'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import { Colors } from '@/constants/Colors'
 import React, { useCallback } from 'react'
 import { Note } from '@/helpers/types'
-import { AppConstants } from '@/constants/AppConstants'
-import { Colors } from '@/constants/Colors'
-import Ionicons from '@expo/vector-icons/Ionicons'
-import { formatTimestampWithHour, hp, wp } from '@/helpers/util'
+import Button from './buttons/Button'
 import { router } from 'expo-router'
-import { Typography } from '@/constants/typography'
+import Row from './util/Row'
 
 
-const NoteComponent = ({note}: {note: Note}) => {
-
+const NoteComponent = ({note, deleteNote}: {note: Note, deleteNote: (note: Note) => Promise<any>}) => {
     const content = note.content.slice(0, 256)
 
+    const onPress = useCallback(() => {
+        router.navigate({
+            pathname: "/(pages)/UpdateNotePage",
+            params: { note_id: note.note_id }
+        })
+    }, [note.note_id])
+
+    const onDelete = useCallback(async () => {
+        await deleteNote(note)
+    }, [note.note_id])
+
     return (
-        <Pressable style={styles.noteContainer} >
+        <Pressable onPress={onPress} style={styles.noteContainer} >
             <Text style={Typography.semibold} >{note.title}</Text>
             <Text numberOfLines={1} style={Typography.regular} >{content}</Text>
-            <Text style={Typography.light}>{formatTimestampWithHour(new Date(note.created_at).toString())}</Text>
+            <Row style={{justifyContent: "space-between"}} >
+                <Text style={Typography.light}>{formatTimestampWithHour(new Date(note.updated_at).toString())}</Text>
+                <Row style={{gap: AppConstants.UI.GAP * 2}} >
+                    <Button onPress={onDelete} iconName='trash-outline' />
+                    <Button onPress={onPress} iconName='create-outline' />
+                </Row>
+            </Row>
         </Pressable>
     )
 }
 
 interface NotesProps {
     notes: Note[]
-    setNotes: React.Dispatch<React.SetStateAction<Note[]>>
+    deleteNote: (note: Note) => Promise<any>
 }
 
-const Notes = ({notes, setNotes}: NotesProps) => {
+
+const Notes = ({ notes, deleteNote }: NotesProps) => {
 
     const KeyExtractor = useCallback((item: Note) => item.note_id.toString(), [])
 
-    const renderItem = useCallback(({item}: {item: Note}) => <NoteComponent note={item} />, [])
+    const renderItem = useCallback(({item}: {item: Note}) => <NoteComponent note={item} deleteNote={deleteNote} />, [])
 
     return (
         <View style={styles.container} >      
@@ -66,6 +85,7 @@ const styles = StyleSheet.create({
         justifyContent: "center"
     },
     noteContainer: {
+        gap: AppConstants.UI.GAP,
         backgroundColor: Colors.backgroundSecondary,
         borderRadius: AppConstants.UI.BORDER_RADIUS,
         paddingHorizontal: AppConstants.UI.ITEM_PADDING.HORIZONTAL,

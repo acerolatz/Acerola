@@ -1,6 +1,5 @@
 import { dbAddNumericInfo, dbUpsertManhwaReadingHistory } from '@/lib/database'
 import { spFetchChapterImages, spUpdateChapterView } from '@/lib/supabase'
-import DebugChapterReader from '@/app/components/chapter/DebugChapterReader'
 import ChapterReader from '@/app/components/chapter/ChapterReader'
 import ChapterHeader from '@/app/components/chapter/ChapterHeader'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -13,10 +12,6 @@ import Toast from 'react-native-toast-message'
 import { useSQLiteContext } from 'expo-sqlite'
 import { Colors } from '@/constants/Colors'
 import { Image } from 'expo-image'
-import { hp } from '@/helpers/util'
-
-
-const DEBUG_CHAPTER_PAGE = false
 
 
 const ChapterPage = () => {  
@@ -25,26 +20,27 @@ const ChapterPage = () => {
   const params = useLocalSearchParams()
   const manhwaTitle = params.manhwaTitle as string
 
-  const chapters = useChapterState(s => s.chapters)
-  const currentChapterIndex = useChapterState(s => s.currentChapterIndex)
-
   const [images, setImages] = useState<ChapterImage[]>([])
   const [loading, setLoading] = useState(false)  
 
+  const chapters = useChapterState(s => s.chapters)
+  const currentChapterIndex = useChapterState(s => s.currentChapterIndex)
   const currentChapter: Chapter = chapters[currentChapterIndex]  
 
   const reloadChapter = async () => {
     if (loading) { return }
     Toast.show(ToastMessages.EN.RELOADING_CHAPTER)
     setLoading(true)
-      await Image.clearMemoryCache();
-      const imgs = await spFetchChapterImages(currentChapter.chapter_id)
+      const [imgs, ] = await Promise.all([
+        spFetchChapterImages(currentChapter.chapter_id),
+        Image.clearMemoryCache()
+      ])
       if (imgs.length === 0) {
         setLoading(false);
         Toast.show(ToastMessages.EN.COULD_NOT_FETCH_CHAPTER_IMAGES)
         return
       }
-      await Image.prefetch(imgs.slice(0, 5).map(i => i.image_url))
+      await Image.prefetch(imgs.slice(0, 5).map(i => i.image_url), 'disk')
       setImages(imgs)
     setLoading(false)
   }
@@ -58,8 +54,10 @@ const ChapterPage = () => {
       ) { return }
       async function init() {
         setLoading(true)
-          await Image.clearMemoryCache()
-          const imgs = await spFetchChapterImages(currentChapter.chapter_id)
+          const [imgs, ] = await Promise.all([
+            spFetchChapterImages(currentChapter.chapter_id),
+            Image.clearMemoryCache()
+          ])
 
           if (imgs.length === 0) { 
             setImages([])
@@ -67,7 +65,7 @@ const ChapterPage = () => {
             return
           }
 
-          if (isCancelled) return
+          if (isCancelled) { return }
 
           await Promise.all([
             dbUpsertManhwaReadingHistory(db, currentChapter.manhwa_id, currentChapter.chapter_id),
@@ -99,22 +97,12 @@ const ChapterPage = () => {
 
   return (
     <View style={styles.container} >
-      {
-        DEBUG_CHAPTER_PAGE ?
-        <DebugChapterReader
-          images={data}
-          estimatedItemSize={hp(40)}
-          manhwaTitle={manhwaTitle}
-          listHeader={listHeader}
-          loading={loading}
-        />  :
-        <ChapterReader 
-          images={data}          
-          manhwaTitle={manhwaTitle}
-          listHeader={listHeader}
-          loading={loading}
-        />
-      }
+      <ChapterReader 
+        images={data}          
+        manhwaTitle={manhwaTitle}
+        listHeader={listHeader}
+        loading={loading}
+      />
     </View>
   )
 }

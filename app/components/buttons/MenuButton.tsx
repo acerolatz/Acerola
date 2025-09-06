@@ -9,7 +9,7 @@ import React from 'react'
 interface MenuButtonProps {
     onPress: () => void
     title: string
-    iconName: string
+    iconName: keyof typeof Ionicons.glyphMap
 }
 
 

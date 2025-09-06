@@ -59,9 +59,7 @@ const CollectionPage = () => {
             <TopBar title={collection_name} >
                 <ReturnButton />
             </TopBar>
-            <ManhwaGrid
-                manhwas={manhwas}
-                onEndReached={onEndReached}/>
+            <ManhwaGrid manhwas={manhwas} onEndReached={onEndReached}/>
         </SafeAreaView>
     )
 }

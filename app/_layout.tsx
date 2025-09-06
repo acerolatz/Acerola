@@ -64,6 +64,7 @@ const RootLayout = () => {
           <Stack.Screen name="(pages)/NewsPage" />
 
           <Stack.Screen name="(pages)/CreateNotePage" />
+          <Stack.Screen name="(pages)/UpdateNotePage" />
           <Stack.Screen name="(pages)/BugReportPage" />
           <Stack.Screen name="(pages)/RequestManhwaPage" />
           <Stack.Screen name="(pages)/DonatePage" />

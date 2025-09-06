@@ -25,7 +25,7 @@ const CurrentDownload = ({ item }: { item: DownloadRequest }) => {
     <Row style={styles.container}>
       <Column>
         <Text numberOfLines={1} style={{ ...Typography.regularBlack, flexShrink: 1 }}>{item.manhwa_name}</Text>
-        <Text style={Typography.regularBlack}>Downloading chapter: {item.chapter_name}</Text>
+        <Text style={Typography.regularBlack}>Downloading chapter {item.chapter_name}</Text>
       </Column>
       <Text style={Typography.regularBlack}>{percentage}%</Text>
     </Row>

@@ -8,7 +8,7 @@ import {
     TextInput, 
     View 
 } from 'react-native'
-import { dbCountRows, dbDeleteAllDownloads, dbSetCacheMaxSize } from '@/lib/database'
+import { dbCountCompletedDownloads, dbCountRows, dbDeleteAllDownloads, dbSetCacheMaxSize } from '@/lib/database'
 import { clearCache, formatBytes, getDirectorySizeBytes, wp } from '@/helpers/util'
 import CustomActivityIndicator from '../util/CustomActivityIndicator';
 import { AppConstants } from '@/constants/AppConstants'
@@ -25,6 +25,7 @@ import { Colors } from '@/constants/Colors'
 import Footer from '../util/Footer'
 import Row from '../util/Row';
 import * as yup from 'yup';
+import { downloadManager } from '@/helpers/DownloadManager';
 
 
 interface FormData {
@@ -60,7 +61,7 @@ const CacheForm = ({
     useEffect(
         () => {
             const init = async() => {
-                setDownloadedChapters(await dbCountRows(db, 'downloads'))
+                setDownloadedChapters(await dbCountCompletedDownloads(db))
             }
             init()
         },
@@ -98,17 +99,20 @@ const CacheForm = ({
 
     const calculateStorage = async () => {
         setStorageLoading(true)
-        const s = await getDirectorySizeBytes(AppConstants.APP.MANHWAS_DIR)
-        setStorageSize(formatBytes(s))
+        const sizeDownloads = await getDirectorySizeBytes(AppConstants.APP.MANHWAS_DIR)
+        const numDownloads = await dbCountCompletedDownloads(db)
+        setStorageSize(formatBytes(sizeDownloads))
+        setDownloadedChapters(numDownloads)
         setStorageLoading(false)
     }
 
     const deleteStorageData = async () => {
         setStorageLoading(true)
+        await downloadManager.cancelAllDownloads(db)
         await dbDeleteAllDownloads(db)
-        setStorageLoading(false)
         await calculateStorage()
-        setDownloadedChapters(await dbCountRows(db, 'downloads'))
+        setStorageLoading(false)
+        setDownloadedChapters(await dbCountCompletedDownloads(db))
     }
 
     return (

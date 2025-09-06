@@ -17,25 +17,27 @@ import {
 } from "@/helpers/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image as CompressorImage } from 'react-native-compressor';
-import { decode, hasInternetAvailable } from "@/helpers/util";
-import { supabaseKey, supabaseUrl } from "./supabaseKey";
+import { decode } from "@/helpers/util";
 import { createClient } from '@supabase/supabase-js';
-import { ToastMessages } from "@/constants/Messages";
 import * as RNLocalize from 'react-native-localize';
 import * as mime from 'react-native-mime-types';
-import Toast from "react-native-toast-message";
 import { PixelRatio } from "react-native";
+import { Keys } from "./supabaseKey";
 import RNFS from 'react-native-fs';
 
 
-export const supabase = createClient(supabaseUrl, supabaseKey as any, {
-    auth: {
-      storage: AsyncStorage,
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: false,
-    },
-});
+export const supabase = createClient(
+    Keys.SUPABASE_URL,
+    Keys.SUPABASE_KEY,
+    {
+        auth: {
+            storage: AsyncStorage,
+            autoRefreshToken: true,
+            persistSession: true,
+            detectSessionInUrl: false,
+        },
+    }
+);
 
 
 export async function spUpdateUserLastLogin(user_id: string) {
@@ -51,14 +53,12 @@ export async function spUpdateUserLastLogin(user_id: string) {
 
 
 export async function spGetManhwas(p_last_sync: string | null): Promise<ServerManhwa[] | null> {
-    const { data, error } = await supabase
-        .rpc("get_manhwas", { p_last_sync })        
+    const { data, error } = await supabase.rpc("get_manhwas", { p_last_sync })
     
     if (error) {
         console.log("error spGetManhwas", error)
         return null
     }
-    
     return data
 }
 
@@ -66,21 +66,19 @@ export async function spGetManhwas(p_last_sync: string | null): Promise<ServerMa
 export async function spRegisterNewUser(user_id: string, device: string, version: string) {
     const timezone = RNLocalize.getTimeZone()
     const locales = RNLocalize.getLocales()
-    const language = locales.length > 0 ? locales.slice(0, 5).map(i => i.languageTag).join(', ') : null
+    const language = locales.length > 0 ?
+        locales.slice(0, 5).map(i => i.languageTag).join(', ') :
+        null
 
-    try {
-        const { error } = await supabase
-          .from("users")
-          .upsert(
-            [{ user_id, device, version, language, timezone }],
-            { onConflict: "user_id" }
-          );
-        
-        if (error) {
-            console.log("error spNewRun", error)
-        }
-    } catch (error) {
-        console.log("unhandled error spNewRun", error)
+    const { error } = await supabase
+      .from("users")
+      .upsert(
+        [{ user_id, device, version, language, timezone }],
+        { onConflict: "user_id" }
+      );
+    
+    if (error) {
+        console.log("error spNewRun", error)
     }
 }
 
@@ -101,11 +99,10 @@ export async function spFetchManhwaById(manhwa_id: number): Promise<ServerManhwa
 }
 
 
-
 export async function spFetchChapterList(manhwa_id: number): Promise<Chapter[]> {
     const { data, error } = await supabase
         .from("chapters")
-        .select("chapter_id, manhwa_id, chapter_name, chapter_num, created_at")
+        .select("*")
         .eq("manhwa_id", manhwa_id)
         .order("chapter_num", {ascending: true})
 
@@ -119,8 +116,10 @@ export async function spFetchChapterList(manhwa_id: number): Promise<Chapter[]> 
 
 
 export async function spUpdateChapterView(p_chapter_id: number) {
-    const { error } = await supabase
-        .rpc("increment_chapter_view", { p_chapter_id })
+    const { error } = await supabase.rpc(
+        "increment_chapter_view",
+        { p_chapter_id }
+    )
 
     if (error) {
         console.log("error spUpdateChapterView", error)
@@ -144,8 +143,10 @@ export async function spFetchGenres(): Promise<Genre[]> {
 
 
 export async function spUpdateManhwaCardView(p_manhwa_id: number) {
-    const { error } = await supabase
-        .rpc("increment_manhwa_card_view", { p_manhwa_id })
+    const { error } = await supabase.rpc(
+        "increment_manhwa_card_view", 
+        { p_manhwa_id }
+    )
 
     if (error) {
         console.error('error spUpdateManhwaCardView', error);
@@ -154,8 +155,10 @@ export async function spUpdateManhwaCardView(p_manhwa_id: number) {
 
 
 export async function spUpdateManhwaViews(p_manhwa_id: number) {
-    const { error } = await supabase
-        .rpc('increment_manhwa_views', { p_manhwa_id  });
+    const { error } = await supabase.rpc(
+        'increment_manhwa_views', 
+        { p_manhwa_id  }
+    );
 
     if (error) {
         console.error('error spUpdateMangaViews', error);
@@ -172,11 +175,6 @@ export async function spFetchChapterImages(chapter_id: number): Promise<ChapterI
 
     if (error) {
         console.log("error spFetchChapterImages", error)
-        const hasInternet = await hasInternetAvailable()
-        Toast.show(!hasInternet ? 
-            ToastMessages.EN.UNABLE_TO_LOAD_IMAGES_INTERNET : 
-            ToastMessages.EN.UNABLE_TO_LOAD_IMAGES
-        )
         return []
     }    
     
@@ -188,31 +186,10 @@ export async function spFetchChapterImages(chapter_id: number): Promise<ChapterI
 }
 
 
-export async function spFetchChapterImagesUrls(chapter_id: number): Promise<string[]> {
-    const { data, error } = await supabase
-        .from("chapter_images")
-        .select("image_url")
-        .eq("chapter_id", chapter_id)
-        .order('index', {ascending: true})
-
-    if (error) {
-        console.log("error spFetchChapterImages", error)
-        const hasInternet = await hasInternetAvailable()
-        Toast.show(!hasInternet ? 
-            ToastMessages.EN.UNABLE_TO_LOAD_IMAGES_INTERNET : 
-            ToastMessages.EN.UNABLE_TO_LOAD_IMAGES
-        )
-        return []
-    }    
-    
-    return data.map(i => i.image_url)
-}
-
-
 export async function spSendRequestPornhwaForm(manhwa: string, message: string | null) {
     const { error } = await supabase
         .from("manhwa_requests")
-        .insert([{manhwa, message}])
+        .insert([{ manhwa, message }])
 
     if (error) {
         console.log("error spRequestManhwa")
@@ -229,7 +206,7 @@ export async function spSendBugReportForm(
 ): Promise<number | null> {
     const { data, error } = await supabase
         .from("bug_reports")
-        .insert([{title, descr, bug_type, device, has_images}])
+        .insert([{ title, descr, bug_type, device, has_images }])
         .select("bug_id")
         .single()
     
@@ -247,18 +224,25 @@ export async function spFetchDonationMethods(): Promise<DonateMethod[]> {
         .from("app_infos")
         .select("name, value, action, created_at")
         .eq("type", "donation")
-        .order("created_at", {ascending: true})
+        .order("created_at", { ascending: true })
 
     if (error) {
         console.log("error spGetDonationMethods", error)
         return []
     }
 
-    return data.map(i => {return {action: i.action, method: i.name, value: i.value}})
+    return data.map(i => {return {
+        action: i.action, 
+        method: i.name, 
+        value: i.value
+    }})
 }
 
 
-function normalizeRandomManhwaCardHeight(width: number, height: number): {
+function normalizeRandomManhwaCardHeight(
+    width: number, 
+    height: number
+): {
   normalizedWidth: number, 
   normalizedHeight: number
 } {
@@ -271,6 +255,7 @@ function normalizeRandomManhwaCardHeight(width: number, height: number): {
   normalizedWidth = normalizedWidth > AppConstants.MEDIA.RANDOM_MANHWAS.MAX_WIDTH ?
     AppConstants.MEDIA.RANDOM_MANHWAS.MAX_WIDTH : 
     normalizedWidth
+
   return { normalizedWidth, normalizedHeight}
 }
 
@@ -280,8 +265,10 @@ export async function spFetchRandomManhwaCards(p_limit: number = 30): Promise<Ma
         return await spFetchLatestManhwaCardsDebug(0, p_limit)
     }
     
-    const { data, error } = await supabase
-        .rpc("get_random_cards", { p_limit })
+    const { data, error } = await supabase.rpc(
+        "get_random_cards", 
+        { p_limit }
+    )
 
     if (error) {
         console.log("error spFetchRandomManhwaCards", error)
@@ -289,11 +276,15 @@ export async function spFetchRandomManhwaCards(p_limit: number = 30): Promise<Ma
     }    
     
     return (data as ManhwaCard[]).map(i => {
-        const { 
-            normalizedWidth, 
-            normalizedHeight 
+        const {
+            normalizedWidth,
+            normalizedHeight
         } = normalizeRandomManhwaCardHeight(i.width, i.height)
-        return {...i, normalizedWidth, normalizedHeight}}
+        return {
+            ...i,
+            normalizedWidth,
+            normalizedHeight
+        }}
     )
 }
 
@@ -339,7 +330,10 @@ export async function spFetchScans(): Promise<Scan[]> {
         return []
     }
     
-    return data.map(s => {return {name: s.name, url: s.value}})
+    return data.map(s => {return {
+        name: s.name, 
+        url: s.value
+    }})
 }
 
 
@@ -378,8 +372,10 @@ export async function spFetchCollectionItems(
     p_offset: number = 0,
     p_limit: number = 30
 ): Promise<Manhwa[]> {
-    const { data, error } = await supabase
-        .rpc('get_manhwas_by_collection', { p_collection_id, p_offset, p_limit })
+    const { data, error } = await supabase.rpc(
+        'get_manhwas_by_collection', 
+        { p_collection_id, p_offset, p_limit }
+    )
 
     if (error) {
         console.log('error spFetchCollectionItems', error)
@@ -425,8 +421,7 @@ export const spSendBugScreenshot = async (uri: string, bug_id: string, index: nu
             });
         
         await RNFS.unlink(compressedUri);
-
-        if (error) throw error;            
+        if (error) throw error;
     } catch (error: any) {
         console.error('error uploadToSupabase', error);
     }        
@@ -455,7 +450,6 @@ export async function spFetchReleasesAndSourceCode(): Promise<ReleaseWrapper> {
 
     return {releases, source}
 }
-
 
 
 export async function spFetchNews(p_offset: number = 0, p_limit: number = 30): Promise<Post[]> {
@@ -547,7 +541,6 @@ export async function spFetchManhwaCoverImage(manhwa_id: number): Promise<string
 }
 
 
-
 export async function spFetchCardAndCover(manhwa_id: number): Promise<DebugManhwaImages> {
     const { data, error } = await supabase
         .from("manhwas")
@@ -568,7 +561,12 @@ export async function spFetchCardAndCover(manhwa_id: number): Promise<DebugManhw
             manhwa_id
         }
     } catch (error) {
-        return {title: data.title, cover : data.cover_image_url, card: null, manhwa_id }
+        return {
+            title: data.title, 
+            cover : data.cover_image_url, 
+            card: null, 
+            manhwa_id 
+        }
     }
 }
 
@@ -601,7 +599,12 @@ export async function spFetchCardAndCoverSearch(p_search_text: string, p_offset:
                 manhwa_id: c.manhwa_id,
             }
         } catch (error) {
-            return {title: c.title, cover : c.cover_image_url, card: null, manhwa_id: c.manhwa_id }
+            return {
+                title: c.title, 
+                cover : c.cover_image_url, 
+                card: null, 
+                manhwa_id: c.manhwa_id 
+            }
         }
     })
 }
@@ -635,7 +638,12 @@ export async function spFetchCardAndCoverLatest(p_limit: number = 32): Promise<D
                 manhwa_id: c.manhwa_id,
             }
         } catch (error) {
-            return {title: c.title, cover : c.cover_image_url, card: null, manhwa_id: c.manhwa_id }
+            return {
+                title: c.title,
+                cover : c.cover_image_url,
+                card: null,
+                manhwa_id: c.manhwa_id
+            }
         }
     })
 }
@@ -644,7 +652,10 @@ export async function spFetchCardAndCoverLatest(p_limit: number = 32): Promise<D
 export async function spUpdateManhwaRating(manhwa_id: number, rating: number, user_id: string) {    
     const { error } = await supabase
         .from("manhwa_ratings")
-        .upsert([{ manhwa_id, rating, user_id}], { onConflict: "manhwa_id, user_id" })
+        .upsert(
+            [{ manhwa_id, rating, user_id}],
+            { onConflict: "manhwa_id, user_id" }
+        )
 
     if (error) {
         console.log(error)

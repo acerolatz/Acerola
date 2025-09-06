@@ -1,31 +1,30 @@
 import { 
     Keyboard, 
     KeyboardAvoidingView, 
-    Platform, 
     StyleSheet, 
     Text, 
     TextInput, 
     View 
 } from 'react-native'
 import ReturnButton from '../components/buttons/ReturnButton'
+import { router, useLocalSearchParams } from 'expo-router'
+import { dbReadNote, dbUpdateNote } from '@/lib/database'
 import { formatTimestampWithHour1 } from '@/helpers/util'
 import { AppConstants } from '@/constants/AppConstants'
-import { yupResolver } from '@hookform/resolvers/yup';
-import { Controller, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup'
+import { Controller, useForm } from 'react-hook-form'
 import { ToastMessages } from '@/constants/Messages'
 import { Typography } from '@/constants/typography'
+import React, { useEffect, useState } from 'react'
 import Button from '../components/buttons/Button'
-import { useSQLiteContext } from 'expo-sqlite'
 import Toast from 'react-native-toast-message'
-import { dbInsertNote } from '@/lib/database'
+import { useSQLiteContext } from 'expo-sqlite'
 import { AppStyle } from '@/styles/AppStyle'
 import { Colors } from '@/constants/Colors'
 import { SafeAreaView } from 'react-native'
 import TopBar from '../components/TopBar'
-import React, { useState } from 'react'
 import Row from '../components/util/Row'
-import { router } from 'expo-router'
-import * as yup from 'yup';
+import * as yup from 'yup'
 
 
 interface FormData {
@@ -45,16 +44,31 @@ const schema = yup.object().shape({
 });
 
 
-const CreateNotePage = () => {
+const UpdateNotePage = () => {
 
     const db = useSQLiteContext()
-    const [loading, setLoading] = useState(false) 
+    const params = useLocalSearchParams()
+    const note_id = params.note_id as any
     const date = formatTimestampWithHour1(new Date().toString())
+
+    useEffect(
+        () => {
+            const init = async () => {
+                const n = await dbReadNote(db, note_id)
+                if (n) {
+                    resetForm({title: n.title, content: n.content})
+                }
+            }   
+            init()
+        },
+        []
+    )
 
     const {
         control,
         handleSubmit,
-        formState: { errors }        
+        formState: { errors },
+        reset: resetForm
     } = useForm<FormData>({
         resolver: yupResolver(schema as any),
         defaultValues: {            
@@ -64,11 +78,14 @@ const CreateNotePage = () => {
     });
 
     const onSubmit = async (form_data: FormData) => {
-        Keyboard.dismiss()        
-        setLoading(true)
-        await dbInsertNote(db, form_data.title.trim(), form_data.content.trim())
+        Keyboard.dismiss()
+        await dbUpdateNote(
+            db,
+            note_id,
+            form_data.title,
+            form_data.content
+        )
         Toast.show(ToastMessages.EN.GENERIC_SUCCESS)
-        setLoading(false)
         router.back()
     };
 
@@ -105,9 +122,9 @@ const CreateNotePage = () => {
                         <TextInput
                             style={styles.contetInput}
                             autoCapitalize='sentences'
+                            textAlignVertical='top'
                             placeholder='Start typing...'
                             placeholderTextColor={Colors.primary}
-                            textAlignVertical='top'
                             onBlur={onBlur}
                             multiline={true}
                             onChangeText={onChange}
@@ -120,7 +137,7 @@ const CreateNotePage = () => {
     )
 }
 
-export default CreateNotePage
+export default UpdateNotePage
 
 const styles = StyleSheet.create({
     container: {
@@ -135,6 +152,6 @@ const styles = StyleSheet.create({
     contetInput: {
         ...Typography.regular,
         flex: 1,
-        paddingBottom: 20        
+        paddingBottom: 20
     }
 })

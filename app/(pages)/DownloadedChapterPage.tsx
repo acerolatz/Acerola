@@ -1,16 +1,15 @@
-import { dbAddNumericInfo, dbUpsertManhwaReadingHistory } from '@/lib/database'
-import ChapterHeader from '@/app/components/chapter/ChapterHeader'
+import { dbAddNumericInfo, dbReadChapterImages, dbUpsertManhwaReadingHistory } from '@/lib/database'
 import ChapterReader from '@/app/components/chapter/ChapterReader'
+import ChapterHeader from '@/app/components/chapter/ChapterHeader'
 import { ChapterImage, DownloadRecord } from '@/helpers/types'
 import React, { useEffect, useMemo, useState } from 'react'
-import { spUpdateChapterView } from '@/lib/supabase'
 import { useChapterState } from '@/hooks/chapterState'
+import { spUpdateChapterView } from '@/lib/supabase'
 import { useLocalSearchParams } from 'expo-router'
 import { StyleSheet, View } from 'react-native'
 import { useSQLiteContext } from 'expo-sqlite'
 import { Colors } from '@/constants/Colors'
 import { Image } from 'expo-image'
-import { readDirImages } from '@/helpers/storage'
 
 
 const DownloadedChapterPage = () => {  
@@ -36,8 +35,10 @@ const DownloadedChapterPage = () => {
       ) { return }
       async function init() {
         setLoading(true)
-          await Image.clearMemoryCache()
-          const imgs: ChapterImage[] = await readDirImages(currentChapter.path)
+          const [imgs,] = await Promise.all([
+            dbReadChapterImages(db, currentChapter.chapter_id),
+            Image.clearMemoryCache()
+          ])
 
           if (imgs.length === 0) { 
             setImages([])
@@ -49,9 +50,10 @@ const DownloadedChapterPage = () => {
 
           await Promise.all([
             dbUpsertManhwaReadingHistory(db, currentChapter.manhwa_id, currentChapter.chapter_id),
-            spUpdateChapterView(currentChapter.chapter_id),
             dbAddNumericInfo(db, 'images', imgs.length)            
           ])
+          
+          spUpdateChapterView(currentChapter.chapter_id)
 
           setImages(imgs)
         setLoading(false)
@@ -77,12 +79,12 @@ const DownloadedChapterPage = () => {
 
   return (
     <View style={styles.container} >
-        <ChapterReader 
-            images={data}
-            manhwaTitle={manhwaTitle}
-            listHeader={listHeader}
-            loading={loading}
-        />
+      <ChapterReader
+        images={data}
+        manhwaTitle={manhwaTitle}
+        listHeader={listHeader}
+        loading={loading}
+      />
     </View>
   )
 }

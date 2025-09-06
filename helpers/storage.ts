@@ -68,18 +68,18 @@ export async function clearFolder(folderUri: string): Promise<void> {
 
 
 export const downloadImages = async (
-  urls: string[], 
+  images: ChapterImage[], 
   path: string,
   onProgress?: (progress: DownloadProgress) => boolean
-): Promise<void> => {
+) => {
   
   await clearFolder(path)
   let completed = 0;
   let shouldStop = false
-  const total = urls.length;
-  const downloadedPaths: string[] = new Array(total);
+  const total = images.length;
 
   const downloadImage = async (url: string, index: number) => {
+    if (shouldStop) { return }
     const fileExt = url.split('.').pop()?.split('?')[0] || 'jpg';
     const filePath = `${path}/image_${index + 1}.${fileExt}`;
     await RNFS.downloadFile({
@@ -99,7 +99,7 @@ export const downloadImages = async (
       },
       progressDivider: 10,
     }).promise;
-    downloadedPaths[index] = filePath;
+    images[index].image_url = filePath;
     completed++;
     if (onProgress) {
       shouldStop = onProgress({
@@ -111,15 +111,15 @@ export const downloadImages = async (
   };
 
   const pool: Promise<void>[] = [];
-  for (let i = 0; i < urls.length; i++) {
-    if (shouldStop) { return }
-    const promise = downloadImage(urls[i], i);
+  for (let i = 0; i < images.length; i++) {
+    if (shouldStop) { return [] }
+    const promise = downloadImage(images[i].image_url, i);
     pool.push(promise);
     if (pool.length >= 8) {
       await Promise.race(pool);
       for (let j = pool.length - 1; j >= 0; j--) {
         if ((pool[j] as any).resolved) pool.splice(j, 1);
-        if (shouldStop) { return }
+        if (shouldStop) { return [] }
       }
     }
   }

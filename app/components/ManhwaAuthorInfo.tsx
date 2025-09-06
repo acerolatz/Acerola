@@ -17,8 +17,8 @@ interface ManhwaAuthorInfoProps {
 
 const ManhwaAuthorInfo = ({manhwa}: ManhwaAuthorInfoProps) => {
   
-  const router = useRouter()
   const db = useSQLiteContext()  
+  const router = useRouter()
   const [authors, setAuthors] = useState<ManhwaAuthor[]>([])
   const flatListRef = useRef<FlatList>(null)  
   
@@ -65,7 +65,6 @@ const ManhwaAuthorInfo = ({manhwa}: ManhwaAuthorInfoProps) => {
       />
     </Row>
   )
-
 }
 
 export default ManhwaAuthorInfo;

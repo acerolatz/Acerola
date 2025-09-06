@@ -3,10 +3,9 @@
 export const ToastMessages = {
     EN: {
         NO_INTERNET: {
-            text1: 'Hey', 
-            text2: "You have no internet!", 
+            text1: "You have no internet!",
             type: "info",
-            visibilityTime: 3500
+            visibilityTime: 3000
         },
         UNABLE_TO_LOAD_IMAGES_INTERNET: {
             text1: "Unable to load images", 

@@ -20,6 +20,8 @@ const ManhwaAlternativeNames = ({names}: AltNamesProps) => {
         return <Item item={item} isLast={index >= names.length - 1} />
     }, [])
 
+    const KeyExtractor = useCallback((item: string) => item, [])
+
     if (names.length === 0) { return <></> }
 
     return (
@@ -27,7 +29,7 @@ const ManhwaAlternativeNames = ({names}: AltNamesProps) => {
             <FlatList
                 data={names}
                 showsHorizontalScrollIndicator={false}
-                keyExtractor={(item) => item}
+                keyExtractor={KeyExtractor}
                 horizontal={true}
                 renderItem={renderItem}
             />

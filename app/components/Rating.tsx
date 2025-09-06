@@ -1,11 +1,11 @@
-import React, { useCallback, useState } from 'react'
 import { StyleSheet, View, Text, Pressable } from 'react-native'
+import { AppConstants } from '@/constants/AppConstants'
+import React, { useCallback, useState } from 'react'
+import { Typography } from '@/constants/typography'
 import Ionicons from '@expo/vector-icons/Ionicons'
-import Row from './util/Row'
 import { Colors } from '@/constants/Colors'
 import { MotiView } from 'moti'
-import { AppConstants } from '@/constants/AppConstants'
-import { Typography } from '@/constants/typography'
+import Row from './util/Row'
 
 
 interface RatingProps {

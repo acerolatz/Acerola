@@ -1,8 +1,8 @@
-import { FlatList, StyleSheet } from 'react-native'
-import React from 'react'
-import { Todo } from '@/helpers/types'
-import TodoComponent from './TodoComponent'
 import CreateTodoComponent from './CreateTodoComponent'
+import { FlatList, StyleSheet } from 'react-native'
+import TodoComponent from './TodoComponent'
+import React, { useCallback } from 'react'
+import { Todo } from '@/helpers/types'
 import Footer from './util/Footer'
 
 
@@ -11,13 +11,21 @@ interface TasksProps {
     setTodos: React.Dispatch<React.SetStateAction<Todo[]>>
 }
 
+
 const Tasks = ({todos, setTodos}: TasksProps) => {
+
+    const KeyExtractor = useCallback((item: Todo) => item.todo_id.toString(), [])
+
+    const renderItem = useCallback(
+        ({item}: {item: Todo}) => <TodoComponent todo={item} setTodos={setTodos} />,
+        []
+    )
 
     return (
         <FlatList
             data={todos}
-            keyExtractor={(item) => item.todo_id.toString()}
-            renderItem={({item}) => <TodoComponent todo={item} setTodos={setTodos} />}
+            keyExtractor={KeyExtractor}
+            renderItem={renderItem}
             keyboardShouldPersistTaps='always'
             showsVerticalScrollIndicator={false}
             ListHeaderComponent={<CreateTodoComponent setTodos={setTodos} />}
@@ -26,6 +34,5 @@ const Tasks = ({todos, setTodos}: TasksProps) => {
     )
 }
 
-export default Tasks
 
-const styles = StyleSheet.create({})
+export default Tasks

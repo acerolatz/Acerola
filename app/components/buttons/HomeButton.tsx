@@ -9,7 +9,7 @@ import React from 'react'
 interface HomeButtonProps {
   size?: number
   color?: string
-  iconName?: string
+  iconName?: keyof typeof Ionicons.glyphMap
   backgroundColor?: string
 }
 

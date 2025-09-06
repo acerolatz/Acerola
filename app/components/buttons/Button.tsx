@@ -6,7 +6,7 @@ import React from 'react'
 
 
 interface ButtonProps {
-  iconName: string
+  iconName: keyof typeof Ionicons.glyphMap
   onPress?: () => any
   iconColor?: string
 }

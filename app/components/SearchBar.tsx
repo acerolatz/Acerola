@@ -1,7 +1,7 @@
 import { AppConstants } from '@/constants/AppConstants'
-import { Colors } from '@/constants/Colors'
-import { AppStyle } from '@/styles/AppStyle'
 import Ionicons from '@expo/vector-icons/Ionicons'
+import { AppStyle } from '@/styles/AppStyle'
+import { Colors } from '@/constants/Colors'
 import React, { useRef } from 'react'
 import { 
     Pressable, 

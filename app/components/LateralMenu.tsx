@@ -1,10 +1,15 @@
 import { AppConstants } from '@/constants/AppConstants'
+import { Typography } from '@/constants/typography'
 import { dbGetCacheMaxSize } from '@/lib/database'
 import { useSQLiteContext } from 'expo-sqlite'
+import MenuButton from './buttons/MenuButton'
 import { AppStyle } from '@/styles/AppStyle'
+import CloseBtn from './buttons/CloseButton'
+import React, { useCallback } from 'react'
 import { openUrl } from '@/helpers/util'
 import { router } from 'expo-router'
-import React from 'react'
+import Footer from './util/Footer'
+import TopBar from './TopBar'
 import {
     Pressable,
     SafeAreaView,
@@ -13,56 +18,7 @@ import {
     Text,
     View
 } from 'react-native'
-import CloseBtn from './buttons/CloseButton'
-import TopBar from './TopBar'
-import Footer from './util/Footer'
-import { Typography } from '@/constants/typography'
-import MenuButton from './buttons/MenuButton'
 
-
-const readingHistoryPage = () => {
-    router.navigate("/(pages)/ReadingHistoryPage")
-}
-
-const libraryPage = () => {
-    router.navigate("/(pages)/LibraryPage")
-}
-
-const scansPage = () => {
-    router.navigate("/(pages)/ScansPage")
-}
-
-const openDonate = () => {
-    router.navigate("/(pages)/DonatePage")
-}
-
-const openBugReport = () => {
-    router.navigate("/(pages)/BugReportPage")
-}
-
-const openDisclaimer = () => {
-    router.navigate("/(pages)/EulaDisclaimerPage")
-}
-
-const openPornhwaRequest = () => {
-    router.navigate("/(pages)/RequestManhwaPage")
-}
-
-const openReddit = async () => {
-    await openUrl(AppConstants.URLS.PORNHWA_REDDIT)
-}
-
-const openReleases = () => {
-    router.navigate("/(pages)/ReleasesPage")
-}
-
-const openNewsPage = () => {
-    router.navigate("/(pages)/NewsPage")
-}
-
-const openDownloads = () => {
-    router.navigate("/(pages)/DownloadPage")
-}
 
 interface LateralMenuProps {
     closeMenu: () => any
@@ -79,6 +35,50 @@ const LateralMenu = ({closeMenu}: LateralMenuProps) => {
             params: { cache_size }
         })
     }
+
+    const readingHistoryPage = useCallback(() => {
+        router.navigate("/(pages)/ReadingHistoryPage")
+    }, [])
+
+    const libraryPage = useCallback(() => {
+        router.navigate("/(pages)/LibraryPage")
+    }, [])
+
+    const scansPage = useCallback(() => {
+        router.navigate("/(pages)/ScansPage")
+    }, [])
+
+    const openDonate = useCallback(() => {
+        router.navigate("/(pages)/DonatePage")
+    }, [])
+
+    const openBugReport = useCallback(() => {
+        router.navigate("/(pages)/BugReportPage")
+    }, [])
+
+    const openDisclaimer = useCallback(() => {
+        router.navigate("/(pages)/EulaDisclaimerPage")
+    }, [])
+
+    const openPornhwaRequest = useCallback(() => {
+        router.navigate("/(pages)/RequestManhwaPage")
+    }, [])
+
+    const openReddit = useCallback(async () => {
+        await openUrl(AppConstants.URLS.PORNHWA_REDDIT)
+    }, [])
+
+    const openReleases = useCallback(() => {
+        router.navigate("/(pages)/ReleasesPage")
+    }, [])
+
+    const openNewsPage = useCallback(() => {
+        router.navigate("/(pages)/NewsPage")
+    }, [])
+
+    const openDownloads = useCallback(() => {
+        router.navigate("/(pages)/DownloadPage")
+    }, [])
 
     return (
         <SafeAreaView style={AppStyle.safeArea} >

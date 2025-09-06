@@ -1,5 +1,6 @@
 import { 
     dbCheckPassword, 
+    dbDeleteNote, 
     dbReadNotes, 
     dbReadTodos, 
     dbSetLastDatabaseSync, 
@@ -67,9 +68,12 @@ const SafeModeHomePage = () => {
         setNotes(n)
     }
 
-    useFocusEffect(useCallback(() => {
-        reload()
-    }, []))
+    useFocusEffect(useCallback(() => {reload()}, []))
+
+    const deleteNote = useCallback(async (note: Note) => {
+        await dbDeleteNote(db, note.note_id)
+        setNotes(prev => prev.filter(i => i.note_id != note.note_id))
+    }, [])
 
     const checkPassword = async () => {
         if (isCheckingPassword.current) { return }
@@ -111,7 +115,7 @@ const SafeModeHomePage = () => {
             <Tasks todos={todos} setTodos={setTodos} />
         </View>,
         <View style={styles.container} >
-            <Notes notes={notes} setNotes={setNotes} />
+            <Notes notes={notes} deleteNote={deleteNote} />
         </View>      
     ];
 

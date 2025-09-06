@@ -1,13 +1,8 @@
 import { Pressable, StyleSheet, Text } from 'react-native'
-import { getChapterGridNumColumns } from '@/helpers/util'
 import { AppConstants } from '@/constants/AppConstants'
 import { Typography } from '@/constants/typography'
 import { Colors } from '@/constants/Colors'
 import React from 'react'
-
-
-const NUM_COLUMNS = getChapterGridNumColumns()
-const ITEM_SIZE = Math.floor((AppConstants.UI.SCREEN.VALID_WIDTH - AppConstants.UI.MARGIN * (NUM_COLUMNS - 1)) / NUM_COLUMNS)
 
 
 interface ChapterGridItemProps {
@@ -16,6 +11,7 @@ interface ChapterGridItemProps {
   index: number
   manhwaColor: string
   onPress: (index: number) => void
+  itemSize: number
 }
 
 
@@ -24,7 +20,8 @@ const ChapterGridItem = ({
   chapterName,
   index,
   manhwaColor,
-  onPress  
+  onPress,
+  itemSize
 }: ChapterGridItemProps) => {
   const backgroundColor = isReaded ? manhwaColor : Colors.backgroundSecondary
   const color = isReaded ? Colors.backgroundSecondary : Colors.white
@@ -32,8 +29,13 @@ const ChapterGridItem = ({
   return (
     <Pressable
       onPress={() => onPress(index)}
-      style={[styles.chapterItem, {backgroundColor}]} >
-          <Text style={[Typography.light, {color}]}>{chapterName}</Text>
+      style={{
+        ...styles.chapterItem, 
+        width: itemSize, 
+        height: itemSize, 
+        backgroundColor
+      }} >
+        <Text style={{...Typography.light, color}}>{chapterName}</Text>
     </Pressable>
   )
 }
@@ -43,9 +45,7 @@ export default ChapterGridItem
 
 
 const styles = StyleSheet.create({
-  chapterItem: {    
-    width: ITEM_SIZE, 
-    height: ITEM_SIZE, 
+  chapterItem: {
     borderRadius: AppConstants.UI.BORDER_RADIUS, 
     alignItems: "center", 
     justifyContent: "center"    

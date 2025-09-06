@@ -1,5 +1,7 @@
 import { 
   Author,
+  Chapter,
+  ChapterImage,
   DebugInfo,  
   DownloadRecord,  
   DownloadRequest,  
@@ -17,6 +19,8 @@ import {
 } from '@/helpers/types';
 import {
   asyncPool,
+  countChar,
+  createRowPlaceholder,
   dbGetSupportedAbis, 
   formatBytes, 
   getCacheSizeBytes, 
@@ -164,6 +168,17 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
     progress INTEGER DEFAULT 0,
     created_at INTEGER NOT NULL 
   );
+
+  CREATE TABLE IF NOT EXISTS images (
+    image_id INTEGER PRIMARY KEY,
+    chapter_id INTEGER NOT NULL,
+    path TEXT NOT NULL UNIQUE,
+    width INTEGER NOT NULL,
+    height INTEGER NOT NULL,
+    img_index INTEGER NOT NULL,
+    CONSTRAINT images_chapter_id_fkey FOREIGN KEY (chapter_id) REFERENCES downloads (chapter_id) ON UPDATE CASCADE ON DELETE CASCADE
+  );
+
   -- ===============================
 
   -- ===============================
@@ -185,6 +200,7 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
   CREATE INDEX IF NOT EXISTS idx_manhwas_updated_at ON manhwas(updated_at DESC);
 
   CREATE INDEX IF NOT EXISTS idx_downloads_cover ON downloads(status, created_at, manhwa_id);
+  CREATE INDEX IF NOT EXISTS idx_images_chapter_index ON images (chapter_id, img_index);
 
   -- ================================
   
@@ -198,7 +214,7 @@ export async function dbMigrate(db: SQLite.SQLiteDatabase) {
       downloads 
     SET 
       status = 'pending' 
-    WHERE 
+    WHERE
       status IN ('downloading', 'cancelled', 'failed');
     
     INSERT OR REPLACE INTO 
@@ -265,7 +281,8 @@ export async function dbDeleteIndexes(db: SQLite.SQLiteDatabase) {
           'idx_alt_titles',
           'idx_alt_titles_manhwa',
           'idx_manhwas_updated_at',
-          'idx_downloads_cover'
+          'idx_downloads_cover',
+          'idx_images_chapter_index'
         );
     `
   ).catch(error => console.log("error dbDeleteIndexes", error))
@@ -338,7 +355,7 @@ export async function dbShouldClearCache(db: SQLite.SQLiteDatabase): Promise<boo
 
 export async function dbCountRows(db: SQLite.SQLiteDatabase, table: string): Promise<number> {
   const r = await db.getFirstAsync<{total: number}>(
-    `SELECT count(*) as total FROM  ${table};`
+    `SELECT count(*) as total FROM ${table};`
   )
   return r ? r.total : 0
 }
@@ -354,7 +371,7 @@ async function dbGetTotalSizeMiB(db: SQLite.SQLiteDatabase): Promise<number | nu
   const r = await db.getFirstAsync<{total_size_mb: number}>(
     `
       SELECT 
-        CAST(page_count * page_size AS REAL) / 1024 / 1024 as total_size_mb 
+        CAST(page_count * page_size AS REAL) / 1024 / 1024 as total_size_mb
       FROM 
         pragma_page_count(), 
         pragma_page_size();
@@ -393,7 +410,9 @@ export async function dbListTable(db: SQLite.SQLiteDatabase, table: string) {
 
 
 export async function dbCleanTable(db: SQLite.SQLiteDatabase, table: string) {
-  await db.runAsync(`DELETE FROM ${table};`).catch(error => console.log(`error dbCleanTable ${table}`, error))
+  await db
+    .runAsync(`DELETE FROM ${table};`)
+    .catch(error => console.log(`error dbCleanTable ${table}`, error))
 }
 
 
@@ -502,7 +521,7 @@ export async function dbHandleFirstRun(db: SQLite.SQLiteDatabase) {
 }
 
 
-export async function dbGetManhwaAltNames(db: SQLite.SQLiteDatabase, manhwa_id: number): Promise<string[]> {
+export async function dbReadManhwaAltNames(db: SQLite.SQLiteDatabase, manhwa_id: number): Promise<string[]> {
   const r = await db.getAllAsync<{title: string}>(
     'SELECT title FROM alt_titles WHERE manhwa_id = ?;',
     [manhwa_id]
@@ -598,27 +617,29 @@ async function dbUpsertManhwas(db: SQLite.SQLiteDatabase, manhwas: Manhwa[]) {
     i.views,    
     i.updated_at,
   ]);  
-  await db.runAsync(`    
-    INSERT INTO manhwas (
-        manhwa_id, 
-        title,
-        descr,
-        cover_image_url,
-        status,
-        color,
-        views,
-        updated_at
-    )
-    VALUES ${placeholders};
-    ON CONFLICT 
-      (manhwa_id)
-    DO UPDATE SET
-      title = EXCLUDED.title,
-      descr = EXCLUDED.descr,
-      cover_image_url = EXCLUDED.cover_image_url,
-      color = EXCLUDED.color,
-      views = EXCLUDED.views,
-      updated_at = EXCLUDED.updated_at;`, 
+  await db.runAsync(
+    `
+      INSERT INTO manhwas (
+          manhwa_id, 
+          title,
+          descr,
+          cover_image_url,
+          status,
+          color,
+          views,
+          updated_at
+      )
+      VALUES ${placeholders};
+      ON CONFLICT 
+        (manhwa_id)
+      DO UPDATE SET
+        title = EXCLUDED.title,
+        descr = EXCLUDED.descr,
+        cover_image_url = EXCLUDED.cover_image_url,
+        color = EXCLUDED.color,
+        views = EXCLUDED.views,
+        updated_at = EXCLUDED.updated_at;
+    `,
     params
   ).catch(error => console.log("error dbUpsertManhwas", error));
 }
@@ -637,24 +658,22 @@ async function dbUpsertManhwas(db: SQLite.SQLiteDatabase, manhwas: Manhwa[]) {
  * @param onConflict - Optional SQL clause for handling conflicts, e.g., `ON CONFLICT(...) DO UPDATE SET ...`
  * @returns A promise that resolves when all batches have been processed
  */
-async function dbUpsertBatch(
+export async function dbUpsertBatch(
   db: SQLite.SQLiteDatabase,
   params: any[],
   table: string,
   columns: string,
-  rowPlaceholder: string,
-  numColumns: number,
   onConflict?: string
-) {
-
-  if (numColumns === 0 || params.length % numColumns != 0) {
-    console.log("invalid numColumns", params.length, numColumns)
-    return
-  }
-
+): Promise<boolean> {
   const MAX_PARAMS = 900
+  const { rowPlaceholder, numColumns } = createRowPlaceholder(columns)
   const CHUNK_SIZE = Math.floor(MAX_PARAMS / numColumns)
   const STEP = CHUNK_SIZE * numColumns
+
+  if (params.length % numColumns != 0) {
+    console.log("invalid numColumns", table, columns, params.length, numColumns)
+    return false
+  }
 
   for (let i = 0; i < params.length; i += STEP) {
     const chunk = params.slice(i, i + STEP)
@@ -670,11 +689,13 @@ async function dbUpsertBatch(
           ${onConflict ?? ''};
         `,
         chunk
-      )
+      )      
     } catch (error) {
       console.log(`error dbUpsertBatch ${table}`, error)
+      return false
     }
   }
+  return true
 }
 
 
@@ -811,8 +832,8 @@ export async function dbSyncDatabase(db: SQLite.SQLiteDatabase): Promise<number>
 
   const authors: AuthorSet = new AuthorSet()
   const genres: GenreSet = new GenreSet()
-  const manhwaAuthors: any[] = []
-  const manhwaGenres: any[] = []
+  const manhwaAuthors: (number | string)[] = []
+  const manhwaGenres: (number | string)[] = []
   const ratings: (number | string)[] = []
   const altTitles: (number | string)[] = []
 
@@ -853,8 +874,6 @@ export async function dbSyncDatabase(db: SQLite.SQLiteDatabase): Promise<number>
       altTitles,
       'alt_titles',
       'manhwa_id, title',
-      '(?,?)',
-      2,
       'ON CONFLICT (manhwa_id, title) DO NOTHING'
     ), 
     dbUpsertBatch(
@@ -862,8 +881,6 @@ export async function dbSyncDatabase(db: SQLite.SQLiteDatabase): Promise<number>
       authors.values().flatMap(a => [a.author_id, a.name, a.role]),
       'authors',
       'author_id, name, role',
-      '(?,?,?)',
-      3,
       'ON CONFLICT (author_id) DO UPDATE SET name = EXCLUDED.name, role = EXCLUDED.role'
     ),
     dbUpsertBatch(
@@ -871,8 +888,6 @@ export async function dbSyncDatabase(db: SQLite.SQLiteDatabase): Promise<number>
       ratings,
       'manhwa_ratings',
       'manhwa_id, rating, total_rating',
-      '(?,?,?)',
-      3,
       'ON CONFLICT (manhwa_id) DO UPDATE SET rating = EXCLUDED.rating, total_rating = EXCLUDED.total_rating'
     )
   ])
@@ -883,8 +898,6 @@ export async function dbSyncDatabase(db: SQLite.SQLiteDatabase): Promise<number>
       manhwaAuthors,
       'manhwa_authors',
       'author_id, manhwa_id, role',
-      '(?,?,?)',
-      3,
       'ON CONFLICT (author_id, manhwa_id, role) DO NOTHING'
     ),
     dbUpsertBatch(
@@ -892,8 +905,6 @@ export async function dbSyncDatabase(db: SQLite.SQLiteDatabase): Promise<number>
       manhwaGenres,
       'manhwa_genres',
       'genre_id, manhwa_id',
-      '(?,?)',
-      2,
       'ON CONFLICT (genre_id, manhwa_id) DO NOTHING'
     )
   ])
@@ -2212,7 +2223,7 @@ export async function dbInsertNote(
 }
 
 
-export async function dbUpdateNote(db: SQLite.SQLiteDatabase, note: Note) {
+export async function dbUpdateNote(db: SQLite.SQLiteDatabase, note_id: number, title: string, content: string) {
   await db.runAsync(
     `
       UPDATE 
@@ -2224,7 +2235,7 @@ export async function dbUpdateNote(db: SQLite.SQLiteDatabase, note: Note) {
       WHERE
         note_id = ?;
     `,
-    [note.title, note.content, Date.now(), note.note_id]
+    [title, content, Date.now(), note_id]
   ).catch(error => console.log("error dbUpdateNote", error)) 
 }
 
@@ -2273,7 +2284,7 @@ export async function dbReadPendingDownloadsByManhwa(db: SQLite.SQLiteDatabase):
 }
 
 
-export async function dbReadCompletedDownloadsByManhwa(db: SQLite.SQLiteDatabase, manhwa_id: number): Promise<DownloadRecord[]> {
+export async function dbReadCompletedDownloadsByManhwa(db: SQLite.SQLiteDatabase, manhwa_id: number): Promise<Chapter[]> {
   const r = await db.getAllAsync<DownloadRecord>(
     `
       SELECT 
@@ -2287,6 +2298,34 @@ export async function dbReadCompletedDownloadsByManhwa(db: SQLite.SQLiteDatabase
     `,
     [manhwa_id]
   ).catch(error => console.log("error dbReadCompletedDownloadsByManhwa", error))
+  return r ? r.map((chapter, index) => {
+    return {...chapter, chapter_num: index, created_at: ''}
+  }) : []
+}
 
+
+export async function dbReadChapterImages(db: SQLite.SQLiteDatabase, chapter_id: number): Promise<ChapterImage[]> {
+  const r = await db.getAllAsync<ChapterImage>(
+    `
+      SELECT 
+        path as image_url, width, height
+      FROM 
+        images
+      WHERE 
+        chapter_id = ?
+      ORDER BY 
+        img_index ASC;
+    `,
+    [chapter_id]
+  ).catch(error => console.log("error dbReadChapterImages", error))
   return r ? r : []
+}
+
+
+
+export async function dbCountCompletedDownloads(db: SQLite.SQLiteDatabase): Promise<number> {
+  const r = await db.getFirstAsync<{total: number}>(
+    `SELECT count(*) as total FROM downloads WHERE status = ${DownloadStatus.Completed};`
+  )
+  return r ? r.total : 0
 }

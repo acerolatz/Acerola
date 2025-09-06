@@ -6,7 +6,7 @@ import { Animated, Pressable, StyleSheet } from 'react-native'
 
 
 interface RotatingButtonProps {
-    iconName?: string
+    iconName?: keyof typeof Ionicons.glyphMap
     iconSize?: number
     iconColor?: string
     duration?: number

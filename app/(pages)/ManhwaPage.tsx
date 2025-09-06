@@ -32,7 +32,7 @@ import React, {
   useCallback 
 } from 'react';
 import { 
-  dbGetManhwaAltNames, 
+  dbReadManhwaAltNames, 
   dbGetUserUUID, 
   dbReadManhwaById, 
   dbReadManhwaRating, 
@@ -81,9 +81,9 @@ const ManhwaPage = () => {
   const [loading, setLoading] = useState(false);
   const [manhwa, setManhwa] = useState<Manhwa | null>(null);
   const [altNames, setAltNames] = useState<string[]>([]);
+  const [ratingEnabled, setRatingEnabled] = useState(true)
   const chapters = useChapterState((s) => s.chapters)
   const setChapters = useChapterState((s) => s.setChapters);
-  const [ratingEnabled, setRatingEnabled] = useState(true)
   
   const isCancelled = useRef(false);
   const userId = useRef<string | null>(null)
@@ -113,7 +113,7 @@ const ManhwaPage = () => {
         dbUpdateManhwaViews(db, manhwa_id),
         dbReadManhwaById(db, manhwa_id),
         dbReadManhwaRating(db, manhwa_id),
-        dbGetManhwaAltNames(db, manhwa_id)
+        dbReadManhwaAltNames(db, manhwa_id)
       ])
 
       if (!m) {

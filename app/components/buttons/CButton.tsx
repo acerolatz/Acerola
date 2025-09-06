@@ -6,7 +6,7 @@ import { ActivityIndicator, Pressable, View, ViewStyle } from 'react-native'
 
 interface CButtonProps {
     style?: ViewStyle
-    iconName: string
+    iconName: keyof typeof Ionicons.glyphMap
     iconSize?: number
     iconColor: string
     onPress: () => any

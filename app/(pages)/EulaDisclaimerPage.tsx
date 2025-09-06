@@ -8,7 +8,6 @@ import { useTextState } from '@/hooks/appTextState'
 import Footer from '@/app/components/util/Footer'
 import { AppStyle } from '@/styles/AppStyle'
 import TopBar from '@/app/components/TopBar'
-import { wp } from '@/helpers/util'
 import { 
     Animated, 
     SafeAreaView, 

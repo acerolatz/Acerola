@@ -3,15 +3,17 @@ import {
   dbDeleteNotCompletedDownloads,
   dbReadDownload,
   dbReadNotCompletedDownloads,
-  dbUpdateDownloadStatus 
+  dbUpdateDownloadStatus, 
+  dbUpsertBatch
 } from "@/lib/database";
 import { 
   DownloadRequest, 
   DownloadRecord,  
   DownloadStatus,
-  DownloadProgress
+  DownloadProgress,
+  ChapterImage
 } from "./types";
-import { spFetchChapterImagesUrls } from "@/lib/supabase";
+import { spFetchChapterImages } from "@/lib/supabase";
 import Toast from "react-native-toast-message";
 import { EventEmitter } from "eventemitter3";
 import { SQLiteDatabase } from "expo-sqlite";
@@ -103,7 +105,7 @@ class DownloadManager {
   }
 
   private async downloadChapter(db: SQLiteDatabase, record: DownloadRecord) {
-    const images: string[] = await spFetchChapterImagesUrls(record.chapter_id);
+    const images: ChapterImage[] = await spFetchChapterImages(record.chapter_id);
     await dbUpdateDownloadStatus(db, record.chapter_id, DownloadStatus.Downloading);
     
     this.emitter.emit("progress", this.queue);
@@ -118,13 +120,30 @@ class DownloadManager {
         return false
       }      
     );
-    
-    await dbUpdateDownloadStatus(
-      db, 
-      record.chapter_id, 
-      this.isCancelled ? DownloadStatus.Cancelled : DownloadStatus.Completed
-    );
 
+    const success = await dbUpsertBatch(
+      db,
+      images.flatMap((img: ChapterImage, index: number) => {return [
+        record.chapter_id, 
+        img.image_url, 
+        img.width, 
+        img.height, 
+        index
+      ]}),
+      'images',
+      'chapter_id, path, width, height, img_index',
+      `ON CONFLICT 
+        (path)
+      DO UPDATE SET
+        chapter_id = EXCLUDED.chapter_id,
+        width = EXCLUDED.width,
+        height = EXCLUDED.height,
+        img_index = EXCLUDED.img_index
+      `
+    )
+
+    const status = this.isCancelled || this.isPaused ? DownloadStatus.Cancelled : success ? DownloadStatus.Completed : DownloadStatus.Failed
+    await dbUpdateDownloadStatus(db, record.chapter_id, status);
     this.resetDownloadProgress();
   }
   
@@ -135,11 +154,14 @@ class DownloadManager {
 
   async resumeDownloads(db: SQLiteDatabase) {
     this.isPaused = false;
+    this.queue = []
     const requests: DownloadRequest[] = await dbReadNotCompletedDownloads(db)
     await asyncPool<DownloadRequest, void>(
       8, 
       requests, 
-      async (request: DownloadRequest) => { await this.addToQueue(db, request, false, true) }
+      async (request: DownloadRequest) => { 
+        await this.addToQueue(db, request, false, true)
+      }
     )
   }
   
@@ -150,6 +172,7 @@ class DownloadManager {
     this.resetDownloadProgress();
     await dbDeleteNotCompletedDownloads(db);
     this.isCancelled = false;
+    this.queue = [];
     this.emitter.emit("queueUpdate", this.queue);
   }
 
